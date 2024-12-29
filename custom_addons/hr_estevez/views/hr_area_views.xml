@@ -1,0 +1,68 @@
+<odoo>
+    <data>
+
+        <record id="action_hr_area" model="ir.actions.act_window">
+            <field name="name">Áreas</field>
+            <field name="res_model">hr.area</field>
+            <field name="view_mode">kanban,list,form</field>
+        </record>
+
+        <record id="view_hr_area_form" model="ir.ui.view">
+            <field name="name">hr.area.form</field>
+            <field name="model">hr.area</field>
+            <field name="arch" type="xml">
+                <form string="Area">
+                    <sheet>
+                        <group>
+                            <field name="name"/>
+                            <field name="department_id"/>
+                            <field name="company_id" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="employee_ids"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="view_hr_area_list" model="ir.ui.view">
+            <field name="name">hr.area.list</field>
+            <field name="model">hr.area</field>
+            <field name="arch" type="xml">
+                <list string="Areas">
+                    <field name="name"/>
+                    <field name="department_id"/>
+                    <field name="company_id" readonly="1"/>
+                </list>
+            </field>
+        </record>
+
+        <record id="view_hr_area_kanban" model="ir.ui.view">
+        <field name="name">hr.area.kanban</field>
+        <field name="model">hr.area</field>
+        <field name="arch" type="xml">
+            <kanban>
+                <field name="name"/>
+                <field name="company_id"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_global_click">
+                            <strong><field name="name"/></strong>
+                            <div>
+                                <span class="fw-bold">Empresa: </span>
+                                <field name="company_id"/>
+                            </div>
+                            <div>
+                                <span class="fw-bold">Departamento: </span>
+                                <field name="department_id"/>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    </data>
+</odoo>

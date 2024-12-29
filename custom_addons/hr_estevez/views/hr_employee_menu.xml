@@ -1,0 +1,18 @@
+<odoo>
+
+    <data>
+
+        <menuitem id="menu_hr_direction" 
+                  name="Direcciones" 
+                  parent="hr.menu_hr_root" 
+                  sequence="9" 
+                  action="action_hr_direction"/>
+
+        <menuitem id="menu_hr_area" 
+                  name="Áreas" 
+                  parent="hr.menu_hr_root" 
+                  sequence="11" 
+                  action="action_hr_area"/>
+    </data>
+    
+</odoo>

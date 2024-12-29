@@ -1,0 +1,74 @@
+<odoo>
+    <data>
+        <record id="action_hr_direction" model="ir.actions.act_window">
+            <field name="name">Direcciones</field>
+            <field name="res_model">hr.direction</field>
+            <field name="view_mode">kanban,list,form</field>
+        </record>
+
+
+        <record id="view_hr_direction_form" model="ir.ui.view">
+            <field name="name">hr.direction.form</field>
+            <field name="model">hr.direction</field>
+            <field name="arch" type="xml">
+                <form string="Direction">
+                    <sheet>
+                        <group>
+                            <field name="name"/>
+                            <field name="director_id"/>
+                            <field name="parent_id"/>
+                            <field name="company_id"/>
+                        </group>
+                        <notebook>
+                            <page string="Departamentos">
+                                <field name="department_ids">
+                                    <list string="Departamentos">
+                                        <field name="name"/>
+                                    </list>
+                                </field>
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="view_hr_direction_list" model="ir.ui.view">
+            <field name="name">hr.direction.list</field>
+            <field name="model">hr.direction</field>
+            <field name="arch" type="xml">
+                <list string="Directions">
+                    <field name="name"/>
+                    <field name="director_id"/>
+                    <field name="parent_id"/>
+                    <field name="company_id"/>
+                </list>
+            </field>
+        </record>
+
+        <record id="view_hr_direction_kanban" model="ir.ui.view">
+            <field name="name">hr.direction.kanban</field>
+            <field name="model">hr.direction</field>
+            <field name="arch" type="xml">
+                <kanban>
+                    <field name="name"/>
+                    <field name="director_id"/>
+                    <field name="company_id"/>
+                    <templates>
+                        <t t-name="kanban-box">
+                            <div class="oe_kanban_global_click">
+                                <strong><field name="name"/></strong>
+                                <div><field name="director_id"/></div>
+                                <div>
+                                    <span class="fw-bold">Empresa: </span>
+                                    <field name="company_id"/>
+                                </div>
+                            </div>
+                        </t>
+                    </templates>
+                </kanban>
+            </field>
+        </record>
+
+    </data>
+</odoo>
