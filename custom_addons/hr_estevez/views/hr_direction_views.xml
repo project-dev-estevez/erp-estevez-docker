@@ -15,8 +15,8 @@
                     <sheet>
                         <group>
                             <field name="name"/>
-                            <field name="director_id"/>
-                            <field name="parent_id"/>
+                            <field name="director_id" options="{'no_create': True}"/>
+                            <field name="parent_id" options="{'no_create': True}"/>
                             <field name="company_id"/>
                         </group>
                         <notebook>
