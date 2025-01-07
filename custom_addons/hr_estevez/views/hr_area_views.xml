@@ -39,30 +39,30 @@
         </record>
 
         <record id="view_hr_area_kanban" model="ir.ui.view">
-        <field name="name">hr.area.kanban</field>
-        <field name="model">hr.area</field>
-        <field name="arch" type="xml">
-            <kanban>
-                <field name="name"/>
-                <field name="company_id"/>
-                <templates>
-                    <t t-name="kanban-box">
-                        <div class="oe_kanban_global_click">
-                            <strong><field name="name"/></strong>
-                            <div>
-                                <span class="fw-bold">Empresa: </span>
-                                <field name="company_id"/>
+            <field name="name">hr.area.kanban</field>
+            <field name="model">hr.area</field>
+            <field name="arch" type="xml">
+                <kanban>
+                    <field name="name"/>
+                    <field name="company_id"/>
+                    <templates>
+                        <t t-name="kanban-box">
+                            <div class="oe_kanban_global_click">
+                                <strong><field name="name"/></strong>
+                                <div>
+                                    <span class="fw-bold">Empresa: </span>
+                                    <field name="company_id"/>
+                                </div>
+                                <div>
+                                    <span class="fw-bold">Departamento: </span>
+                                    <field name="department_id"/>
+                                </div>
                             </div>
-                            <div>
-                                <span class="fw-bold">Departamento: </span>
-                                <field name="department_id"/>
-                            </div>
-                        </div>
-                    </t>
-                </templates>
-            </kanban>
-        </field>
-    </record>
+                        </t>
+                    </templates>
+                </kanban>
+            </field>
+        </record>
 
     </data>
 </odoo>

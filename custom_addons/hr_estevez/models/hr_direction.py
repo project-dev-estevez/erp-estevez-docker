@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from odoo import models, fields
+from odoo import models, fields, api
 
 class HrDirection(models.Model):
     _name = 'hr.direction'
@@ -12,3 +12,9 @@ class HrDirection(models.Model):
     child_ids = fields.One2many('hr.direction', 'parent_id', string='Direcciones Hijas')
     company_id = fields.Many2one('res.company', string='Empresa', ondelete='set null')
     department_ids = fields.One2many('hr.department', 'direction_id', string='Departamentos')
+    total_departments = fields.Integer(string='Total Departamentos', compute='_compute_total_departments')
+
+    @api.depends('department_ids')
+    def _compute_total_departments(self):
+        for direction in self:
+            direction.total_departments = len(direction.department_ids)

@@ -55,13 +55,21 @@
                     <field name="director_id"/>
                     <field name="company_id"/>
                     <templates>
-                        <t t-name="kanban-box">
-                            <div class="oe_kanban_global_click">
-                                <strong><field name="name"/></strong>
-                                <div><field name="director_id"/></div>
-                                <div>
-                                    <span class="fw-bold">Empresa: </span>
-                                    <field name="company_id"/>
+                        <t t-name="card">
+                            <a type="open">
+                                <field name="name" class="fw-bold fs-4 d-bolck ms-2"/>
+                            </a>
+                            <field name="director_id" widget="many2one_avatar_employee" options="{'display_avatar_name': True}" readonly="1" class="text-muted ms-2"/>
+                            <div class="small mt-1 ms-2" groups="base.group_multi_company">
+                                <i class="fa fa-building-o" role="img" aria-label="Company" title="Company"/>
+                                <field name="company_id" class="ms-1"/>
+                            </div>
+                            <div class="row g-0 mt-3 mb-2 ms-2">
+                                <div class="col-6">
+                                    <button class="btn btn-primary">
+                                        <field name="total_departments"/>
+                                        Departamentos
+                                    </button>
                                 </div>
                             </div>
                         </t>
