@@ -8,6 +8,7 @@ class HrArea(models.Model):
     company_id = fields.Many2one('res.company', string='Empresa', ondelete='set null', readonly=True)
     department_id = fields.Many2one('hr.department', string='Departamento')
     employee_ids = fields.One2many('hr.employee', 'area_id', string='Empleados')
+    coordinator_id = fields.Many2one('hr.employee', string='Coordinador')
 
     @api.onchange('department_id')
     def _onchange_department_id(self):

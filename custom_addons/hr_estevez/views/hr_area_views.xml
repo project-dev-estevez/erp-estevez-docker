@@ -15,6 +15,7 @@
                     <sheet>
                         <group>
                             <field name="name"/>
+                            <field name="coordinator_id"/>
                             <field name="department_id"/>
                             <field name="company_id" readonly="1"/>
                         </group>
@@ -45,18 +46,16 @@
                 <kanban>
                     <field name="name"/>
                     <field name="company_id"/>
+                    <field name="coordinator_id"/>
                     <templates>
-                        <t t-name="kanban-box">
-                            <div class="oe_kanban_global_click">
-                                <strong><field name="name"/></strong>
-                                <div>
-                                    <span class="fw-bold">Empresa: </span>
-                                    <field name="company_id"/>
-                                </div>
-                                <div>
-                                    <span class="fw-bold">Departamento: </span>
-                                    <field name="department_id"/>
-                                </div>
+                        <t t-name="card">
+                            <a type="open">
+                                <field name="name" class="fw-bold fs-4 d-bolck ms-2"/>
+                            </a>
+                            <field name="coordinator_id" widget="many2one_avatar_employee" options="{'display_avatar_name': True}" readonly="1" class="text-muted ms-2"/>
+                            <div class="small mt-1 ms-2" groups="base.group_multi_company">
+                                <i class="fa fa-building-o" role="img" aria-label="Company" title="Company"/>
+                                <field name="company_id" class="ms-1"/>
                             </div>
                         </t>
                     </templates>
