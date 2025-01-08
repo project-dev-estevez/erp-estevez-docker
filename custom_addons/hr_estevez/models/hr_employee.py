@@ -34,7 +34,7 @@ class HrEmployee(models.Model):
     nss = fields.Char(string='NSS')
     voter_key = fields.Char(string='Clave Elector')
     license_number = fields.Char(string='Número de Licencia')
-    infonavit = fields.Char(string='Infonavit')
+    infonavit = fields.Boolean(string='Infonavit', default=False)
     private_colonia = fields.Char(string="Colonia")
     fiscal_zip = fields.Char(string="Fiscal ZIP")
 
