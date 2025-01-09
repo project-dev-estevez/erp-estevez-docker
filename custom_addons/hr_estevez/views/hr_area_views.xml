@@ -30,7 +30,7 @@
         <record id="view_hr_area_list" model="ir.ui.view">
             <field name="name">hr.area.list</field>
             <field name="model">hr.area</field>
-            <field name="arch" type="xml">
+            <field name="arch" type="xml">    
                 <list string="Areas">
                     <field name="name"/>
                     <field name="department_id"/>
@@ -56,6 +56,14 @@
                             <div class="small mt-1 ms-2" groups="base.group_multi_company">
                                 <i class="fa fa-building-o" role="img" aria-label="Company" title="Company"/>
                                 <field name="company_id" class="ms-1"/>
+                            </div>
+                            <div class="row g-0 mt-3 mb-2 ms-2">
+                                <div class="col-6">
+                                    <button class=" btn btn-primary">
+                                        <field name="total_employees"/>
+                                        Empleados
+                                    </button>
+                                </div>
                             </div>
                         </t>
                     </templates>
