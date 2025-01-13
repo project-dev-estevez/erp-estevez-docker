@@ -26,7 +26,7 @@
                     <group>
                         <field name="company_id" string="Compañia" readonly="1" invisible="not direction_id"/>
                         <field name="direction_id" options="{'no_create': True}"/>
-                        <field name="department_id" domain="[('direction_id', '=', direction_id)]" invisible="not direction_id"/>
+                        <field name="department_id" domain="[('direction_id', '=', direction_id)]" invisible="not direction_id" options="{'no_create': True}"/>
                         <field name="area_id" domain="[('department_id', '=', department_id)]" invisible="not department_id"/>
                         <field name="job_id"/>
                         <field name="parent_id" string="Jefe Inmediato"/>
