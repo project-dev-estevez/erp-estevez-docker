@@ -18,7 +18,7 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['hr'],
+    'depends': ['hr', 'hr_contract'],
 
     # always loaded
     'data': [
@@ -28,6 +28,7 @@
         'views/hr_area_views.xml',
         'views/hr_employee_menu.xml',
         'views/hr_employee_views.xml',
+        'views/hr_contract_views.xml',
     ],
     # only loaded in demonstration mode
     'demo': [
