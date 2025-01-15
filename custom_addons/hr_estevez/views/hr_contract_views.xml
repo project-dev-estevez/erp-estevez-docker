@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_hr_contract_form_inherit" model="ir.ui.view">
+        <field name="name">hr.contract.form.inherit</field>
+        <field name="model">hr.contract</field>
+        <field name="inherit_id" ref="hr_contract.hr_contract_view_form"/>
+        <field name="arch" type="xml">
+            <!-- Columna de la izquierda -->
+            <xpath expr="//group/group[@name='top_info_left']" position="replace">
+                <group>
+                    <field name="active" invisible="1"/>
+                    <field name="company_id" options="{'no_create': True}"/>
+                    <field name="employee_id" widget="many2one_avatar_employee" options="{'no_create': True}"/>
+                    <field name="active_employee" invisible="1"/>
+                    <!-- Fecha de ingreso a la empresa -->
+                    <field name="date_of_entry"/>
+                    <field name="date_start" string="Fecha Inicio de Contrato"/>
+                    <field name="date_end" string="Fecha Fin de Contrato"/>
+                    <field name="days_to_expiry"/>
+                    <field name="bank"/>
+                    <field name="bank_account"/>
+                    <field name="clabe"/>
+                </group>
+            </xpath>
+
+            <!-- Columna de la derecha -->
+            <xpath expr="//group/group[@name='top_info_right']" position="replace">
+                <group>
+                    <field name="work_location" readonly="1"/>
+                    <field name="structure_type_id" groups="!hr_contract.group_hr_contract_manager" domain="['|', ('country_id', '=', False), ('country_id', '=', company_country_id)]" options="{'no_open': True, 'no_create': True}"/>
+                    <field name="structure_type_id" groups="hr_contract.group_hr_contract_manager" domain="['|', ('country_id', '=', False), ('country_id', '=', company_country_id)]"/>
+                    <field name="work_direction" readonly="1"/>
+                    <field name="department_id" groups="!hr_contract.group_hr_contract_manager" options="{'no_open': True, 'no_create': True}" readonly="1"/>
+                    <field name="department_id" groups="hr_contract.group_hr_contract_manager" readonly="1"/>
+                    <field name="work_area" readonly="1"/>
+                    <field name="job_id" groups="!hr_contract.group_hr_contract_manager" options="{'no_open': True, 'no_create': True}" readonly="1"/>
+                    <field name="job_id" groups="hr_contract.group_hr_contract_manager" readonly="1"/>
+                    <field name="contract_type_id" groups="!hr_contract.group_hr_contract_manager" options="{'no_open': True, 'no_create': True}"/>
+                    <field name="contract_type_id" groups="hr_contract.group_hr_contract_manager"/>
+                    <field name="hr_responsible_id" widget="many2one_avatar_user" invisible="1"/>
+                </group>
+            </xpath>
+
+        </field>
+    </record>
+</odoo>
