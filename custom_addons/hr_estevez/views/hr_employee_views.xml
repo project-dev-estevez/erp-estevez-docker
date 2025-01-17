@@ -183,6 +183,12 @@
                     </page>
                 </xpath>
 
+                <!-- Nueva página de Documentos -->
+                <xpath expr="//notebook/page[@name='personal_information']" position="after">
+                    <page name="documents" string="Documentos">
+                    </page>
+                </xpath>
+
 
 
 

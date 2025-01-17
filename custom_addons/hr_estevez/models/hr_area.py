@@ -35,3 +35,6 @@ class HrArea(models.Model):
     def _compute_total_employees(self):
         for area in self:
             area.total_employees = len(area.employee_ids)
+            
+            
+            
