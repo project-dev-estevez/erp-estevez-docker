@@ -189,6 +189,41 @@
                     </page>
                 </xpath>
 
+                <!-- Nueva página de Incapacidades -->
+                <xpath expr="//notebook/page[@name='documents']" position="after">
+                    <page name="disabilities" string="Incapacidades">
+                    </page>
+                </xpath>
+
+                <!-- Nueva página de Actas Administrativas -->
+                <xpath expr="//notebook/page[@name='disabilities']" position="after">
+                    <page name="memorandum" string="Actas Administrativas">
+                    </page>
+                </xpath>
+
+                <!-- Nueva página de Vacaciones y permisos -->
+                <xpath expr="//notebook/page[@name='memorandum']" position="after">
+                    <page name="vacations and permits" string="Vacaciones y Permisos">
+                    </page>
+                </xpath>
+
+                <!-- Nueva página de Asignaciones -->
+                <xpath expr="//notebook/page[@name='vacations and permits']" position="after">
+                    <page name="assignments" string="Asignaciones">
+                    </page>
+                </xpath>
+
+                <!-- Nueva página de Incidencias -->
+                <xpath expr="//notebook/page[@name='assignments']" position="after">
+                    <page name="incidents" string="Incidencias">
+                    </page>
+                </xpath>
+
+                <!-- Nueva página de Cursos -->
+                <xpath expr="//notebook/page[@name='incidents']" position="after">
+                    <page name="courses" string="Cursos">
+                    </page>
+                </xpath>
 
 
 
