@@ -17,6 +17,7 @@
                             <field name="name"/>
                             <field name="coordinator_id"/>
                             <field name="department_id"/>
+                            <field name="direction_id"/>
                             <field name="company_id" readonly="1"/>
                         </group>
                         <group>
@@ -35,6 +36,7 @@
                     <field name="name"/>
                     <field name="department_id"/>
                     <field name="company_id" readonly="1"/>
+                    <field name="direction_id"/>
                 </list>
             </field>
         </record>
