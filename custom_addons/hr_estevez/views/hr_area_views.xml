@@ -16,7 +16,8 @@
                         <group>
                             <field name="name"/>
                             <field name="coordinator_id"/>
-                            <field name="department_id" options="{'no_create': True}"/>
+                            <field name="department_id" options="{'no_create': True}"/>                            
+                            <field name="direction_id"/>
                             <field name="company_id" readonly="1"/>
                         </group>
                         <group>
@@ -35,6 +36,7 @@
                     <field name="name"/>
                     <field name="department_id"/>
                     <field name="company_id" readonly="1"/>
+                    <field name="direction_id"/>
                 </list>
             </field>
         </record>
@@ -59,7 +61,7 @@
                             </div>
                             <div class="row g-0 mt-3 mb-2 ms-2">
                                 <div class="col-6">
-                                    <button class=" btn btn-primary">
+                                    <button type="button" class=" btn btn-primary" name="total_employees_button">
                                         <field name="total_employees"/>
                                         Empleados
                                     </button>
@@ -73,3 +75,5 @@
 
     </data>
 </odoo>
+
+

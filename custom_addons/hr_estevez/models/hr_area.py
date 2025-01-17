@@ -9,6 +9,7 @@ class HrArea(models.Model):
     department_id = fields.Many2one('hr.department', string='Departamento')
     employee_ids = fields.One2many('hr.employee', 'area_id', string='Empleados')
     coordinator_id = fields.Many2one('hr.employee', string='Coordinador')
+    direction_id = fields.Many2one('hr.direction', string='Dirección')
     total_employees = fields.Integer(string='Total Empleados', compute='_compute_total_employees')
 
     @api.onchange('department_id')
@@ -34,3 +35,6 @@ class HrArea(models.Model):
     def _compute_total_employees(self):
         for area in self:
             area.total_employees = len(area.employee_ids)
+            
+            
+            
