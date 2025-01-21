@@ -86,11 +86,11 @@
                         <group>
                             <group>
                                 <div class="text-primary font-weight-bold fs-3">
-                                    Contacto Privado
+                                    Contacto Personal
                                 </div>
                                 <br/>
                                 <div class="font-weight-bold">
-                                    Dirección Privada
+                                    Dirección Personal
                                 </div>
                                 <br/>
                                 <div class="o_address_format">
@@ -127,7 +127,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <field name="private_email" placeholder="e.g. myprivateemail@example.com"/>
+                                <field name="private_email"/>
                                 <field name="private_phone"/>
                                 <field name="gender"/>
                                 <field name="birthday"/>
