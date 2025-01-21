@@ -41,6 +41,16 @@
                 </group>
             </xpath>
 
+            <!-- Nuevas páginas -->
+            <xpath expr="//notebook/page[@name='other']" position="after">
+                <page name="documents" string="Contrato">
+                    <!-- Aquí puedes agregar los campos y contenido de la nueva página -->
+                    <group>
+                        <!-- Agrega más campos según sea necesario -->
+                    </group>
+                </page>
+            </xpath>
+
         </field>
     </record>
 </odoo>

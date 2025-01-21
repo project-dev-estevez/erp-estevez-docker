@@ -30,7 +30,6 @@
         'views/hr_employee_views.xml',
         'views/hr_contract_views.xml',
     ],
-    'pre_init_hook': 'migrate',
     # only loaded in demonstration mode
     'demo': [
         'demo/demo.xml',
