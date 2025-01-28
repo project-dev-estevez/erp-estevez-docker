@@ -9,8 +9,12 @@
             <field name="inherit_id" ref="hr.view_hr_job_form"/>
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='name']" position="after">
-                    <label for="area_id"/>
-                    <field name="area_id"/>
+                    <group>
+                        <field name="area_id"/>
+                        <field name="department_id"/>
+                        <field name="direction_id"/>
+                        <field name="company_id"/>
+                    </group>
                 </xpath>
             </field>
         </record>

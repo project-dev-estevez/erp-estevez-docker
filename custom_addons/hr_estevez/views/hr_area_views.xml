@@ -18,7 +18,7 @@
                             <field name="coordinator_id"/>
                             <field name="department_id" options="{'no_create': True}"/>                            
                             <field name="direction_id"/>
-                            <field name="company_id" readonly="1"/>
+                            <field name="company_id"/>
                         </group>
                         <group>
                             <field name="employee_ids"/>

@@ -28,8 +28,8 @@
                         <field name="direction_id" options="{'no_create': True}"/>
                         <field name="department_id" domain="[('direction_id', '=', direction_id)]" invisible="not direction_id" options="{'no_create': True}"/>
                         <field name="area_id" domain="[('department_id', '=', department_id)]" invisible="not department_id" options="{'no_create': True}"/>
-                        <field name="job_id"/>
-                        <field name="parent_id" string="Jefe Inmediato"/>
+                        <field name="job_id" domain="[('area_id', '=', area_id)]" invisible="not area_id" options="{'no_create': True}"/>
+                        <field name="parent_id" domain="[('department_id', '=', department_id)]" string="Jefe Inmediato" options="{'no_create': True}"/>
                     </group>
                 </xpath>
 
