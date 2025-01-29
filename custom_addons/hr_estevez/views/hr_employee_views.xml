@@ -1,11 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <data>
+    <data> 
+
+        <!-- Heredar la vista de búsqueda de empleados -->
+        <record id="view_employee_search_inherit" model="ir.ui.view">
+            <field name="name">hr.employee.search.inherit</field>
+            <field name="model">hr.employee</field>
+            <field name="inherit_id" ref="hr.view_employee_filter"/> <!-- Asegúrate de que esta referencia sea correcta -->
+            <field name="arch" type="xml">
+                <!-- Modificar el filtro "Archived" -->
+                <filter name="inactive" position="attributes">
+                    <attribute name="string">Bajas</attribute>
+                </filter>
+            </field>
+        </record>
+ 
         <record id="view_employee_form_inherit" model="ir.ui.view">
             <field name="name">hr.employee.form.inherit</field>
             <field name="model">hr.employee</field>
             <field name="inherit_id" ref="hr.view_employee_form"/>
             <field name="arch" type="xml">
+            
+            <xpath expr="//header" position="inside">
+                <button name="action_archive_employee" 
+                    string="Dar de baja" 
+                    type="object" 
+                    class="oe_highlight"
+                    invisible="not active"/>  <!-- Solo visible si active=True -->
+            </xpath>
+            <xpath expr="//header" position="inside">
+                <button name="action_reactivate_employee"
+                    string="Dar de alta"
+                    type="object"
+                    class="oe_highlight"
+                    invisible="active"/>  <!-- Solo visible si active=False -->
+            </xpath>
 
                 <!-- Nombres, Apellidos, # empleado, Proyecto y Etiquetas -->
                 <xpath expr="//group/group[field[@name='work_email']]" position="replace">
@@ -86,11 +115,11 @@
                         <group>
                             <group>
                                 <div class="text-primary font-weight-bold fs-3">
-                                    Contacto Personal
+                                    Contacto Privado
                                 </div>
                                 <br/>
                                 <div class="font-weight-bold">
-                                    Dirección Personal
+                                    Dirección Privada
                                 </div>
                                 <br/>
                                 <div class="o_address_format">
@@ -127,7 +156,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <field name="private_email"/>
+                                <field name="private_email" placeholder="e.g. myprivateemail@example.com"/>
                                 <field name="private_phone"/>
                                 <field name="gender"/>
                                 <field name="birthday"/>

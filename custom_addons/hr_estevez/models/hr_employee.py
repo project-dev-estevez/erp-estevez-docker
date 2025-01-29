@@ -4,10 +4,20 @@ from datetime import date
 class HrEmployee(models.Model):
     _inherit = 'hr.employee'
 
+      # Método para archivar (dar de baja)
+    def action_archive_employee(self):
+        for employee in self:
+            employee.write({'active': False})
+
+    # Método para reactivar
+    def action_reactivate_employee(self):
+        for employee in self:
+            employee.write({'active': True})
+
     # Primera Columna en la Vista de Empleados
-    names = fields.Char(string='Nombres', required=True)
-    last_name = fields.Char(string='Apellido Paterno', required=True)
-    mother_last_name = fields.Char(string='Apellido Materno', required=True)
+    names = fields.Char(string='Nombres')
+    last_name = fields.Char(string='Apellido Paterno')
+    mother_last_name = fields.Char(string='Apellido Materno')
     employee_number = fields.Char(string='Número de Empleado')
     project = fields.Char(string='Proyecto')
 
