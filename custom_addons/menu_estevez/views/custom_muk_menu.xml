@@ -1,41 +1,41 @@
 <odoo>
 
     <!-- 1. Operaciones -->
-    <menuitem id="menu_operations_root" name="Operaciones" sequence="11" web_icon="menu_estevez,static/img/1.operaciones-icon.png" action="hr.open_view_employee_list_my" groups="base.group_system"/>
+    <!-- <menuitem id="menu_operations_root" name="Operaciones" sequence="11" web_icon="menu_estevez,static/img/1.operaciones-icon.png" action="hr.open_view_employee_list_my" groups="base.group_system"/> -->
 
     <!-- 2. Obra Civil -->
-    <menuitem id="menu_civil_root" name="Obra Civil" sequence="12" web_icon="menu_estevez,static/img/2.obra-civil-icon.png" action="hr.open_view_employee_list_my" groups="base.group_system"/>
+    <!-- <menuitem id="menu_civil_root" name="Obra Civil" sequence="12" web_icon="menu_estevez,static/img/2.obra-civil-icon.png" action="hr.open_view_employee_list_my" groups="base.group_system"/> -->
 
     <!-- 3. Ingeniería -->
-    <menuitem id="menu_engineering_root" name="Ingeniería" sequence="13" web_icon="menu_estevez,static/img/3.ingenieria-icon.png" action="hr.open_view_employee_list_my" groups="base.group_system"/>
+    <!-- <menuitem id="menu_engineering_root" name="Ingeniería" sequence="13" web_icon="menu_estevez,static/img/3.ingenieria-icon.png" action="hr.open_view_employee_list_my" groups="base.group_system"/> -->
 
     <!-- 4. PMO -->
-    <menuitem id="menu_pmo_root" name="PMO" sequence="14" web_icon="menu_estevez,static/img/4.pmo-icon.png" action="hr.open_view_employee_list_my" groups="base.group_system"/>
+    <!-- <menuitem id="menu_pmo_root" name="PMO" sequence="14" web_icon="menu_estevez,static/img/4.pmo-icon.png" action="hr.open_view_employee_list_my" groups="base.group_system"/> -->
 
     <!-- 5. Administración Obra -->
-    <menuitem id="menu_admin_obra_root" name="Administración Obra" sequence="15" web_icon="menu_estevez,static/img/5.administracion-obra-icon.png" action="hr.open_view_employee_list_my" groups="base.group_system"/>
+    <!-- <menuitem id="menu_admin_obra_root" name="Administración Obra" sequence="15" web_icon="menu_estevez,static/img/5.administracion-obra-icon.png" action="hr.open_view_employee_list_my" groups="base.group_system"/> -->
 
     <!-- 6. Almacen -->
-    <menuitem id="menu_almacen_root" name="Almacen" sequence="16" web_icon="menu_estevez,static/img/6.almacen-icon.png" action="hr.open_view_employee_list_my" groups="base.group_system"/>
+    <!-- <menuitem id="menu_almacen_root" name="Almacen" sequence="16" web_icon="menu_estevez,static/img/6.almacen-icon.png" action="hr.open_view_employee_list_my" groups="base.group_system"/> -->
 
     <!-- 7. Adquisiciones -->
-    <menuitem id="menu_adquisiciones_root" name="Adquisiciones" sequence="17" web_icon="menu_estevez,static/img/7.adquisiciones-icon.png" action="hr.open_view_employee_list_my" groups="base.group_system"/>
+    <!-- <menuitem id="menu_adquisiciones_root" name="Adquisiciones" sequence="17" web_icon="menu_estevez,static/img/7.adquisiciones-icon.png" action="hr.open_view_employee_list_my" groups="base.group_system"/> -->
 
     <!-- 8. Control Vehicular -->
-    <menuitem id="menu_control_vehicular_root" name="Control Vehicular" sequence="18" web_icon="menu_estevez,static/img/8.control-vehicular-icon.png" action="hr.open_view_employee_list_my" groups="base.group_system"/>
+    <!-- <menuitem id="menu_control_vehicular_root" name="Control Vehicular" sequence="18" web_icon="menu_estevez,static/img/8.control-vehicular-icon.png" action="hr.open_view_employee_list_my" groups="base.group_system"/> -->
 
     <!-- 9. TI -->
-    <menuitem id="menu_ti_root" name="TI" sequence="19" web_icon="menu_estevez,static/img/9.ti-icon.png" action="hr.open_view_employee_list_my" groups="base.group_system"/>
+    <!-- <menuitem id="menu_ti_root" name="TI" sequence="19" web_icon="menu_estevez,static/img/9.ti-icon.png" action="hr.open_view_employee_list_my" groups="base.group_system"/> -->
 
     <!-- 10. Laboratorio -->
-    <menuitem id="menu_laboratorio_root" name="Laboratorio" sequence="20" web_icon="menu_estevez,static/img/10.laboratorio-icon.png" action="hr.open_view_employee_list_my" groups="base.group_system"/>
+    <!-- <menuitem id="menu_laboratorio_root" name="Laboratorio" sequence="20" web_icon="menu_estevez,static/img/10.laboratorio-icon.png" action="hr.open_view_employee_list_my" groups="base.group_system"/> -->
 
     <!-- 11. Talento Humano -->
     <menuitem id="menu_talento_humano_root" name="Talento Humano" sequence="21" web_icon="menu_estevez,static/img/11.talento-humano-icon.png" action="hr.open_view_employee_list_my"/>
 
     <!-- 12. Contabilidad -->
-    <menuitem id="menu_contabilidad_root" name="Contabilidad" sequence="22" web_icon="menu_estevez,static/img/12.contabilidad-icon.png" action="hr.open_view_employee_list_my" groups="base.group_system"/>
+    <!-- <menuitem id="menu_contabilidad_root" name="Contabilidad" sequence="22" web_icon="menu_estevez,static/img/12.contabilidad-icon.png" action="hr.open_view_employee_list_my" groups="base.group_system"/> -->
 
     <!-- 13. Juridica -->
-    <menuitem id="menu_juridica_root" name="Juridica" sequence="23" web_icon="menu_estevez,static/img/13.juridica-icon.png" action="hr.open_view_employee_list_my" groups="base.group_system"/>
+    <!-- <menuitem id="menu_juridica_root" name="Juridica" sequence="23" web_icon="menu_estevez,static/img/13.juridica-icon.png" action="hr.open_view_employee_list_my" groups="base.group_system"/> -->
 </odoo>
