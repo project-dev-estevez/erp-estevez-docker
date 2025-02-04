@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_calendar,access_calendar,calendar.model_calendar_event,roles_permissions_estevez.group_custom_user_permissions,1,1,1,1
+access_pending_activities,access_pending_activities,project.model_project_task,roles_permissions_estevez.group_custom_user_permissions,1,1,1,1
+access_user_profile,access_user_profile,base.model_res_users,roles_permissions_estevez.group_custom_user_permissions,1,1,1,1
+access_website,access_website,website.model_website,roles_permissions_estevez.group_custom_user_permissions,1,1,1,1

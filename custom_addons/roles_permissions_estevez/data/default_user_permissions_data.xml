@@ -1,0 +1,6 @@
+<odoo>
+    <record id="group_basic_permissions" model="res.groups">
+        <field name="name">Basic Permissions</field>
+        <field name="category_id" ref="base.module_category_user_type"/>
+    </record>
+</odoo>
