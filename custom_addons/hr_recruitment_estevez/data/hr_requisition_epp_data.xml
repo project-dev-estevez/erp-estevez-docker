@@ -1,0 +1,20 @@
+<odoo>
+    <record id="epp_casco" model="hr.requisition.epp">
+        <field name="name">Casco</field>
+    </record>
+    <record id="epp_guantes" model="hr.requisition.epp">
+        <field name="name">Guantes</field>
+    </record>
+    <record id="epp_botas" model="hr.requisition.epp">
+        <field name="name">Botas</field>
+    </record>
+    <record id="epp_barbiquejo" model="hr.requisition.epp">
+        <field name="name">Barbiquejo</field>
+    </record>
+    <record id="epp_lentes" model="hr.requisition.epp">
+        <field name="name">Lentes</field>
+    </record>
+    <record id="epp_otro" model="hr.requisition.epp">
+        <field name="name">Otro</field>
+    </record>
+</odoo>

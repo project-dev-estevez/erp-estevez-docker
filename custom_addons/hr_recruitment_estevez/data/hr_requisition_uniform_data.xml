@@ -1,0 +1,8 @@
+<odoo>
+    <record id="uniform_camisola" model="hr.requisition.uniform">
+        <field name="name">Camisola</field>
+    </record>
+    <record id="uniform_chaleco_seguridad" model="hr.requisition.uniform">
+        <field name="name">Chaleco de Seguridad</field>
+    </record>
+</odoo>

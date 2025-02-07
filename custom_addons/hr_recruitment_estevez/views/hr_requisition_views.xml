@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    
+    <!-- Vista de lista para requisiciones -->
+    <record id="view_hr_requisition_list" model="ir.ui.view">
+        <field name="name">hr.requisition.list</field>
+        <field name="model">hr.requisition</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="create_date" string="Fecha y Hora de Creación"/>
+                <field name="job_id"/>
+                <field name="department_id"/>
+                <field name="requestor_id"/>
+                <field name="establishment"/>
+                <field name="requisition_type"/>
+                <field name="state"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Vista de formulario para requisiciones -->
+    <record id="view_hr_requisition_form" model="ir.ui.view">
+        <field name="name">hr.requisition.form</field>
+        <field name="model">hr.requisition</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="requisition_number" readonly="1"/>
+                            <field name="requestor_id"/>
+                            <field name="establishment"/>
+                        </group>
+                        <group>
+                            <field name="direction_id"/>
+                            <field name="department_id"/>
+                            <field name="job_id"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Especificaciones">
+                            <group>
+                                <group>
+                                    <field name="requisition_type"/>
+                                    <field name="employee_id" invisible="1"/>
+                                    <field name="vacancy_reason"/>
+                                    <field name="other_reason_description" invisible="1"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="Datos del Puesto">
+                            <group>
+                                <group>
+                                    <field name="job_type"/>
+                                    <field name="workstation_direction_id"/>
+                                    <field name="workstation_department_id"/>
+                                    <field name="workstation_job_id"/>
+                                </group>
+                                <group>
+                                    <field name="project"/>
+                                    <field name="number_of_vacancies"/>
+                                    <field name="work_schedule"/>
+                                </group>
+                            </group>
+                            <group>
+                                <group>
+                                    <field name="gender"/>
+                                    <field name="age_range"/>
+                                    <field name="years_of_experience"/>
+                                    <field name="general_functions"/>
+                                    <field name="academic_degree_id"/>
+                                    <field name="software_to_use"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="Equipo Requerido">
+                            <group>
+                                <field name="computer_equipment_required"/>
+                                <field name="cellular_equipment_required"/>
+                                <field name="uniform_ids" widget="many2many_tags"/>
+                                <field name="epp_ids" widget="many2many_tags"/>
+                                <field name="other_epp_description" invisible="1"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <footer>
+                    <button string="Enviar para Aprobación" type="object" name="action_submit_for_approval" class="btn-primary" invisible="1"/>
+                    <button string="Aprobar" type="object" name="action_approve" class="btn-success" invisible="1"/>
+                    <button string="Rechazar" type="object" name="action_reject" class="btn-danger" invisible="1"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- Acción para abrir requisiciones -->
+    <record id="action_hr_requisition" model="ir.actions.act_window">
+        <field name="name">Requisiciones</field>
+        <field name="res_model">hr.requisition</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <!-- Menú de requisiciones -->
+    <menuitem id="menu_hr_requisition_root" name="Requisición de Personal" sequence="1"/>
+    <menuitem id="menu_hr_requisition" name="Requisición de Personal" parent="hr_recruitment.menu_hr_recruitment_root" action="action_hr_requisition" sequence="1"/>
+</odoo>
