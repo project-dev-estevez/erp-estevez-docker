@@ -15,8 +15,9 @@
         'views/hr_applicant_view_form_inherit.xml',
         "data/hr_requisition_uniform_data.xml",
         "data/hr_requisition_epp_data.xml",
-        "views/hr_requisition_views.xml",
+        "views/hr_requisition_views.xml"
     ],
     "installable": True,
     "application": False,
+    "i18n": ["i18n/es_MX.po", "i18n/es_CO.po"],
 }
