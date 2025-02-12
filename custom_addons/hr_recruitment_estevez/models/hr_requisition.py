@@ -6,24 +6,18 @@ class HrRequisition(models.Model):
     _description = 'Requisición de Personal'
 
     state = fields.Selection([
-        ('draft', 'Borrador'),
         ('to_approve', 'Para Aprobar'),
         ('approved', 'Aprobado'),
         ('rejected', 'Rechazado'),
-    ], string="Estado", default='draft')
+    ], string="Estado", default='to_approve')
 
-    # Información del solicitante
     requisition_number = fields.Char(string='Formato de Solicitud', readonly=True, default='DA-F0-TH-006')
+    # Información del solicitante
     requestor_id = fields.Many2one('res.users', string="Solicitante", default=lambda self: self.env.user, required=True, readonly=True)
-    establishment = fields.Selection([
-        ('estevez_jor', 'Estevez.Jor'),
-        ('kuali_digital', 'Kuali Digital'),
-        ('fundidora', 'Fundidora'),
-        ('vigiliner', 'Vigiliner'),
-    ], string="Establecimiento", required=True)
-    direction_id = fields.Many2one('hr.direction', string="Dirección", required=True)
-    department_id = fields.Many2one('hr.department', string="Departamento", domain="[('direction_id', '=', direction_id)]", required=True)
-    job_id = fields.Many2one('hr.job', string="Puesto Solicitado", domain="[('department_id', '=', department_id)]", required=True)
+    company_id = fields.Many2one('res.company', string="Empresa", related='requestor_id.company_id', readonly=True, store=False)
+    direction_id = fields.Many2one('hr.direction', string="Dirección", related='requestor_id.employee_id.direction_id', readonly=True, store=False)
+    department_id = fields.Many2one('hr.department', string="Departamento", related='requestor_id.employee_id.department_id', readonly=True, store=False)
+    job_id = fields.Many2one('hr.job', string="Puesto Solicitante", related='requestor_id.employee_id.job_id', readonly=True, store=False)
 
     # Especificaciones de la requisición
     requisition_type = fields.Selection([
@@ -46,12 +40,12 @@ class HrRequisition(models.Model):
     
     # Información del puesto
     job_type = fields.Selection([
-        ('administrative', 'Administrative'),
-        ('operational', 'Operational'),
+        ('administrative', 'Administrativo'),
+        ('operational', 'Operativo'),
     ], string="Tipo de Puesto", required=True)
     workstation_direction_id = fields.Many2one('hr.direction', string="Dirección del Puesto", required=True)
     workstation_department_id = fields.Many2one('hr.department', string="Departamento del Puesto", domain="[('direction_id', '=', workstation_direction_id)]", required=True)
-    workstation_job_id = fields.Many2one('hr.job', string="Puesto a Cubrir", domain="[('department_id', '=', workstation_department_id)]", required=True)
+    workstation_job_id = fields.Many2one('hr.job', string="Puesto Solicitado", domain="[('department_id', '=', workstation_department_id)]", required=True)
     project = fields.Char(string="ID de Proyecto")
     number_of_vacancies = fields.Integer(string="Número de Vacantes", default=1)
     work_schedule = fields.Many2one('resource.calendar', string="Horario de Jornada Laboral", required=True)
@@ -60,18 +54,22 @@ class HrRequisition(models.Model):
         ('female', 'Femenino'),
         ('other', 'Otro'),
     ], string="Género")
-    age_range = fields.Char(string="Rango de Edad", required=True)
+    age_range_min = fields.Integer(string="Edad Mínima", required=True, default=18)
+    age_range_max = fields.Integer(string="Edad Máxima", required=True, default=100)
     years_of_experience = fields.Integer(string="Años de Experiencia", required=True)
     general_functions = fields.Text(string="Funciones Generales del Puesto")
-    academic_degree_id = fields.Many2one('hr.recruitment.degree', string="Grado Académico", required=True)
-    software_to_use = fields.Char(string="Software a Utilizar", required=True)
+    academic_degree_id = fields.Many2one('hr.recruitment.degree', string="Escolaridad o Grado Académico", required=True)
+    software_ids = fields.Many2many('hr.requisition.software', string="Software que se utilizará por el empleado")
 
     # Equipo requerido
     computer_equipment_required = fields.Boolean(string="¿Requiere Equipo de Cómputo?", default=False)
     cellular_equipment_required = fields.Boolean(string="¿Requiere Equipo Celular?", default=False)
     uniform_ids = fields.Many2many('hr.requisition.uniform', string="Uniformes")
-    epp_ids = fields.Many2many('hr.requisition.epp', string="EPP")
-    other_epp_description = fields.Text(string="Descripción de Otro EPP")
+    epp_ids = fields.Many2many('hr.requisition.epp', string="Equipo de Protección Personal")
+
+    _sql_constraints = [
+        ('check_years_of_experience', 'CHECK(years_of_experience >= 0)', 'Los años de experiencia no pueden ser un número negativo.')
+    ]
 
     # Acciones de estado
     def action_submit_for_approval(self):
@@ -82,6 +80,16 @@ class HrRequisition(models.Model):
 
     def action_reject(self):
         self.state = 'rejected'
+
+    @api.constrains('age_range_min', 'age_range_max')
+    def _check_age_range(self):
+        for record in self:
+            if record.age_range_min < 18:
+                raise ValidationError("La edad mínima debe ser al menos 18 años.")
+            if record.age_range_max > 100:
+                raise ValidationError("La edad máxima debe ser como máximo 100 años.")
+            if record.age_range_min > record.age_range_max:
+                raise ValidationError("La edad mínima no puede ser mayor que la edad máxima.")
 
     # Si es para un reemplazo se debe de seleccionar el empleado a reemplazar
     @api.constrains('requisition_type', 'employee_id')
@@ -96,12 +104,3 @@ class HrRequisition(models.Model):
         for record in self:
             if record.vacancy_reason == 'other' and not record.other_reason_description:
                 raise ValidationError("Debe especificar la descripción del otro motivo cuando el motivo de la vacante es 'Otro'.")
-
-    # Si se selecciona "Otro" en EPP, se debe habilitar el campo de descripción
-    @api.onchange('epp_ids')
-    def _onchange_epp_ids(self):
-        other_epp = self.env.ref('hr_recruitment_estevez.epp_otro', raise_if_not_found=False)
-        if other_epp and other_epp in self.epp_ids:
-            self.other_epp_description = True
-        else:
-            self.other_epp_description = False
