@@ -1,9 +1,0 @@
-msgid ""
-msgstr ""
-"Content-Type: text/plain; charset=UTF-8\n"
-"Language: es_MX\n"
-
-#. module: hr_recruitment_estevez
-#: model:ir.ui.menu,menu_hr_candidate
-msgid "Candidates"
-msgstr "Candidatos"

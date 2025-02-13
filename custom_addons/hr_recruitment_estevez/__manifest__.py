@@ -13,11 +13,11 @@
     "data": [
         "security/ir.model.access.csv",
         'views/hr_applicant_view_form_inherit.xml',
+        "views/hr_requisition_views.xml",
         "data/hr_requisition_uniform_data.xml",
         "data/hr_requisition_epp_data.xml",
-        "views/hr_requisition_views.xml"
     ],
     "installable": True,
     "application": False,
-    "i18n": ["i18n/es_MX.po", "i18n/es_CO.po"],
+    "i18n": ["i18n/es_419.po", "i18n/es.po"],
 }
