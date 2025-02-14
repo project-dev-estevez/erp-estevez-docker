@@ -1,0 +1,47 @@
+<odoo>
+    <!-- Eliminar opciones existentes -->
+    <delete model="res.partner.industry" search="[]"/>
+    <!-- Nuevas opciones -->
+    <record id="industry_1" model="res.partner.industry">
+        <field name="name">Construcción</field>        
+    </record>
+    <record id="industry_2" model="res.partner.industry">
+        <field name="name">Materiales eléctricos</field>
+    </record>
+    <record id="industry_3" model="res.partner.industry">
+        <field name="name">Fibra óptica y telecomunicaciones</field>
+    </record>
+    <record id="industry_4" model="res.partner.industry">
+        <field name="name">Ingeniería civil</field>
+    </record>
+    <record id="industry_5" model="res.partner.industry">
+        <field name="name">Proveedores de maquinaria pesada</field>
+    </record>
+    <record id="industry_6" model="res.partner.industry">
+        <field name="name">Servicios de mantenimiento industrial</field>
+    </record>
+    <record id="industry_7" model="res.partner.industry">
+        <field name="name">Consultoría en infraestructura</field>
+    </record>
+    <record id="industry_8" model="res.partner.industry">
+        <field name="name">Tecnología y software</field>
+    </record>
+    <record id="industry_9" model="res.partner.industry">
+        <field name="name">Logística y transporte</field>
+    </record>
+    <record id="industry_10" model="res.partner.industry">
+        <field name="name">Seguridad industrial</field>
+    </record>
+    <record id="industry_11" model="res.partner.industry">
+        <field name="name">Energías renovables</field>
+    </record>
+    <record id="industry_12" model="res.partner.industry">
+        <field name="name">Automatización y control</field>
+    </record>
+    <record id="industry_13" model="res.partner.industry">
+        <field name="name">Proveedores de materiales de oficina</field>
+    </record>
+    <record id="industry_14" model="res.partner.industry">
+        <field name="name">Farmacéutica</field>
+    </record>
+</odoo>
