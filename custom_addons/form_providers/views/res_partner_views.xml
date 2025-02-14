@@ -1,0 +1,97 @@
+<odoo>
+    <record id="view_partner_form_custom" model="ir.ui.view">
+        <field name="name">res.partner.form.custom</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <!-- Agregar el campo "nuevo_campo" debajo de "vat" -->
+            <xpath expr="//field[@name='vat']" position="after">
+                <field name="nuevo_campo" string="Nombre comercial" required="1"/>                
+            </xpath>                        
+            <xpath expr="//field[@name='nuevo_campo']" position="after">
+                <field name="industry_id" required="1"/>
+            </xpath>            
+            <xpath expr="//group[@name='misc']//field[@name='industry_id']" position="replace"/>
+
+             
+        </field>
+    </record>
+
+    <record id="view_res_partner_form_inherit" model="ir.ui.view">
+        <field name="name">res.partner.form.inherit</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+        
+            <!-- Cambiar el nombre del campo "Teléfono" a "Celular" -->
+            <field name="phone" position="attributes" required="1">
+                <attribute name="string">Celular</attribute>
+            </field>
+            <!-- Cambiar el nombre del campo "Celular" a "Celular dos" -->
+            <field name="mobile" position="attributes">
+                <attribute name="string">Celular Extra</attribute>
+            </field>
+            <field name="email" position="attributes">
+                <attribute name="required">True</attribute>
+            </field>
+            <field name="street" position="attributes">
+                <attribute name="required">True</attribute>
+            </field>
+            <field name="street2" position="attributes">
+                <attribute name="required">True</attribute>
+            </field>
+            <field name="city" position="attributes">
+                <attribute name="required">True</attribute>
+            </field>
+            <field name="state_id" position="attributes">
+                <attribute name="required">True</attribute>
+            </field>
+            <field name="zip" position="attributes">
+                <attribute name="required">True</attribute>
+            </field>
+            <field name="country_id" position="attributes">
+                <attribute name="required">True</attribute>
+            </field>
+            <!-- Eliminar el campo "Idioma" -->
+            <field name="lang" position="replace"/>
+            <!-- Eliminar el campo "Título" -->
+            <field name="title" position="replace"/>
+            <!-- Eliminar el campo "Puesto de trabajo" -->
+            <field name="function" position="replace"/>  
+
+            <!-- Eliminar el placeholder del campo "Sitio web" -->
+            <field name="name" position="attributes">
+                <attribute name="placeholder"/>
+            </field>
+            <field name="website" position="attributes">
+                <attribute name="placeholder"/>
+            </field>
+
+            <!-- Eliminar el placeholder del campo "Etiquetas" -->
+            <field name="category_id" position="attributes">
+                <attribute name="placeholder"/>
+            </field>
+
+            <!-- Ocultar la pestaña "Contacts & Addresses" -->
+            <xpath expr="//page[@name='contact_addresses']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+
+             <xpath expr="//group[@name='sale']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+
+            <xpath expr="//group[@name='misc']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+
+<!--xpath expr="//div[@name='button_box']/button[@name='394']" position="after">
+                    <button name="action_open_whatsapp" class="oe_stat_button" icon="fa-whatsapp" type="object" string="WhatsApp"/>
+                </xpath-->
+
+            <field name="lang" position="replace"/>             
+                     
+        </field>
+    </record>
+    
+</odoo>
