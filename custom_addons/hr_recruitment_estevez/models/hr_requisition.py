@@ -1,14 +1,19 @@
+import logging
 from odoo import models, fields, api
 from odoo.exceptions import ValidationError
+
+_logger = logging.getLogger(__name__)
 
 class HrRequisition(models.Model):
     _name = 'hr.requisition'
     _description = 'Requisición de Personal'
+    _inherit = ['mail.thread']
 
     state = fields.Selection([
-        ('to_approve', 'Para Aprobar'),
-        ('approved', 'Aprobado'),
+        ('to_approve', 'Por Aprobar'),
+        ('first_approval', 'En Curso'),
         ('rejected', 'Rechazado'),
+        ('approved', 'Aprobado'),
     ], string="Estado", default='to_approve')
 
     requisition_number = fields.Char(string='Formato de Solicitud', readonly=True, default='DA-F0-TH-006')
@@ -72,14 +77,107 @@ class HrRequisition(models.Model):
     ]
 
     # Acciones de estado
-    def action_submit_for_approval(self):
-        self.state = 'to_approve'
-
     def action_approve(self):
-        self.state = 'approved'
+        self.state = 'first_approval'
+        
+        if not self.direction_id:
+            _logger.warning("No direction ID found for the requisition")
+            return
+
+        _logger.info("Direction ID found: %s", self.direction_id.id)
+        if not self.direction_id.director_id:
+            _logger.warning("No director ID found for direction ID: %s", self.direction_id.id)
+            return
+
+        _logger.info("Director ID found: %s", self.direction_id.director_id.id)
+        director_user = self.direction_id.director_id.user_id
+        if not director_user:
+            _logger.warning("No director user found for director ID: %s", self.direction_id.director_id.id)
+            return
+
+        _logger.info("Director user found: %s", director_user.id)
+        if not director_user.employee_id or not director_user.employee_id.parent_id:
+            _logger.warning("No immediate supervisor found for director user ID: %s", director_user.id)
+            return
+
+        immediate_supervisor_user = director_user.employee_id.parent_id.user_id
+        if not immediate_supervisor_user:
+            _logger.warning("No user found for immediate supervisor of director user ID: %s", director_user.id)
+            return
+
+        _logger.info("Immediate supervisor user found: %s", immediate_supervisor_user.id)
+        message = "La requisición de personal ha sido aprobada por %s." % self.requestor_id.name
+        subject = "Requisición Aprobada: %s" % self.requisition_number
+        message_id = self.message_post(
+            body=message,
+            subject=subject,
+            partner_ids=[immediate_supervisor_user.partner_id.id],
+            message_type='notification',
+            subtype_xmlid='mail.mt_comment',
+        )
+        _logger.info("Notification sent to immediate supervisor user: %s", immediate_supervisor_user.partner_id.id)
+        _logger.info("Message ID: %s", message_id)
+
+    def action_confirm_approve(self):
+        if self.state == 'first_approval':
+            self.state = 'approved'
+            
+            if not self.direction_id:
+                _logger.warning("No direction ID found for the requisition")
+                return
+
+            _logger.info("Direction ID found: %s", self.direction_id.id)
+            if not self.direction_id.director_id:
+                _logger.warning("No director ID found for direction ID: %s", self.direction_id.id)
+                return
+
+            _logger.info("Director ID found: %s", self.direction_id.director_id.id)
+            director_user = self.direction_id.director_id.user_id
+            if not director_user:
+                _logger.warning("No director user found for director ID: %s", self.direction_id.director_id.id)
+                return
+
+            _logger.info("Director user found: %s", director_user.id)
+            message = "La requisición de personal ha sido aprobada por %s." % self.requestor_id.name
+            subject = "Requisición Aprobada: %s" % self.requisition_number
+            partner_ids = [director_user.partner_id.id, self.requestor_id.partner_id.id]
+            message_id = self.message_post(
+                body=message,
+                subject=subject,
+                partner_ids=partner_ids,
+                message_type='notification',
+                subtype_xmlid='mail.mt_comment',
+            )
+            _logger.info("Notification sent to director user: %s and requestor user: %s", director_user.partner_id.id, self.requestor_id.partner_id.id)
+            _logger.info("Message ID: %s", message_id)
 
     def action_reject(self):
         self.state = 'rejected'
+        partner_ids = [self.requestor_id.partner_id.id]
+        
+        if self.state == 'first_approval' and self.direction_id and self.direction_id.director_id:
+            director_user = self.direction_id.director_id.user_id
+            if director_user and director_user.partner_id:
+                partner_ids.append(director_user.partner_id.id)
+        
+        if not partner_ids:
+            _logger.warning("No partner IDs found for notification")
+            return
+
+        message = "Su solicitud de requisición de personal ha sido rechazada."
+        subject = "Requisición Rechazada: %s" % self.requisition_number
+        message_id = self.message_post(
+            body=message,
+            subject=subject,
+            partner_ids=partner_ids,
+            message_type='notification',
+            subtype_xmlid='mail.mt_comment',
+        )
+        if message_id:
+            _logger.info("Notification sent to partner IDs: %s", partner_ids)
+            _logger.info("Message ID: %s", message_id)
+        else:
+            _logger.warning("Failed to send notification to partner IDs: %s", partner_ids)
 
     @api.constrains('age_range_min', 'age_range_max')
     def _check_age_range(self):
@@ -104,3 +202,39 @@ class HrRequisition(models.Model):
         for record in self:
             if record.vacancy_reason == 'other' and not record.other_reason_description:
                 raise ValidationError("Debe especificar la descripción del otro motivo cuando el motivo de la vacante es 'Otro'.")
+
+    @api.model
+    def create(self, vals):
+        _logger.info("Creating a new hr.requisition record with values: %s", vals)
+        record = super(HrRequisition, self).create(vals)
+        _logger.info("New hr.requisition record created with ID: %s", record.id)
+
+        if not record.direction_id:
+            _logger.warning("No direction ID found for the requisition")
+            return record
+
+        _logger.info("Direction ID found: %s", record.direction_id.id)
+        if not record.direction_id.director_id:
+            _logger.warning("No director ID found for direction ID: %s", record.direction_id.id)
+            return record
+
+        _logger.info("Director ID found: %s", record.direction_id.director_id.id)
+        director_user = record.direction_id.director_id.user_id
+        if not director_user:
+            _logger.warning("No director user found for director ID: %s", record.direction_id.director_id.id)
+            return record
+
+        _logger.info("Director user found: %s", director_user.id)
+        message = "Se ha creado una nueva requisición de personal por el usuario %s." % record.requestor_id.name
+        subject = "Nueva Requisición: %s" % record.requisition_number
+        message_id = record.message_post(
+            body=message,
+            subject = subject,
+            partner_ids=[director_user.partner_id.id],
+            message_type='notification',
+            subtype_xmlid='mail.mt_comment',
+        )
+        _logger.info("Notification sent to director user: %s", director_user.partner_id.id)
+        _logger.info("Message ID: %s", message_id)
+
+        return record

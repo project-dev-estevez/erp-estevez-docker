@@ -13,7 +13,12 @@
                 <field name="requestor_id"/>
                 <field name="company_id"/>
                 <field name="requisition_type"/>
-                <field name="state" widget="statusbar"/>
+                <field name="state" 
+                       widget="badge" 
+                       decoration-muted="state == 'to_approve'" 
+                       decoration-primary="state == 'first_approval'" 
+                       decoration-success="state == 'approved'" 
+                       decoration-danger="state == 'rejected'"/>
             </list>
         </field>
     </record>
@@ -24,6 +29,17 @@
         <field name="model">hr.requisition</field>
         <field name="arch" type="xml">
             <form>
+                <header>
+                    <button name="action_approve" string="Aprobar" type="object" class="btn-primary" invisible="state in ('rejected', 'first_approval', 'second_approval', 'approved') or requestor_id == uid"/>
+                    <button name="action_confirm_approve" string="Confirmar Aprobación" type="object" class="btn-primary" invisible="state in ('to_approve', 'rejected', 'approved') or requestor_id == uid"/>
+                    <button name="action_reject" string="Rechazar" type="object" invisible="state in ('rejected', 'approved') or requestor_id == uid"/>
+                    <field name="state" 
+                           widget="statusbar" 
+                           decoration-muted="state == 'to_approve'" 
+                           decoration-primary="state == 'first_approval'" 
+                           decoration-success="state == 'second_approval'" 
+                           decoration-danger="state == 'rejected'"/>
+                </header>
                 <sheet>
                     <h1>Requisición de Personal</h1>
                     <separator string="Datos del Solicitante"/>
@@ -98,11 +114,6 @@
                         </page>
                     </notebook>
                 </sheet>
-                <footer>
-                    <button string="Enviar para Aprobación" type="object" name="action_submit_for_approval" class="btn-primary"/>
-                    <button string="Aprobar" type="object" name="action_approve" class="btn-success" invisible="1"/>
-                    <button string="Rechazar" type="object" name="action_reject" class="btn-danger" invisible="1"/>
-                </footer>
             </form>
         </field>
     </record>
