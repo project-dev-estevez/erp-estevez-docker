@@ -61,16 +61,17 @@ class ProductTemplate(models.Model):
         help="Selecciona una unidad de medida para este producto.",
         domain="[('active', '=', True)]"  # Solo unidades activas
     )
-    type = fields.Selection(
-        selection=[
-            ('consu', 'Consumibles'),
-            ('service', 'Servicios'),
-            ('product', 'Hola')
-        ],
-        default='consu',
-        string="Tipo de Producto",
-        required=True
-    )
+    
+    #type = fields.Selection(
+    #    selection=[
+    #        ('consu', 'Consumibles'),
+    #        ('service', 'Servicios'),
+    #        ('product', 'Hola')
+    #    ],
+    #    default='consu',
+    #    string="Tipo de Producto",
+    #    required=True
+    #)
 
     # Restricción para asegurar que el código sea único
     _sql_constraints = [
