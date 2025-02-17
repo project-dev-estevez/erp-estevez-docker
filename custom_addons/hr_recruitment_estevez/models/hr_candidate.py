@@ -5,13 +5,24 @@ import re
 
 _logger = logging.getLogger(__name__)
 
-class HrApplicant(models.Model):
-    _inherit = 'hr.applicant'
+class HrCandidate(models.Model):
+    _inherit = 'hr.candidate'
 
     def _format_phone_number(self, phone_number):
         if phone_number and not phone_number.startswith('+52'):
             phone_number = '+52 ' + re.sub(r'(\d{3})(\d{3})(\d{4})', r'\1 \2 \3', phone_number)
         return phone_number
+
+    @api.model
+    def create(self, vals):
+        if 'partner_phone' in vals and vals['partner_phone']:
+            vals['partner_phone'] = self._format_phone_number(vals['partner_phone'])
+        return super(HrCandidate, self).create(vals)
+
+    def write(self, vals):
+        if 'partner_phone' in vals and vals['partner_phone']:
+            vals['partner_phone'] = self._format_phone_number(vals['partner_phone'])
+        return super(HrCandidate, self).write(vals)
 
     @api.onchange('partner_phone')
     def _onchange_partner_phone(self):
@@ -19,10 +30,10 @@ class HrApplicant(models.Model):
             self.partner_phone = self._format_phone_number(self.partner_phone)
 
     def action_open_whatsapp(self):
-        for applicant in self:
-            if applicant.partner_phone:
+        for candidate in self:
+            if candidate.partner_phone:
                 # Eliminar caracteres no numéricos
-                phone = re.sub(r'\D', '', applicant.partner_phone)
+                phone = re.sub(r'\D', '', candidate.partner_phone)
                 # Verificar si el número ya tiene un código de país
                 if not phone.startswith('52'):
                     phone = '52' + phone
@@ -35,4 +46,4 @@ class HrApplicant(models.Model):
                     'target': 'new',
                 }
             else:
-                raise UserError("The applicant does not have a phone number.")
+                raise UserError("The candidate does not have a phone number.")

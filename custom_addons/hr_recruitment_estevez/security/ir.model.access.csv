@@ -2,4 +2,5 @@ id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_hr_requisition_user,access_hr_requisition_user,model_hr_requisition,base.group_user,1,1,1,1
 access_hr_requisition_uniform_user,access_hr_requisition_uniform_user,model_hr_requisition_uniform,base.group_user,1,1,1,1
 access_hr_requisition_epp_user,access_hr_requisition_epp_user,model_hr_requisition_epp,base.group_user,1,1,1,1
+access_hr_candidate_user,access_hr_candidate_user,model_hr_applicant,base.group_user,1,1,1,1
 access_hr_requisition_software_user,access_hr_requisition_software_user,model_hr_requisition_software,base.group_user,1,1,1,1
