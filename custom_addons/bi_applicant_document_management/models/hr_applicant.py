@@ -16,7 +16,7 @@ class HrApplicant(models.Model):
 
     def action_open_documents(self):
         return {
-            'name': _('Applicant Documents'),
+            'name': _('Documentos del solicitante'),
             'view_type': 'form',
             'view_mode': 'kanban,list,form',
             'res_model': 'ir.attachment',
