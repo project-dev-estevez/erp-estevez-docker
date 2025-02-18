@@ -28,8 +28,7 @@ class HrRequisition(models.Model):
     requisition_type = fields.Selection([
         ('new_creation', 'Puesto de nueva creación'),
         ('replacement', 'Reposición de personal'),
-        ('new_vacancy', 'Nueva vacante'),
-        ('other', 'Otro'),
+        ('new_vacancy', 'Nueva vacante')
     ], string="Tipo de Requisición", required=True)
     employee_id = fields.Many2one('hr.employee', string="Empleado a Reemplazar")
     vacancy_reason = fields.Selection([
@@ -52,15 +51,15 @@ class HrRequisition(models.Model):
     workstation_department_id = fields.Many2one('hr.department', string="Departamento del Puesto", domain="[('direction_id', '=', workstation_direction_id)]", required=True)
     workstation_job_id = fields.Many2one('hr.job', string="Puesto Solicitado", domain="[('department_id', '=', workstation_department_id)]", required=True)
     project = fields.Char(string="ID de Proyecto")
-    number_of_vacancies = fields.Integer(string="Número de Vacantes", default=1)
+    number_of_vacancies = fields.Integer(string="Número de Vacantes")
     work_schedule = fields.Many2one('resource.calendar', string="Horario de Jornada Laboral", required=True)
     gender = fields.Selection([
         ('male', 'Masculino'),
         ('female', 'Femenino'),
         ('other', 'Otro'),
     ], string="Género")
-    age_range_min = fields.Integer(string="Edad Mínima", required=True, default=18)
-    age_range_max = fields.Integer(string="Edad Máxima", required=True, default=100)
+    age_range_min = fields.Integer(string="Edad Mínima", required=True)
+    age_range_max = fields.Integer(string="Edad Máxima", required=True)
     years_of_experience = fields.Integer(string="Años de Experiencia", required=True)
     general_functions = fields.Text(string="Funciones Generales del Puesto")
     academic_degree_id = fields.Many2one('hr.recruitment.degree', string="Escolaridad o Grado Académico", required=True)
@@ -238,3 +237,10 @@ class HrRequisition(models.Model):
         _logger.info("Message ID: %s", message_id)
 
         return record
+    
+    def action_save(self):
+        # Aquí puedes agregar cualquier lógica adicional antes de guardar
+        self.ensure_one()
+        self.write({'state': self.state})  # Esto guarda el registro
+        _logger.info("Requisición guardada con éxito")
+        return True
