@@ -10,7 +10,13 @@
     'version': '0.2',
     'depends': ['base', 'purchase'],  # Dependencias del módulo
     'data': [
+                
          'views/res_partner_industry_data.xml',  # Archivo de datos        
         'views/res_partner_views.xml',
     ],   
+    'assets': {
+    'web.assets_backend': [
+        'form_providers/static/src/js/confirmation_modal.js',
+    ],
+},
 }
