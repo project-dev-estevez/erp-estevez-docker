@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Acción -->
+        <record id="action_mi_menu" model="ir.actions.act_window">
+            <field name="name">Mi Acción</field>
+            <field name="res_model">purchase.order</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <!-- Menú Principal -->
+        <menuitem 
+            id="requisition" 
+            name="Requisiciones"
+            parent="purchase.menu_purchase_root"
+            sequence="3"
+        />
+
+        <!-- Submenú -->
+        <menuitem 
+            id="general_services" 
+            name="Servicios Generales"
+            parent="requisition"
+            sequence="10"  
+            action="action_purchase_services"
+        />
+
+        <!-- Submenú -->
+        <menuitem 
+            id="acquisitions" 
+            name="Adquisiciones"
+            parent="requisition"
+            sequence="20"  
+            action="action_mi_menu"
+        />
+    </data>
+</odoo>
