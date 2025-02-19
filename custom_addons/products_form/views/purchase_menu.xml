@@ -11,7 +11,7 @@
         <!-- Menú Principal -->
         <menuitem 
             id="requisition" 
-            name="Requisiciones"
+            name="Requisición de Compras"
             parent="purchase.menu_purchase_root"
             sequence="3"
         />
