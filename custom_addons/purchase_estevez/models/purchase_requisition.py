@@ -22,7 +22,47 @@ class PurchaseRequisition(models.Model):
     department_id = fields.Many2one('hr.department', string="Departamento", related='requestor_id.employee_id.department_id', readonly=True, store=False)
     job_id = fields.Many2one('hr.job', string="Puesto Solicitante", related='requestor_id.employee_id.job_id', readonly=True, store=False)
 
-    priority = fields.Char('Prioridad', required=True)
+    state_id = fields.Many2one(
+        'res.country.state',
+        string='Mercado',
+        domain="[('country_id.code', '=', 'MX')]"
+    )
+
+    project_id = fields.Char(string='Proyecto')
+    segment = fields.Char(string='Segmento')
+
+    request_type = fields.Selection([
+        ('camp', 'Campamento'),
+        ('lodging', 'Hospedaje'),
+        ('store', 'Almacén'),
+        ('machinery_equipment', 'Maquinaría y equpo'),
+        ('service_payment', 'Pago de servicio'),
+        ('freight', 'Flete'),
+    ], string='Tipo de Solicitud')
+
+
+    priority = fields.Selection([
+        ('urgent', 'Urgente'),
+        ('recurrent', 'Recurrente'),
+        ('scheduled', 'Programada'),
+    ], string='Nivel Prioridad')
+
+    activity_to_do = fields.Text(
+        string="¿Qué actividad se realizará?",
+        help="Descripción de la actividad"
+    )
+    why_is_activity_to_do = fields.Text(
+        string="¿Por qué se realizará la actividad?",
+        help="Explicación de la razón de la actividad"
+    )
+    what_is_activity_to_do = fields.Text(
+        string="¿Para que se realiza la actividad",
+        help="Explicación de la función de la actividad"
+    )
+    comments = fields.Text(
+        string="Comentarios",
+        help="Comentarios adicionales para el solicitante"
+    )
 
 
 # Acciones de estado
