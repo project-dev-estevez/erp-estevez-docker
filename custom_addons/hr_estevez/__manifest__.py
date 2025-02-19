@@ -29,12 +29,12 @@
         'views/hr_employee_menu.xml',
         'views/hr_employee_views.xml',
         'views/hr_contract_views.xml',
-        'views/hr_job_views.xml',
+        'views/hr_job_views.xml'
         #"views/hr_partner_views.xml",
     ],
     # only loaded in demonstration mode
     'demo': [
         'demo/demo.xml',
-    ],
+    ]
 }
 

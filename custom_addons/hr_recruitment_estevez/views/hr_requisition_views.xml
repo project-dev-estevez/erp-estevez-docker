@@ -19,6 +19,9 @@
                        decoration-primary="state == 'first_approval'" 
                        decoration-success="state == 'approved'" 
                        decoration-danger="state == 'rejected'"/>
+                <button name="action_approve" string="Aprobar" type="object" icon="fa-thumbs-up" invisible="state in ('rejected', 'first_approval', 'second_approval', 'approved') or requestor_id == uid"/>
+                <button name="action_confirm_approve" string="Confirmar" type="object" icon="fa-thumbs-up" invisible="state in ('to_approve', 'rejected', 'approved') or requestor_id == uid"/>
+                <button name="action_reject" string="Rechazar" type="object" icon="fa-times" invisible="state in ('rejected', 'approved') or requestor_id == uid"/>
             </list>
         </field>
     </record>
@@ -113,8 +116,28 @@
                             </group>                            
                         </page>
                     </notebook>
+                    <div class="text-center">
+                        <button name="action_save" string="Guardar" type="object" class="btn btn-primary btn-lg mt-4"/>
+                    </div>
                 </sheet>
             </form>
+        </field>
+    </record>
+
+    <!-- Vista de search para requisiciones -->
+    <record id="view_hr_requisition_search" model="ir.ui.view">
+        <field name="name">hr.requisition.search</field>
+        <field name="model">hr.requisition</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="requisition_number"/>
+                <field name="requestor_id"/>
+                <field name="company_id"/>
+                <field name="requisition_type"/>
+                <field name="state"/>
+                <separator/>
+                <filter name="filter_to_approve" string="Esperándome" domain="[('state', 'in', ['to_approve', 'first_approval'])]" />
+            </search>
         </field>
     </record>
 
@@ -123,6 +146,7 @@
         <field name="name">Requisiciones</field>
         <field name="res_model">hr.requisition</field>
         <field name="view_mode">list,form</field>
+        <field name="context">{'search_default_filter_to_approve': 1}</field>
     </record>
 
     <!-- Menú de requisiciones -->

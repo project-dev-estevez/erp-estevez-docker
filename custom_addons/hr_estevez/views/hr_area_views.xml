@@ -61,7 +61,7 @@
                             </div>
                             <div class="row g-0 mt-3 mb-2 ms-2">
                                 <div class="col-6">
-                                    <button type="button" class=" btn btn-primary" name="total_employees_button">
+                                    <button type="button" class="btn btn-primary" name="total_employees_button">
                                         <field name="total_employees"/>
                                         Empleados
                                     </button>
