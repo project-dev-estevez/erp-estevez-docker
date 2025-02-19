@@ -63,9 +63,14 @@
                     </group>
                 </xpath>
 
+                <!-- Aplicar clases a todas las páginas dentro del notebook -->
+                <xpath expr="//notebook/page" position="attributes">
+                    <attribute name="class" add="bg-primary text-white shadow mb-3"/>
+                </xpath>
+
                 <!-- Información de Trabajo -->
                 <xpath expr="//notebook/page[@name='public']" position="replace">
-                    <page name="public" string="Información de Trabajo">
+                    <page name="public" string="Información de Trabajo" class="bg-primary text-white shadow mb-3">
                         <group>
                             <div class="text-primary font-weight-bold fs-3">
                                 Ubicación
@@ -112,7 +117,7 @@
 
                 <!-- Información Personal -->
                 <xpath expr="//notebook/page[@name='personal_information']" position="replace">
-                    <page name="personal_information" string="Información Personal" groups="hr.group_hr_user">
+                    <page name="personal_information" string="Información Personal" groups="hr.group_hr_user" class="bg-primary text-white shadow mb-3">
                         <group>
                             <group>
                                 <div class="text-primary font-weight-bold fs-3">
@@ -206,7 +211,6 @@
                                 </div>
                                 <field name="marital"/>
                                 <field name="spouse_complete_name" invisible="marital not in ['married', 'cohabitant']"/>
-                                <field name="spouse_birthdate" invisible="marital not in ['married', 'cohabitant']"/>
                                 <field name="children"/>
                             </group>
                         </group>
@@ -215,126 +219,45 @@
 
                 <!-- Nueva página de Documentos -->
                 <xpath expr="//notebook/page[@name='personal_information']" position="after">
-                    <page name="documents" string="Documentos">
+                    <page name="documents" string="Documentos" class="bg-primary text-white shadow mb-3">
                     </page>
                 </xpath>
 
                 <!-- Nueva página de Incapacidades -->
                 <xpath expr="//notebook/page[@name='documents']" position="after">
-                    <page name="disabilities" string="Incapacidades">
+                    <page name="disabilities" string="Incapacidades" class="bg-primary text-white shadow mb-3">
                     </page>
                 </xpath>
 
                 <!-- Nueva página de Actas Administrativas -->
                 <xpath expr="//notebook/page[@name='disabilities']" position="after">
-                    <page name="memorandum" string="Actas Administrativas">
+                    <page name="memorandum" string="Actas Administrativas" class="bg-primary text-white shadow mb-3">
                     </page>
                 </xpath>
 
                 <!-- Nueva página de Vacaciones y permisos -->
                 <xpath expr="//notebook/page[@name='memorandum']" position="after">
-                    <page name="vacations and permits" string="Vacaciones y Permisos">
+                    <page name="vacations and permits" string="Vacaciones y Permisos" class="bg-primary text-white shadow mb-3">
                     </page>
                 </xpath>
 
                 <!-- Nueva página de Asignaciones -->
                 <xpath expr="//notebook/page[@name='vacations and permits']" position="after">
-                    <page name="assignments" string="Asignaciones">
+                    <page name="assignments" string="Asignaciones" class="bg-primary text-white shadow mb-3">
                     </page>
                 </xpath>
 
                 <!-- Nueva página de Incidencias -->
                 <xpath expr="//notebook/page[@name='assignments']" position="after">
-                    <page name="incidents" string="Incidencias">
+                    <page name="incidents" string="Incidencias" class="bg-primary text-white shadow mb-3">
                     </page>
                 </xpath>
 
                 <!-- Nueva página de Cursos -->
                 <xpath expr="//notebook/page[@name='incidents']" position="after">
-                    <page name="courses" string="Cursos">
+                    <page name="courses" string="Cursos" class="bg-primary text-white shadow mb-3">
                     </page>
                 </xpath>
-
-
-
-                
-                <!-- <field name="department_id" position="before">
-                    <field name="direction_id"/>
-                </field>
-                <field name="job_id" position="before">
-                    <field name="area_id"/>
-                </field>
-                <xpath expr="//field[@name='work_phone']" position="replace">
-                    <field name="work_phone" invisible="1"/>
-                </xpath>
-                <xpath expr="//field[@name='coach_id']" position="replace">
-                    <field name="coach_id" invisible="1"/>
-                </xpath>
-
-                <xpath expr="//field[@name='work_email']" position="before">
-                    <field name="names"/>
-                    <field name="last_name"/>
-                    <field name="mother_last_name"/>
-                    <field name="payment_type"/>
-                    <field name="rfc"/>
-                    <field name="curp"/>
-                    <field name="nss"/>
-                    <field name="voter_key"/>
-                    <field name="infonavit"/> 
-                    <field name="license_number"/>
-                </xpath>
-                <xpath expr="//field[@name='name']" position="replace">
-                    <field name="name" readonly="1"/>
-                </xpath>
-
-                <xpath expr="//div[contains(@class, 'o_address_format')]" position="replace">
-                    <div class="o_address_format">
-                        <div class="row">
-                            <div class="col">
-                                <field name="private_country_id" placeholder="País" class="o_address_country" options='{"no_open": True, "no_create": True}'/>
-                            </div>
-                        </div>
-                        <div class="row g-1">
-                            <div class="col p-1">
-                                <field name="private_street" placeholder="Calle"/>
-                            </div>
-                            <div class="col p-1">
-                                <field name="private_street2" placeholder="Número"/>
-                            </div>
-                            <div class="col p-1">
-                                <field name="private_colonia" placeholder="Colonia"/>
-                            </div>
-                        </div>
-                        <div class="row g-1">
-                            <div class="col p-1">
-                                <field name="private_state_id" placeholder="Estado" options="{'no_open': True, 'no_quick_create': True}" context="{'default_country_id': private_country_id}"/>
-                            </div>
-                            <div class="col p-1">
-                                <field name="private_city" placeholder="Municipio"/>
-                            </div>
-                        </div>
-                        <div class="row g-1">
-                            <div class="col p-1">
-                                <field name="private_zip" placeholder="C.P"/>
-                            </div>
-                            <div class="col p-1">
-                                <field name="fiscal_zip" placeholder="C.P Fiscal"/>
-                            </div>
-                        </div>
-                    </div>
-                </xpath>
-                <xpath expr="//label[@for='distance_home_work']" position="replace"/>
-                <xpath expr="//div[@name='div_km_home_work']" position="replace"/>
-                <xpath expr="//field[@name='private_car_plate']" position="replace"/>
-                <xpath expr="//field[@name='ssnid']" position="attributes">
-                    <attribute name="string">Número de seguridad social IMSS</attribute>
-                </xpath>
-                <xpath expr="//page[@name='personal_information']" position="attributes">
-                    <attribute name="string">Información Personal</attribute>
-                </xpath>
-                <xpath expr="//label[@for='private_street']" position="attributes">
-                    <attribute name="string">Dirección Personal</attribute>
-                </xpath> -->
 
             </field>
         </record>
