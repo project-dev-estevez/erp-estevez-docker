@@ -54,6 +54,14 @@ class HrEmployee(models.Model):
     name = fields.Char(string='Nombre Completo', compute='_compute_full_name', store=True, readonly=True)
     age = fields.Integer(string='Edad', compute='_compute_age')
 
+    country_id = fields.Many2one('res.country', string='País', default=lambda self: self.env.ref('base.mx').id)
+    is_mexico = fields.Boolean(string="Is Mexico", compute="_compute_is_mexico", store=False)
+
+    @api.depends('country_id')
+    def _compute_is_mexico(self):
+        for record in self:
+            record.is_mexico = record.country_id.code == 'MX'
+
     @api.depends('names', 'last_name', 'mother_last_name')
     def _compute_full_name(self):
         for record in self:

@@ -2,7 +2,7 @@
 <odoo>
     <data> 
 
-        <!-- Heredar la vista de búsqueda de empleados -->
+        <!-- Heredar la vista de búsqueda -->
         <record id="view_employee_search_inherit" model="ir.ui.view">
             <field name="name">hr.employee.search.inherit</field>
             <field name="model">hr.employee</field>
@@ -15,6 +15,7 @@
             </field>
         </record>
  
+        <!-- Heredar la vista de formulario -->
         <record id="view_employee_form_inherit" model="ir.ui.view">
             <field name="name">hr.employee.form.inherit</field>
             <field name="model">hr.employee</field>
@@ -183,15 +184,15 @@
                                 <field name="study_field"/>
                                 <field name="study_school"/>
 
-                                <div class="text-primary font-weight-bold fs-3">
+                                <div class="text-primary font-weight-bold fs-3" invisible="is_mexico">
                                     Permiso de Trabajo
                                 </div>
-                                <field name="visa_no"/>
-                                <field name="permit_no"/>
-                                <field name="visa_expire"/>
-                                <field name="work_permit_expiration_date"/>
+                                <field name="visa_no" invisible="is_mexico"/>
+                                <field name="permit_no" invisible="is_mexico"/>
+                                <field name="visa_expire" invisible="is_mexico"/>
+                                <field name="work_permit_expiration_date" invisible="is_mexico"/>
                                 <field name="work_permit_name" invisible="1"/>
-                                <field name="has_work_permit" widget="work_permit_upload" filename="work_permit_name"/>
+                                <field name="has_work_permit" widget="work_permit_upload" filename="work_permit_name" invisible="is_mexico"/>
                             </group>
                             <group>
                                 <div class="text-primary font-weight-bold fs-3">
@@ -338,6 +339,7 @@
             </field>
         </record>
 
+        <!-- Heredar la vista de lista -->
         <record id="view_employee_list_inherit" model="ir.ui.view">
             <field name="name">hr.employee.list.inherit</field>
             <field name="model">hr.employee</field>
