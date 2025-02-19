@@ -1,0 +1,14 @@
+/* Archivo: static/src/css/custom.css */
+
+/* Columna que ocupa todo el ancho */
+.ancho-completo {
+    width: 100% !important;
+    min-width: 100% !important;
+    display: block;
+}
+
+/* Columna que se mueve abajo con margen */
+.columna-debajo {
+    width: 100% !important;
+    margin-top: 15px; /* Espacio entre columnas */
+}

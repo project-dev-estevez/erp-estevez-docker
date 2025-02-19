@@ -8,7 +8,7 @@
     'website': "https://estevez-erp.ddns.net/",
     'category': 'Purchase',
     'version': '0.2',
-    'depends': ['base', 'purchase'],  # Dependencias del módulo
+    'depends': ['base', 'purchase', 'account'],  # Dependencias del módulo
     'data': [
                 
          'views/res_partner_industry_data.xml',  # Archivo de datos        
@@ -16,7 +16,7 @@
     ],   
     'assets': {
     'web.assets_backend': [
-        'form_providers/static/src/js/confirmation_modal.js',
+        'form_providers/static/src/css/custom.css',
     ],
 },
 }

@@ -15,6 +15,14 @@
                 <field name="nuevo_campo" string="Persona de contacto"/>                
             </xpath>              
             <xpath expr="//group[@name='misc']//field[@name='industry_id']" position="replace"/>                                       
+             <!-- Modificar la lista de CUENTAS BANCARIAS -->
+        <xpath expr="//field[@name='bank_ids']//field[@name='acc_number']" position="attributes">
+            <attribute name="class">ancho-completo</attribute>
+        </xpath>
+
+        <xpath expr="//field[@name='bank_ids']//field[@name='bank_id']" position="attributes">
+            <attribute name="class">columna-debajo</attribute>
+        </xpath>
                                             
         </field>
     </record>
@@ -83,15 +91,18 @@
 
             <xpath expr="//group[@name='misc']" position="attributes">
                 <attribute name="invisible">1</attribute>
-            </xpath>                               
+            </xpath>         
+                      
           <!-- Agregar el botón "Guardar" dentro del oe_button_box -->
             <xpath expr="//div[@name='button_box']" position="inside">
                 <button string="Guardar" type="object" name="action_guardar" class="btn btn-outline-primary o_form_button_create"/>
             </xpath>
-            <field name="lang" position="replace"/>             
+
+            <field name="lang" position="replace"/>    
+         
             <xpath expr="//div[@name='button_box']/button[@name='action_guardar']" position="after">
-                <button name="action_open_whatsapp" class="oe_stat_button" icon="fa-whatsapp" type="object" string="WhatsApp" invisible="not phone"/>
-            </xpath>
+        <button name="action_open_whatsapp" class="oe_stat_button" icon="fa-whatsapp" type="object" string="WhatsApp" invisible="not phone"/>
+    </xpath>
         </field>
     </record>
 </odoo>
