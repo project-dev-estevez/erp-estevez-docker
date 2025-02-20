@@ -1,6 +1,7 @@
 import logging
-from odoo import models, fields, api
+from odoo import models, fields, api, exceptions
 from odoo.exceptions import ValidationError
+from datetime import date
 
 _logger = logging.getLogger(__name__)
 
@@ -40,6 +41,15 @@ class PurchaseRequisition(models.Model):
         ('freight', 'Flete'),
     ], string='Tipo de Solicitud')
 
+    date_start = fields.Date(string="Fecha de inicio")
+    date_end = fields.Date(string="Fecha de finalización")
+    duration_days = fields.Char(
+        string="Días y noches",
+        compute="_compute_duration_days",
+        store=True,
+        help="Días calculados entre fecha inicio y fin"
+    )
+
 
     priority = fields.Selection([
         ('urgent', 'Urgente'),
@@ -64,6 +74,59 @@ class PurchaseRequisition(models.Model):
         help="Comentarios adicionales para el solicitante"
     )
 
+    #Campos de campamento
+    vehicle_count = fields.Integer(
+        string="Número de vehículos",
+        default=1,  # Valor predeterminado
+        help="Cantidad total de vehículos requeridos",
+        # Restricciones opcionales:
+        required=True,  # Obligatorio
+        positive=True,  # Solo números positivos
+    )
+
+    type_vehicle = fields.Selection([
+        ('NP-300', 'NP-300'),
+        ('RAM', 'RAM'),
+        ('utilitarian', 'Utilitario'),
+    ], string='Tipo Vehiculo')
+
+    number_rooms = fields.Integer(
+        string="Número de habitaciones",
+        default=1,  # Valor predeterminado
+        help="Cantidad total de habitaciones requeridos",
+        # Restricciones opcionales:
+        required=True,  # Obligatorio
+        positive=True,  # Solo números positivos
+    )
+
+    number_beds = fields.Integer(
+        string="Número de camas",
+        default=1,  # Valor predeterminado
+        help="Cantidad total de camas requeridos",
+        # Restricciones opcionales:
+        required=True,  # Obligatorio
+        positive=True,  # Solo números positivos
+    )
+
+    service_ids = fields.Many2many('purchase.requisition.service', string="Servicios")
+    employee_id = fields.Many2one('hr.employee', string="Persona responsable")
+
+    responsible_number = fields.Integer(
+        string="Número del responsable",
+        default=1,  # Valor predeterminado
+        help="Numero requerido",
+        # Restricciones opcionales:
+        required=True,  # Obligatorio
+        positive=True,  # Solo números positivos
+    )
+
+    employee_ids = fields.Many2many('hr.employee', string="Listado de personal")
+
+    fiscal_situation = fields.Binary(string="Subir archivo")
+    fiscal_situation_name = fields.Char(string="Nombre del archivo")
+
+    letter_responsibility = fields.Binary(string="Subir archivo")
+    letter_responsibility_name = fields.Char(string="Nombre del archivo")
 
 # Acciones de estado
     def action_approve(self):
@@ -167,3 +230,24 @@ class PurchaseRequisition(models.Model):
             _logger.info("Message ID: %s", message_id)
         else:
             _logger.warning("Failed to send notification to partner IDs: %s", partner_ids)
+
+    @api.constrains('date_start', 'date_end')
+    def _check_dates(self):
+        for record in self:
+            if record.date_start and record.date_end:
+                if record.date_start > record.date_end:
+                    raise exceptions.ValidationError(
+                        "⚠️ La fecha de inicio no puede ser posterior a la fecha final."
+                    )
+    @api.depends('date_start', 'date_end')
+    def _compute_duration_days(self):
+        for record in self:
+            if record.date_start and record.date_end:
+                start = fields.Date.from_string(record.date_start)
+                end = fields.Date.from_string(record.date_end)
+                delta = end - start
+                days = delta.days
+                nights = max(days - 1, 0)  # Evita números negativos
+                record.duration_days = f"{days} días y {nights} noches"
+            else:
+                record.duration_days = "0 días y 0 noches"
