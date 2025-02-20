@@ -1,7 +1,5 @@
 <odoo>
-
     <data>
-
         <menuitem id="menu_hr_direction" 
                   name="Direcciones" 
                   parent="hr.menu_hr_root" 
@@ -13,6 +11,13 @@
                   parent="hr.menu_hr_root" 
                   sequence="11" 
                   action="action_hr_area"/>
+
+        <!-- Nuevo elemento de menú para Puestos de trabajo -->
+        <menuitem id="menu_hr_job_custom" 
+                  name="Puestos de trabajo" 
+                  parent="hr.menu_hr_root" 
+                  sequence="12" 
+                  action="action_hr_job_custom"/>
+
     </data>
-    
 </odoo>

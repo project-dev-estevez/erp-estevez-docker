@@ -71,46 +71,38 @@
                 <!-- Información de Trabajo -->
                 <xpath expr="//notebook/page[@name='public']" position="replace">
                     <page name="public" string="Información de Trabajo" class="bg-primary text-white shadow mb-3">
-                        <group>
-                            <div class="text-primary font-weight-bold fs-3">
-                                Ubicación
-                            </div>
-                            <field name="address_id" context="{'show_address': 1}" options='{"highlight_first_line": True}'/>
-                            <field name="work_location_id" context="{'default_address_id': address_id}" placeholder="e.g. Building 2, Remote, etc."/>
+                        <group string="Ubicación">
+                            <group>
+                                <field name="address_id" context="{'show_address': 1}" options='{"highlight_first_line": True}'/>
+                                <field name="work_location_id" context="{'default_address_id': address_id}" placeholder="e.g. Building 2, Remote, etc."/>
+                            </group>
                         </group>
-                        <hr/>
-                        <group>
-                            <div class="text-primary font-weight-bold fs-3">
-                                Contacto
-                            </div>
-                            <field name="work_email" widget="email" placeholder="e.g. johndoe@estevezjor.mx"/>
-                            <field name="work_phone" widget="phone"/>
+                        <group string="Contacto">
+                            <group>
+                                <field name="work_email" widget="email" placeholder="e.g. johndoe@estevezjor.mx"/>
+                                <field name="work_phone" widget="phone"/>
+                            </group>
                         </group>
-                        <hr/>
-                        <group>
-                            <div class="text-primary font-weight-bold fs-3">
-                                Nómina
-                            </div>
-                            <field name="imss_registration_date"/>
-                            <field name="payment_type"/>
-                            <field name="payroll_type"/>
+                        <group string="Nómina">
+                            <group>
+                                <field name="imss_registration_date"/>
+                                <field name="payment_type"/>
+                                <field name="payroll_type"/>
+                            </group>
                         </group>
-                        <hr/>
                         <group name="managers" string="Aprobadores" class="hide-group-if-empty" invisible="1">
                         </group>
-                        <hr class="hide-group-if-empty" invisible="1"/>
                         <group name="departure" string="Departure" invisible="active">
                             <field name="departure_reason_id" options="{'no_edit': True, 'no_create': True, 'no_open': True}"/>
                             <field name="departure_description"/>
                             <field name="departure_date"/>
                         </group>
-                        <group>
-                            <div class="text-primary font-weight-bold fs-3">
-                                Horario
-                            </div>
-                            <field name="resource_calendar_id" help="The default working hours are set in configuration."/>
-                            <field name="id" invisible="1"/>
-                            <field name="tz" required="id"/>
+                        <group string="Horario de Trabajo">
+                            <group>
+                                <field name="resource_calendar_id" help="The default working hours are set in configuration."/>
+                                <field name="id" invisible="1"/>
+                                <field name="tz" required="id"/>
+                            </group>
                         </group>
                     </page>
                 </xpath>
@@ -118,12 +110,8 @@
                 <!-- Información Personal -->
                 <xpath expr="//notebook/page[@name='personal_information']" position="replace">
                     <page name="personal_information" string="Información Personal" groups="hr.group_hr_user" class="bg-primary text-white shadow mb-3">
-                        <group>
+                        <group string="Contacto Privado">
                             <group>
-                                <div class="text-primary font-weight-bold fs-3">
-                                    Contacto Privado
-                                </div>
-                                <br/>
                                 <div class="font-weight-bold">
                                     Dirección Privada
                                 </div>
@@ -165,6 +153,8 @@
                                 <field name="private_email" placeholder="e.g. myprivateemail@example.com"/>
                                 <field name="private_phone"/>
                                 <field name="gender"/>
+                            </group>                                    
+                            <group>
                                 <field name="birthday"/>
                                 <field name="age" invisible="not birthday"/>
                                 <field name="rfc"/>
@@ -173,42 +163,38 @@
                                 <field name="voter_key"/>
                                 <field name="infonavit"/> 
                                 <field name="license_number"/>
-
                             </group>
-                            <group>
-                                <div class="text-primary font-weight-bold fs-3">
-                                    Nacionalidad
-                                </div>
+                        </group>
+
+                        <group>
+                           <group string="Nacionalidad">
                                 <field name="country_id" options='{"no_open": True, "no_create": True}'/>
                                 <field name="country_of_birth"/>
                                 <field name="place_of_birth"/>
-                                <div class="text-primary font-weight-bold fs-3">
-                                    Educación
-                                </div>
+                            </group>
+                            <group string="Educación">
                                 <field name="certificate"/>
                                 <field name="study_field"/>
                                 <field name="study_school"/>
+                            </group> 
+                        </group>
 
-                                <div class="text-primary font-weight-bold fs-3" invisible="is_mexico">
-                                    Permiso de Trabajo
-                                </div>
-                                <field name="visa_no" invisible="is_mexico"/>
-                                <field name="permit_no" invisible="is_mexico"/>
-                                <field name="visa_expire" invisible="is_mexico"/>
-                                <field name="work_permit_expiration_date" invisible="is_mexico"/>
-                                <field name="work_permit_name" invisible="1"/>
-                                <field name="has_work_permit" widget="work_permit_upload" filename="work_permit_name" invisible="is_mexico"/>
-                            </group>
-                            <group>
-                                <div class="text-primary font-weight-bold fs-3">
-                                    Emergencia
-                                </div>
+                        <group string="Permiso de Trabajo" invisible="is_mexico">
+                            <field name="visa_no" invisible="is_mexico"/>
+                            <field name="permit_no" invisible="is_mexico"/>
+                            <field name="visa_expire" invisible="is_mexico"/>
+                            <field name="work_permit_expiration_date" invisible="is_mexico"/>
+                            <field name="work_permit_name" invisible="1"/>
+                            <field name="has_work_permit" widget="work_permit_upload" filename="work_permit_name" invisible="is_mexico"/>
+                        </group>
+
+                        <group>                            
+                            <group string="Contacto de Emergencia">
                                 <field name="emergency_contact"/>
                                 <field name="emergency_phone" class="o_force_ltr"/>
+                            </group>
 
-                                <div class="text-primary font-weight-bold fs-3">
-                                    Situación Familiar
-                                </div>
+                            <group string="Situación Familiar">
                                 <field name="marital"/>
                                 <field name="spouse_complete_name" invisible="marital not in ['married', 'cohabitant']"/>
                                 <field name="children"/>
