@@ -23,13 +23,13 @@
     # always loaded
     'data': [
         'security/ir.model.access.csv',
+        'views/hr_job_views.xml',
         'views/hr_direction_views.xml',
         'views/hr_department_views.xml',
         'views/hr_area_views.xml',
         'views/hr_employee_menu.xml',
         'views/hr_employee_views.xml',
-        'views/hr_contract_views.xml',
-        'views/hr_job_views.xml'
+        'views/hr_contract_views.xml'
         #"views/hr_partner_views.xml",
     ],
     # only loaded in demonstration mode
