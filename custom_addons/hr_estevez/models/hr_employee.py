@@ -55,6 +55,8 @@ class HrEmployee(models.Model):
     age = fields.Integer(string='Edad', compute='_compute_age')
 
     country_id = fields.Many2one('res.country', string='País', default=lambda self: self.env.ref('base.mx').id)
+    country_of_birth = fields.Many2one('res.country', string="Country of Birth", groups="hr.group_hr_user", tracking=True, default=lambda self: self.env.ref('base.mx').id)
+    private_country_id = fields.Many2one("res.country", string="Private Country", groups="hr.group_hr_user", default=lambda self: self.env.ref('base.mx').id)
     is_mexico = fields.Boolean(string="Is Mexico", compute="_compute_is_mexico", store=False)
 
     marital = fields.Selection([
