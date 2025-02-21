@@ -104,17 +104,13 @@
                                         widget="number" invisible="request_type in ['lodging', 'store']"/> 
                                     <field name="employee_ids" widget="many2many_tags" invisible="request_type == 'store'"/>
                                     <field name="fiscal_situation" 
-                                        string="Situación fiscal y/o factura" 
                                         widget="binary" 
-                                        filename="fiscal_situation" 
-                                        placeholder="Haz clic para subir un archivo" invisible="request_type in ['lodging', 'store']"/>
-                                    <field name="fiscal_situation_name" invisible="1"/>
+                                        filename="fiscal_situation_name"
+                                        placeholder="Situación Fiscal y/o factura"/>
                                     <field name="letter_responsibility" 
-                                        string="Carta de responsabilidad" 
                                         widget="binary" 
-                                        filename="letter_responsibility" 
-                                        placeholder="Haz clic para subir un archivo"  invisible="request_type == 'store'"/>
-                                    <field name="letter_responsibility_name" invisible="1"/>
+                                        filename="letter_responsibility_name" 
+                                        placeholder="Carta de responsabilidad de uso"  invisible="request_type == 'store'"/>
                                 </group>
                           
                           
@@ -177,19 +173,15 @@
                                         string="Periodo a pagar"
                                         placeholder="Selecciona una fecha"/>
                                     <field name="payment_receipt" 
-                                        string="Recibo de pago" 
                                         widget="binary" 
-                                        filename="payment_receipt" 
-                                        placeholder="Haz clic para subir un archivo"/>
-                                    <field name="payment_receipt_name" invisible="1"/>
+                                        filename="payment_receipt_name" 
+                                        placeholder="Recibo de pago"/>
                                     <field name="employee_ids" widget="many2many_tags"/>
                                     <field name="deposit_person"/>
                                     <field name="additional_specifications" 
-                                        string="Especifiaciones Adicionales" 
                                         widget="binary" 
-                                        filename="additional_specifications" 
-                                        placeholder="Haz clic para subir un archivo"/>
-                                    <field name="additional_specifications_name" invisible="1"/>
+                                        filename="additional_specifications_name" 
+                                        placeholder="Especificaciones Adicionales"/>
                                 </group>
                              
                             </group>
