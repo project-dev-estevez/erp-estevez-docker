@@ -1,12 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<odoo>
-    <data>
-        <!-- Acción -->
-        <record id="action_mi_menu" model="ir.actions.act_window">
-            <field name="name">Mi Acción</field>
-            <field name="res_model">purchase.order</field>
-            <field name="view_mode">tree,form</field>
-        </record>
+<odoo>            
+    <data>                        
 
         <!-- Menú Principal -->
         <menuitem 
@@ -14,8 +8,8 @@
             name="Requisición de Compras"
             parent="purchase.menu_purchase_root"
             sequence="3"
-        />
-
+        />   
+     
         <!-- Submenú -->
         <menuitem 
             id="general_services" 
@@ -31,7 +25,16 @@
             name="Adquisiciones"
             parent="requisition"
             sequence="20"  
-            action="action_mi_menu"
+            action="action_purchase_acquisition"
+        />
+
+
+        <menuitem 
+            id="menu_proveedores_custom" 
+            name="Proveedores"
+            parent="purchase.menu_purchase_root" 
+            sequence="4"  
+            action="account.res_partner_action_supplier"            
         />
     </data>
 </odoo>

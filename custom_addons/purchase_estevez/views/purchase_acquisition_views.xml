@@ -1,0 +1,83 @@
+<odoo>
+    <data>
+        <record id="action_purchase_acquisition" model="ir.actions.act_window">
+            <field name="name">Adquisiones</field>
+            <field name="res_model">purchase.acquisition</field>
+            <field name="view_mode">kanban,list,form</field>
+        </record>
+
+
+        <record id="view_purchas_acquisition_form" model="ir.ui.view">
+            <field name="name">purchase.acquisition.form</field>
+            <field name="model">purchase.acquisition</field>
+            <field name="arch" type="xml">
+                <form string="Acquisitions">                    
+                <sheet>
+                    <h1>Adquisiciones</h1>
+                    <separator string="Datos"/>
+                    <group>
+                        <group>                        
+                            <field name="fecha_limite_entrega"/>                            
+                            <field name="tipo" default="'Producto'"/>
+                            <field name="proyecto"/>
+                            <field name="segmento"/>
+                            <field name="prioridad" placeholder="Selecciona una opción"/>
+                            <field name="almacen"/>
+                            <field name="sugerencia"/>
+                            <field name="comentarios"/>                       
+                            <field name="nombre_producto"/>
+                            <field name="cantidad"/>
+                            <field name="medida"/>
+                            <field name="descripcion"/>
+                            <field name="especificaciones"/>
+                        </group>
+                    </group>
+                    <div class="text-center">
+                        <button type="object" name="save_dat" string="Guardar" class="btn btn-primary"/>                    
+                    </div>
+                </sheet>                
+                </form>
+            </field>
+        </record>   
+        <record id="view_purchase_acquisition_list" model="ir.ui.view">
+            <field name="name">purchase.acquisition.list</field>
+            <field name="model">purchase.acquisition</field>
+            <field name="arch" type="xml">
+                <list string="Services">
+                    <field name="fecha_limite_entrega"/>
+                </list>
+            </field>
+        </record>
+
+        <record id="view_purchase_acquisition_kanban" model="ir.ui.view">
+            <field name="name">purchase.acquisition.kanban</field>
+            <field name="model">purchase.acquisition</field>
+            <field name="arch" type="xml">
+                <kanban>
+                    <field name="fecha_limite_entrega"/>
+          
+                    <templates>
+                        <t t-name="card">
+                            <a type="open">
+                                <field name="fecha_limite_entrega" class="fw-bold fs-4 d-bolck ms-2"/>
+                            </a>
+                            <field name="fecha_limite_entrega" widget="many2one_avatar_employee" options="{'display_avatar_name': True}" readonly="1" class="text-muted ms-2"/>
+                            <div class="small mt-1 ms-2" groups="base.group_multi_company">
+                                <i class="fa fa-building-o" role="img" aria-label="Company" title="Company"/>
+                                <field name="fecha_limite_entrega" class="ms-1"/>
+                            </div>
+                            <div class="row g-0 mt-3 mb-2 ms-2">
+                                <div class="col-6">
+                                    <button class="btn btn-primary">
+                                        <field name="fecha_limite_entrega"/>
+                                        Departamentos
+                                    </button>
+                                </div>
+                            </div>
+                        </t>
+                    </templates>
+                </kanban>
+            </field>
+        </record>                  
+    </data>
+</odoo>
