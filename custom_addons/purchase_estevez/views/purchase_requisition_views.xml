@@ -68,8 +68,10 @@
                                 </group>
                             </group>
                         </page>
-                        <page string="Datos Campamento" class="bg-primary text-white shadow mb-3" invisible="request_type != 'camp'">
-                            <group string="Información del Campamento">
+                        <page string="Datos Solicitud" class="bg-warning text-white shadow mb-3" invisible="request_type not in ['camp', 'lodging', 'store']">
+                            <div class="mb-4">
+                                <h2><field name="dynamic_page_title"/></h2>
+                            </div>
                                 <group>
                                     <field name="date_start" widget="date" 
                                         string="Fecha inicio"
@@ -84,53 +86,163 @@
                                     </xpath>
                                     <field name="vehicle_count" 
                                         string="Vehículos requeridos" 
-                                        widget="number"/>
-                                    <field name="type_vehicle"/>
+                                        widget="number" invisible="request_type == 'store'"/>
+                                    <field name="type_vehicle" invisible="request_type == 'store'"/>
                                     <field name="number_rooms"
                                         string="Habitaciones requeridos"
-                                        widget="number"/> 
+                                        widget="number" invisible="request_type in ['lodging', 'store']"/> 
                                     <field name="number_beds"
                                         string="Camas requeridos"
-                                        widget="number"/> 
-                                    <field name="service_ids" widget="many2many_tags"/>
-                                    <field name="employee_id" options="{'no_quick_create': True, 'no_create_edit': True}"/>
+                                        widget="number" invisible="request_type == 'store'"/> 
+                                    <field name="area"
+                                        string="Area requerida"
+                                        widget="number" invisible="request_type in ['lodging', 'camp']"/>
+                                    <field name="service_ids" widget="many2many_tags" invisible="request_type == 'lodging'"/>
+                                    <field name="employee_id" options="{'no_quick_create': True, 'no_create_edit': True}" invisible="request_type in ['lodging', 'store']"/>
                                     <field name="responsible_number"
-                                        string="numero requerido"
-                                        widget="number"/> 
-                                    <field name="employee_ids" widget="many2many_tags"/>
+                                        string="Numero de persona responsable del campamento"
+                                        widget="number" invisible="request_type in ['lodging', 'store']"/> 
+                                    <field name="employee_ids" widget="many2many_tags" invisible="request_type == 'store'"/>
                                     <field name="fiscal_situation" 
                                         string="Situación fiscal y/o factura" 
                                         widget="binary" 
                                         filename="fiscal_situation" 
-                                        placeholder="Haz clic para subir un archivo"/>
+                                        placeholder="Haz clic para subir un archivo" invisible="request_type in ['lodging', 'store']"/>
                                     <field name="fiscal_situation_name" invisible="1"/>
                                     <field name="letter_responsibility" 
                                         string="Carta de responsabilidad" 
                                         widget="binary" 
                                         filename="letter_responsibility" 
-                                        placeholder="Haz clic para subir un archivo"/>
+                                        placeholder="Haz clic para subir un archivo"  invisible="request_type == 'store'"/>
                                     <field name="letter_responsibility_name" invisible="1"/>
                                 </group>
-                            </group>
-                            <group string="Información General">
+                          
+                          
+                        
+                        </page>
+                        <page string="Datos Maquinaría o equipo" class="bg-warning text-white shadow mb-3" invisible="request_type not in ['machinery_equipment']">
+                            <group string="Información Sobre Equipo Requerido">
                                 <group>
+                                    <field name="date_start" widget="date" 
+                                        string="Fecha inicio"
+                                        placeholder="Selecciona una fecha"/>
+                                    <field name="date_end" widget="date" 
+                                        string="Fecha fin"
+                                        placeholder="Selecciona una fecha"/>
+                                    <xpath expr="//field[@name='date_end']" position="after">
+                                        <div class="alert alert-info" invisible="not duration_days">
+                                            <field name="duration_days" readonly="1" class="oe_inline"/>
+                                        </div>
+                                    </xpath>
+                                    <field name="machinery_equipment_required"/>
+                                    <field name="other_machinery_equipment" invisible="machinery_equipment_required != 'other'"/>
+                                    <field name="capacity_hoist"
+                                        string="Capacidad requerida"
+                                        widget="number"/>
+                                    <field name="stowage_height"
+                                        string="Altura Estiba"
+                                        widget="number"/> 
+                                    <field name="fuel_type"/>
+                                    <field name="operator_required"/>
+                                    <field name="terrain_tires"/>
+                                </group>
+                                <group string="Ubicación del servicio">
+                                <group>
+                                    <field name="street_address"/>
+                                    <field name="state_id" 
+                                        widget="selection" 
+                                        options="{'no_create': True, 'no_open': True}"/>
+                                    <field name="city_id" 
+                                        domain="[('state_id', '=', state_id)]"
+                                        options="{'no_create': True}"/>
+                                    <field name="zip_code"/>
+                                    <field name="arrival_time" 
+                                        widget="datetime" 
+                                        options="{'format': 'HH:mm:ss'}"
+                                        placeholder="Selecciona la hora"/>
                                     
                                 </group>
                             </group>
-
-                        
-                        </page>
-                        <!--<page string="Equipo Requerido" class="bg-primary text-white shadow mb-3">
-                            <group string="Información Sobre Equipo Requerido">
-                                <group>
-                                    <field name="computer_equipment_required"/>
-                                    <field name="cellular_equipment_required"/>
-                                    <field name="uniform_ids" widget="many2many_tags"/>
-                                    <field name="epp_ids" widget="many2many_tags"/>
-                                </group>
                             </group>                            
-                        </page>-->
+                        </page>
+
+                        <page string="Datos Pago de Servicios" class="bg-warning text-white shadow mb-3" invisible="request_type not in ['service_payment']">
+                            <group string="Información Sobre Pago de Servicios">
+                                <group>
+                                    <field name="service_payment"/>
+                                    <field name="amount_to_pay"
+                                        string="Monto a pagar"
+                                        widget="number"/> 
+                                    <field name="period_to_pay" widget="date" 
+                                        string="Periodo a pagar"
+                                        placeholder="Selecciona una fecha"/>
+                                    <field name="payment_receipt" 
+                                        string="Recibo de pago" 
+                                        widget="binary" 
+                                        filename="payment_receipt" 
+                                        placeholder="Haz clic para subir un archivo"/>
+                                    <field name="payment_receipt_name" invisible="1"/>
+                                    <field name="employee_ids" widget="many2many_tags"/>
+                                    <field name="deposit_person"/>
+                                    <field name="additional_specifications" 
+                                        string="Especifiaciones Adicionales" 
+                                        widget="binary" 
+                                        filename="additional_specifications" 
+                                        placeholder="Haz clic para subir un archivo"/>
+                                    <field name="additional_specifications_name" invisible="1"/>
+                                </group>
+                             
+                            </group>
+                                                       
+                        </page>
+
+                        <page string="Datos Pago de Flete" class="bg-warning text-white shadow mb-3" invisible="request_type not in ['freight']">
+                            <group string="Información Sobre Flete">
+                                <group>
+                                    <field name="description_merchandise"/>
+                                    <field name="weight"
+                                        string="Peso"
+                                        widget="number"/> 
+                                    <field name="dimension"/>
+                                    <field name="type_vehicle"/>
+                                    <field name="date_use" widget="date" 
+                                        string="Fecha de uso"
+                                        placeholder="Selecciona una fecha"/>
+                                    <field name="product"/>
+                                    
+                                </group>
+
+                                <group string="Origen">
+                                    <field name="street_number_origin"/>
+                                    <field name="colony_origin"/>
+                                    <field name="city_origin"/>
+                                    <field name="zip_code_origin"/>
+                                </group>
+
+                                <group string="Destino">
+                                    <field name="street_number_destination"/>
+                                    <field name="colony_destination"/>
+                                    <field name="city_destination"/>
+                                    <field name="zip_code_destination"/>
+                                </group>
+
+                                <group string="Datos Entrega">
+                                    <field name="delivery_name"/>
+                                    <field name="delivery_phone"
+                                        string="Teléfono Entrega"
+                                        widget="number"/> 
+                                    <field name="receiver_name"/>
+                                    <field name="receiver_phone"
+                                        string="Teléfono Recibe"
+                                        widget="number"/> 
+                                </group>
+                            </group>
+                                                       
+                        </page>
                     </notebook>
+                    <div class="text-center">
+                        <button name="action_save" string="Guardar" type="object" class="btn btn-primary btn-lg mt-4"/>
+                    </div>
                 </sheet>
                 </form>
             </field>
