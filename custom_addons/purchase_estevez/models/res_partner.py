@@ -14,7 +14,7 @@ class ResPartner(models.Model):
     state_id = fields.Many2one('res.country.state', required=True)  # Estado
     zip = fields.Char(required=True)  #Codigo Postal
     country_id = fields.Many2one('res.country', required=True)       
-    buyer_id = fields.Many2one('hr.employee', string="Compradora", domain="[('department_id', '=', 8)]")     
+    buyer_id = fields.Many2one('hr.employee', string="Compradorasss", domain="[('department_id', '=', 4)]")     
  # Método para el botón "Guardar"
     def action_guardar(self):
         self.ensure_one()
