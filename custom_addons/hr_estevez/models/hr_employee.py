@@ -1,5 +1,6 @@
 from odoo import api, models, fields
 from datetime import date
+import re
 
 class HrEmployee(models.Model):
     _inherit = 'hr.employee'
@@ -125,3 +126,18 @@ class HrEmployee(models.Model):
                 record.age = today.year - record.birthday.year - ((today.month, today.day) < (record.birthday.month, record.birthday.day))
             else:
                 record.age = 0
+
+    def _format_phone_number(self, phone_number):
+        if phone_number and not phone_number.startswith('+52'):
+            phone_number = '+52 ' + re.sub(r'(\d{3})(\d{3})(\d{4})', r'\1 \2 \3', phone_number)
+        return phone_number
+
+    @api.onchange('work_phone')
+    def _onchange_work_phone(self):
+        if self.work_phone:
+            self.work_phone = self._format_phone_number(self.work_phone)
+
+    @api.onchange('private_phone')
+    def _onchange_private_phone(self):
+        if self.private_phone:
+            self.private_phone = self._format_phone_number(self.private_phone)

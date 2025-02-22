@@ -105,8 +105,6 @@
                                 <field name="payroll_type"/>
                             </group>
                         </group>
-                        <!-- <group name="managers" string="Aprobadores" class="hide-group-if-empty" invisible="1">
-                        </group> -->
                         <group name="departure" string="Departure" invisible="active">
                             <field name="departure_reason_id" options="{'no_edit': True, 'no_create': True, 'no_open': True}"/>
                             <field name="departure_description"/>

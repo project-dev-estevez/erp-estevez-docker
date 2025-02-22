@@ -13,17 +13,6 @@ class HrCandidate(models.Model):
             phone_number = '+52 ' + re.sub(r'(\d{3})(\d{3})(\d{4})', r'\1 \2 \3', phone_number)
         return phone_number
 
-    @api.model
-    def create(self, vals):
-        if 'partner_phone' in vals and vals['partner_phone']:
-            vals['partner_phone'] = self._format_phone_number(vals['partner_phone'])
-        return super(HrCandidate, self).create(vals)
-
-    def write(self, vals):
-        if 'partner_phone' in vals and vals['partner_phone']:
-            vals['partner_phone'] = self._format_phone_number(vals['partner_phone'])
-        return super(HrCandidate, self).write(vals)
-
     @api.onchange('partner_phone')
     def _onchange_partner_phone(self):
         if self.partner_phone:
