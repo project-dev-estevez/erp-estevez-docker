@@ -6,39 +6,39 @@
             <field name="view_mode">kanban,list,form</field>
         </record>
 
-
         <record id="view_purchas_acquisition_form" model="ir.ui.view">
             <field name="name">purchase.acquisition.form</field>
             <field name="model">purchase.acquisition</field>
             <field name="arch" type="xml">
                 <form string="Acquisitions">                    
-                <sheet>
-                    <h1>Adquisiciones</h1>
-                    <separator string="Datos"/>
-                    <group>
-                        <group>                        
-                            <field name="fecha_limite_entrega"/>                            
-                            <field name="tipo" default="'Producto'"/>
-                            <field name="proyecto"/>
-                            <field name="segmento"/>
-                            <field name="prioridad" placeholder="Selecciona una opción"/>
-                            <field name="almacen"/>
-                            <field name="sugerencia"/>
-                            <field name="comentarios"/>                       
-                            <field name="nombre_producto"/>
-                            <field name="cantidad"/>
-                            <field name="medida"/>
-                            <field name="descripcion"/>
-                            <field name="especificaciones"/>
-                        </group>
-                    </group>
-                    <div class="text-center">
-                        <button type="object" name="save_dat" string="Guardar" class="btn btn-primary"/>                    
-                    </div>
-                </sheet>                
+                    <sheet>
+                        <h1>Adquisiciones</h1>
+                        <separator string="Datos"/>
+                        <group>
+                            <group>                        
+                                <field name="fecha_limite_entrega"/>                            
+                                <field name="tipo" default="'Producto'"/>
+                                <field name="proyecto"/>
+                                <field name="segmento"/>
+                                <field name="prioridad" placeholder="Selecciona una opción"/>
+                                <field name="almacen"/>
+                                <field name="sugerencia"/>
+                                <field name="comentarios"/>                       
+                                <field name="nombre_producto"/>
+                                <field name="cantidad"/>
+                                <field name="medida"/>
+                                <field name="descripcion"/>
+                                <field name="especificaciones"/>
+                            </group>
+                        </group>                        
+                        <div class="text-center">
+                            <button type="object" name="save_dat" string="Guardar" class="btn btn-primary"/>                    
+                        </div>
+                    </sheet>                
                 </form>
             </field>
         </record>   
+
         <record id="view_purchase_acquisition_list" model="ir.ui.view">
             <field name="name">purchase.acquisition.list</field>
             <field name="model">purchase.acquisition</field>
@@ -55,7 +55,6 @@
             <field name="arch" type="xml">
                 <kanban>
                     <field name="fecha_limite_entrega"/>
-          
                     <templates>
                         <t t-name="card">
                             <a type="open">

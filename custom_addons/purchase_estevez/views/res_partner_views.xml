@@ -1,4 +1,5 @@
 <odoo>
+<data>
     <record id="view_partner_form_custom" model="ir.ui.view">
         <field name="name">res.partner.form.custom</field>
         <field name="model">res.partner</field>
@@ -14,8 +15,7 @@
             <xpath expr="//field[@name='industry_id']" position="after">
                 <field name="nuevo_campo" string="Persona de contacto"/>                
             </xpath>              
-            <xpath expr="//group[@name='misc']//field[@name='industry_id']" position="replace"/>        
-                                                                                                  
+            <xpath expr="//group[@name='misc']//field[@name='industry_id']" position="replace"/>                                                        
         </field>
     </record>
     <record id="view_res_partner_form_inherit" model="ir.ui.view">
@@ -23,10 +23,10 @@
         <field name="model">res.partner</field>
         <field name="inherit_id" ref="base.view_partner_form"/>
         <field name="arch" type="xml">
-         <!-- Cambiar Términos de pago a Condiciones de pago -->
-        <field name="property_supplier_payment_term_id" position="attributes">
-            <attribute name="string">Condiciones de pago</attribute>
-        </field>
+            <!-- Cambiar Términos de pago a Condiciones de pago -->
+            <field name="property_supplier_payment_term_id" position="attributes">
+                <attribute name="string">Condiciones de pago</attribute>
+            </field>
             <!-- Cambiar el nombre del campo "Teléfono" a "Celular" -->
             <field name="phone" position="attributes" required="1">
                 <attribute name="string">Celular</attribute>
@@ -63,7 +63,7 @@
             <!-- Eliminar el placeholder del campo "Sitio web" -->
             <field name="name" position="attributes">
                 <attribute name="placeholder"/>
-            </field>
+            </field>    
             <field name="website" position="attributes">
                 <attribute name="placeholder"/>
             </field>
@@ -71,31 +71,68 @@
             <field name="category_id" position="attributes">
                 <attribute name="placeholder"/>
             </field>
-
             <!-- Ocultar la pestaña "Contacts & Addresses" -->
             <xpath expr="//page[@name='contact_addresses']" position="attributes">
                 <attribute name="invisible">1</attribute>
             </xpath>
-
             <xpath expr="//group[@name='sale']" position="attributes">
                 <attribute name="invisible">1</attribute>
             </xpath>
-
             <xpath expr="//group[@name='misc']" position="attributes">
                 <attribute name="invisible">1</attribute>
-            </xpath>         
-                      
-          <!-- Agregar el botón "Guardar" dentro del oe_button_box -->
+            </xpath>                               
+            <!-- Agregar el botón "Guardar" dentro del oe_button_box -->
             <xpath expr="//div[@name='button_box']" position="inside">
                 <button string="Guardar" type="object" name="action_guardar" class="btn btn-outline-primary o_form_button_create"/>
             </xpath>
-
-            <field name="lang" position="replace"/>    
-         
+            <field name="lang" position="replace"/>             
             <xpath expr="//div[@name='button_box']/button[@name='action_guardar']" position="after">
-        <button name="action_open_whatsapp" class="oe_stat_button" icon="fa-whatsapp" type="object" string="WhatsApp" invisible="not phone"/>
-    </xpath>
+                <button name="action_open_whatsapp" class="oe_stat_button" icon="fa-whatsapp" type="object" string="WhatsApp" invisible="not phone"/>
+            </xpath>
+        </field>
+    </record>     
 
+    <record id="view_res_partner_list_inherit" model="ir.ui.view">
+            <field name="name">res.partner.list.inherit</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.view_partner_tree"/> <!-- ID de la vista original -->
+            <field name="arch" type="xml">
+                <!-- Agregar el campo en la vista de lista (tree) -->
+                <xpath expr="//list/field[@name='complete_name']" position="after">
+                    <field name="nuevo_campo" string="Nombre comercial"/>
+                </xpath>
+                <xpath expr="//list/field[@name='nuevo_campo']" position="after">
+                    <field name="industry_id" string="Giro"/>
+                </xpath>
+                 <xpath expr="//list/field[@name='industry_id']" position="after">
+                    <field name="nuevo_campo" string="Persona de contacto"/>
+                </xpath>
+                <xpath expr="//list/field[@name='state_id']" position="after">
+                    <field name="state_id" string="Estado"/>
+                </xpath> 
+                <xpath expr="//list/field[@name='user_id']" position="replace">            
+                </xpath> 
+                <xpath expr="//list/field[@name='activity_ids']" position="replace">            
+                </xpath>
+                <xpath expr="//list/field[@name='city']" position="replace">            
+                </xpath>
+                <xpath expr="//list/field[@name='country_id']" position="replace">            
+                </xpath>
+            </field>
+     </record>
+     <record id="view_res_partner_kanban_inherit" model="ir.ui.view">
+        <field name="name">res.partner.kanban.inherit</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.res_partner_kanban_view"/> <!-- ID de la vista Kanban original -->
+        <field name="arch" type="xml">
+            <!-- Agregar un nuevo campo a la tarjeta Kanban -->
+            <xpath expr="//field[@name='email']" position="after">
+                <field name="phone" string="Telefono"/>
+            </xpath>         
+            <xpath expr="//field[@name='phone']" position="after">
+                <field name="industry_id" string="Giro"/>
+            </xpath>        
         </field>
     </record>
+    </data>
 </odoo>
