@@ -10,29 +10,55 @@
             <field name="name">purchase.acquisition.form</field>
             <field name="model">purchase.acquisition</field>
             <field name="arch" type="xml">
-                <form string="Acquisitions">                    
+                <form string="Acquisitions">          
+                <header>
+                <button name="action_approve" string="Aprobar" type="object" class="btn-primary" invisible="state in ('rejected', 'first_approval', 'second_approval', 'approved') or requestor_id == uid"/>
+                    <button name="action_confirm_approve" string="Confirmar Aprobación" type="object" class="btn-primary" invisible="state in ('to_approve', 'rejected', 'approved') or requestor_id == uid"/>
+                    <button name="action_reject" string="Rechazar" type="object" invisible="state in ('rejected', 'approved') or requestor_id == uid"/>
+                    <field name="state" 
+                           widget="statusbar" 
+                           decoration-muted="state == 'to_approve'" 
+                           decoration-primary="state == 'first_approval'" 
+                           decoration-success="state == 'second_approval'" 
+                           decoration-danger="state == 'rejected'"/>
+                </header>          
                     <sheet>
                         <h1>Adquisiciones</h1>
-                        <separator string="Datos"/>
+                        <separator string="Datos del solicitante"/>
                         <group>
-                            <group>                        
-                                <field name="fecha_limite_entrega"/>                            
-                                <field name="tipo" default="'Producto'"/>
-                                <field name="proyecto"/>
-                                <field name="segmento"/>
-                                <field name="prioridad" placeholder="Selecciona una opción"/>
-                                <field name="almacen"/>
-                                <field name="sugerencia"/>
-                                <field name="comentarios"/>                       
-                                <field name="nombre_producto"/>
-                                <field name="cantidad"/>
-                                <field name="medida"/>
-                                <field name="descripcion"/>
-                                <field name="especificaciones"/>
+                            <group>                            
+                                <field name="requestor_id"/>
+                                <field name="company_id"/>
+                            </group>
+                            <group>
+                                <field name="direction_id"/>
+                                <field name="department_id"/>
+                                <field name="job_id"/>
                             </group>
                         </group>                        
+                            <group string="Especificaciones">
+                                <group>                        
+                                    <field name="fecha_limite_entrega"/>                            
+                                    <field name="tipo" default="'Producto'"/>
+                                    <field name="proyecto"/>
+                                    <field name="segmento"/>
+                                    <field name="prioridad" placeholder="Selecciona una opción"/>
+                                    <field name="almacen"/>
+                                    <field name="sugerencia"/>
+                                    <field name="comentarios"/>                                                           
+                                </group>
+                            </group>  
+                            <group>
+                                <group string="Especificaciones del producto">
+                                    <field name="nombre_producto"/>                                    
+                                    <field name="cantidad"/>
+                                    <field name="medida"/>
+                                    <field name="descripcion"/>
+                                    <field name="especificaciones"/>
+                                </group>                                
+                            </group>                      
                         <div class="text-center">
-                            <button type="object" name="save_dat" string="Guardar" class="btn btn-primary"/>                    
+                            <button type="object" name="save_dat" string="Enviar solicitud" class="btn btn-primary"/>                    
                         </div>
                     </sheet>                
                 </form>
