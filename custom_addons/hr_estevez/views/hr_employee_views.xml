@@ -123,10 +123,10 @@
                 <!-- Información Personal -->
                 <xpath expr="//notebook/page[@name='personal_information']" position="replace">
                     <page name="personal_information" string="Información Personal" groups="hr.group_hr_user" class="bg-primary text-white shadow mb-3">
-                        <group string="Contacto Privado">
+                        <group string="Contacto Personal">
                             <group>
                                 <div class="font-weight-bold">
-                                    Dirección Privada
+                                    Dirección Personal
                                 </div>
                                 <br/>
                                 <div class="o_address_format">
@@ -163,7 +163,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <field name="private_email" placeholder="e.g. myprivateemail@example.com"/>
+                                <field name="private_email" placeholder="myprivateemail@example.com"/>
                                 <field name="private_phone"/>
                                 <field name="gender"/>
                             </group>                                    
