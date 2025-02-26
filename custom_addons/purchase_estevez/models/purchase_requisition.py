@@ -248,7 +248,7 @@ class PurchaseRequisition(models.Model):
     delivery_phone = fields.Char(
         string="Teléfono de quien entregar",
     )
-    receiver_name = fields.Char(string="Nombre de quine recibe")
+    receiver_name = fields.Char(string="Nombre de quien recibe")
     receiver_phone = fields.Char(
         string="Teléfono de quien recibe",
     )

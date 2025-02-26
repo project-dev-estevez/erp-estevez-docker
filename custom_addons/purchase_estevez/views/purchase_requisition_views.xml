@@ -106,11 +106,11 @@
                                     <field name="fiscal_situation" 
                                         widget="binary" 
                                         filename="fiscal_situation_name"
-                                        placeholder="Situación Fiscal y/o factura"/>
+                                        placeholder="Cargar carta de situación fiscal y/o factura en caso de ser deposito"/>
                                     <field name="letter_responsibility" 
                                         widget="binary" 
                                         filename="letter_responsibility_name" 
-                                        placeholder="Carta de responsabilidad de uso"  invisible="request_type == 'store'"/>
+                                        placeholder="Carta de responsabilidad de uso del inmueble"  invisible="request_type == 'store'"/>
                                 </group>
                           
                           
@@ -256,12 +256,12 @@
             <field name="model">purchase.requisition</field>
             <field name="arch" type="xml">
                 <kanban>
-                    <field name="priority"/>
+                    <field name="request_type"/>
           
                     <templates>
                         <t t-name="card">
                             <a type="open">
-                                <field name="priority" class="fw-bold fs-4 d-bolck ms-2"/>
+                                <field name="request_type" class="fw-bold fs-4 d-bolck ms-2"/>
                             </a>
                             <field name="priority" widget="many2one_avatar_employee" options="{'display_avatar_name': True}" readonly="1" class="text-muted ms-2"/>
                             <div class="small mt-1 ms-2" groups="base.group_multi_company">
