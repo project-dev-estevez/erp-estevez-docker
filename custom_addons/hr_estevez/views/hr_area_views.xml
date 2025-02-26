@@ -11,7 +11,7 @@
             <field name="name">hr.area.form</field>
             <field name="model">hr.area</field>
             <field name="arch" type="xml">
-                <form string="Area">
+                <form string="Área">
                     <sheet>
                         <group>
                             <field name="name"/>

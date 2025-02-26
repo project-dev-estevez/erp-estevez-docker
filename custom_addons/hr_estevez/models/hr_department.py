@@ -3,7 +3,7 @@ from odoo import api, models, fields
 class HrDepartment(models.Model):
     _inherit = 'hr.department'
 
-    area_ids = fields.One2many('hr.area', 'department_id', string='Areas')
+    area_ids = fields.One2many('hr.area', 'department_id', string='Áreas')
     direction_id = fields.Many2one('hr.direction', string='Dirección')
 
     parent_id = fields.Many2one('hr.department', string='Parent Department', index=True, check_company=True, store=False)

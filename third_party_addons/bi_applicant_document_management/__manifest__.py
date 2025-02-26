@@ -15,6 +15,7 @@
     "depends": ['base', 'hr_recruitment'],
     "data": [
         'views/hr_applicant_views.xml',
+        'views/ir_attachment_views.xml',
         ],
     'license':'OPL-1',
     'installable': True,

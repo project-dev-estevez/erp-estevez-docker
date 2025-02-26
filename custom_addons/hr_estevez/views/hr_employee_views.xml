@@ -22,20 +22,30 @@
             <field name="inherit_id" ref="hr.view_employee_form"/>
             <field name="arch" type="xml">
             
-            <xpath expr="//header" position="inside">
-                <button name="action_archive_employee" 
-                    string="Dar de baja" 
-                    type="object" 
-                    class="oe_highlight"
-                    invisible="not active"/>  <!-- Solo visible si active=True -->
-            </xpath>
-            <xpath expr="//header" position="inside">
-                <button name="action_reactivate_employee"
-                    string="Dar de alta"
-                    type="object"
-                    class="oe_highlight"
-                    invisible="active"/>  <!-- Solo visible si active=False -->
-            </xpath>
+                <xpath expr="//header" position="inside">
+                    <button name="action_archive_employee" 
+                        string="Dar de baja" 
+                        type="object" 
+                        class="oe_highlight"
+                        invisible="not active"/>  <!-- Solo visible si active=True -->
+                </xpath>
+                <xpath expr="//header" position="inside">
+                    <button name="action_reactivate_employee"
+                        string="Dar de alta"
+                        type="object"
+                        class="oe_highlight"
+                        invisible="active"/>  <!-- Solo visible si active=False -->
+                </xpath>
+
+                <!-- Eliminar el grupo managers de su ubicación actual -->
+                <xpath expr="//group[@name='managers']" position="replace">
+                    <!-- Eliminar el grupo managers -->
+                </xpath>
+
+                <!-- Insertar el grupo managers en la página hr_settings -->
+                <xpath expr="//notebook/page[@name='hr_settings']" position="inside">
+                    <group name="managers" string="Aprobadores" class="hide-group-if-empty" invisible="1"/>
+                </xpath>
 
                 <!-- Nombres, Apellidos, # empleado, Proyecto y Etiquetas -->
                 <xpath expr="//group/group[field[@name='work_email']]" position="replace">
@@ -68,12 +78,17 @@
                     <attribute name="class" add="bg-primary text-white shadow mb-3"/>
                 </xpath>
 
+                <!-- Aplicar clases a la página hr_settings -->
+                <xpath expr="//notebook/page[@name='hr_settings']" position="attributes">
+                    <attribute name="class" add="bg-primary text-white shadow mb-3"/>
+                </xpath>
+
                 <!-- Información de Trabajo -->
                 <xpath expr="//notebook/page[@name='public']" position="replace">
                     <page name="public" string="Información de Trabajo" class="bg-primary text-white shadow mb-3">
                         <group string="Ubicación">
                             <group>
-                                <field name="address_id" context="{'show_address': 1}" options='{"highlight_first_line": True}'/>
+                                <field name="address_id" context="{'show_address': 1}" options="{'highlight_first_line': True, 'no_edit': True, 'no_create': True, 'no_open': True}" domain="[('is_company', '=', True)]"/>
                                 <field name="work_location_id" context="{'default_address_id': address_id}" placeholder="e.g. Building 2, Remote, etc."/>
                             </group>
                         </group>
@@ -90,8 +105,6 @@
                                 <field name="payroll_type"/>
                             </group>
                         </group>
-                        <group name="managers" string="Aprobadores" class="hide-group-if-empty" invisible="1">
-                        </group>
                         <group name="departure" string="Departure" invisible="active">
                             <field name="departure_reason_id" options="{'no_edit': True, 'no_create': True, 'no_open': True}"/>
                             <field name="departure_description"/>
@@ -101,7 +114,7 @@
                             <group>
                                 <field name="resource_calendar_id" help="The default working hours are set in configuration."/>
                                 <field name="id" invisible="1"/>
-                                <field name="tz" required="id"/>
+                                <field name="tz" required="id" invisible="1"/>
                             </group>
                         </group>
                     </page>
@@ -110,10 +123,10 @@
                 <!-- Información Personal -->
                 <xpath expr="//notebook/page[@name='personal_information']" position="replace">
                     <page name="personal_information" string="Información Personal" groups="hr.group_hr_user" class="bg-primary text-white shadow mb-3">
-                        <group string="Contacto Privado">
+                        <group string="Contacto Personal">
                             <group>
                                 <div class="font-weight-bold">
-                                    Dirección Privada
+                                    Dirección Personal
                                 </div>
                                 <br/>
                                 <div class="o_address_format">
@@ -150,7 +163,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <field name="private_email" placeholder="e.g. myprivateemail@example.com"/>
+                                <field name="private_email" placeholder="myprivateemail@example.com"/>
                                 <field name="private_phone"/>
                                 <field name="gender"/>
                             </group>                                    

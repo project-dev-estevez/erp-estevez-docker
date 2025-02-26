@@ -20,7 +20,7 @@ class HrApplicant(models.Model):
             'view_type': 'form',
             'view_mode': 'kanban,list,form',
             'res_model': 'ir.attachment',
-            'view_id': False,
+            'view_id': self.env.ref('bi_applicant_document_management.view_ir_attachment_kanban').id,  # Especificar la vista kanban
             'type': 'ir.actions.act_window',
             'domain': [('res_model', '=', 'hr.applicant'), ('res_id', '=', self.id)],
             'context': {'default_res_model': 'hr.applicant', 'default_res_id': self.id},

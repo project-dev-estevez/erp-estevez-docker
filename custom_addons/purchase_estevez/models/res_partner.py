@@ -5,7 +5,7 @@ import re
 
 class ResPartner(models.Model):
     _inherit = "res.partner"
-    nuevo_campo = fields.Char(string="Nombre comercial")          
+    nuevo_campo = fields.Char(string="Nombre comercial")       
     email = fields.Char(required=True)
     vat = fields.Char(string="RFC", required=True)
     street = fields.Char(required=True)
@@ -14,11 +14,10 @@ class ResPartner(models.Model):
     state_id = fields.Many2one('res.country.state', required=True)  # Estado
     zip = fields.Char(required=True)  #Codigo Postal
     country_id = fields.Many2one('res.country', required=True)       
-    buyer_id = fields.Many2one('hr.employee', string="Compradorasss", domain="[('department_id', '=', 4)]")     
+    buyer_id = fields.Many2one('hr.employee', string="Comprador", domain="[('department_id', '=', 4)]")         
  # Método para el botón "Guardar"
     def action_guardar(self):
-        self.ensure_one()
-        # Guardar cambios (Odoo guarda automáticamente al cerrar, pero puedes añadir lógica aquí)
+        self.ensure_one()        
         return {
             "type": "ir.actions.act_window_close",
         }
