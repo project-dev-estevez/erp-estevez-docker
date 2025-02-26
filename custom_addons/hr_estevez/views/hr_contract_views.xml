@@ -63,7 +63,7 @@
         <field name="arch" type="xml">
             <xpath expr="//field[@name='date_start']" position="after">
                 <field name="create_date" string="Fecha de Creación" optional="hide"/>
-                <field name="days_to_expiry" string="Dias Vencimiento" optional="hide"/>
+                <field name="days_to_expiry" string="Días Vencimiento" optional="hide"/>
                 <field name="create_uid" string="Creado por" widget="many2one_avatar_user" optional="hide"/>
             </xpath>
         </field>

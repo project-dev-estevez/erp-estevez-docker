@@ -25,7 +25,7 @@ class HrEmployee(models.Model):
     # Segunda Columna en la Vista de Empleados 
     company_id = fields.Many2one('res.company', string='Company', compute='_compute_company', store=True, readonly=True)
     direction_id = fields.Many2one('hr.direction', string='Dirección')
-    area_id = fields.Many2one('hr.area', string='Area')
+    area_id = fields.Many2one('hr.area', string='Área')
 
     # Información de Trabajo
     imss_registration_date = fields.Date(string='Fecha de Alta en IMSS')
@@ -63,7 +63,7 @@ class HrEmployee(models.Model):
     marital = fields.Selection([
         ('single', 'Soltero(a)'),
         ('married', 'Casado(a)'),
-        ('cohabitant', 'Cohabitante Legal'),
+        ('cohabitant', 'En Concubinato'),
         ('widower', 'Viudo(a)'),
         ('divorced', 'Divorciado(a)')
     ], string='Estado Civil', required=True, tracking=True)
