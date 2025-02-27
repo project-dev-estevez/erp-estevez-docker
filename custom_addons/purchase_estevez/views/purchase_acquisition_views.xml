@@ -11,17 +11,17 @@
             <field name="model">purchase.acquisition</field>
             <field name="arch" type="xml">
                 <form string="Acquisitions">          
-                <header>
-                <button name="action_approve" string="Aprobar" type="object" class="btn-primary" invisible="state in ('rejected', 'first_approval', 'second_approval', 'approved') or requestor_id == uid"/>
-                    <button name="action_confirm_approve" string="Confirmar Aprobación" type="object" class="btn-primary" invisible="state in ('to_approve', 'rejected', 'approved') or requestor_id == uid"/>
-                    <button name="action_reject" string="Rechazar" type="object" invisible="state in ('rejected', 'approved') or requestor_id == uid"/>
-                    <field name="state" 
+                    <header>
+                        <button name="action_approve" string="Aprobar" type="object" class="btn-primary" invisible="state in ('rejected', 'first_approval', 'second_approval', 'approved') or requestor_id == uid"/>
+                        <button name="action_confirm_approve" string="Confirmar Aprobación" type="object" class="btn-primary" invisible="state in ('to_approve', 'rejected', 'approved') or requestor_id == uid"/>
+                        <button name="action_reject" string="Rechazar" type="object" invisible="state in ('rejected', 'approved') or requestor_id == uid"/>
+                        <field name="state" 
                            widget="statusbar" 
                            decoration-muted="state == 'to_approve'" 
                            decoration-primary="state == 'first_approval'" 
                            decoration-success="state == 'second_approval'" 
                            decoration-danger="state == 'rejected'"/>
-                </header>          
+                        </header>          
                     <sheet>
                         <h1>Adquisiciones</h1>
                         <separator string="Datos del solicitante"/>
@@ -52,7 +52,7 @@
                                 <group string="Especificaciones del producto">
                                     <field name="nombre_producto"/>                                    
                                     <field name="cantidad"/>
-                                    <field name="medida"/>
+                                    <field name="medida" placeholder="Selecciona una opción"/>
                                     <field name="descripcion"/>
                                     <field name="especificaciones"/>
                                 </group>                                
@@ -63,14 +63,30 @@
                     </sheet>                
                 </form>
             </field>
-        </record>   
+        </record>       
 
-        <record id="view_purchase_acquisition_list" model="ir.ui.view">
+        <record id="view_purchas_acquisition_list" model="ir.ui.view">
             <field name="name">purchase.acquisition.list</field>
             <field name="model">purchase.acquisition</field>
             <field name="arch" type="xml">
-                <list string="Services">
-                    <field name="fecha_limite_entrega"/>
+                <list>
+                    <field name="create_date" string="Fecha y hora creación"/>
+                    <field name="requestor_id" string="Solicitante"/>
+                    <field name="proyecto" string="Proyecto"/>
+                    <field name="segmento" string="Segmento"/>
+                    <field name="tipo" string="Tipo de requisición"/>
+                    <field name="prioridad" string="Prioridad"/>
+                    <field name="fecha_limite_entrega" string="Fecha limite"/>
+                    <field name="state" string="Estatus"/>
+                    <field name="state" 
+                       widget="badge" 
+                       decoration-muted="state == 'to_approve'" 
+                       decoration-primary="state == 'first_approval'" 
+                       decoration-success="state == 'approved'" 
+                       decoration-danger="state == 'rejected'"/>
+                <button name="action_approve" string="Aprobar" type="object" icon="fa-thumbs-up" invisible="state in ('rejected', 'first_approval', 'second_approval', 'approved') or requestor_id == uid"/>
+                <button name="action_confirm_approve" string="Confirmar" type="object" icon="fa-thumbs-up" invisible="state in ('to_approve', 'rejected', 'approved') or requestor_id == uid"/>
+                <button name="action_reject" string="Rechazar" type="object" icon="fa-times" invisible="state in ('rejected', 'approved') or requestor_id == uid"/>
                 </list>
             </field>
         </record>
