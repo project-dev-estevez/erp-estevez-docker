@@ -246,7 +246,21 @@
             <field name="model">purchase.requisition</field>
             <field name="arch" type="xml">
                 <list string="Services">
-                    <field name="priority"/>
+                    <field name="create_date" string="Fecha de creación" width="250px"/>
+                    <field name="requestor_id" string="Solicitante"/>
+                    <field name="project_id" string="Proyecto"/>
+                    <field name="segment" string="Segmento"/>
+                    <field name="request_type" string="Tipo"/>
+                    <field name="date_end" string="Fecha limite" width="200px"/>                    
+                    <field name="state" string="Estatus"
+                       widget="badge" 
+                       decoration-muted="state == 'to_approve'" 
+                       decoration-primary="state == 'first_approval'" 
+                       decoration-success="state == 'approved'" 
+                       decoration-danger="state == 'rejected'"/>
+                <button name="action_approve" string="Aprobar" type="object" icon="fa-thumbs-up" invisible="state in ('rejected', 'first_approval', 'second_approval', 'approved') or requestor_id == uid"/>
+                <button name="action_confirm_approve" string="Confirmar" type="object" icon="fa-thumbs-up" invisible="state in ('to_approve', 'rejected', 'approved') or requestor_id == uid"/>
+                <button name="action_reject" string="Rechazar" type="object" icon="fa-times" invisible="state in ('rejected', 'approved') or requestor_id == uid"/>
                 </list>
             </field>
         </record>
@@ -261,18 +275,18 @@
                     <templates>
                         <t t-name="card">
                             <a type="open">
-                                <field name="priority" class="fw-bold fs-4 d-bolck ms-2"/>
+                                <field name="request_type" class="fw-bold fs-4 d-bolck ms-2"/>
                             </a>
-                            <field name="priority" widget="many2one_avatar_employee" options="{'display_avatar_name': True}" readonly="1" class="text-muted ms-2"/>
+                            <field name="requestor_id" widget="many2one_avatar_employee" options="{'display_avatar_name': True}" readonly="1" class="text-muted ms-2"/>
                             <div class="small mt-1 ms-2" groups="base.group_multi_company">
                                 <i class="fa fa-building-o" role="img" aria-label="Company" title="Company"/>
                                 <field name="priority" class="ms-1"/>
                             </div>
                             <div class="row g-0 mt-3 mb-2 ms-2">
                                 <div class="col-6">
-                                    <button class="btn btn-primary">
-                                        <field name="priority"/>
-                                        Departamentos
+                                    <button class="btn btn-primary">                                        
+                                        Proyecto
+                                        <field name="project_id"/>
                                     </button>
                                 </div>
                             </div>

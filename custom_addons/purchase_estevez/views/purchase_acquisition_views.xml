@@ -26,7 +26,7 @@
                         <h1>Adquisiciones</h1>
                         <separator string="Datos del solicitante"/>
                         <group>
-                            <group>                            
+                            <group>                                               
                                 <field name="requestor_id"/>
                                 <field name="company_id"/>
                             </group>
@@ -111,7 +111,7 @@
                                 <div class="col-6">
                                     <button class="btn btn-primary">
                                         <field name="fecha_limite_entrega"/>
-                                        Departamentos
+                                        Fecha Limite
                                     </button>
                                 </div>
                             </div>
