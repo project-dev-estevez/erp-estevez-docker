@@ -5,3 +5,4 @@ from . import hr_requisition_epp
 from . import hr_applicant
 from . import hr_candidate
 from . import hr_requisition_software
+from . import hr_recruitment_degree
