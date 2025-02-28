@@ -77,8 +77,7 @@
                     <field name="tipo" string="Tipo de requisición"/>
                     <field name="prioridad" string="Prioridad"/>
                     <field name="fecha_limite_entrega" string="Fecha limite"/>
-                    <field name="state" string="Estatus"/>
-                    <field name="state" 
+                    <field name="state" string="Estatus"                    
                        widget="badge" 
                        decoration-muted="state == 'to_approve'" 
                        decoration-primary="state == 'first_approval'" 
