@@ -3,6 +3,8 @@ from odoo import models, fields, api
 from odoo.exceptions import ValidationError
 from datetime import datetime
 
+_logger = logging.getLogger(__name__)
+
 class PurchaseAcquisition(models.Model):
     _name = 'purchase.acquisition'
     _description = 'Acquisition'
@@ -12,7 +14,37 @@ class PurchaseAcquisition(models.Model):
     company_id = fields.Many2one('res.company', string="Empresa", related='requestor_id.company_id', readonly=True, store=False)
     direction_id = fields.Many2one('hr.direction', string="Dirección", related='requestor_id.employee_id.direction_id', readonly=True, store=False)
     department_id = fields.Many2one('hr.department', string="Departamento", related='requestor_id.employee_id.department_id', readonly=True, store=False)
-    job_id = fields.Many2one('hr.job', string="Puesto Solicitante", related='requestor_id.employee_id.job_id', readonly=True, store=False)
+    job_id = fields.Many2one('hr.job', string="Puesto Solicitante", related='requestor_id.employee_id.job_id', readonly=True, store=False)       
+
+    medida = fields.Selection(
+        selection=[            
+            ('pieza', 'Pieza'),
+            ('juego', 'Juego'),
+            ('kilogramo', 'Kilogramo'),
+            ('litro', 'Litro'),
+            ('metro', 'Metro'),
+            ('otro', 'Otro'),
+            ('caja', 'Caja'),
+            ('centimetro', 'Centimetro'),
+            ('horas', 'Horas'),
+            ('kit', 'Kit'),
+            ('kilometro', 'Kilometro'),
+            ('lote', 'Lote'),
+            ('metro_cuadrado','Metro cuadrado'),
+            ('metro_cubico', 'Metro cubico'),
+            ('metro_lineal', 'Metro lineal'),
+            ('rollo', 'Rollo'),
+            ('servicio', 'Servicio'),
+            ('tonelada', 'Tonelada'),
+            ('bolsa', 'Bolsa'),
+            ('cubeta', 'Cubeta'),
+            ('paquete', 'Paquete'),
+            ('galon', 'Galon'),
+            ('bidon', 'Bidon'),
+            ('pares', 'Pares'),
+            ('no_aplica', 'No aplica'),
+        ],
+        string='Unidad', required=True)
 
     #Adquisiciones
 
@@ -31,8 +63,7 @@ class PurchaseAcquisition(models.Model):
     sugerencia = fields.Char(string='Sugerencia de proveedor', required=True)
     comentarios = fields.Char(string='Comentarios', required=True)
     nombre_producto = fields.Many2one('product.product', string='Nombre del producto', required=True)
-    cantidad = fields.Integer(string='Cantidad', required=True)
-    medida = fields.Char(string='Unidad de medida', required=True)
+    cantidad = fields.Integer(string='Cantidad', required=True)    
     descripcion = fields.Char(string='Descripcion', required=True)
     especificaciones = fields.Char(string='Especificaciones', required=True)
 
@@ -47,7 +78,7 @@ class PurchaseAcquisition(models.Model):
         self.state = 'first_approval'
         
         if not self.direction_id:
-            _logger.warning("No direction ID found for the requisition")
+            _logger.warning("No se encontro director para la adquisición")
             return
 
         _logger.info("Direction ID found: %s", self.direction_id.id)
