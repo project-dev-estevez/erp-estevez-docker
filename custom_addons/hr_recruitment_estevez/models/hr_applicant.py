@@ -1,4 +1,4 @@
-from odoo import models, api
+from odoo import models, api, fields, _
 from odoo.exceptions import UserError
 import logging
 import re
@@ -7,6 +7,31 @@ _logger = logging.getLogger(__name__)
 
 class HrApplicant(models.Model):
     _inherit = 'hr.applicant'
+
+    documents_count = fields.Integer(
+        'Documents Count', compute="_compute_applicant_documents")
+    
+    def _compute_applicant_documents(self):
+        for record in self:
+            record.documents_count = self.env['ir.attachment'].search_count(
+                [('res_model', '=', 'hr.applicant'), ('res_id', '=', record.id)])
+    
+    def action_open_documents(self):
+        required_documents = ['doc1', 'doc2', 'doc3', 'doc4', 'doc5']
+        return {
+            'name': _('Documentos del Aplicante'),
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': 'ir.attachment',
+            'view_id': self.env.ref('hr_recruitment_estevez.view_hr_applicant_documents').id,
+            'type': 'ir.actions.act_window',
+            'domain': [('res_model', '=', 'hr.applicant'), ('res_id', '=', self.id)],
+            'context': {
+                'default_res_model': 'hr.applicant',
+                'default_res_id': self.id,
+                'required_documents': required_documents,
+            },
+        }
 
     def _format_phone_number(self, phone_number):
         if phone_number and not phone_number.startswith('+52'):
