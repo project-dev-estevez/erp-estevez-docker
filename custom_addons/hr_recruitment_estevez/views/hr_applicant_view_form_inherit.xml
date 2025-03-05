@@ -22,7 +22,7 @@
                     <t t-name="kanban-box">
                         <div class="oe_kanban_card">
                             <div class="oe_kanban_content">
-                                <strong><t t-esc="record.name.value"/></strong>
+                                <h3><t t-esc="record.name.value"/></h3>
                                 <!-- Badge para indicar si el archivo está adjunto -->
                                 <div t-if="record.attached.raw_value" class="text-success">
                                     Archivo Adjunto
