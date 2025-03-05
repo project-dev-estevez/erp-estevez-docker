@@ -6,31 +6,29 @@
         <field name="arch" type="xml">
             <xpath expr="//div[@name='button_box']/button[@name='action_create_meeting']" position="after">
                 <button name="action_open_whatsapp" class="oe_stat_button" icon="fa-whatsapp" type="object" string="WhatsApp" invisible="not partner_phone"/>
-                <button class="oe_stat_button" name="action_open_documents" type="object" icon="fa-file-text-o">
-                    <field string="Documentos" name="documents_count" widget="statinfo"/>
-                </button>
+                <button class="oe_stat_button" name="action_open_documents" type="object" icon="fa-file-text-o" string="Documentos"/>
             </xpath>
         </field>
     </record>
 
     <record id="view_hr_applicant_documents_kanban" model="ir.ui.view">
         <field name="name">hr.applicant.documents.kanban</field>
-        <field name="model">ir.attachment</field>
+        <field name="model">hr.applicant.document</field> <!-- Cambia el modelo aquí -->
         <field name="arch" type="xml">
             <kanban class="o_kanban_view">
                 <field name="name"/>
-                <field name="datas"/> <!-- Campo que indica si hay un archivo adjunto -->
+                <field name="attached"/> <!-- Campo que indica si el archivo está adjunto -->
                 <templates>
                     <t t-name="kanban-box">
                         <div class="oe_kanban_card">
                             <div class="oe_kanban_content">
                                 <strong><t t-esc="record.name.value"/></strong>
                                 <!-- Badge para indicar si el archivo está adjunto -->
-                                <div t-if="record.datas.value" class="oe_kanban_badge oe_kanban_badge_success">
+                                <div t-if="record.attached.value == True" class="text-success">
                                     Archivo Adjunto
                                 </div>
-                                <div t-else="" class="oe_kanban_badge oe_kanban_badge_danger">
-                                    Sin Archivo
+                                <div t-else="" class="text-danger">
+                                    Sin Adjuntar
                                 </div>
                             </div>
                         </div>

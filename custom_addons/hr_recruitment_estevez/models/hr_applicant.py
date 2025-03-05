@@ -27,6 +27,7 @@ class HrApplicant(models.Model):
             'type': 'ir.actions.act_window',
             'target': 'new',
             'context': {'create': False},
+            'views': [(self.env.ref('hr_recruitment_estevez.view_hr_applicant_documents_kanban').id, 'kanban')],  # Asegúrate de usar la vista correcta
         }
 
     def _format_phone_number(self, phone_number):

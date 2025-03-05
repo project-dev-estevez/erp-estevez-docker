@@ -1,4 +1,6 @@
 from odoo import models, fields, api
+import logging
+_logger = logging.getLogger(__name__)
 
 class HrApplicantDocument(models.TransientModel):
     _name = 'hr.applicant.document'
@@ -27,18 +29,23 @@ class HrApplicantDocument(models.TransientModel):
             'CURP',
             'Prueba Psicométrica'
         ]
+
+        # Buscar archivos adjuntos asociados al aplicante
         existing_docs = self.env['ir.attachment'].search([
             ('res_model', '=', 'hr.applicant'),
             ('res_id', '=', applicant_id)
         ])
 
-        # Verificar cuáles ya están adjuntos
+        # Verificar cuáles documentos ya están adjuntos
         docs_data = []
-        for doc in required_documents:
+        for doc_name in required_documents:
+            # Verificar si hay un archivo adjunto con un nombre que coincida
+            attached = any(doc_name.lower() in doc.name.lower() for doc in existing_docs)
+            _logger.info(f"Documento: {doc_name}, Adjunto: {attached}")  # Depuración
             docs_data.append({
-                'name': doc,
+                'name': doc_name,
                 'applicant_id': applicant_id,
-                'attached': any(doc in d.name for d in existing_docs),
+                'attached': attached,  # Asignar el valor correcto
             })
 
         # Crear los registros
