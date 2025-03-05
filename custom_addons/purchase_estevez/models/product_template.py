@@ -62,16 +62,7 @@ class ProductTemplate(models.Model):
         domain="[('active', '=', True)]"  # Solo unidades activas
     )
     
-    #type = fields.Selection(
-    #    selection=[
-    #        ('consu', 'Consumibles'),
-    #        ('service', 'Servicios'),
-    #        ('product', 'Hola')
-    #    ],
-    #    default='consu',
-    #    string="Tipo de Producto",
-    #    required=True
-    #)
+   
 
     # Restricción para asegurar que el código sea único
     _sql_constraints = [
