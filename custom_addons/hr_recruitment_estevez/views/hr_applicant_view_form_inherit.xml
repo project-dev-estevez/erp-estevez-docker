@@ -24,12 +24,29 @@
                             <div class="oe_kanban_content">
                                 <strong><t t-esc="record.name.value"/></strong>
                                 <!-- Badge para indicar si el archivo está adjunto -->
-                                <div t-if="record.attached.value == True" class="text-success">
+                                <div t-if="record.attached.raw_value" class="text-success">
                                     Archivo Adjunto
                                 </div>
                                 <div t-else="" class="text-danger">
                                     Sin Adjuntar
                                 </div>
+                                <!-- Botón para adjuntar archivos -->
+                                <button class="oe_stat_button" name="action_attach_document" type="object" icon="fa-paperclip" string="Adjuntar"/>
+                                <!-- Botón para visualizar el documento adjunto -->
+                                <button t-if="record.attached.raw_value" 
+                                        class="oe_stat_button" 
+                                        name="action_view_document" 
+                                        type="object" 
+                                        icon="fa-eye" 
+                                        string="Visualizar"/>
+                                <!-- Botón para descargar el documento adjunto -->
+                                <button t-if="record.attached.raw_value" 
+                                        class="oe_stat_button" 
+                                        name="action_download_document" 
+                                        type="object" 
+                                        icon="fa-download" 
+                                        string="Descargar"/>
+                            
                             </div>
                         </div>
                     </t>
