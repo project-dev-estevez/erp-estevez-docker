@@ -1,14 +1,57 @@
 <odoo>
-    <data>
-        <record id="view_hr_applicant_form_inherit" model="ir.ui.view">
-            <field name="name">hr.applicant.form.inherit</field>
-            <field name="model">hr.applicant</field>
-            <field name="inherit_id" ref="hr_recruitment.hr_applicant_view_form"/>
-            <field name="arch" type="xml">
-                <xpath expr="//div[@name='button_box']/button[@name='action_create_meeting']" position="after">
-                    <button name="action_open_whatsapp" class="oe_stat_button" icon="fa-whatsapp" type="object" string="WhatsApp" invisible="not partner_phone"/>
-                </xpath>
-            </field>
-        </record>
-    </data>
+    <record id="view_hr_applicant_form_inherit" model="ir.ui.view">
+        <field name="name">hr.applicant.form.inherit</field>
+        <field name="model">hr.applicant</field>
+        <field name="inherit_id" ref="hr_recruitment.hr_applicant_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='button_box']/button[@name='action_create_meeting']" position="after">
+                <button name="action_open_whatsapp" class="oe_stat_button" icon="fa-whatsapp" type="object" string="WhatsApp" invisible="not partner_phone"/>
+                <button class="oe_stat_button" name="action_open_documents" type="object" icon="fa-file-text-o" string="Documentos"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_hr_applicant_documents_kanban" model="ir.ui.view">
+        <field name="name">hr.applicant.documents.kanban</field>
+        <field name="model">hr.applicant.document</field> <!-- Cambia el modelo aquí -->
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_view">
+                <field name="name"/>
+                <field name="attached"/> <!-- Campo que indica si el archivo está adjunto -->
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_card">
+                            <div class="oe_kanban_content">
+                                <h3><t t-esc="record.name.value"/></h3>
+                                <!-- Badge para indicar si el archivo está adjunto -->
+                                <div t-if="record.attached.raw_value" class="text-success">
+                                    Archivo Adjunto
+                                </div>
+                                <div t-else="" class="text-danger">
+                                    Sin Adjuntar
+                                </div>
+                                <!-- Botón para adjuntar archivos -->
+                                <button class="oe_stat_button" name="action_attach_document" type="object" icon="fa-paperclip" string="Adjuntar"/>
+                                <!-- Botón para visualizar el documento adjunto -->
+                                <button t-if="record.attached.raw_value" 
+                                        class="oe_stat_button" 
+                                        name="action_view_document" 
+                                        type="object" 
+                                        icon="fa-eye" 
+                                        string="Visualizar"/>
+                                <!-- Botón para descargar el documento adjunto -->
+                                <button t-if="record.attached.raw_value" 
+                                        class="oe_stat_button" 
+                                        name="action_download_document" 
+                                        type="object" 
+                                        icon="fa-download" 
+                                        string="Descargar"/>
+                            
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
 </odoo>

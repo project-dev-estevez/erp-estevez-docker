@@ -1,4 +1,4 @@
-from odoo import models, api
+from odoo import models, api, fields, _
 from odoo.exceptions import UserError
 import logging
 import re
@@ -7,6 +7,28 @@ _logger = logging.getLogger(__name__)
 
 class HrApplicant(models.Model):
     _inherit = 'hr.applicant'
+
+    documents_count = fields.Integer(
+        'Documents Count', compute="_compute_applicant_documents")
+    
+    def _compute_applicant_documents(self):
+        for record in self:
+            record.documents_count = self.env['ir.attachment'].search_count(
+                [('res_model', '=', 'hr.applicant'), ('res_id', '=', record.id)])
+    
+    def action_open_documents(self):
+        self.env['hr.applicant.document'].search([]).unlink()
+        docs = self.env['hr.applicant.document'].create_required_documents(self.id)
+
+        return {
+            'name': _('Documentos del Aplicante'),
+            'view_mode': 'kanban',
+            'res_model': 'hr.applicant.document',
+            'type': 'ir.actions.act_window',
+            'target': 'new',
+            'context': {'create': False},
+            'views': [(self.env.ref('hr_recruitment_estevez.view_hr_applicant_documents_kanban').id, 'kanban')],  # Asegúrate de usar la vista correcta
+        }
 
     def _format_phone_number(self, phone_number):
         if phone_number and not phone_number.startswith('+52'):

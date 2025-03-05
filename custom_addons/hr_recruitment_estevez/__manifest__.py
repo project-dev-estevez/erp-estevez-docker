@@ -9,10 +9,10 @@
     "website": "https://estevezjorinternacional.com",
     "category": "Human Resources",
     "version": "0.1",
-    "depends": ["hr", "hr_estevez", "hr_recruitment"],
+    "depends": ['base', 'hr', 'hr_estevez', 'hr_recruitment', 'utm'],
     "data": [
-        "security/hr_recruitment_security.xml",
         "security/ir.model.access.csv",
+        "security/hr_recruitment_security.xml",
         'views/hr_applicant_view_form_inherit.xml',
         "views/hr_requisition_views.xml",
         "data/hr_requisition_uniform_data.xml",
