@@ -1,0 +1,18 @@
+<odoo>
+    <data>
+        <!-- Heredar el modelo purchase.order para modificar el campo partner_id -->
+        <record id="purchase_order_inherit" model="ir.ui.view">
+            <field name="name">purchase.order.form.inherit</field>
+            <field name="model">purchase.order</field>
+            <field name="inherit_id" ref="purchase.purchase_order_form"/>
+            <field name="arch" type="xml">
+                <!-- Modificar el campo partner_id con dominio -->
+                <xpath expr="//field[@name='partner_id']" position="attributes">
+                    <attribute name="domain">
+                        [('supplier_rank', '>', 0), ('is_company', '=', True)]
+                    </attribute>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>
