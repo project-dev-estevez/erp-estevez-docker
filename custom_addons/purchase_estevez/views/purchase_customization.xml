@@ -1,5 +1,5 @@
 <odoo>
-    <data>
+    <data>    
         <!-- Heredar el modelo purchase.order para modificar el campo partner_id -->
         <record id="purchase_order_inherit" model="ir.ui.view">
             <field name="name">purchase.order.form.inherit</field>
@@ -11,8 +11,8 @@
                     <attribute name="domain">
                         [('supplier_rank', '>', 0), ('is_company', '=', True)]
                     </attribute>
-                </xpath>
+                </xpath>                 
             </field>
-        </record>
+        </record>     
     </data>
 </odoo>
