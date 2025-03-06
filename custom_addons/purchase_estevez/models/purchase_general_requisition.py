@@ -2,12 +2,13 @@ import logging
 from odoo import models, fields, api, exceptions
 from odoo.exceptions import ValidationError
 from datetime import date
+from dateutil.relativedelta import relativedelta
 
 _logger = logging.getLogger(__name__)
 
-class PurchaseRequisition(models.Model):
-    _name = 'purchase.requisition'
-    _description = 'Requisition'
+class PurchaseGeneralServiceRequisition(models.Model):
+    _name = 'purchase.general.requisition'
+    _description = 'General Service Requisition'
 
     state = fields.Selection([
         ('to_approve', 'Por Aprobar'),
@@ -131,10 +132,10 @@ class PurchaseRequisition(models.Model):
 
     employee_ids = fields.Many2many('hr.employee', string="Listado de personal")
 
-    fiscal_situation = fields.Binary(string="Subir archivo")
+    fiscal_situation = fields.Binary(string="Cargar carta de situación fiscal y/o factura en caso de ser deposito")
     fiscal_situation_name = fields.Char(string="Nombre del archivo")
 
-    letter_responsibility = fields.Binary(string="Subir archivo")
+    letter_responsibility = fields.Binary(string="Carta de responsabilidad de uso del inmueble")
     letter_responsibility_name = fields.Char(string="Nombre del archivo")
 
     #campos maquinaría
@@ -208,12 +209,12 @@ class PurchaseRequisition(models.Model):
     )
     period_to_pay = fields.Date(string="Periodo a pagar")
     
-    payment_receipt = fields.Binary(string="Subir archivo")
+    payment_receipt = fields.Binary(string="Cargar recibo de pago")
     payment_receipt_name = fields.Char(string="Nombre del archivo")
 
     deposit_person = fields.Boolean(string="¿Deposito a una persona para pago de servicio?", default=False)
 
-    additional_specifications = fields.Binary(string="Subir archivo")
+    additional_specifications = fields.Binary(string="Especificaciones Adicionales")
     additional_specifications_name = fields.Char(string="Nombre del archivo")
 
     #campos de flete
@@ -367,18 +368,30 @@ class PurchaseRequisition(models.Model):
                     raise exceptions.ValidationError(
                         "⚠️ La fecha de inicio no puede ser posterior a la fecha final."
                     )
-    @api.depends('date_start', 'date_end')
+    @api.depends('date_start', 'date_end', 'request_type')
     def _compute_duration_days(self):
         for record in self:
             if record.date_start and record.date_end:
                 start = fields.Date.from_string(record.date_start)
                 end = fields.Date.from_string(record.date_end)
-                delta = end - start
-                days = delta.days
-                nights = max(days - 1, 0)  # Evita números negativos
-                record.duration_days = f"{days} días y {nights} noches"
+                
+                if record.request_type == 'camp':
+                    # Cálculo de meses y días usando relativedelta
+                    delta = relativedelta(end, start)
+                    months = delta.years * 12 + delta.months
+                    days = delta.days
+                    record.duration_days = f"{months} meses y {days} días"
+                else:
+                    # Cálculo original de días y noches
+                    delta = end - start
+                    days = delta.days
+                    nights = max(days - 1, 0)
+                    record.duration_days = f"{days} días y {nights} noches"
             else:
-                record.duration_days = "0 días y 0 noches"
+                if record.request_type == 'camp':
+                    record.duration_days = "0 meses y 0 días"
+                else:
+                    record.duration_days = "0 días y 0 noches"
 
     @api.depends('request_type')
     def _compute_dynamic_page_title(self):

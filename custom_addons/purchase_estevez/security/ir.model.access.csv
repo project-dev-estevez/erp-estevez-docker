@@ -1,5 +1,5 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_purchase_requisition_user,access_purchase_requisition_user,model_purchase_requisition,base.group_user,1,1,1,1
+access_purchase_general_requisition_user,access_purchase_general_requisition_user,model_purchase_general_requisition,base.group_user,1,1,1,1
 access_purchase_acquisition_user,access_purchase_acquisition_user,model_purchase_acquisition,base.group_user,1,1,1,1
 access_purchase_requisition_service_user,access_purchase_requisition_service_user,model_purchase_requisition_service,base.group_user,1,1,1,1
 access_res_partner_user,access_res_partner_user,model_res_partner,base.group_user,1,1,1,1

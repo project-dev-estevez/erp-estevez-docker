@@ -2,14 +2,14 @@
     <data>
         <record id="action_purchase_services" model="ir.actions.act_window">
             <field name="name">Servicios Generales</field>
-            <field name="res_model">purchase.requisition</field>
+            <field name="res_model">purchase.general.requisition</field>
             <field name="view_mode">kanban,list,form</field>
         </record>
 
 
-        <record id="view_purchas_requisition_form" model="ir.ui.view">
-            <field name="name">purchase.requisition.form</field>
-            <field name="model">purchase.requisition</field>
+        <record id="view_purchase_general_requisition_form" model="ir.ui.view">
+            <field name="name">purchase.general.requisition.form</field>
+            <field name="model">purchase.general.requisition</field>
             <field name="arch" type="xml">
                 <form string="Services">
                     <header>
@@ -79,7 +79,15 @@
                                     <field name="date_end" widget="date" 
                                         string="Fecha fin"
                                         placeholder="Selecciona una fecha"/>
-                                    <xpath expr="//field[@name='date_end']" position="after">
+                                    <!-- Mostrar para tipos que NO son 'camp' -->
+                                    <xpath expr="//field[@name='date_end']" position="after" invisible="request_type == 'camp'">
+                                        <div class="alert alert-info" invisible="not duration_days">
+                                            <field name="duration_days" readonly="1" class="oe_inline"/>
+                                        </div>
+                                    </xpath>
+                                    
+                                    <!-- Mostrar solo para 'camp' -->
+                                    <xpath expr="//field[@name='date_end']" position="after" invisible="request_type != 'camp'">
                                         <div class="alert alert-info" invisible="not duration_days">
                                             <field name="duration_days" readonly="1" class="oe_inline"/>
                                         </div>
@@ -102,7 +110,11 @@
                                     <field name="responsible_number"
                                         string="Numero de persona responsable del campamento"
                                         widget="number" invisible="request_type in ['lodging', 'store']"/> 
-                                    <field name="employee_ids" widget="many2many_tags" invisible="request_type == 'store'"/>
+                                    <field 
+                                        name="employee_ids" 
+                                        widget="many2many_tags" 
+                                        options="{'field': 'display_name'}" 
+                                    />
                                     <field name="fiscal_situation" 
                                         widget="binary" 
                                         filename="fiscal_situation_name"
@@ -241,9 +253,9 @@
         </record>
 
 
-        <record id="view_purchase_requisition_list" model="ir.ui.view">
-            <field name="name">purchase.requisition.list</field>
-            <field name="model">purchase.requisition</field>
+        <record id="view_purchase_general_requisition_list" model="ir.ui.view">
+            <field name="name">purchase.general.requisition.list</field>
+            <field name="model">purchase.general.requisition</field>
             <field name="arch" type="xml">
                 <list string="Services">
                     <field name="create_date" string="Fecha de creación" width="250px"/>
@@ -265,9 +277,9 @@
             </field>
         </record>
 
-        <record id="view_purchase_requisition_kanban" model="ir.ui.view">
-            <field name="name">purchase.requisition.kanban</field>
-            <field name="model">purchase.requisition</field>
+        <record id="view_purchase_general_requisition_kanban" model="ir.ui.view">
+            <field name="name">purchase.general.requisition.kanban</field>
+            <field name="model">purchase.general.requisition</field>
             <field name="arch" type="xml">
                 <kanban>
                     <field name="request_type"/>
