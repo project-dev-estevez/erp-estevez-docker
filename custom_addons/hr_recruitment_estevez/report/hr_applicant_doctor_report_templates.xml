@@ -2,18 +2,20 @@
     <template id="report_hr_applicant_document">
         <t t-call="web.html_container">
             <t t-foreach="docs" t-as="doc">
-                <div class="page">
-                    <h2>Clinical History</h2>
-                    <p><strong>Patient Name:</strong> <t t-esc="doc.patient_name"/></p>
-                    <p><strong>Gender:</strong> <t t-esc="doc.gender"/></p>
-                    <p><strong>Birth Date:</strong> <t t-esc="doc.birth_date"/></p>
-                    <p><strong>Age:</strong> <t t-esc="doc.age"/></p>
-                    <p><strong>Job Position:</strong> <t t-esc="doc.job_position"/></p>
-                    <p><strong>Education:</strong> <t t-esc="doc.education"/></p>
-                    <p><strong>Address:</strong> <t t-esc="doc.address"/></p>
-                    <p><strong>Phone:</strong> <t t-esc="doc.phone"/></p>
-                    <!-- Add more fields as needed -->
-                </div>
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <h2>Report title</h2>
+                        <h2>Clinical History</h2>
+                        <p><strong>Patient Name:</strong> <t t-esc="doc.patient_name"/></p>
+                        <p><strong>Gender:</strong> <t t-esc="doc.gender"/></p>
+                        <p><strong>Birth Date:</strong> <t t-esc="doc.birth_date"/></p>
+                        <p><strong>Age:</strong> <t t-esc="doc.age"/></p>
+                        <p><strong>Job Position:</strong> <t t-esc="doc.job_position"/></p>
+                        <p><strong>Education:</strong> <t t-esc="doc.education"/></p>
+                        <p><strong>Address:</strong> <t t-esc="doc.address"/></p>
+                        <p><strong>Phone:</strong> <t t-esc="doc.phone"/></p>
+                    </div>
+                </t>
             </t>
         </t>
     </template>

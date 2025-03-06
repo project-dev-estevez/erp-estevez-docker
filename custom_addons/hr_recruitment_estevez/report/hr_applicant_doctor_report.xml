@@ -1,11 +1,12 @@
 <odoo>
-    <report
-        id="action_report_hr_applicant_document"
-        model="hr.applicant"
-        string="Clinical History Report"
-        report_type="qweb-pdf"
-        name="hr_recruitment_estevez.report_hr_applicant_document"
-        file="hr_recruitment_estevez.report_hr_applicant_document"
-        print_report_name="'Clinical_History_Report_' + object.patient_name"
-    />
+    <record id="action_report_hr_applicant_document" model="ir.actions.report">
+        <field name="name">Clinical History Report</field>
+        <field name="model">hr.applicant</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">hr_recruitment_estevez.report_hr_applicant_document</field>
+        <field name="report_file">hr_recruitment_estevez.report_hr_applicant_document</field>
+        <field name="print_report_name">'Clinical_History_Report_' + object.patient_name</field>
+        <field name="binding_model_id" eval="False"/>
+        <field name="binding_type">report</field>
+    </record>
 </odoo>

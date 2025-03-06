@@ -80,6 +80,7 @@
 
                     <div class="text-center">
                         <button name="action_save" string="Guardar" type="object" class="btn btn-primary btn-lg mt-4"/>
+                        <button name="%(action_report_hr_applicant_document)d" string="Generar PDF" type="action" class="btn btn-secondary btn-lg mt-4"/>
                     </div>
                 </page>
             </xpath>
