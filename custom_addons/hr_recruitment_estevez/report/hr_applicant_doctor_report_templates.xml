@@ -12,7 +12,73 @@
                                     <small>Revisión: 01</small>
                                 </div>
                             </div>
-                            <div class="row">
+                            <table class="table table-bordered">
+                                <tbody>
+                                    <tr>
+                                        <td colspan="2">
+                                            <strong>Centro Laboral:</strong> 
+                                            <t t-esc="doc.company_id.name"/>
+                                        </td>
+                                        <td>
+                                            <strong>Expediente:</strong> 
+                                            123124
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Fecha de Elaboración:</strong> <t t-esc="doc.create_date.strftime('%Y-%m-%d')"/></td>
+                                        <td><strong>Hora de Elaboración:</strong> <t t-esc="doc.create_date.strftime('%H:%M:%S')"/></td>
+                                        <td><strong>Tipo de Interrogatorio:</strong> <t t-esc="dict(doc._fields['interrogation_type'].selection).get(doc.interrogation_type)"/></td>
+                                    </tr>
+                                    <!-- <tr>
+                                        <td colspan="2">Larry the Bird</td>
+                                        <td>@twitter</td>
+                                    </tr> -->
+                                </tbody>
+                            </table>
+
+                            <h3><strong>I. FICHA DE IDENTIFICACIÓN</strong></h3>
+
+                            <table class="table table-bordered">
+                                <tbody>
+                                    <tr>
+                                        <td colspan="2">
+                                            <strong>Centro Laboral:</strong> 
+                                            <t t-esc="doc.company_id.name"/>
+                                        </td>
+                                        <td>
+                                            <strong>Expediente:</strong> 
+                                            123124
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Fecha de Elaboración:</strong> <t t-esc="doc.create_date.strftime('%Y-%m-%d')"/></td>
+                                        <td><strong>Hora de Elaboración:</strong> <t t-esc="doc.create_date.strftime('%H:%M:%S')"/></td>
+                                        <td><strong>Tipo de Interrogatorio:</strong> <t t-esc="dict(doc._fields['interrogation_type'].selection).get(doc.interrogation_type)"/></td>
+                                    </tr>
+                                    <!-- <tr>
+                                        <td colspan="2">Larry the Bird</td>
+                                        <td>@twitter</td>
+                                    </tr> -->
+                                </tbody>
+                            </table>
+                    
+
+
+                            <!-- <table class="table table-bordered mt-4">
+                                <tr>
+                                    <td><strong>Centro Laboral:</strong> <t t-esc="doc.company_id.name"/></td>
+                                    <td><strong>Expediente:</strong> 123456</td>
+                                </tr>
+                            </table> -->
+                            <!-- <table class="table table-bordered mb-2">
+                                <tr>
+                                    <td><strong>Fecha de Elaboración:</strong> <t t-esc="doc.create_date.strftime('%Y-%m-%d')"/></td>
+                                    <td><strong>Hora de Elaboración:</strong> <t t-esc="doc.create_date.strftime('%H:%M:%S')"/></td>
+                                    <td><strong>Tipo de Interrogatorio:</strong> <t t-esc="dict(doc._fields['interrogation_type'].selection).get(doc.interrogation_type)"/></td>
+                                </tr>
+                            </table> -->
+
+                            <!-- <div class="row">
                                 <div class="col">
                                     <h2>Clinical History</h2>
                                     <p><strong>Patient Name:</strong> <t t-esc="doc.patient_name"/></p>
@@ -24,7 +90,7 @@
                                     <p><strong>Address:</strong> <t t-esc="doc.address"/></p>
                                     <p><strong>Phone:</strong> <t t-esc="doc.phone"/></p>
                                 </div>
-                            </div>
+                            </div> -->
                         </div>
                     </div>
                 </t>

@@ -2,7 +2,7 @@
     'name': 'Compras Estevez',
     'version': '1.0',
     'summary': 'Modulo compras de Estevez',
-    'depends': ['product','account','purchase', 'base', 'account'],
+    'depends': ['product','purchase', 'base', 'account'],
     'author': 'Estevez.Jor',
     'category': 'Purchases',
     'description': """
@@ -11,7 +11,7 @@
     'data': [
         'security/ir.model.access.csv',
         'views/product_views.xml',
-        'views/purchase_requisition_views.xml',
+        'views/purchase_general_requisition_views.xml',
         'views/purchase_acquisition_views.xml',
         'views/purchase_menu.xml',
         'views/res_partner_industry_data.xml',      
