@@ -1,0 +1,11 @@
+<odoo>
+    <report
+        id="action_report_hr_applicant_document"
+        model="hr.applicant"
+        string="Clinical History Report"
+        report_type="qweb-pdf"
+        name="hr_recruitment_estevez.report_hr_applicant_document"
+        file="hr_recruitment_estevez.report_hr_applicant_document"
+        print_report_name="'Clinical_History_Report_' + object.patient_name"
+    />
+</odoo>

@@ -8,6 +8,81 @@
                 <button name="action_open_whatsapp" class="oe_stat_button" icon="fa-whatsapp" type="object" string="WhatsApp" invisible="not partner_phone"/>
                 <button class="oe_stat_button" name="action_open_documents" type="object" icon="fa-file-text-o" string="Documentos"/>
             </xpath>
+
+            <xpath expr="//notebook" position="inside">
+                <page string="Clinical History" name="clinical_history">
+                    <group string="Identification Sheet">
+                        <field name="interrogation_type"/>
+                        <field name="patient_name"/>
+                        <field name="gender"/>
+                        <field name="birth_date"/>
+                        <field name="age"/>
+                        <field name="job_position"/>
+                        <field name="education"/>
+                        <field name="address"/>
+                        <field name="phone"/>
+                    </group>
+                    <group string="Family Medical History">
+                        <field name="family_medical_history"/>
+                    </group>
+                    <group string="Non-Pathological Personal History">
+                        <field name="place_of_origin"/>
+                        <field name="marital_status"/>
+                        <field name="religion"/>
+                        <field name="housing_type"/>
+                        <field name="construction_material"/>
+                        <field name="housing_services"/>
+                        <field name="weekly_clothing_change"/>
+                        <field name="daily_teeth_brushing"/>
+                        <field name="zoonosis"/>
+                        <field name="overcrowding"/>
+                        <field name="tattoos_piercings"/>
+                        <field name="blood_type"/>
+                        <field name="donor"/>
+                    </group>
+                    <group string="Pathological Personal History">
+                        <field name="previous_surgeries"/>
+                        <field name="traumas"/>
+                        <field name="transfusions"/>
+                        <field name="allergies"/>
+                        <field name="chronic_diseases"/>
+                        <field name="childhood_diseases"/>
+                        <field name="smoking"/>
+                        <field name="alcoholism"/>
+                        <field name="drug_addiction"/>
+                    </group>
+                    <group string="Vaccination Schedule">
+                        <field name="complete_schedule"/>
+                        <field name="no_vaccination_card"/>
+                        <field name="last_vaccine"/>
+                    </group>
+                    <group string="Physical Examination">
+                        <field name="heart_rate"/>
+                        <field name="respiratory_rate"/>
+                        <field name="temperature"/>
+                        <field name="blood_pressure"/>
+                        <field name="oxygen_saturation"/>
+                        <field name="weight"/>
+                        <field name="height"/>
+                        <field name="bmi"/>
+                    </group>
+                    <group string="Diagnosis and Treatment">
+                        <field name="clinical_diagnosis"/>
+                        <field name="treatment_instructions"/>
+                        <field name="next_appointment"/>
+                        <field name="prognosis"/>
+                    </group>
+                    <group string="Signatures">
+                        <field name="doctor_signature"/>
+                        <field name="professional_license"/>
+                        <field name="worker_signature"/>
+                    </group>
+
+                    <div class="text-center">
+                        <button name="action_save" string="Guardar" type="object" class="btn btn-primary btn-lg mt-4"/>
+                    </div>
+                </page>
+            </xpath>
         </field>
     </record>
 
