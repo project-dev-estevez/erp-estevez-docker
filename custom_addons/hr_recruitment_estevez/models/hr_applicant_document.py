@@ -31,10 +31,11 @@ class HrApplicantDocument(models.TransientModel):
             'view_mode': 'form',
             'view_id': self.env.ref('base.view_attachment_form').id,
             'target': 'new',
+            'name': 'Adjunte el Documento',
             'context': {
                 'default_res_model': 'hr.applicant',
                 'default_res_id': self.applicant_id.id,
-                'default_name': self.name,
+                'default_name': self.name
             },
         }   
 
