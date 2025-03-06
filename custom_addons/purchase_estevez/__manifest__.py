@@ -16,7 +16,7 @@
         'views/purchase_menu.xml',
         'views/res_partner_industry_data.xml',      
         'views/res_partner_views.xml',
-        'views/res_partner_banks.xml',
+        #'views/res_partner_banks.xml',
         'views/purchase_customization.xml',
         
     ],

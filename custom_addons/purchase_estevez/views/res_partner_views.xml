@@ -7,9 +7,9 @@
             <field name="arch" type="xml">
                 <!-- Agregar el campo "nuevo_campo" debajo de "vat" -->
                 <xpath expr="//field[@name='vat']" position="after">
-                    <field name="trade_name" string="Nombre comercial" required="1"/>                                
+                    <!--field name="trade_name" string="Nombre comercial" required="1"/-->
                     <field name="industry_id" required="1"/>                                
-                    <field name="contact" string="Persona de contacto"/>
+                    <!--field name="contact" string="Persona de contacto"/-->
                 </xpath>              
                 <xpath expr="//group[@name='misc']//field[@name='industry_id']" position="replace"/>                                                        
             </field>
