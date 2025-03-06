@@ -7,13 +7,9 @@
             <field name="arch" type="xml">
                 <!-- Agregar el campo "nuevo_campo" debajo de "vat" -->
                 <xpath expr="//field[@name='vat']" position="after">
-                    <field name="nuevo_campo" string="Nombre comercial" required="1"/>                
-                </xpath>                        
-                <xpath expr="//field[@name='nuevo_campo']" position="after">
-                    <field name="industry_id" required="1"/>
-                </xpath>         
-                <xpath expr="//field[@name='industry_id']" position="after">
-                    <field name="nuevo_campo" string="Persona de contacto"/>                
+                    <field name="trade_name" string="Nombre comercial" required="1"/>                                
+                    <field name="industry_id" required="1"/>                                
+                    <field name="contact" string="Persona de contacto"/>
                 </xpath>              
                 <xpath expr="//group[@name='misc']//field[@name='industry_id']" position="replace"/>                                                        
             </field>
@@ -100,13 +96,13 @@
             <field name="arch" type="xml">
                 <!-- Agregar el campo en la vista de lista (tree) -->
                 <xpath expr="//list/field[@name='complete_name']" position="after">
-                    <field name="nuevo_campo" string="Nombre comercial"/>
+                    <field name="trade_name" string="Nombre comercial"/>
                 </xpath>
-                <xpath expr="//list/field[@name='nuevo_campo']" position="after">
+                <xpath expr="//list/field[@name='trade_name']" position="after">
                     <field name="industry_id" string="Giro"/>
                 </xpath>
                  <xpath expr="//list/field[@name='industry_id']" position="after">
-                    <field name="nuevo_campo" string="Persona de contacto"/>
+                    <field name="trade_name" string="Persona de contacto"/>
                 </xpath>
                 <xpath expr="//list/field[@name='state_id']" position="after">
                     <field name="state_id" string="Estado"/>

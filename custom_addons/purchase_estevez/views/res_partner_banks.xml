@@ -16,9 +16,11 @@
                                     <list>
                                         <field name="sequence" widget="handle"/>
                                         <field name="acc_number"/>                                        
-                                        <field name="bank_id"/>
+                                        <field name="bank_id"/>  
+                                        <field name="clabe"/> 
+                                        <field name="reference"/>                                      
                                         <field name="allow_out_payment"/>
-                                        <field name="acc_holder_name" column_invisible="True"/>
+                                        <field name="acc_holder_name"/>
                                     </list>
                                 </field>
                             </group>
@@ -49,6 +51,17 @@
                             </group>
                         </sheet>
                     </page>
+                </xpath>
+            </field>
+        </record>
+        <record id="view_partner_bank_form_inherit" model="ir.ui.view">
+            <field name="name">res.partner.bank.form.inherit</field>
+            <field name="model">res.partner.bank</field>
+            <field name="inherit_id" ref="base.view_partner_bank_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='acc_number']" position="after">
+                    <field name="clabe"/>    
+                    <field name="reference"/>        
                 </xpath>
             </field>
         </record>

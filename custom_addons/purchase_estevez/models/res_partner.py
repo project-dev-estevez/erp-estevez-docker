@@ -1,11 +1,14 @@
 from odoo import models, fields
+from odoo.exceptions import UserError
 import logging
 _logger = logging.getLogger(__name__)
 import re
 
 class ResPartner(models.Model):
     _inherit = "res.partner"
-    nuevo_campo = fields.Char(string="Nombre comercial")       
+
+    trade_name = fields.Char(string="Nombre comercial")         
+    contact = fields.Char(string="Contacto")  
     email = fields.Char(required=True)
     vat = fields.Char(string="RFC", required=True)
     street = fields.Char(required=True)
@@ -14,8 +17,8 @@ class ResPartner(models.Model):
     state_id = fields.Many2one('res.country.state', required=True)  # Estado
     zip = fields.Char(required=True)  #Codigo Postal
     country_id = fields.Many2one('res.country', required=True)       
-    buyer_id = fields.Many2one('hr.employee', string="Comprador", domain="[('department_id', '=', 4)]")  
-    #contacto = fields.Char(string="Contacto")       
+    buyer_id = fields.Many2one('hr.employee', string="Comprador", domain="[('department_id', '=', 4)]")     
+
  # Método para el botón "Guardar"
     def action_guardar(self):
         self.ensure_one()        
