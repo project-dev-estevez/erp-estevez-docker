@@ -1,19 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-
-    <data>
-    
-        <record id="view_hr_job_form_inherit" model="ir.ui.view">
+    <record id="view_hr_job_form_inherit" model="ir.ui.view">
             <field name="name">hr.job.form.inherit</field>
             <field name="model">hr.job</field>
             <field name="inherit_id" ref="hr.view_hr_job_form"/>
             <field name="arch" type="xml">
-                <xpath expr="//field[@name='name']" position="after">
+                <xpath expr="//div[@class='oe_title']" position="after">
                     <group>
-                        <field name="area_id"/>
-                        <field name="department_id"/>
-                        <field name="direction_id"/>
                         <field name="company_id"/>
+                        <field name="direction_id"/>
+                        <field name="department_id"/>
+                        <field name="area_id"/>
                     </group>
                 </xpath>
             </field>
@@ -37,8 +34,4 @@
             <field name="view_mode">list,form</field>
             <field name="view_id" ref="hr.view_hr_job_tree"/>
         </record>
-    
-    </data>
-    
-
 </odoo>
