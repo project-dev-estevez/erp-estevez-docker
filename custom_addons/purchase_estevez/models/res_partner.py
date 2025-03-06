@@ -7,8 +7,8 @@ import re
 class ResPartner(models.Model):
     _inherit = "res.partner"
 
-    #trade_name = fields.Char(string="Nombre comercial")         
-    #contact = fields.Char(string="Contacto")  
+    trade_name = fields.Char(string="Nombre comercial")         
+    contact = fields.Char(string="Contacto")  
     email = fields.Char(required=True)
     vat = fields.Char(string="RFC", required=True)
     street = fields.Char(required=True)
