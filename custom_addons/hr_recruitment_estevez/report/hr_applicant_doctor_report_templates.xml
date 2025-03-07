@@ -5,19 +5,38 @@
                 <t t-call="web.external_layout">
                     <div class="page">
                         <div class="container">
-                            <div class="row">
-                                <div class="col text-center">
-                                    <h1><strong>HISTORIA CLÍNICA GENERAL</strong></h1>
-                                    <small>Código: DA-FE-HS-043</small><br/>
-                                    <small>Revisión: 01</small>
-                                </div>
-                            </div>
+                            <table class="table table-bordered">
+                                <tbody>
+                                    <tr>
+                                        <td rowspan="2">
+                                            <div class="text-center">
+                                                <h2><strong>HISTORIA CLÍNICA GENERAL</strong></h2>
+                                            </div> 
+                                        </td>
+                                        <td>
+                                            <div class="text-center">
+                                                <strong>Código:</strong> 
+                                                123124
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="text-center">
+                                                <strong>Revisión:</strong> 
+                                                010101
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
                             <table class="table table-bordered">
                                 <tbody>
                                     <tr>
                                         <td colspan="2">
-                                            <strong>Centro Laboral:</strong> 
-                                            <t t-esc="doc.company_id.name"/>
+                                            <strong>Centro Laboral Estévez Jor</strong> 
+                                            
                                         </td>
                                         <td>
                                             <strong>Expediente:</strong> 
@@ -29,68 +48,161 @@
                                         <td><strong>Hora de Elaboración:</strong> <t t-esc="doc.create_date.strftime('%H:%M:%S')"/></td>
                                         <td><strong>Tipo de Interrogatorio:</strong> <t t-esc="dict(doc._fields['interrogation_type'].selection).get(doc.interrogation_type)"/></td>
                                     </tr>
-                                    <!-- <tr>
-                                        <td colspan="2">Larry the Bird</td>
-                                        <td>@twitter</td>
-                                    </tr> -->
                                 </tbody>
                             </table>
 
-                            <h3><strong>I. FICHA DE IDENTIFICACIÓN</strong></h3>
+
+                            <h4><strong>I. FICHA DE IDENTIFICACIÓN</strong></h4>
 
                             <table class="table table-bordered">
                                 <tbody>
                                     <tr>
                                         <td colspan="2">
-                                            <strong>Centro Laboral:</strong> 
-                                            <t t-esc="doc.company_id.name"/>
+                                            <strong>Nombre Del Paciente (Apellido Paterno, Apellido Materno Y Nombre)</strong> 
+                                            
                                         </td>
                                         <td>
-                                            <strong>Expediente:</strong> 
-                                            123124
+                                            <strong>Sexo:</strong>
+                                            *****
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td><strong>Fecha de Elaboración:</strong> <t t-esc="doc.create_date.strftime('%Y-%m-%d')"/></td>
-                                        <td><strong>Hora de Elaboración:</strong> <t t-esc="doc.create_date.strftime('%H:%M:%S')"/></td>
-                                        <td><strong>Tipo de Interrogatorio:</strong> <t t-esc="dict(doc._fields['interrogation_type'].selection).get(doc.interrogation_type)"/></td>
+                                        <td><strong>Fecha de Nacimiento:</strong> <t t-esc="doc.create_date.strftime('%Y-%m-%d')"/></td>
+                                        <td><strong>Puesto Laboral:</strong> <t t-esc="1234"/></td>
+                                        <td><strong>Escolaridad:</strong> <t t-esc="123456"/></td>
                                     </tr>
-                                    <!-- <tr>
-                                        <td colspan="2">Larry the Bird</td>
-                                        <td>@twitter</td>
-                                    </tr> -->
+                                    
+                                    <tr>
+                                        <td><strong>Domicilio:</strong> <t t-esc="12345"/></td>
+                                        <td colspan="2"><strong>Teléfono:</strong> <t t-esc="1234567890"/></td>
+                                    </tr>
                                 </tbody>
                             </table>
-                    
 
+                            <h4><strong>II. ANTECEDENTES HEREDO FAMILIARES</strong></h4>
+                            <hr/>
 
-                            <!-- <table class="table table-bordered mt-4">
-                                <tr>
-                                    <td><strong>Centro Laboral:</strong> <t t-esc="doc.company_id.name"/></td>
-                                    <td><strong>Expediente:</strong> 123456</td>
-                                </tr>
-                            </table> -->
-                            <!-- <table class="table table-bordered mb-2">
-                                <tr>
-                                    <td><strong>Fecha de Elaboración:</strong> <t t-esc="doc.create_date.strftime('%Y-%m-%d')"/></td>
-                                    <td><strong>Hora de Elaboración:</strong> <t t-esc="doc.create_date.strftime('%H:%M:%S')"/></td>
-                                    <td><strong>Tipo de Interrogatorio:</strong> <t t-esc="dict(doc._fields['interrogation_type'].selection).get(doc.interrogation_type)"/></td>
-                                </tr>
-                            </table> -->
+                            <h4><strong>III. ANTECEDENTES PERSONALES NO PATOLÓGICOS</strong></h4>
 
-                            <!-- <div class="row">
-                                <div class="col">
-                                    <h2>Clinical History</h2>
-                                    <p><strong>Patient Name:</strong> <t t-esc="doc.patient_name"/></p>
-                                    <p><strong>Gender:</strong> <t t-esc="doc.gender"/></p>
-                                    <p><strong>Birth Date:</strong> <t t-esc="doc.birth_date"/></p>
-                                    <p><strong>Age:</strong> <t t-esc="doc.age"/></p>
-                                    <p><strong>Job Position:</strong> <t t-esc="doc.job_position"/></p>
-                                    <p><strong>Education:</strong> <t t-esc="doc.education"/></p>
-                                    <p><strong>Address:</strong> <t t-esc="doc.address"/></p>
-                                    <p><strong>Phone:</strong> <t t-esc="doc.phone"/></p>
-                                </div>
-                            </div> -->
+                            <p>Paciente originario de _________________ y residente _________________, (soltero/ casado), religión. Vive en casa (propia / rentada), construida con materiales (no) perdurables, cuenta con todos los servicios intradomicilarios y extradomiciliarios. Realiza (número) veces a la semana, cambio de ropa interna y diario, realiza cepillado de dientes diario (número) veces al día. <strong>Zoonosis negada:</strong> Combe (negado / positivo). <strong>Hacinamiento:</strong> (negado / positivo). <strong>Tatuajes y Perforaciones:</strong> ______________________</p>
+                            <p><strong>Tipo Sanguíneo:</strong> ___ <strong>Donador:</strong> _______</p>
+                            <p><strong>Oficios desempeñados</strong> (antecedentes de incapacidades, accidentes, enfermedades del trabajo o accidentes del trayecto):</p>
+                            
+                            <hr/>
+
+                            <h4><strong>IV. ANTECEDENTES PERSONALES PATOLÓGICOS</strong></h4>
+                            <hr/>
+
+                            <p><strong>Quirúrgicos:</strong> _________________ <strong>Traumáticos:</strong> _________________  <strong>Transfusionales:</strong> _________________ </p>
+                            <p><strong>Alérgicos:</strong> _________________ <strong>crónico-degenerativos:</strong> _________________  <strong>Enfermedades de la infancia:</strong> _________________ </p>
+                            <p><strong>infancia:</strong> _________________ <strong>Tabaquismo:</strong> _________________  <strong>Alcoholismo:</strong> _________________ </p>
+                            <p><strong>Toxicomanías:</strong> _________________ </p>
+
+                            <table class="table table-bordered">
+                                <tbody>
+                                    <tr>
+                                        <td>
+                                            <strong>ESQUEMA DE VACUNACION:</strong>
+                                        </td>
+                                        <td colspan="2">
+                                            <strong>Última vacuna:</strong>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <hr/>
+
+                            <h4><strong>V. PADECIMIENTO ACTUAL </strong></h4>
+                            <hr/>
+
+                            <h4><strong>VI. INTERROGATORIO POR APARATOS Y SISTEMAS </strong></h4>
+                            <hr/>
+
+                            <p><strong>Cardiovascular: </strong> (interrogatorio sobre disnea, taquicardia, bradicardia, cianosis, plétora yugular y lipotimia negados)</p>
+                            <hr/>
+                            <p><strong>Respiratorio: </strong>(Interrogatorio sobre, disnea, tiros intercostales, aleteo nasal, tos persistente y crónica, expectoración y hemoptisis)</p>
+                            <hr/>
+                            <p><strong>Gastrointestinal: </strong>(Interrogatorio sobre disfagia, reflujo gastroesofágico, pirosis, plenitud postprandial, constipación, flatulencia, nausea, vómito y diarrea negados, evacuaciones normales.)</p>
+                            <hr/>
+                            <p><strong>Endócrino: </strong>(Interrogados y negados.)</p>
+                            <hr/>
+                            <p><strong>Nervioso: </strong>(Interrogatorio sobre, epilepsia, cefalea, miopía, astigmatismo, negados.)</p>
+                            <hr/>
+                            <p><strong>Musculo esquelético: </strong>(Interrogatorio sobre mialgias, artralgias, debilidad muscular, negados.)</p>
+                            <hr/>
+                            <p><strong>Piel, Mucosas Y Anexos: </strong>(Interrogatorio sobre, nevos, condilomas, xerosis, negados.)</p>
+                            <hr/>
+
+                            <h4><strong>VII. SIGNOS VITALES </strong></h4>
+
+                            <table class="table table-bordered">
+                                <tbody>
+                                    
+                                    <tr>
+                                        <td class="text-center"><strong>Frecuencia Cardiaca</strong></td>
+                                        <td class="text-center"><strong>Frecuencia Respiratoria</strong></td>
+                                        <td class="text-center"><strong>Temperatura</strong></td>
+                                        <td class="text-center"><strong>Tensión Arterial</strong></td>
+                                        <td class="text-center"><strong>Sat O2</strong></td>
+                                        <td class="text-center"><strong>Peso</strong></td>
+                                        <td class="text-center"><strong>Talla</strong></td>
+                                        <td class="text-center"><strong>IMC</strong></td>
+                                    </tr>
+
+                                    <tr>
+                                        <td class="text-center"><strong>Lpm</strong></td>
+                                        <td class="text-center"><strong>rpm</strong></td>
+                                        <td class="text-center"><strong>°c</strong></td>
+                                        <td class="text-center"><strong>mmHg</strong></td>
+                                        <td class="text-center"><strong>%</strong></td>
+                                        <td class="text-center"><strong>kg</strong></td>
+                                        <td class="text-center"><strong>cms</strong></td>
+                                        <td class="text-center"><strong></strong></td>
+                                    </tr>
+                                    
+                                </tbody>
+                            </table>
+
+                            <h4><strong>VIII. EXPLORACIÓN FÍSICAL </strong></h4>
+                            <hr/>
+                            <p><strong>Habitus Exterior: </strong>de edad aparente a la cronológica, alerta, cooperadora, consciente, (orientada / desorientada) en tiempo, persona y espacio, (con / sin) facies características, (con / sin) adecuada coloración e (hidratación / deshidratación) de piel y tegumentos, marcha (normal / anormal), posición libremente escogida.</p>
+                            <hr/>
+                            <p><strong>Cabeza: </strong>normocéfalo, (con / sin) endostosis (con / ni) exostosis, pabellones auriculares (con / sin) adecuada implantación, canales auditivos externos permeables, membranas timpánicas íntegras, (con / sin) presencia de reflejo luminoso, (con / sin) adecuada movilidad. Ojos simétricos, párpados íntegros, pupilas isocóricas normorreflécticas. Narinas permeables, cornetes medio e inferior normales, (con / sin) ciclo nasal, (con / sin) desviación de tabique, datos de epistaxis, (con / sin) descarga anterior. Labios simétricos, cavidad oral (con / sin) mucosa hidratada, faringe (no) hiperémica, presencia de descarga retronasal , exudado faríngeo, amígdalas presentes.</p>
+                            <hr/>
+                            <p><strong>Cuello: </strong>cilíndrico, con tráquea central y móvil, (si / no) se palpa tiroides o adenomegalias, (con / sin) plétora yugular, (con / sin) pulso carotideo presente bilateralmente</p>
+                            <hr/>
+                            <p><strong>Tórax: </strong>normolíneo, (con / sin) respiración torácica, mecánica ventilatoria simétrica y comparativa, campos pulmonares (bien / mal) ventilados, (no) sibilancias (con / ni) estertores, (no) tiros intercostales, (no) se integró síndrome pleuropulmonar. Mamas simétricas, pezón central (con / sin) datos patológicos, (no) dolorosas a la palpación, (con / sin) hallazgos patológicos. Ruidos cardiacos rítmicos de (buena / mala) intensidad y frecuencia, (si / no) se ausculta soplo, frote, galope.</p>
+                            <hr/>
+                            <p><strong>Abdomen: </strong>plano blando y depresible, (no) datos de parestesias (con / ni) hipervaralgesia, peristalsis presente de (buen / mal) ritmo e intensidad, (no) doloroso a la palpación media y profunda (con / sin) viceromegalias, (con / sin) datos de irritación peritoneal, timpánico a la percusión sobre el marco cólico, signo de Murphy (- / +), puntos uretrales (- / +), Giordano (- / +), Rebote (- / +).</p>
+                            <hr/>
+                            <p><strong>Genitales: </strong>(de acuerdo con edad y sexo.)</p>
+                            <hr/>
+                            <p><strong>Extremidades: </strong>Extremidades: superiores e inferiores eutróficas, eutérmicas, (con / sin) datos de edema, tono y fuerza _/5 por Roots, reflejos osteotendinosos presentes, (con / sin) compromiso arterial o venoso.</p>
+                            <hr/>
+                            <p><strong>Piel: </strong>de (buena / mala) coloración e (hidratación / deshidratación).</p>
+                            <p><strong>Antidoping</strong></p>
+                            <p><strong>Glucosa</strong></p>
+                            <hr/>
+
+                            <h4><strong>IX. RESULTADOS PREVIOS Y ACTUALES DE LABORATORIO, GABINETE Y OTROS:</strong></h4>
+                            <hr/>
+                            <h4><strong>X. DIAGNÓSTICOS O PROBLEMAS CLÍNICOS:</strong></h4>
+                            <p><strong>1.</strong><strong>Sobrepeso: </strong></p>
+                            <p><strong>2.</strong><strong>Ametropía no corregida: </strong></p>
+                            <hr/>
+                            <h4><strong>XI. TERAPÉUTICA EMPLEADA Y RESULTADOS (PREVIOS):  </strong></h4>
+                            <p>No aplica</p>
+                            <hr/>
+                            <h4><strong>XII. TRATAMIENTO E INDICACIONES: </strong></h4>
+                            <hr/>
+                            <h4><strong>XIII. PROXIMA CITA: </strong> ABIERTA</h4>
+                            <hr/>
+                            <h4><strong>XIV. PRONÓSTICO: </strong> LIGADO A EVOLUCIÓN</h4>
+                            <hr/>
+
+                            <h4><strong>FIRMA Y SELLO REGISTRO MEDICO </strong> <strong>FIRMA DEL TRABAJADOR</strong></h4>
+                            <hr/>
+
                         </div>
                     </div>
                 </t>
