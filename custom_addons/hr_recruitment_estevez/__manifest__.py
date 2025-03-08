@@ -11,8 +11,8 @@
     "version": "0.1",
     "depends": ['base', 'hr', 'hr_estevez', 'hr_recruitment', 'utm'],
     "data": [
-        "security/ir.model.access.csv",
         "security/hr_recruitment_security.xml",
+        "security/ir.model.access.csv",
         'report/hr_applicant_doctor_report_templates.xml',
         'report/hr_applicant_doctor_report.xml',
         'views/hr_applicant_view_form_inherit.xml',

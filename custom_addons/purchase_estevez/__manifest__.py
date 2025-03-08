@@ -2,7 +2,7 @@
     'name': 'Compras Estevez',
     'version': '1.0',
     'summary': 'Modulo compras de Estevez',
-    'depends': ['product','purchase', 'base', 'account'],
+    'depends': ['product','purchase', 'base', 'account', 'purchase_requisition'],
     'author': 'Estevez.Jor',
     'category': 'Purchases',
     'description': """
