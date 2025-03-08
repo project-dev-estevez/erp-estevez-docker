@@ -1,4 +1,4 @@
-<odoo>
+<!--odoo>
     <data>
         <record id="view_partner_property_form_inherit" model="ir.ui.view">
             <field name="name">res.partner.property.form.inherit</field>
@@ -66,4 +66,4 @@
             </field>
         </record>
     </data>
-</odoo>
+</!--odoo-->
