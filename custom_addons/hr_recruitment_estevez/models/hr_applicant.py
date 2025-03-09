@@ -1,5 +1,6 @@
 from odoo import models, api, fields, _
 from odoo.exceptions import UserError
+from datetime import timedelta
 import logging
 import re
 
@@ -154,3 +155,101 @@ class HrApplicant(models.Model):
         self.write(self._context.get('params', {}))
         # Generate the PDF report
         return self.env.ref('hr_recruitment_estevez.action_report_hr_applicant_document').report_action(self)
+
+
+    @api.model
+    def check_first_contact_stage(self):
+        # Buscar el stage por nombre, sin sensibilidad a mayúsculas/minúsculas
+        first_contact_stage = self.env['hr.recruitment.stage'].search([('name', 'ilike', 'primer contacto')], limit=1)
+        if not first_contact_stage:
+            _logger.error("Stage 'Primer Contacto' not found")
+            return
+        
+        # Buscar o crear el tag "Falta de seguimiento"
+        tag_name = "Falta de seguimiento"
+        tag = self.env['hr.applicant.category'].search([('name', '=', tag_name)], limit=1)
+        if not tag:
+            tag = self.env['hr.applicant.category'].create({'name': tag_name})
+        
+        applicants = self.search([
+            ('stage_id', '=', first_contact_stage.id),
+            ('kanban_state', '!=', 'blocked'),
+            ('date_last_stage_update', '<=', fields.Datetime.now() - timedelta(hours=24))
+        ])
+        for applicant in applicants:
+            applicant.write({
+                'kanban_state': 'blocked',
+                'categ_ids': [(4, tag.id)]
+            })
+            # Notificar al reclutador
+            applicant.message_post(
+                body="El postulante ha sido bloqueado por falta de seguimiento.",
+                subtype_id=self.env.ref('mail.mt_comment').id
+            )
+
+    @api.model
+    def check_interview_stage(self):
+        _logger.info("Executing check_interview_stage")
+        
+        # Buscar el stage por nombre, sin sensibilidad a mayúsculas/minúsculas
+        interview_stage = self.env['hr.recruitment.stage'].search([('name', 'ilike', 'entrevista')], limit=1)
+        if not interview_stage:
+            _logger.error("Stage 'Entrevista' not found")
+            return
+        
+        # Buscar o crear el tag "Reprogramar entrevista"
+        tag_name = "Reprogramar entrevista"
+        tag = self.env['hr.applicant.category'].search([('name', '=', tag_name)], limit=1)
+        if not tag:
+            tag = self.env['hr.applicant.category'].create({'name': tag_name})
+        
+        applicants = self.search([
+            ('stage_id', '=', interview_stage.id),
+            ('kanban_state', '!=', 'blocked'),
+            ('date_last_stage_update', '<=', fields.Datetime.now() - timedelta(hours=24))
+        ])
+        _logger.info(f"Found {len(applicants)} applicants to block")
+        for applicant in applicants:
+            applicant.write({
+                'kanban_state': 'blocked',
+                'categ_ids': [(4, tag.id)]
+            })
+            # Notificar al reclutador
+            applicant.message_post(
+                body="El candidato ha sido bloqueado, se debe reprogramar entrevista.",
+                subtype_id=self.env.ref('mail.mt_comment').id
+            )
+
+    @api.model
+    def check_psychometric_tests_stage(self):
+        
+        # Buscar el stage por nombre, sin sensibilidad a mayúsculas/minúsculas
+        psychometric_tests_stage = self.env['hr.recruitment.stage'].search([('name', 'ilike', 'pruebas psicométricas')], limit=1)
+        
+        # Buscar o crear el tag "No realizar pruebas"
+        tag_name = "No realizó pruebas a tiempo"
+        tag = self.env['hr.applicant.category'].search([('name', '=', tag_name)], limit=1)
+        if not tag:
+            tag = self.env['hr.applicant.category'].create({'name': tag_name})
+        
+        applicants = self.search([
+            ('stage_id', '=', psychometric_tests_stage.id),
+            ('kanban_state', '!=', 'blocked'),
+            ('date_last_stage_update', '<=', fields.Datetime.now() - timedelta(hours=24))
+        ])
+        _logger.info(f"Found {len(applicants)} applicants to block")
+        for applicant in applicants:
+            applicant.write({
+                'kanban_state': 'blocked',
+                'categ_ids': [(4, tag.id)]
+            })
+            # Notificar al reclutador
+            applicant.message_post(
+                body="El candidato ha sido bloqueado por no realizar las pruebas psicométricas en el tiempo establecido.",
+                subtype_id=self.env.ref('mail.mt_comment').id
+            )
+
+    def write(self, vals):
+        if 'stage_id' in vals and any(applicant.kanban_state == 'blocked' for applicant in self):
+            raise UserError(_("El postulante está bloqueado y no puede avanzar en el proceso hasta que el bloqueo sea resuelto o eliminado manualmente por un usuario autorizado."))
+        return super(HrApplicant, self).write(vals)

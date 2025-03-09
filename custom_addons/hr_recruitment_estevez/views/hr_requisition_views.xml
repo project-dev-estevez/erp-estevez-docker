@@ -82,7 +82,7 @@
                                 <group>
                                     <field name="project"/>
                                     <field name="number_of_vacancies"/>
-                                    <field name="work_schedule"/>
+                                    <field name="work_schedule" options="{'no_quick_create': True, 'no_create_edit': True}"/>
                                 </group>
                             </group>
 

@@ -1,4 +1,4 @@
-from odoo import models, api
+from odoo import models, fields, api
 from odoo.exceptions import UserError
 import logging
 import re
@@ -7,6 +7,8 @@ _logger = logging.getLogger(__name__)
 
 class HrCandidate(models.Model):
     _inherit = 'hr.candidate'
+
+    rfc = fields.Char(string="RFC")
 
     def _format_phone_number(self, phone_number):
         if phone_number and not phone_number.startswith('+52'):
@@ -36,3 +38,14 @@ class HrCandidate(models.Model):
                 }
             else:
                 raise UserError("The candidate does not have a phone number.")
+            
+
+    @api.model
+    def create(self, vals):
+        if vals.get('rfc'):
+            existing_candidate = self.with_context(active_test=False).search([('rfc', '=', vals['rfc']), ('rfc', '!=', '')], limit=1)
+            if existing_candidate:
+                # Eliminar el candidato existente con el mismo RFC
+                existing_candidate.unlink()
+                raise UserError("El candidato con RFC %s ya se ha postulado anteriormente!" % vals['rfc'])
+        return super(HrCandidate, self).create(vals)
