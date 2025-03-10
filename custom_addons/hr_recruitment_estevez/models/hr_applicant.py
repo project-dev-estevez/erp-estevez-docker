@@ -25,7 +25,8 @@ class HrApplicant(models.Model):
     family_medical_history = fields.Text(string="Antecedentes Heredo Familiares")
 
     # Antecedentes Personales No Patológicos
-    place_of_origin = fields.Char(string="Lugar de Origen y Residencia")
+    place_of_origin = fields.Char(string="Lugar de Origen")
+    place_of_residence = fields.Char(string="Lugar de Residencia")
     marital_status = fields.Selection([('single', 'Soltero'), ('married', 'Casado')], string="Estado Civil")
     religion = fields.Char(string="Religión")
     housing_type = fields.Selection([('own', 'Propia'), ('rented', 'Rentada')], string="Tipo de Vivienda")
@@ -40,15 +41,15 @@ class HrApplicant(models.Model):
     donor = fields.Boolean(string="Donador")
 
     # Antecedentes Personales Patológicos
-    previous_surgeries = fields.Char(string="Cirugías Previas")
-    traumas = fields.Char(string="Traumas")
-    transfusions = fields.Char(string="Transfusiones")
-    allergies = fields.Char(string="Alergias")
-    chronic_diseases = fields.Char(string="Enfermedades Crónicas")
+    previous_surgeries = fields.Char(string="Quirúrgicos")
+    traumas = fields.Char(string="Traumáticos")
+    transfusions = fields.Char(string="Transfusionales")
+    allergies = fields.Char(string="Alérgicos")
+    chronic_diseases = fields.Char(string="Crónico-degenerativos")
     childhood_diseases = fields.Char(string="Enfermedades de la Infancia")
     smoking = fields.Selection([('yes', 'Sí'), ('no', 'No')], string="Tabaquismo")
     alcoholism = fields.Selection([('yes', 'Sí'), ('no', 'No')], string="Alcoholismo")
-    drug_addiction = fields.Char(string="Adicción a Drogas")
+    drug_addiction = fields.Char(string="Toxicomanías")
 
     # Esquema de Vacunación
     complete_schedule = fields.Selection([('yes', 'Sí'), ('no', 'No')], string="Esquema Completo")
@@ -56,14 +57,14 @@ class HrApplicant(models.Model):
     last_vaccine = fields.Date(string="Última Vacuna")
 
     # Examen Físico
-    heart_rate = fields.Integer(string="Frecuencia Cardíaca (LPM)")
-    respiratory_rate = fields.Integer(string="Frecuencia Respiratoria (RPM)")
-    temperature = fields.Float(string="Temperatura (°C)")
-    blood_pressure = fields.Char(string="Presión Arterial (mmHg)")
-    oxygen_saturation = fields.Float(string="Saturación de Oxígeno (%)")
-    weight = fields.Float(string="Peso (Kg)")
-    height = fields.Float(string="Estatura (Cm)")
-    bmi = fields.Float(string="IMC")
+    heart_rate = fields.Integer(string="Cardiovascular (LPM)")
+    respiratory_rate = fields.Integer(string="Respiratorio (RPM)")
+    temperature = fields.Float(string="Gastrointestinal")
+    blood_pressure = fields.Char(string="Genitourinario")
+    oxygen_saturation = fields.Float(string="Endócrino")
+    weight = fields.Float(string="Nervioso")
+    height = fields.Float(string="Musculoesquelético")
+    bmi = fields.Float(string="Piel, mucosas y anexos")
 
     # Diagnóstico y Tratamiento
     clinical_diagnosis = fields.Text(string="Diagnóstico Clínico")

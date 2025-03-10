@@ -10,8 +10,8 @@
             </xpath>
 
             <xpath expr="//notebook" position="inside">
-                <page string="Clinical History" name="clinical_history">
-                    <group string="Identification Sheet">
+                <page string="Historia Clínica General" name="clinical_history">
+                    <group string="Ficha de Identificación">
                         <field name="interrogation_type"/>
                         <field name="patient_name"/>
                         <field name="gender"/>
@@ -22,11 +22,12 @@
                         <field name="address"/>
                         <field name="phone"/>
                     </group>
-                    <group string="Family Medical History">
+                    <group string="Antecedentes Heredo Familiares">
                         <field name="family_medical_history"/>
                     </group>
-                    <group string="Non-Pathological Personal History">
+                    <group string="Antecedentes Personales No Patológicos">
                         <field name="place_of_origin"/>
+                        <field name="place_of_residence"/>
                         <field name="marital_status"/>
                         <field name="religion"/>
                         <field name="housing_type"/>
@@ -40,7 +41,7 @@
                         <field name="blood_type"/>
                         <field name="donor"/>
                     </group>
-                    <group string="Pathological Personal History">
+                    <group string="Antecedentes Personales Patológicos">
                         <field name="previous_surgeries"/>
                         <field name="traumas"/>
                         <field name="transfusions"/>
@@ -51,12 +52,12 @@
                         <field name="alcoholism"/>
                         <field name="drug_addiction"/>
                     </group>
-                    <group string="Vaccination Schedule">
+                    <group string="Esquema de Vacunación">
                         <field name="complete_schedule"/>
                         <field name="no_vaccination_card"/>
                         <field name="last_vaccine"/>
                     </group>
-                    <group string="Physical Examination">
+                    <group string="Interrogatorio por Aparatos y Sistemas">
                         <field name="heart_rate"/>
                         <field name="respiratory_rate"/>
                         <field name="temperature"/>
@@ -66,13 +67,13 @@
                         <field name="height"/>
                         <field name="bmi"/>
                     </group>
-                    <group string="Diagnosis and Treatment">
+                    <group string="Interrogatorio por Aparatos y Sistemas">
                         <field name="clinical_diagnosis"/>
                         <field name="treatment_instructions"/>
                         <field name="next_appointment"/>
                         <field name="prognosis"/>
                     </group>
-                    <group string="Signatures">
+                    <group string="Firma y Sello">
                         <field name="doctor_signature"/>
                         <field name="professional_license"/>
                         <field name="worker_signature"/>
