@@ -28,8 +28,8 @@
         "views/hr_requisition_views.xml",
         
         # Archivos de informes
-        'report/hr_applicant_doctor_report_templates.xml',
         'report/hr_applicant_doctor_report.xml',
+        'report/hr_applicant_doctor_report_templates.xml',
     ],
     "installable": True,
     "application": False,
