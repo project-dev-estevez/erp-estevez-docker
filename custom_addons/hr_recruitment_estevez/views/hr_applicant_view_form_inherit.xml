@@ -10,7 +10,7 @@
             </xpath>
 
             <xpath expr="//notebook" position="inside">
-                <page string="Historia Clínica General" name="clinical_history">
+                <page string="Historia Clínica General" name="clinical_history" invisible="not is_examen_medico">
                     <group string="Ficha de Identificación">
                         <field name="interrogation_type"/>
                         <field name="patient_name"/>

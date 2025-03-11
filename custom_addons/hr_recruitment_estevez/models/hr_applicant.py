@@ -1,6 +1,7 @@
 from odoo import models, api, fields, _
 from odoo.exceptions import UserError
 from datetime import timedelta
+import json
 import logging
 import re
 
@@ -8,6 +9,8 @@ _logger = logging.getLogger(__name__)
 
 class HrApplicant(models.Model):
     _inherit = 'hr.applicant'
+
+    is_examen_medico = fields.Boolean(compute="_compute_is_examen_medico")
 
     # *********Formulario de historia clinica *********
     # Ficha de Identificación
@@ -254,3 +257,12 @@ class HrApplicant(models.Model):
         if 'stage_id' in vals and any(applicant.kanban_state == 'blocked' for applicant in self):
             raise UserError(_("El postulante está bloqueado y no puede avanzar en el proceso hasta que el bloqueo sea resuelto o eliminado manualmente por un usuario autorizado."))
         return super(HrApplicant, self).write(vals)
+
+    @api.depends('stage_id.name')
+    def _compute_is_examen_medico(self):
+        for record in self:
+            stage_name = record.stage_id.name
+            if stage_name:
+                record.is_examen_medico = stage_name == 'Examen Médico'
+            else:
+                record.is_examen_medico = False
