@@ -1,6 +1,6 @@
 from odoo import models, api, fields, _
 from odoo.exceptions import UserError
-from datetime import timedelta
+from datetime import timedelta, date
 import base64
 import logging
 import re
@@ -18,9 +18,9 @@ class HrApplicant(models.Model):
     patient_name = fields.Char(string="Nombre del Paciente", compute="_compute_patient_name")
     gender = fields.Selection([('male', 'Masculino'), ('female', 'Femenino')], string="Género")
     birth_date = fields.Date(string="Fecha de Nacimiento")
-    age = fields.Integer(string="Edad")
+    age = fields.Char(string="Edad", compute="_compute_age", readonly=True)
     job_position = fields.Char(string="Puesto de Trabajo", compute="_compute_job_position")
-    education = fields.Char(string="Escolaridad")
+    degree_id = fields.Many2one('hr.recruitment.degree', string="Escolaridad")
     address = fields.Text(string="Dirección")
     phone = fields.Char(string="Teléfono", compute="_compute_phone")
 
@@ -30,12 +30,19 @@ class HrApplicant(models.Model):
     # Antecedentes Personales No Patológicos
     place_of_origin = fields.Char(string="Lugar de Origen")
     place_of_residence = fields.Char(string="Lugar de Residencia")
-    marital_status = fields.Selection([('single', 'Soltero'), ('married', 'Casado')], string="Estado Civil")
+    marital_status = fields.Selection([
+        ('single', 'Soltero(a)'),
+        ('married', 'Casado(a)'),
+        ('cohabitant', 'En Concubinato'),
+        ('widower', 'Viudo(a)'),
+        ('divorced', 'Divorciado(a)')
+    ], string='Estado Civil', tracking=True)
     religion = fields.Char(string="Religión")
     housing_type = fields.Selection([('own', 'Propia'), ('rented', 'Rentada')], string="Tipo de Vivienda")
     construction_material = fields.Selection([('durable', 'Durable'), ('non_durable', 'No Durable')], string="Material de Construcción")
     housing_services = fields.Char(string="Servicios de Vivienda")
-    weekly_clothing_change = fields.Integer(string="Cambio de Ropa Semanal")
+    weekly_clothing_change = fields.Char(string="Cambio de Ropa Semanal")
+    occupations = fields.Text(string="Oficios Desempeñados")
     daily_teeth_brushing = fields.Integer(string="Cepillado de Dientes Diario")
     zoonosis = fields.Selection([('negative', 'Negativo'), ('positive', 'Positivo')], string="Zoonosis")
     overcrowding = fields.Selection([('negative', 'Negativo'), ('positive', 'Positivo')], string="Hacinamiento")
@@ -44,36 +51,79 @@ class HrApplicant(models.Model):
     donor = fields.Boolean(string="Donador")
 
     # Antecedentes Personales Patológicos
+    # Esquema de Vacunación
+    complete_schedule = fields.Selection([('yes', 'Sí'), ('no', 'No')], string="Esquema Completo Vacunación")
+    comments = fields.Text(string="Comentarios")
+    no_vaccination_card = fields.Boolean(string="Sin Cartilla de Vacunación")
+    last_vaccine = fields.Date(string="Última Vacuna")
     previous_surgeries = fields.Char(string="Quirúrgicos")
     traumas = fields.Char(string="Traumáticos")
     transfusions = fields.Char(string="Transfusionales")
     allergies = fields.Char(string="Alérgicos")
     chronic_diseases = fields.Char(string="Crónico-degenerativos")
     childhood_diseases = fields.Char(string="Enfermedades de la Infancia")
-    smoking = fields.Selection([('yes', 'Sí'), ('no', 'No')], string="Tabaquismo")
-    alcoholism = fields.Selection([('yes', 'Sí'), ('no', 'No')], string="Alcoholismo")
-    drug_addiction = fields.Char(string="Toxicomanías")
+    smoking = fields.Selection([('yes', 'Sí'), ('no', 'No'), ('social', 'Social')], string="Tabaquismo")
+    alcoholism = fields.Selection([('yes', 'Sí'), ('no', 'No'), ('social', 'Social')], string="Alcoholismo")
+    drug_addiction = fields.Selection([('yes', 'Sí'), ('no', 'No'), ('social', 'Social')], string="Toxicomanías")
 
-    # Esquema de Vacunación
-    complete_schedule = fields.Selection([('yes', 'Sí'), ('no', 'No')], string="Esquema Completo")
-    no_vaccination_card = fields.Boolean(string="Sin Cartilla de Vacunación")
-    last_vaccine = fields.Date(string="Última Vacuna")
+    # Antecedentes Gineco-Obstétricos
+    menarche = fields.Char(string="Menarca")
+    thelarche = fields.Char(string="Telarca")
+    rhythm = fields.Char(string="Ritmo")
+    gpca = fields.Char(string="GPCA")
+    breastfeeding_history = fields.Selection([('yes', 'Sí'), ('no', 'No')], string="Antecedente de Lactancia Materna")
+    ivsa = fields.Char(string="IVSA")
+    nps = fields.Char(string="NPS")
+    mpf = fields.Char(string="MPF")
 
-    # Examen Físico
-    heart_rate = fields.Integer(string="Cardiovascular (LPM)")
-    respiratory_rate = fields.Integer(string="Respiratorio (RPM)")
-    temperature = fields.Float(string="Gastrointestinal")
-    blood_pressure = fields.Char(string="Genitourinario")
-    oxygen_saturation = fields.Float(string="Endócrino")
-    weight = fields.Float(string="Nervioso")
-    height = fields.Float(string="Musculoesquelético")
-    bmi = fields.Float(string="Piel, mucosas y anexos")
+    # Padecimiento Actual
+    current_condition = fields.Text(string="Padecimiento Actual")
 
-    # Diagnóstico y Tratamiento
-    clinical_diagnosis = fields.Text(string="Diagnóstico Clínico")
-    treatment_instructions = fields.Text(string="Tratamiento e Instrucciones")
-    next_appointment = fields.Date(string="Próxima Cita")
-    prognosis = fields.Char(string="Pronóstico")
+    # Interrogatorio por aparatos y sistemas
+    cardiovascular = fields.Char(string="Cardiovascular")
+    respiratory = fields.Char(string="Respiratorio")
+    gastrointestinal = fields.Char(string="Gastrointestinal")
+    genitourinary = fields.Char(string="Genitourinario")
+    endocrine = fields.Char(string="Endocrino")
+    nervous = fields.Char(string="Nervioso")
+    musculoskeletal = fields.Char(string="Músculo-Esquelético")
+    skin_mucous = fields.Char(string="Piel y Mucosas")
+
+    # Signos Vitales
+    heart_rate = fields.Integer(string="Frecuencia Cardiaca (Lpm)")
+    respiratory_rate = fields.Integer(string="Frecuencia Respiratoria (Rpm)")
+    temperature = fields.Float(string="Temperatura (°C)")
+    blood_pressure = fields.Char(string="Tensión Arterial (mmHg)")
+    oxygen_saturation = fields.Float(string="Saturación O2 (%)")
+    weight = fields.Float(string="Peso (Kg)")
+    height = fields.Float(string="Talla (Cm)")
+    bmi = fields.Float(string="IMC", compute="_compute_bmi", readonly=True)
+
+    # Exploración Física
+    head_neck = fields.Char(string="Cabeza y Cuello")
+    chest = fields.Char(string="Tórax")
+    abdomen = fields.Char(string="Abdomen")
+    extremities = fields.Char(string="Extremidades")
+    neurological = fields.Char(string="Neurológico")
+    skin = fields.Char(string="Piel")
+
+    # Resultados Previos y Actuales de Laboratorio, Gabinete y Otros
+    laboratory_results = fields.Text(string="Resultados")
+
+    # Diagnóstico o Problemas Clínicos
+    diagnosis = fields.Text(string="Diagnóstico")
+
+    # Terapéutica Empleada y Resultados Previos
+    previous_treatment = fields.Text(string="Terapéutica Empleada y Resultados Previos")
+
+    # Tratamiento e Indicaciones
+    treatment_recommendations = fields.Text(string="Tratamiento e Indicaciones")
+
+    # Próxima Cita
+    next_appointment = fields.Text(string="Próxima Cita")
+
+    # Pronóstico
+    prognosis = fields.Text(string="Pronóstico")
 
     # Firmas
     doctor_signature = fields.Binary(string="Firma del Doctor")
@@ -83,8 +133,26 @@ class HrApplicant(models.Model):
     documents_count = fields.Integer(
         'Documents Count', compute="_compute_applicant_documents")
     
-
     # Computed fields
+    @api.depends('weight', 'height')
+    def _compute_bmi(self):
+        for record in self:
+            if record.weight and record.height:
+                height_in_meters = record.height / 100
+                record.bmi = record.weight / (height_in_meters ** 2)
+            else:
+                record.bmi = 0
+
+    @api.depends('birth_date')
+    def _compute_age(self):
+        for record in self:
+            if record.birth_date:
+                today = date.today()
+                age = today.year - record.birth_date.year - ((today.month, today.day) < (record.birth_date.month, record.birth_date.day))
+                record.age = f"{age} años"
+            else:
+                record.age = "0 años"
+
     def _compute_work_center(self):
         for record in self:
             record.work_center = record.company_id.name
