@@ -1,7 +1,7 @@
 from odoo import models, api, fields, _
 from odoo.exceptions import UserError
 from datetime import timedelta
-import json
+import base64
 import logging
 import re
 
@@ -153,13 +153,6 @@ class HrApplicant(models.Model):
             else:
                 raise UserError("The applicant does not have a phone number.")
             
-    def action_save(self):
-        # Save the record
-        self.ensure_one()
-        self.write(self._context.get('params', {}))
-        # Generate the PDF report
-        return self.env.ref('hr_recruitment_estevez.action_report_hr_applicant_document').report_action(self)
-
 
     @api.model
     def check_first_contact_stage(self):
