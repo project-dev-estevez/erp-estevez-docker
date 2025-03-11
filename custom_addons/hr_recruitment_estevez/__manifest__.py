@@ -21,15 +21,15 @@
         "data/ir_cron_first_stage_data.xml",
         "data/ir_cron_interviews_data.xml",
         "data/ir_cron_psychometric_data.xml",
+
+        # Archivos de informes
+        'report/hr_applicant_doctor_report.xml',
+        'report/hr_applicant_doctor_report_templates.xml',
         
         # Archivos de vistas
         'views/hr_applicant_view_form_inherit.xml',
         'views/hr_candidate_view_form_inherit.xml',
-        "views/hr_requisition_views.xml",
-        
-        # Archivos de informes
-        'report/hr_applicant_doctor_report.xml',
-        'report/hr_applicant_doctor_report_templates.xml',
+        "views/hr_requisition_views.xml"
     ],
     "installable": True,
     "application": False,
