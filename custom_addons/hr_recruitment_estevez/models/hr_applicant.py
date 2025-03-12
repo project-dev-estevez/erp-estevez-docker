@@ -276,7 +276,7 @@ class HrApplicant(models.Model):
             applicants = self.search([
                 ('stage_id', '=', stage.id),
                 ('kanban_state', '!=', 'blocked'),
-                ('date_last_stage_update', '<=', fields.Datetime.now() - timedelta(minutes=1))
+                ('date_last_stage_update', '<=', fields.Datetime.now() - timedelta(hours=24))
             ])
             
             _logger.info(f"Found {len(applicants)} applicants to block in stage {stage.name}")
