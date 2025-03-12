@@ -21,6 +21,7 @@
         "data/ir_cron_first_stage_data.xml",
         "data/ir_cron_interviews_data.xml",
         "data/ir_cron_psychometric_data.xml",
+        "data/ir_cron_driving_test_data.xml",
 
         # Archivos de informes
         'report/hr_applicant_doctor_report.xml',

@@ -314,6 +314,36 @@ class HrApplicant(models.Model):
                 subtype_id=self.env.ref('mail.mt_comment').id
             )
 
+    @api.model
+    def check_driving_test_stage(self):
+        # Buscar el stage por nombre, sin sensibilidad a mayúsculas/minúsculas
+        driving_test_stage = self.env['hr.recruitment.stage'].search([('name', 'ilike', 'prueba de manejo')], limit=1)
+        if not driving_test_stage:
+            _logger.error("Stage 'Prueba de Manejo' not found")
+            return
+        
+        # Buscar o crear el tag "Falta de seguimiento"
+        tag_name = "Falta de seguimiento"
+        tag = self.env['hr.applicant.category'].search([('name', '=', tag_name)], limit=1)
+        if not tag:
+            tag = self.env['hr.applicant.category'].create({'name': tag_name})
+        
+        applicants = self.search([
+            ('stage_id', '=', driving_test_stage.id),
+            ('kanban_state', '!=', 'blocked'),
+            ('date_last_stage_update', '<=', fields.Datetime.now() - timedelta(hours=48))
+        ])
+        for applicant in applicants:
+            applicant.write({
+                'kanban_state': 'blocked',
+                'categ_ids': [(4, tag.id)]
+            })
+            # Notificar al reclutador
+            applicant.message_post(
+                body="Bloqueado por falta de seguimiento en la prueba de manejo.",
+                subtype_id=self.env.ref('mail.mt_comment').id
+            )
+
     def write(self, vals):
         if 'stage_id' in vals and any(applicant.kanban_state == 'blocked' for applicant in self):
             raise UserError(_("El postulante está bloqueado y no puede avanzar en el proceso hasta que el bloqueo sea resuelto o eliminado manualmente por un usuario autorizado."))
