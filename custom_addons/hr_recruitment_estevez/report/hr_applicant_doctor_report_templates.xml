@@ -5,7 +5,8 @@
                 <t t-call="web.external_layout">
                     <div class="page">
                         <div class="container">
-                            <table class="table table-bordered">
+                            <!-- Titulo, Código y Revisión -->
+                            <table class="table">
                                 <tbody>
                                     <tr>
                                         <td rowspan="2">
@@ -31,7 +32,8 @@
                                 </tbody>
                             </table>
 
-                            <table class="table table-bordered">
+                            <!-- Centro Laboral, Expediente, Fecha, Hora, Tipo interrogatorio -->
+                            <table class="table">
                                 <tbody>
                                     <tr>
                                         <td colspan="2">
@@ -39,77 +41,81 @@
                                             
                                         </td>
                                         <td>
-                                            <strong>Expediente:</strong> 
-                                            123124
+                                            <strong>Expediente</strong>
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td><strong>Fecha de Elaboración:</strong> <t t-esc="doc.create_date.strftime('%Y-%m-%d')"/></td>
-                                        <td><strong>Hora de Elaboración:</strong> <t t-esc="doc.create_date.strftime('%H:%M:%S')"/></td>
-                                        <td><strong>Tipo de Interrogatorio:</strong> <t t-esc="dict(doc._fields['interrogation_type'].selection).get(doc.interrogation_type)"/></td>
+                                        <td><strong>Fecha de Elaboración:</strong> <t t-esc="doc.create_date.strftime('%d-%m-%Y')"/></td>
+                                        <td><strong>Hora de Elaboración:</strong> <t t-esc="doc.create_date.strftime('%H:%M')"/></td>
+                                        <td><strong>Tipo de Interrogatorio:</strong> <t t-esc="dict([('direct', 'Directo'), ('indirect', 'Indirecto')]).get(doc.interrogation_type)"/></td>
                                     </tr>
                                 </tbody>
                             </table>
 
-
+                            <!-- Ficha de identificación -->
                             <h4><strong>I. FICHA DE IDENTIFICACIÓN</strong></h4>
-
                             <table class="table table-bordered">
                                 <tbody>
+                                    <!-- Nombre y sexo -->
                                     <tr>
-                                        <td colspan="2">
-                                            <strong>Nombre Del Paciente (Apellido Paterno, Apellido Materno Y Nombre)</strong> 
-                                            
+                                        <td>
+                                            <t t-esc="doc.patient_name"/>
                                         </td>
                                         <td>
                                             <strong>Sexo:</strong>
-                                            *****
+                                            <t t-esc="dict([('male', 'Masculino'), ('female', 'Femenino')]).get(doc.gender)"/>
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td><strong>Fecha de Nacimiento:</strong> <t t-esc="doc.create_date.strftime('%Y-%m-%d')"/></td>
-                                        <td><strong>Puesto Laboral:</strong> <t t-esc="1234"/></td>
-                                        <td><strong>Escolaridad:</strong> <t t-esc="123456"/></td>
+                                        <td><strong>Fecha de Nacimiento:</strong> <t t-esc="doc.birth_date.strftime('%Y-%m-%d')"/></td>
+                                        <td><strong>Puesto Laboral:</strong> <t t-esc="doc.job_position"/></td>
                                     </tr>
                                     
                                     <tr>
-                                        <td><strong>Domicilio:</strong> <t t-esc="12345"/></td>
-                                        <td colspan="2"><strong>Teléfono:</strong> <t t-esc="1234567890"/></td>
+                                        <td><strong>Edad:</strong> <t t-esc="doc.age"/></td>
+                                        <td><strong>Escolaridad:</strong> <t t-esc="doc.degree_id.name"/></td>
+                                    </tr>
+
+                                    <tr>
+                                        <td><strong>Domicilio:</strong> <t t-esc="doc.address"/></td>
+                                        <td><strong>Teléfono:</strong> <t t-esc="doc.phone"/></td>
                                     </tr>
                                 </tbody>
                             </table>
 
+                            <!-- Antecedentes heredo familiares -->
                             <h4><strong>II. ANTECEDENTES HEREDO FAMILIARES</strong></h4>
+                            <p><t t-esc="doc.family_medical_history"/></p>
                             <hr/>
 
                             <h4><strong>III. ANTECEDENTES PERSONALES NO PATOLÓGICOS</strong></h4>
 
-                            <p>Paciente originario de _________________ y residente _________________, (soltero/ casado), religión. Vive en casa (propia / rentada), construida con materiales (no) perdurables, cuenta con todos los servicios intradomicilarios y extradomiciliarios. Realiza (número) veces a la semana, cambio de ropa interna y diario, realiza cepillado de dientes diario (número) veces al día. <strong>Zoonosis negada:</strong> Combe (negado / positivo). <strong>Hacinamiento:</strong> (negado / positivo). <strong>Tatuajes y Perforaciones:</strong> ______________________</p>
-                            <p><strong>Tipo Sanguíneo:</strong> ___ <strong>Donador:</strong> _______</p>
-                            <p><strong>Oficios desempeñados</strong> (antecedentes de incapacidades, accidentes, enfermedades del trabajo o accidentes del trayecto):</p>
+                            <p>Paciente originario de <t t-esc="doc.place_of_origin"/> y residente en <t t-esc="doc.place_of_residence"/>, 
+                                <t t-esc="dict([('single', 'Soltero(a)'), ('married', 'Casado(a)'), ('cohabitant', 'En Concubinato'), ('widower', 'Viudo(a)'), ('divorced', 'Divorciado(a)')]).get(doc.marital_status)"/>, 
+                                <t t-esc="doc.religion"/>. Vive en casa <t t-esc="dict([('own', 'Propia'), ('rented', 'Rentada')]).get(doc.housing_type)"/>, 
+                                construida con materiales <t t-esc="dict([('durable', 'Durable'), ('non_durable', 'No Durable')]).get(doc.construction_material)"/>, cuenta con todos los servicios 
+                                intradomiciliarios y extradomiciliarios. Realiza baño <t t-esc="doc.weekly_clothing_change"/> veces a la semana, 
+                                cambio de ropa interna y diario, realiza cepillado de dientes diario <t t-esc="doc.daily_teeth_brushing"/> 
+                                veces al día. 
+                                <strong>Zoonosis:</strong> <t t-esc="dict([('negative', 'Negativo'), ('positive', 'Positivo')]).get(doc.zoonosis)"/> 
+                                <strong>Hacinamiento:</strong> <t t-esc="dict([('negative', 'Negativo'), ('positive', 'Positivo')]).get(doc.overcrowding)"/> 
+                                <strong>Tatuajes y Perforaciones:</strong> <t t-esc="doc.tattoos_piercings"/>
+                                <strong>Tipo Sanguíneo:</strong> <t t-esc="doc.blood_type"/> 
+                                <strong>Donador:</strong> <t t-esc="doc.donor and 'Sí' or 'No'"/>
+                                <br/>
+                                <strong>Oficios desempeñados:</strong> <t t-esc="doc.occupations"/>
+                            </p>
                             
                             <hr/>
 
                             <h4><strong>IV. ANTECEDENTES PERSONALES PATOLÓGICOS</strong></h4>
-                            <hr/>
 
-                            <p><strong>Quirúrgicos:</strong> _________________ <strong>Traumáticos:</strong> _________________  <strong>Transfusionales:</strong> _________________ </p>
-                            <p><strong>Alérgicos:</strong> _________________ <strong>crónico-degenerativos:</strong> _________________  <strong>Enfermedades de la infancia:</strong> _________________ </p>
-                            <p><strong>infancia:</strong> _________________ <strong>Tabaquismo:</strong> _________________  <strong>Alcoholismo:</strong> _________________ </p>
-                            <p><strong>Toxicomanías:</strong> _________________ </p>
+                            <p><strong>Quirúrgicos:</strong> <t t-esc="doc.previous_surgeries"/> <strong>Traumáticos:</strong> <t t-esc="doc.traumas"/>  <strong>Transfusionales:</strong> <t t-esc="doc.transfusions"/> </p>
+                            <p><strong>Alérgicos:</strong> <t t-esc="doc.allergies"/> <strong>Crónico-degenerativos:</strong> <t t-esc="doc.chronic_diseases"/>  <strong>Enfermedades de la infancia:</strong> <t t-esc="doc.childhood_diseases"/> </p>
+                            <p><strong>Tabaquismo:</strong> <t t-esc="dict([('yes', 'Sí'), ('no', 'No'), ('social', 'Social')]).get(doc.smoking)"/> <strong>Alcoholismo:</strong> <t t-esc="dict([('yes', 'Sí'), ('no', 'No'), ('social', 'Social')]).get(doc.alcoholism)"/> </p>
+                            <p><strong>Toxicomanías:</strong> <t t-esc="dict([('yes', 'Sí'), ('no', 'No'), ('social', 'Social')]).get(doc.drug_addiction)"/> </p>
 
-                            <table class="table table-bordered">
-                                <tbody>
-                                    <tr>
-                                        <td>
-                                            <strong>ESQUEMA DE VACUNACION:</strong>
-                                        </td>
-                                        <td colspan="2">
-                                            <strong>Última vacuna:</strong>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                            kjhg    
                             <hr/>
 
                             <h4><strong>V. PADECIMIENTO ACTUAL </strong></h4>
