@@ -256,11 +256,13 @@ class HrApplicant(models.Model):
     def check_interview_stage(self):
         _logger.info("Executing check_interview_stage")
         
-        # Buscar el stage por nombre, sin sensibilidad a mayúsculas/minúsculas
-        interview_stage = self.env['hr.recruitment.stage'].search([('name', 'ilike', 'entrevista')], limit=1)
-        if not interview_stage:
-            _logger.error("Stage 'Entrevista' not found")
+        # Buscar todos los stages por nombre, sin sensibilidad a mayúsculas/minúsculas
+        interview_stages = self.env['hr.recruitment.stage'].search([('name', 'ilike', 'entrevista')])
+        if not interview_stages:
+            _logger.error("No stages 'Entrevista' found")
             return
+        
+        _logger.info(f"Found {len(interview_stages)} interview stages")
         
         # Buscar o crear el tag "Reprogramar entrevista"
         tag_name = "Reprogramar entrevista"
@@ -268,22 +270,28 @@ class HrApplicant(models.Model):
         if not tag:
             tag = self.env['hr.applicant.category'].create({'name': tag_name})
         
-        applicants = self.search([
-            ('stage_id', '=', interview_stage.id),
-            ('kanban_state', '!=', 'blocked'),
-            ('date_last_stage_update', '<=', fields.Datetime.now() - timedelta(hours=24))
-        ])
-        _logger.info(f"Found {len(applicants)} applicants to block")
-        for applicant in applicants:
-            applicant.write({
-                'kanban_state': 'blocked',
-                'categ_ids': [(4, tag.id)]
-            })
-            # Notificar al reclutador
-            applicant.message_post(
-                body="El candidato ha sido bloqueado, se debe reprogramar entrevista.",
-                subtype_id=self.env.ref('mail.mt_comment').id
-            )
+        _logger.info("Tag 'Reprogramar entrevista' found or created")
+        
+        for stage in interview_stages:
+            applicants = self.search([
+                ('stage_id', '=', stage.id),
+                ('kanban_state', '!=', 'blocked'),
+                ('date_last_stage_update', '<=', fields.Datetime.now() - timedelta(minutes=1))
+            ])
+            
+            _logger.info(f"Found {len(applicants)} applicants to block in stage {stage.name}")
+            
+            for applicant in applicants:
+                applicant.write({
+                    'kanban_state': 'blocked',
+                    'categ_ids': [(4, tag.id)]
+                })
+                # Notificar al reclutador
+                applicant.message_post(
+                    body="El candidato ha sido bloqueado, se debe reprogramar entrevista.",
+                    subtype_id=self.env.ref('mail.mt_comment').id
+                )
+                _logger.info(f"Applicant {applicant.id} blocked and notified")
 
     @api.model
     def check_psychometric_tests_stage(self):
