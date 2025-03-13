@@ -56,7 +56,8 @@ class HrApplicantDocument(models.TransientModel):
             'Carta de Recomendacion Personal',
             'Carta de retencion Infonavit',
             'CURP',
-            'Prueba Psicométrica'
+            'Prueba Psicométrica',
+            'Historia Clínica',
         ]
 
         # Buscar archivos adjuntos asociados al aplicante

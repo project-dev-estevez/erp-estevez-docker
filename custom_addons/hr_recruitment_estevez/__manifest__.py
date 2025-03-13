@@ -11,14 +11,26 @@
     "version": "0.1",
     "depends": ['base', 'hr', 'hr_estevez', 'hr_recruitment', 'utm'],
     "data": [
+        # Archivos de seguridad
         "security/hr_recruitment_security.xml",
         "security/ir.model.access.csv",
-        'report/hr_applicant_doctor_report_templates.xml',
-        'report/hr_applicant_doctor_report.xml',
-        'views/hr_applicant_view_form_inherit.xml',
-        "views/hr_requisition_views.xml",
+        
+        # Archivos de datos
         "data/hr_requisition_uniform_data.xml",
-        "data/hr_requisition_epp_data.xml"
+        "data/hr_requisition_epp_data.xml",
+        "data/ir_cron_first_stage_data.xml",
+        "data/ir_cron_interviews_data.xml",
+        "data/ir_cron_psychometric_data.xml",
+        "data/ir_cron_driving_test_data.xml",
+
+        # Archivos de informes
+        'report/hr_applicant_doctor_report.xml',
+        'report/hr_applicant_doctor_report_templates.xml',
+        
+        # Archivos de vistas
+        'views/hr_applicant_view_form_inherit.xml',
+        'views/hr_candidate_view_form_inherit.xml',
+        "views/hr_requisition_views.xml"
     ],
     "installable": True,
     "application": False,

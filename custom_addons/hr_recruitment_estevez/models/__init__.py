@@ -8,3 +8,4 @@ from . import hr_requisition_software
 from . import hr_recruitment_degree
 from . import hr_applicant_document
 from . import ir_attachment
+from . import report
