@@ -15,6 +15,9 @@
                         <button name="action_approve" string="Aprobar" type="object" class="btn-primary" invisible="state in ('rejected', 'first_approval', 'second_approval', 'approved') or requestor_id == uid"/>
                         <button name="action_confirm_approve" string="Confirmar Aprobación" type="object" class="btn-primary" invisible="state in ('to_approve', 'rejected', 'approved') or requestor_id == uid"/>
                         <button name="action_reject" string="Rechazar" type="object" invisible="state in ('rejected', 'approved') or requestor_id == uid"/>
+                        <!-- Nuevos botones que aparecen cuando state es 'approved' -->
+                        <button name="action_quotation" string="Iniciar cotización" type="object" class="btn-primary" invisible="state != 'approved'"/>
+                        <button name="action_purchase" string="Iniciar orden de compra" type="object" class="btn-primary" invisible="state != 'approved'"/>
                         <field name="state" 
                            widget="statusbar" 
                            decoration-muted="state == 'to_approve'" 
@@ -29,6 +32,7 @@
                             <group>                                               
                                 <field name="requestor_id"/>
                                 <field name="company_id"/>
+                                <field name="proveedor_id"/>
                             </group>
                             <group>
                                 <field name="direction_id"/>
@@ -55,15 +59,35 @@
                                     <field name="medida" placeholder="Selecciona una opción"/>
                                     <field name="descripcion"/>
                                     <field name="especificaciones"/>
+                                    
                                 </group>                                
-                            </group>                      
-                        <div class="text-center">
-                            <button type="object" name="save_dat" string="Enviar solicitud" class="btn btn-primary"/>                    
-                        </div>
+                            </group>                                
                     </sheet>                
                 </form>
             </field>
         </record>       
+
+        <!--record id="order_line_product" model="ir.ui.view">
+    <field name="name">purchase.order.form</field>
+    <field name="model">purchase.order.line</field>
+    <field name="arch" type="xml">
+        <form>
+            <field name="order_line" mode="tree,form">
+                <tree string="Purchase Order Lines" editable="bottom">
+                    <field name="product_id" widget="product_label_section_and_note_field"/>
+                    <field name="product_qty"/>
+                    <field name="product_uom" groups="uom.group_uom"/>
+                    <field name="price_unit"/>
+                    <field name="taxes_id" widget="many2many_tags"/>
+                    <field name="price_subtotal" string="Amount"/>
+                </tree>
+            </field>
+            <footer class="text-center">
+                <button type="object" name="save_dat" string="Enviar solicitud" class="btn btn-primary"/>
+            </footer>
+        </form>
+    </field>
+</record-->
 
         <record id="view_purchas_acquisition_list" model="ir.ui.view">
             <field name="name">purchase.acquisition.list</field>
