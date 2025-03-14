@@ -118,7 +118,20 @@
                             kjhg    
                             <hr/>
 
+
+                            <table class="table table-bordered">
+                                <tbody>
+                                    <tr>
+                                        <td class="text-center"><strong>ESQUEMA DE VACUNACIÓN: </strong><P> Esquema COVID 19: 2 inmunizaciones marca moderna.</P></td>
+                                        <td class="text-center"><strong>Última vacuna: 2024</strong></td>
+                                    
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                            <hr/>
                             <h4><strong>V. PADECIMIENTO ACTUAL </strong></h4>
+                            <P>Interrogado y negado</P>
                             <hr/>
 
                             <h4><strong>VI. INTERROGATORIO POR APARATOS Y SISTEMAS </strong></h4>
@@ -156,14 +169,14 @@
                                     </tr>
 
                                     <tr>
-                                        <td class="text-center"><strong>Lpm</strong></td>
-                                        <td class="text-center"><strong>rpm</strong></td>
-                                        <td class="text-center"><strong>°c</strong></td>
-                                        <td class="text-center"><strong>mmHg</strong></td>
-                                        <td class="text-center"><strong>%</strong></td>
-                                        <td class="text-center"><strong>kg</strong></td>
-                                        <td class="text-center"><strong>cms</strong></td>
-                                        <td class="text-center"><strong></strong></td>
+                                        <td class="text-center"><strong>72 lpm</strong></td>
+                                        <td class="text-center"><strong>14 rpm</strong></td>
+                                        <td class="text-center"><strong>36.8°c</strong></td>
+                                        <td class="text-center"><strong>116/71 mmHg</strong></td>
+                                        <td class="text-center"><strong>95 %</strong></td>
+                                        <td class="text-center"><strong>65 kg</strong></td>
+                                        <td class="text-center"><strong>1.6 cm</strong></td>
+                                        <td class="text-center"><strong>25.4 </strong></td>
                                     </tr>
                                     
                                 </tbody>
@@ -171,9 +184,9 @@
 
                             <h4><strong>VIII. EXPLORACIÓN FÍSICAL </strong></h4>
                             <hr/>
-                            <p><strong>Habitus Exterior: </strong>de edad aparente a la cronológica, alerta, cooperadora, consciente, (orientada / desorientada) en tiempo, persona y espacio, (con / sin) facies características, (con / sin) adecuada coloración e (hidratación / deshidratación) de piel y tegumentos, marcha (normal / anormal), posición libremente escogida.</p>
+                            <p><strong>Habitus Exterior: </strong>Masculino de edad aparente a la cronológica, alerta, cooperadora, consciente, orientada en tiempo, persona y espacio, sin facies características, con adecuada coloración e hidratación de piel y tegumentos, marcha normal, posición libremente escogida.</p>
                             <hr/>
-                            <p><strong>Cabeza: </strong>normocéfalo, (con / sin) endostosis (con / ni) exostosis, pabellones auriculares (con / sin) adecuada implantación, canales auditivos externos permeables, membranas timpánicas íntegras, (con / sin) presencia de reflejo luminoso, (con / sin) adecuada movilidad. Ojos simétricos, párpados íntegros, pupilas isocóricas normorreflécticas. Narinas permeables, cornetes medio e inferior normales, (con / sin) ciclo nasal, (con / sin) desviación de tabique, datos de epistaxis, (con / sin) descarga anterior. Labios simétricos, cavidad oral (con / sin) mucosa hidratada, faringe (no) hiperémica, presencia de descarga retronasal , exudado faríngeo, amígdalas presentes.</p>
+                            <p><strong>Cabeza: </strong>Normocéfalo, sin endostosis ni exostosis, pabellones auriculares con adecuada implantación, canales auditivos externos permeables, membranas timpánicas íntegras, con presencia de reflejo luminoso, con adecuada movilidad. Ojos simétricos, párpados íntegros, pupilas isocóricas normorreflécticas. Narinas permeables, cornetes medio e inferior normales, con ciclo nasal, sin desviación de tabique, datos de epistaxis, sin descarga anterior. Labios simétricos, cavidad oral con mucosa hidratada, faringe hiperémica, presencia de descarga retronasal , exudado faríngeo, amígdalas presentes.</p>
                             <hr/>
                             <p><strong>Cuello: </strong>cilíndrico, con tráquea central y móvil, (si / no) se palpa tiroides o adenomegalias, (con / sin) plétora yugular, (con / sin) pulso carotideo presente bilateralmente</p>
                             <hr/>
@@ -186,8 +199,8 @@
                             <p><strong>Extremidades: </strong>Extremidades: superiores e inferiores eutróficas, eutérmicas, (con / sin) datos de edema, tono y fuerza _/5 por Roots, reflejos osteotendinosos presentes, (con / sin) compromiso arterial o venoso.</p>
                             <hr/>
                             <p><strong>Piel: </strong>de (buena / mala) coloración e (hidratación / deshidratación).</p>
-                            <p><strong>Antidoping</strong></p>
-                            <p><strong>Glucosa</strong></p>
+                            <p><strong>Antidoping: NA</strong></p>
+                            <p><strong>Glucosa: NA mg/dL</strong></p>
                             <hr/>
 
                             <h4><strong>IX. RESULTADOS PREVIOS Y ACTUALES DE LABORATORIO, GABINETE Y OTROS:</strong></h4>
@@ -201,13 +214,23 @@
                             <hr/>
                             <h4><strong>XII. TRATAMIENTO E INDICACIONES: </strong></h4>
                             <hr/>
+                            <p>Dieta ríca en verduras, baja eb carbohidratos, tomar abundate liquido, noderarar el consumo de carnes rojas, embutidos y lácteos. Evitar cambios bruscos de temperatura, realizar actividad fisica diariamente (caminata ligera a tolerancia), se promueve al salud bucal, hábitos higienicos generales, evitar accidentes. Se consulta guia de práctica clinica, se realizan accíones del servicio de promoción  y prevención para una mejor salud.</p>
+                            <hr/>
                             <h4><strong>XIII. PROXIMA CITA: </strong> ABIERTA</h4>
                             <hr/>
                             <h4><strong>XIV. PRONÓSTICO: </strong> LIGADO A EVOLUCIÓN</h4>
                             <hr/>
 
-                            <h4><strong>FIRMA Y SELLO REGISTRO MEDICO </strong> <strong>FIRMA DEL TRABAJADOR</strong></h4>
-                            <hr/>
+                            <div class="d-flex justify-content-between mt-5 pt-5 mx-5">
+                                <div class="text-left ml-3 text-nowrap fs-6">
+                                    <p>__________________________________________</p>
+                                    <strong>FIRMA Y SELLO REGISTRO MÉDICO</strong>
+                                </div>
+                                <div lass="text-right mr-3">
+                                    <p>_______________________________</p>
+                                    <strong>FIRMA DEL TRABAJADOR</strong>
+                                </div>
+                            </div>
 
                         </div>
                     </div>

@@ -14,7 +14,16 @@ class PurchaseAcquisition(models.Model):
     company_id = fields.Many2one('res.company', string="Empresa", related='requestor_id.company_id', readonly=True, store=False)
     direction_id = fields.Many2one('hr.direction', string="Dirección", related='requestor_id.employee_id.direction_id', readonly=True, store=False)
     department_id = fields.Many2one('hr.department', string="Departamento", related='requestor_id.employee_id.department_id', readonly=True, store=False)
-    job_id = fields.Many2one('hr.job', string="Puesto Solicitante", related='requestor_id.employee_id.job_id', readonly=True, store=False)       
+    job_id = fields.Many2one('hr.job', string="Puesto Solicitante", related='requestor_id.employee_id.job_id', readonly=True, store=False)      
+    acquisition_id = fields.Many2one('purchase.acquisition', string='Acquisition')    
+    #order_line = fields.One2many('purchase.order.line', 'acquisition_id', string="Líneas de Pedido")
+
+    proveedor_id = fields.Many2one(
+        'res.partner', 
+        string="Proveedor", 
+        required=True, 
+        domain="[('supplier_rank', '>', 0)]"  # Filtra solo contactos con rol de proveedor
+    )
 
     medida = fields.Selection(
         selection=[            
@@ -66,13 +75,68 @@ class PurchaseAcquisition(models.Model):
     cantidad = fields.Integer(string='Cantidad', required=True)    
     descripcion = fields.Char(string='Descripcion', required=True)
     especificaciones = fields.Char(string='Especificaciones', required=True)
+    requisition_number = fields.Char(string="Número de requisición")
 
     state = fields.Selection([
         ('to_approve', 'Pendiente Aprobación'),
         ('first_approval', 'En Curso'),
         ('rejected', 'Rechazado'),
         ('approved', 'Aprobado'),
-    ], string="Estado", default='to_approve')
+    ], string="Estado", default='to_approve')    
+
+    def action_purchase(self):       
+        self.ensure_one()
+        order_lines = []
+        for line in self.order_line_ids:
+            # Verifica que los campos tengan valores válidos
+            if not line.product_id:
+                raise ValidationError("El campo 'product_id' no puede estar vacío.")
+            if not line.product_qty or line.product_qty <= 0:
+                raise ValidationError("El campo 'product_qty' debe ser mayor que cero.")
+            if not line.price_unit or line.price_unit <= 0:
+                raise ValidationError("El campo 'price_unit' debe ser mayor que cero.")
+
+            order_lines.append((0, 0, {
+                'product_id': line.product_id.id,
+                'product_qty': line.product_qty,
+                'price_unit': line.price_unit,
+                'acquisition_id': self.id,  # Asigna la adquisición a la línea
+            }))
+
+        purchase_order = self.env['purchase.order'].create({
+            'partner_id': self.proveedor_id.id,
+            'origin': self.requisition_number,
+            'order_line': order_lines,
+        })
+        return {
+            'type': 'ir.actions.act_window',
+            'res_model': 'purchase.order',
+            'res_id': purchase_order.id,
+            'view_mode': 'form',
+            'target': 'current',
+        }
+
+    def action_quotation(self):
+        self.ensure_one()        
+        quotation = self.env['purchase.order'].create({  # Reemplaza 'sale.order' por tu modelo de cotización
+            'partner_id': self.requestor_id.partner_id.id,  # Ejemplo: Asignar el solicitante como contacto
+            'origin': self.requisition_number,  # Referencia a la adquisición
+            'order_line': [
+                (0, 0, {  # Crear línea de cotización
+                    'product_id': self.nombre_producto.id,
+                    'product_qty': self.cantidad,
+                    'price_unit': self.nombre_producto.standard_price,
+                })
+            ],
+        })    
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'Cotización',
+            'res_model': 'purchase.order',  # Ajusta al modelo correcto
+            'res_id': quotation.id,
+            'view_mode': 'form',
+            'target': 'current',
+        }    
 
     def action_approve(self):
         self.state = 'first_approval'
@@ -194,6 +258,5 @@ class PurchaseAcquisition(models.Model):
         return {
             "type": "ir.actions.act_window_close",  # Cierra la ventana de este formulario
         }
-
     
 
