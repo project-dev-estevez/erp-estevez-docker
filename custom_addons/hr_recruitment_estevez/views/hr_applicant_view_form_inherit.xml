@@ -11,6 +11,11 @@
 
             <xpath expr="//notebook" position="inside">
                 <page string="Historia Clínica General" name="clinical_history" invisible="not is_examen_medico">
+
+                    <group string="Resultado del Examen Médico">
+                        <field name="aptitude_state" widget="statusbar" options="{'clickable': '1'}" nolabel="1"/>
+                    </group>
+
                     <group string="Ficha de Identificación">
                         <field name="interrogation_type"/>
                         <field name="patient_name"/>
@@ -114,7 +119,7 @@
                     </group>
 
                     <group string="Tratamiento e Indicaciones">
-                        <field name="treatment_recommendations"/>
+                        <field name="treatment_recommendations" readonly="1"/>
                     </group>
 
                     <group string="Próxima Cita">
@@ -123,16 +128,6 @@
 
                     <group string="Pronóstico">
                         <field name="prognosis"/>
-                    </group>
-
-                    <group string="Firma y Sello">
-                        <field name="professional_license"/>
-                        <group>
-                            <field name="doctor_signature" widget="signature"/>
-                        </group>
-                        <group>
-                            <field name="worker_signature" widget="signature"/>
-                        </group>
                     </group>
 
                     <div class="text-center">

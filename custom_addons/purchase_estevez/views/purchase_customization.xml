@@ -15,34 +15,28 @@
                 
             </field>
         </record>
+        
 
-        <!-- Heredar la vista de purchase_requisition para ocultar requisition_id -->
-        <record id="purchase_order_inherit_requisition" model="ir.ui.view">
-            <field name="name">purchase.order.form.inherit.hide_requisition</field>
+        <!-- Heredar la vista de lista de purchase.order (Solicitudes de Cotización) -->
+        <record id="view_purchase_order_kpis_tree_inherit" model="ir.ui.view">
+            <field name="name">purchase.order.kpis.tree.inherit</field>
             <field name="model">purchase.order</field>
-            <field name="inherit_id" ref="purchase_requisition.purchase_order_form_inherit"/>
+            <field name="inherit_id" ref="purchase.purchase_order_kpis_tree"/>
             <field name="arch" type="xml">
-                <!-- Ocultar campo con XPath preciso -->
-                <xpath expr="//field[@name='requisition_id']" position="attributes">
-                    <attribute name="invisible">1</attribute>
+                <!-- Añadir el botón dentro del header -->
+                <xpath expr="//list/header" position="inside">
+                    <button 
+                        name="action_view_all_alternatives" 
+                        string="Ver Alternativas" 
+                        type="object" 
+                        class="btn-primary" 
+                    />
                 </xpath>
             </field>
         </record>
 
-        
 
-        <record id="purchase_order_inherit_rename_header" model="ir.ui.view">
-            <field name="name">purchase.order.form.rename.header</field>
-            <field name="model">purchase.order</field>
-            <field name="inherit_id" ref="purchase.purchase_order_form"/>
-            <field name="arch" type="xml">
-                <!-- Cambiar "New" en el título -->
-                <xpath expr="//h1/field[@name='name']" position="replace">
-                    <h1>Nueva Solicitud</h1>
-                </xpath>
-            </field>
-        </record>
 
-        
+
     </data>
 </odoo>
