@@ -25,11 +25,22 @@ class HrApplicantDocument(models.TransientModel):
 
     def action_attach_document(self):
         self.ensure_one()
+
+        # Buscar y eliminar el documento existente con el mismo nombre
+        existing_attachment = self.env['ir.attachment'].search([
+            ('res_model', '=', 'hr.applicant'),
+            ('res_id', '=', self.applicant_id.id),
+            ('name', '=', self.name)
+        ], limit=1)
+        
+        if existing_attachment:
+            existing_attachment.unlink()
+
         return {
             'type': 'ir.actions.act_window',
             'res_model': 'ir.attachment',
             'view_mode': 'form',
-            'view_id': self.env.ref('base.view_attachment_form').id,
+            'view_id': self.env.ref('hr_recruitment_estevez.view_attachment_form_custom').id,
             'target': 'new',
             'name': 'Adjunte el Documento',
             'context': {
@@ -49,7 +60,7 @@ class HrApplicantDocument(models.TransientModel):
             'Acta de Nacimiento',
             'Comprobante de estudios',
             'Comprobante de domicilio',
-            'Formato IMSS',
+            'Comprobante Número de Seguridad Social',
             'Formato RFC',
             'Licencia de Conducir',
             'Cartas de Recomendacion Laboral',

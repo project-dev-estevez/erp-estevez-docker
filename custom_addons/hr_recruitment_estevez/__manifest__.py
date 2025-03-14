@@ -28,6 +28,7 @@
         'report/hr_applicant_doctor_report_templates.xml',
         
         # Archivos de vistas
+        'views/hr_applicant_document_views.xml',
         'views/hr_applicant_view_form_inherit.xml',
         'views/hr_candidate_view_form_inherit.xml',
         "views/hr_requisition_views.xml"
