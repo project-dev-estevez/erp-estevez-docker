@@ -1,4 +1,19 @@
 <odoo>
+
+    <record id="view_purchase_order_form_inherit_incoterm" model="ir.ui.view">
+        <field name="name">purchase.order.form.inherit.incoterm</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_form"/>
+        <field name="arch" type="xml">
+            <!-- Hacer visibles los campos de Incoterm en el tab "Otra Información" -->
+            <xpath expr="//group[@name='other_info']" position="inside">
+                <field name="incoterm_id" string="Incoterm"/>
+                <field name="incoterm_location_id"/>
+            </xpath>
+        </field>
+    </record>
+
+
     <record id="purchase_order_form_inherit_hide_requisition" model="ir.ui.view">
         <field name="name">purchase.order.form.inherit.hide.requisition</field>
         <field name="model">purchase.order</field>

@@ -6,3 +6,6 @@ from . import purchase_general_requisition
 from . import purchase_acquisition
 from . import purchase_requisition_service
 from . import hr_employee
+from . import purchase_requisition
+from . import purchase_order
+from . import purchase_incoterm_location
