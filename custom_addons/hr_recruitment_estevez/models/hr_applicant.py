@@ -241,6 +241,17 @@ class HrApplicant(models.Model):
         _logger.info(f"Found {len(applicants)} applicants to block in stage {stage_name}")
 
         for applicant in applicants:
+            # Verificar si el aplicante tiene actividades programadas para una fecha y hora posterior a la fecha y hora actual
+            future_activities = self.env['mail.activity'].search([
+                ('res_model', '=', 'hr.applicant'),
+                ('res_id', '=', applicant.id),
+                ('date_deadline', '>', fields.Datetime.now())
+            ])
+            
+            if future_activities:
+                _logger.info(f"Applicant {applicant.id} has future activities and will not be blocked")
+                continue
+
             applicant.write({
                 'kanban_state': 'blocked'
             })
