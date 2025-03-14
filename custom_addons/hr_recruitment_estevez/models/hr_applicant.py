@@ -117,7 +117,12 @@ class HrApplicant(models.Model):
     previous_treatment = fields.Text(string="Terapéutica Empleada y Resultados Previos")
 
     # Tratamiento e Indicaciones
-    treatment_recommendations = fields.Text(string="Tratamiento e Indicaciones")
+    treatment_recommendations = fields.Text(
+        string="Tratamiento e Indicaciones",
+        compute="_compute_treatment_recommendations",
+        readonly=True,
+        store=False
+    )
 
     # Próxima Cita
     next_appointment = fields.Text(string="Próxima Cita")
@@ -125,10 +130,11 @@ class HrApplicant(models.Model):
     # Pronóstico
     prognosis = fields.Text(string="Pronóstico")
 
-    # Firmas
-    doctor_signature = fields.Binary(string="Firma del Doctor")
-    professional_license = fields.Char(string="Cédula Profesional", compute="_compute_professional_license")
-    worker_signature = fields.Binary(string="Firma del Trabajador")
+    aptitude_state = fields.Selection([
+        ('apto', 'Apto'),
+        ('no_apto', 'No Apto'),
+        ('apto_condicionado', 'Apto Condicionado')
+    ], string="Estado de Aptitud", default='apto')
 
     documents_count = fields.Integer(
         'Documents Count', compute="_compute_applicant_documents")
@@ -142,6 +148,16 @@ class HrApplicant(models.Model):
                 record.bmi = record.weight / (height_in_meters ** 2)
             else:
                 record.bmi = 0
+
+    @api.depends()
+    def _compute_treatment_recommendations(self):
+        for record in self:
+            record.treatment_recommendations = _(
+                "Dieta rica en verduras, baja en carbohidratos, tomar abundante líquido, moderar el consumo de carnes rojas, embutidos y lácteos. "
+                "Evitar cambios bruscos de temperatura, realizar actividad física diariamente (caminata ligera a tolerancia), se promueve la salud bucal, "
+                "hábitos higiénicos generales, evitar accidentes. Se consulta guía de práctica clínica, se realizan acciones del servicio de promoción y "
+                "prevención para una mejor salud."
+            )
 
     @api.depends('birth_date')
     def _compute_age(self):
