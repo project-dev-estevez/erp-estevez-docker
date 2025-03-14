@@ -221,15 +221,17 @@
                             <h4><strong>XIV. PRONÓSTICO: </strong> LIGADO A EVOLUCIÓN</h4>
                             <hr/>
 
-                            <table class="table table-bordered">
-                                <tbody>                                   
-                                    <tr>
-                                        <td class="text-center"><strong>FIRMA Y SELLO REGISTRO MEDICO</strong></td>
-                                        <td class="text-center"><strong>FIRMA DEL TRABAJADOR</strong></td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                            
+                            <div class="d-flex justify-content-between mt-5 pt-5 mx-5">
+                                <div class="text-left ml-3 text-nowrap fs-6">
+                                    <p>__________________________________________</p>
+                                    <strong>FIRMA Y SELLO REGISTRO MÉDICO</strong>
+                                </div>
+                                <div lass="text-right mr-3">
+                                    <p>_______________________________</p>
+                                    <strong>FIRMA DEL TRABAJADOR</strong>
+                                </div>
+                            </div>
+
                         </div>
                     </div>
                 </t>

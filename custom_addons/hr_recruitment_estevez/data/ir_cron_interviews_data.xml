@@ -4,7 +4,7 @@
         <field name="name">Check Interview Stage</field>
         <field name="model_id" ref="model_hr_applicant"/>
         <field name="state">code</field>
-        <field name="code">model.check_interview_stage()</field>
+        <field name="code">model.check_stage_time_to_bocked('entrevista', 24)</field>
         <field name="interval_number">1</field>
         <field name="interval_type">days</field>
     </record>
