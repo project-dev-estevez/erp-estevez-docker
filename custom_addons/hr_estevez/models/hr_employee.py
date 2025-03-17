@@ -1,4 +1,4 @@
-from odoo import api, models, fields
+from odoo import api, models, fields, _
 from odoo.exceptions import UserError
 from datetime import date
 import re
@@ -161,3 +161,16 @@ class HrEmployee(models.Model):
                 }
             else:
                 raise UserError("The employee does not have a phone number.")
+            
+
+    def action_open_documents(self):
+        return {
+            'name': _('Documentos del Empleado'),
+            'view_type': 'form',
+            'view_mode': 'kanban,list,form',
+            'res_model': 'ir.attachment',
+            'view_id': False,
+            'type': 'ir.actions.act_window',
+            'domain': [('res_model', '=', 'hr.employee'), ('res_id', '=', self.id)],
+            'context': {'default_res_model': 'hr.employee', 'default_res_id': self.id, 'create': True, 'edit': True},
+        }
