@@ -1,7 +1,6 @@
 from odoo import models, api, fields, _
 from odoo.exceptions import UserError
 from datetime import timedelta, date
-import base64
 import logging
 import re
 

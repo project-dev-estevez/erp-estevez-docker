@@ -1,4 +1,5 @@
 from odoo import api, models, fields
+from odoo.exceptions import UserError
 from datetime import date
 import re
 
@@ -141,3 +142,22 @@ class HrEmployee(models.Model):
     def _onchange_private_phone(self):
         if self.private_phone:
             self.private_phone = self._format_phone_number(self.private_phone)
+
+    def action_open_whatsapp(self):
+        for employee in self:
+            phone = employee.work_phone or employee.private_phone
+            if phone:
+                # Eliminar caracteres no numéricos
+                phone = re.sub(r'\D', '', phone)
+                # Verificar si el número ya tiene un código de país
+                if not phone.startswith('52'):
+                    phone = '52' + phone
+                message = "Hola"
+                url = f"https://wa.me/{phone}?text={message}"
+                return {
+                    'type': 'ir.actions.act_url',
+                    'url': url,
+                    'target': 'new',
+                }
+            else:
+                raise UserError("The employee does not have a phone number.")
