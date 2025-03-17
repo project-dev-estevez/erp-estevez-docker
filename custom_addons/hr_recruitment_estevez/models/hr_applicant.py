@@ -145,7 +145,7 @@ class HrApplicant(models.Model):
         for record in self:
             if record.weight and record.height:
                 height_in_meters = record.height / 100
-                record.bmi = record.weight / (height_in_meters ** 2)
+                record.bmi = round(record.weight / (height_in_meters ** 2), 1)
             else:
                 record.bmi = 0
 
