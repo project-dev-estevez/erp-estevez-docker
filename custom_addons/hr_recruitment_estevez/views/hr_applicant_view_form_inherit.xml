@@ -140,7 +140,7 @@
             </xpath>
 
             <!-- Eliminar el grupo "Sourcing" del notebook -->
-            <xpath expr="//notebook/page[@name='application_details']/group/group[@string='Sourcing']" position="replace">
+            <xpath expr="//notebook/page[@name='application_details']/group/group[field[@name='source_id']]" position="replace">
                 <!-- Eliminar el grupo "Sourcing" -->
             </xpath>
 
