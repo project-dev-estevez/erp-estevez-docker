@@ -4,11 +4,13 @@
         <field name="model">hr.applicant</field>
         <field name="inherit_id" ref="hr_recruitment.hr_applicant_view_form"/>
         <field name="arch" type="xml">
+            <!-- Botones inteligentes -->
             <xpath expr="//div[@name='button_box']/button[@name='action_create_meeting']" position="after">
                 <button name="action_open_whatsapp" class="oe_stat_button" icon="fa-whatsapp" type="object" string="WhatsApp" invisible="not partner_phone"/>
                 <button class="oe_stat_button" name="action_open_documents" type="object" icon="fa-file-text-o" string="Documentos"/>
             </xpath>
 
+            <!-- Agregar Historia Clinica Page -->
             <xpath expr="//notebook" position="inside">
                 <page string="Historia Clínica General" name="clinical_history" invisible="not is_examen_medico">
 
@@ -28,7 +30,7 @@
                         <field name="phone"/>
                     </group>
                     <group string="Antecedentes Heredo Familiares">
-                        <field name="family_medical_history"/>
+                        <field name="family_medical_history" nolabel="1"/>
                     </group>
                     <group string="Antecedentes Personales No Patológicos">
                         <field name="place_of_origin"/>
@@ -73,7 +75,7 @@
                         <field name="mpf"/>
                     </group>
                     <group string="Padecimiento Actual">
-                        <field name="current_condition"/>
+                        <field name="current_condition" nolabel="1"/>
                     </group>
                     <group string="Interrogatorio por Aparatos y Sistemas">
                         <field name="cardiovascular" placeholder="disnea, taquicardia, bradicardia, cianosis, plétora yugular y lipotimia negados" />
@@ -107,27 +109,27 @@
                     </group>
 
                     <group string="Resultados Previos y Actuales de Laboratorio, Gabinete y Otros">
-                        <field name="laboratory_results"/>
+                        <field name="laboratory_results" nolabel="1"/>
                     </group>
 
                     <group string="Diagnóstico o Problemas Clínicos">
-                        <field name="diagnosis"/>
+                        <field name="diagnosis" nolabel="1"/>
                     </group>
 
                     <group string="Terapéutica Empleada y Resultados Previos">
-                        <field name="previous_treatment"/>
+                        <field name="previous_treatment" nolabel="1"/>
                     </group>
 
                     <group string="Tratamiento e Indicaciones">
-                        <field name="treatment_recommendations" readonly="1"/>
+                        <field name="treatment_recommendations" nolabel="1" readonly="1"/>
                     </group>
 
                     <group string="Próxima Cita">
-                        <field name="next_appointment"/>
+                        <field name="next_appointment" nolabel="1"/>
                     </group>
 
                     <group string="Pronóstico">
-                        <field name="prognosis"/>
+                        <field name="prognosis" nolabel="1"/>
                     </group>
 
                     <div class="text-center">
@@ -135,6 +137,17 @@
                         <!-- <button name="%(action_report_hr_applicant_document)d" string="Generar PDF" type="action" class="btn btn-secondary btn-lg mt-4"/> -->
                     </div>
                 </page>
+            </xpath>
+
+            <!-- Eliminar el grupo "Sourcing" del notebook -->
+            <xpath expr="//notebook/page[@name='application_details']/group/group[field[@name='source_id']]" position="replace">
+                <!-- Eliminar el grupo "Sourcing" -->
+            </xpath>
+
+            <!-- Agregar los campos debajo de linkedin_profile -->
+            <xpath expr="//field[@name='linkedin_profile']" position="after">
+                <field name="source_id"/>
+                <field name="medium_id"/>
             </xpath>
         </field>
     </record>

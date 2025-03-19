@@ -37,7 +37,7 @@
                                 <tbody>
                                     <tr>
                                         <td colspan="2">
-                                            <strong>Centro Laboral Estévez Jor</strong> 
+                                            <strong>Centro Laboral:</strong> <t t-esc="doc.company_id.name"/>
                                             
                                         </td>
                                         <td>
@@ -90,13 +90,17 @@
 
                             <h4><strong>III. ANTECEDENTES PERSONALES NO PATOLÓGICOS</strong></h4>
 
-                            <p>Paciente originario de <t t-esc="doc.place_of_origin"/> y residente en <t t-esc="doc.place_of_residence"/>, 
-                                <t t-esc="dict([('single', 'Soltero(a)'), ('married', 'Casado(a)'), ('cohabitant', 'En Concubinato'), ('widower', 'Viudo(a)'), ('divorced', 'Divorciado(a)')]).get(doc.marital_status)"/>, 
-                                <t t-esc="doc.religion"/>. Vive en casa <t t-esc="dict([('own', 'Propia'), ('rented', 'Rentada')]).get(doc.housing_type)"/>, 
-                                construida con materiales <t t-esc="dict([('durable', 'Durable'), ('non_durable', 'No Durable')]).get(doc.construction_material)"/>, cuenta con todos los servicios 
-                                intradomiciliarios y extradomiciliarios. Realiza baño <t t-esc="doc.weekly_clothing_change"/> veces a la semana, 
-                                cambio de ropa interna y diario, realiza cepillado de dientes diario <t t-esc="doc.daily_teeth_brushing"/> 
-                                veces al día. 
+                            <p>
+                                Paciente originario de <t t-esc="doc.place_of_origin"/>,
+                                reside en <t t-esc="doc.place_of_residence"/>, 
+                                <t t-esc="dict([('single', 'Soltero'), ('married', 'Casado'), ('divorced', 'Divorciado'), ('widowed', 'Viudo')]).get(doc.marital_status)"/>, 
+                                <t t-esc="doc.religion"/>,
+                                Vive en casa <t t-esc="dict([('own', 'Propia'), ('rented', 'Rentada')]).get(doc.housing_type)"/>, 
+                                construida con materiales <t t-esc="dict([('durable', 'Durables'), ('non_durable', 'No Durables')]).get(doc.construction_material)"/>, 
+                                cuenta con todos los servicios intradomiciliarios y extradomiciliarios. 
+                                Realiza baño <t t-esc="doc.weekly_clothing_change"/> veces a la semana, 
+                                cambio de ropa interior y exterior a diario, 
+                                realiza cepillado de dientes <t t-esc="doc.daily_teeth_brushing"/> veces al día.                                
                                 <strong>Zoonosis:</strong> <t t-esc="dict([('negative', 'Negativo'), ('positive', 'Positivo')]).get(doc.zoonosis)"/> 
                                 <strong>Hacinamiento:</strong> <t t-esc="dict([('negative', 'Negativo'), ('positive', 'Positivo')]).get(doc.overcrowding)"/> 
                                 <strong>Tatuajes y Perforaciones:</strong> <t t-esc="doc.tattoos_piercings"/>
@@ -110,53 +114,54 @@
 
                             <h4><strong>IV. ANTECEDENTES PERSONALES PATOLÓGICOS</strong></h4>
 
-                            <p><strong>Quirúrgicos:</strong> <t t-esc="doc.previous_surgeries"/> <strong>Traumáticos:</strong> <t t-esc="doc.traumas"/>  <strong>Transfusionales:</strong> <t t-esc="doc.transfusions"/> </p>
-                            <p><strong>Alérgicos:</strong> <t t-esc="doc.allergies"/> <strong>Crónico-degenerativos:</strong> <t t-esc="doc.chronic_diseases"/>  <strong>Enfermedades de la infancia:</strong> <t t-esc="doc.childhood_diseases"/> </p>
-                            <p><strong>Tabaquismo:</strong> <t t-esc="dict([('yes', 'Sí'), ('no', 'No'), ('social', 'Social')]).get(doc.smoking)"/> <strong>Alcoholismo:</strong> <t t-esc="dict([('yes', 'Sí'), ('no', 'No'), ('social', 'Social')]).get(doc.alcoholism)"/> </p>
-                            <p><strong>Toxicomanías:</strong> <t t-esc="dict([('yes', 'Sí'), ('no', 'No'), ('social', 'Social')]).get(doc.drug_addiction)"/> </p>
+                            <p>
+                                <strong>Quirúrgicos:</strong> <t t-esc="doc.previous_surgeries"/>.
+                                <strong>Traumáticos:</strong> <t t-esc="doc.traumas"/>.
+                                <strong>Transfusionales:</strong> <t t-esc="doc.transfusions"/>.
+                                <strong>Alérgicos:</strong> <t t-esc="doc.allergies"/>.
+                                <strong>Crónico-degenerativos:</strong> <t t-esc="doc.chronic_diseases"/>.
+                                <strong>Enfermedades de la infancia:</strong> <t t-esc="doc.childhood_diseases"/>.
+                                <strong>Tabaquismo:</strong> <t t-esc="dict([('yes', 'Sí'), ('no', 'No'), ('social', 'Social')]).get(doc.smoking)"/>.
+                                <strong>Alcoholismo:</strong> <t t-esc="dict([('yes', 'Sí'), ('no', 'No'), ('social', 'Social')]).get(doc.alcoholism)"/>.
+                                <strong>Toxicomanías:</strong> <t t-esc="dict([('yes', 'Sí'), ('no', 'No'), ('social', 'Social')]).get(doc.drug_addiction)"/>.
+                            </p>
 
-                            kjhg    
+                            <div class="row text-center">
+                                <div class="col">
+                                    <strong>Esquema de Vacunación: </strong>
+                                    <t t-esc="dict([('yes', 'Sí'), ('no', 'No')]).get(doc.complete_schedule)"/>.
+                                    <t t-esc="doc.comments"/>
+                                </div>
+                                <div class="col">
+                                    <strong>Última vacuna: </strong>
+                                    <t t-esc="doc.last_vaccine.strftime('%Y')"/>
+                                </div>
+                            </div>
+
                             <hr/>
 
-
-                            <table class="table table-bordered">
-                                <tbody>
-                                    <tr>
-                                        <td class="text-center"><strong>ESQUEMA DE VACUNACIÓN: </strong><P> Esquema COVID 19: 2 inmunizaciones marca moderna.</P></td>
-                                        <td class="text-center"><strong>Última vacuna: 2024</strong></td>
-                                    
-                                    </tr>
-                                </tbody>
-                            </table>
-
-                            <hr/>
                             <h4><strong>V. PADECIMIENTO ACTUAL </strong></h4>
-                            <P>Interrogado y negado</P>
+                            <p><t t-esc="doc.current_condition"/></p>
+                            
                             <hr/>
 
                             <h4><strong>VI. INTERROGATORIO POR APARATOS Y SISTEMAS </strong></h4>
-                            <hr/>
 
-                            <p><strong>Cardiovascular: </strong> (interrogatorio sobre disnea, taquicardia, bradicardia, cianosis, plétora yugular y lipotimia negados)</p>
-                            <hr/>
-                            <p><strong>Respiratorio: </strong>(Interrogatorio sobre, disnea, tiros intercostales, aleteo nasal, tos persistente y crónica, expectoración y hemoptisis)</p>
-                            <hr/>
-                            <p><strong>Gastrointestinal: </strong>(Interrogatorio sobre disfagia, reflujo gastroesofágico, pirosis, plenitud postprandial, constipación, flatulencia, nausea, vómito y diarrea negados, evacuaciones normales.)</p>
-                            <hr/>
-                            <p><strong>Endócrino: </strong>(Interrogados y negados.)</p>
-                            <hr/>
-                            <p><strong>Nervioso: </strong>(Interrogatorio sobre, epilepsia, cefalea, miopía, astigmatismo, negados.)</p>
-                            <hr/>
-                            <p><strong>Musculo esquelético: </strong>(Interrogatorio sobre mialgias, artralgias, debilidad muscular, negados.)</p>
-                            <hr/>
-                            <p><strong>Piel, Mucosas Y Anexos: </strong>(Interrogatorio sobre, nevos, condilomas, xerosis, negados.)</p>
+                            <p><strong>Cardiovascular: </strong> <t t-esc="doc.cardiovascular or 'disnea, taquicardia, bradicardia, cianosis, plétora yugular y lipotimia negados'"/></p>
+                            <p><strong>Respiratorio: </strong> <t t-esc="doc.respiratory or 'disnea, tiros intercostales, aleteo nasal, tos persistente y crónica, expectoración y hemoptisis'"/></p>
+                            <p><strong>Gastrointestinal: </strong> <t t-esc="doc.gastrointestinal or 'disfagia, reflujo gastroesofágico, pirosis, plenitud postprandial, constipación, flatulencia, nausea, vómito y diarrea negados, evacuaciones normales'"/></p>
+                            <p><strong>Genitourinario: </strong> <t t-esc="doc.genitourinary or 'disuria, poliuria, tenesmo vesical, piuria, hematuria, incontinencia urinaria, disminución del chorro de orina, negados, diuresis normal'"/></p>
+                            <p><strong>Endócrino: </strong> <t t-esc="doc.endocrine or 'interrogados y negados'"/></p>
+                            <p><strong>Nervioso: </strong> <t t-esc="doc.nervous or 'epilepsia, cefalea, miopía, astigmatismo, negados'"/></p>
+                            <p><strong>Músculo-Esquelético: </strong> <t t-esc="doc.musculoskeletal or 'mialgias, artralgias, debilidad muscular, negados'"/></p>
+                            <p><strong>Piel, Mucosas y Anexos: </strong> <t t-esc="doc.skin_mucous or 'nevos, condilomas, xerosis, negados'"/></p>
+                            
                             <hr/>
 
                             <h4><strong>VII. SIGNOS VITALES </strong></h4>
 
-                            <table class="table table-bordered">
+                            <table class="table">
                                 <tbody>
-                                    
                                     <tr>
                                         <td class="text-center"><strong>Frecuencia Cardiaca</strong></td>
                                         <td class="text-center"><strong>Frecuencia Respiratoria</strong></td>
@@ -169,65 +174,62 @@
                                     </tr>
 
                                     <tr>
-                                        <td class="text-center"><strong>72 lpm</strong></td>
-                                        <td class="text-center"><strong>14 rpm</strong></td>
-                                        <td class="text-center"><strong>36.8°c</strong></td>
-                                        <td class="text-center"><strong>116/71 mmHg</strong></td>
-                                        <td class="text-center"><strong>95 %</strong></td>
-                                        <td class="text-center"><strong>65 kg</strong></td>
-                                        <td class="text-center"><strong>1.6 cm</strong></td>
-                                        <td class="text-center"><strong>25.4 </strong></td>
+                                        <td class="text-center"><t t-esc="doc.heart_rate"/> lpm</td>
+                                        <td class="text-center"><t t-esc="doc.respiratory_rate"/> rpm</td>
+                                        <td class="text-center"><t t-esc="doc.temperature"/> °c</td>
+                                        <td class="text-center"><t t-esc="doc.blood_pressure"/></td>
+                                        <td class="text-center"><t t-esc="doc.oxygen_saturation"/> %</td>
+                                        <td class="text-center"><t t-esc="doc.weight"/> kg</td>
+                                        <td class="text-center"><t t-esc="doc.height"/> cm</td>
+                                        <td class="text-center"><t t-esc="doc.bmi"/></td>
                                     </tr>
-                                    
                                 </tbody>
                             </table>
 
-                            <h4><strong>VIII. EXPLORACIÓN FÍSICAL </strong></h4>
                             <hr/>
-                            <p><strong>Habitus Exterior: </strong>Masculino de edad aparente a la cronológica, alerta, cooperadora, consciente, orientada en tiempo, persona y espacio, sin facies características, con adecuada coloración e hidratación de piel y tegumentos, marcha normal, posición libremente escogida.</p>
-                            <hr/>
-                            <p><strong>Cabeza: </strong>Normocéfalo, sin endostosis ni exostosis, pabellones auriculares con adecuada implantación, canales auditivos externos permeables, membranas timpánicas íntegras, con presencia de reflejo luminoso, con adecuada movilidad. Ojos simétricos, párpados íntegros, pupilas isocóricas normorreflécticas. Narinas permeables, cornetes medio e inferior normales, con ciclo nasal, sin desviación de tabique, datos de epistaxis, sin descarga anterior. Labios simétricos, cavidad oral con mucosa hidratada, faringe hiperémica, presencia de descarga retronasal , exudado faríngeo, amígdalas presentes.</p>
-                            <hr/>
-                            <p><strong>Cuello: </strong>cilíndrico, con tráquea central y móvil, (si / no) se palpa tiroides o adenomegalias, (con / sin) plétora yugular, (con / sin) pulso carotideo presente bilateralmente</p>
-                            <hr/>
-                            <p><strong>Tórax: </strong>normolíneo, (con / sin) respiración torácica, mecánica ventilatoria simétrica y comparativa, campos pulmonares (bien / mal) ventilados, (no) sibilancias (con / ni) estertores, (no) tiros intercostales, (no) se integró síndrome pleuropulmonar. Mamas simétricas, pezón central (con / sin) datos patológicos, (no) dolorosas a la palpación, (con / sin) hallazgos patológicos. Ruidos cardiacos rítmicos de (buena / mala) intensidad y frecuencia, (si / no) se ausculta soplo, frote, galope.</p>
-                            <hr/>
-                            <p><strong>Abdomen: </strong>plano blando y depresible, (no) datos de parestesias (con / ni) hipervaralgesia, peristalsis presente de (buen / mal) ritmo e intensidad, (no) doloroso a la palpación media y profunda (con / sin) viceromegalias, (con / sin) datos de irritación peritoneal, timpánico a la percusión sobre el marco cólico, signo de Murphy (- / +), puntos uretrales (- / +), Giordano (- / +), Rebote (- / +).</p>
-                            <hr/>
-                            <p><strong>Genitales: </strong>(de acuerdo con edad y sexo.)</p>
-                            <hr/>
-                            <p><strong>Extremidades: </strong>Extremidades: superiores e inferiores eutróficas, eutérmicas, (con / sin) datos de edema, tono y fuerza _/5 por Roots, reflejos osteotendinosos presentes, (con / sin) compromiso arterial o venoso.</p>
-                            <hr/>
-                            <p><strong>Piel: </strong>de (buena / mala) coloración e (hidratación / deshidratación).</p>
-                            <p><strong>Antidoping: NA</strong></p>
-                            <p><strong>Glucosa: NA mg/dL</strong></p>
+
+                            <h4><strong>VIII. EXPLORACIÓN FÍSICA </strong></h4>
+
+                            <!-- <p><strong>Habitus Exterior: </strong></p> -->
+                            <p><strong>Cabeza y Cuello: </strong><t t-esc="doc.head_neck"/></p>
+                            <p><strong>Tórax: </strong><t t-esc="doc.chest"/></p>
+                            <p><strong>Abdomen: </strong><t t-esc="doc.abdomen"/></p>
+                            <p><strong>Extremidades: </strong><t t-esc="doc.extremities"/></p>
+                            <p><strong>Neurológico: </strong><t t-esc="doc.neurological"/></p>
+                            <p><strong>Piel: </strong><t t-esc="doc.skin"/></p>
+                            <!-- <p><strong>Antidoping: NA</strong></p>
+                            <p><strong>Glucosa: NA mg/dL</strong></p> -->
+                            
                             <hr/>
 
                             <h4><strong>IX. RESULTADOS PREVIOS Y ACTUALES DE LABORATORIO, GABINETE Y OTROS:</strong></h4>
+                            <p><t t-esc="doc.laboratory_results"/></p>
                             <hr/>
                             <h4><strong>X. DIAGNÓSTICOS O PROBLEMAS CLÍNICOS:</strong></h4>
-                            <p><strong>1.</strong><strong>Sobrepeso: </strong></p>
-                            <p><strong>2.</strong><strong>Ametropía no corregida: </strong></p>
-                            <hr/>
-                            <h4><strong>XI. TERAPÉUTICA EMPLEADA Y RESULTADOS (PREVIOS):  </strong></h4>
-                            <p>No aplica</p>
-                            <hr/>
-                            <h4><strong>XII. TRATAMIENTO E INDICACIONES: </strong></h4>
-                            <hr/>
-                            <p>Dieta ríca en verduras, baja eb carbohidratos, tomar abundate liquido, noderarar el consumo de carnes rojas, embutidos y lácteos. Evitar cambios bruscos de temperatura, realizar actividad fisica diariamente (caminata ligera a tolerancia), se promueve al salud bucal, hábitos higienicos generales, evitar accidentes. Se consulta guia de práctica clinica, se realizan accíones del servicio de promoción  y prevención para una mejor salud.</p>
-                            <hr/>
-                            <h4><strong>XIII. PROXIMA CITA: </strong> ABIERTA</h4>
-                            <hr/>
-                            <h4><strong>XIV. PRONÓSTICO: </strong> LIGADO A EVOLUCIÓN</h4>
+                            <p><t t-esc="doc.diagnosis"/></p>
                             <hr/>
 
-                            <div class="d-flex justify-content-between mt-5 pt-5 mx-5">
-                                <div class="text-left ml-3 text-nowrap fs-6">
-                                    <p>__________________________________________</p>
+                            <h4><strong>XI. TERAPÉUTICA EMPLEADA Y RESULTADOS (PREVIOS):  </strong></h4>
+                            <p><t t-esc="doc.previous_treatment or 'No aplica'"/></p>
+                            <hr/>
+
+                            <h4><strong>XII. TRATAMIENTO E INDICACIONES: </strong></h4>
+                            <p><t t-esc="doc.treatment_recommendations"/></p>
+                            <hr/>
+
+                            <h4><strong>XIII. PROXIMA CITA: </strong> <t t-esc="doc.next_appointment or 'ABIERTA'"/></h4>
+                            <hr/>
+                            <h4><strong>XIV. PRONÓSTICO: </strong> <t t-esc="doc.prognosis or 'LIGADO A EVOLUCIÓN'"/></h4>
+                            <hr/>
+
+                            <br/><br/><br/><br/><br/>
+                            <div class="d-flex justify-content-between">
+                                <div class="text-center">
+                                    <p>____________________________________________________</p>
                                     <strong>FIRMA Y SELLO REGISTRO MÉDICO</strong>
                                 </div>
-                                <div lass="text-right mr-3">
-                                    <p>_______________________________</p>
+                                <div class="text-center">
+                                    <p>____________________________________________________</p>
                                     <strong>FIRMA DEL TRABAJADOR</strong>
                                 </div>
                             </div>

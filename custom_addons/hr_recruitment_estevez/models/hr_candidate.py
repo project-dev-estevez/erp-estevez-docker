@@ -37,15 +37,14 @@ class HrCandidate(models.Model):
                     'target': 'new',
                 }
             else:
-                raise UserError("The candidate does not have a phone number.")
-            
+                raise UserError("The candidate does not have a phone number.")      
 
     @api.model
     def create(self, vals):
         if vals.get('rfc'):
             existing_candidate = self.with_context(active_test=False).search([('rfc', '=', vals['rfc']), ('rfc', '!=', '')], limit=1)
             if existing_candidate:
-                # Eliminar el candidato existente con el mismo RFC
-                existing_candidate.unlink()
+                # Archivar el candidato existente con el mismo RFC
+                existing_candidate.active = False
                 raise UserError("El candidato con RFC %s ya se ha postulado anteriormente!" % vals['rfc'])
         return super(HrCandidate, self).create(vals)

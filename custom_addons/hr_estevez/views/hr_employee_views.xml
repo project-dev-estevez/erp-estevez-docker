@@ -21,9 +21,14 @@
             <field name="model">hr.employee</field>
             <field name="inherit_id" ref="hr.view_employee_form"/>
             <field name="arch" type="xml">
+
+                <xpath expr="//div[@name='button_box']/button[last()]" position="after">
+                    <button name="action_open_whatsapp" class="oe_stat_button" icon="fa-whatsapp" type="object" string="WhatsApp" invisible="not (work_phone or private_phone)"/>
+                    <button name="action_open_documents" class="oe_stat_button" icon="fa-file-text-o" type="object" string="Documentos" />
+                </xpath>
             
                 <xpath expr="//header" position="inside">
-                    <button name="action_archive_employee" 
+                    <button name="action_archive_employee"
                         string="Dar de baja" 
                         type="object" 
                         class="oe_highlight"
