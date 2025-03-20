@@ -48,16 +48,16 @@ class PurchaseAcquisition(models.Model):
         order_lines = []
         for line in self.order_line_ids:
             order_lines.append((0, 0, {
-                'product_id': line.product_id.id,  # ID del producto
-                'product_qty': line.product_qty,   # Cantidad del producto
-                'product_uom': line.product_uom.id,  # Unidad de medida
-                'price_unit': line.price_unit,     # Precio unitario
+                'product_id': line.product_id.id,  
+                'product_qty': line.product_qty,  
+                'product_uom': line.product_uom.id,  
+                'price_unit': line.price_unit,    
             }))
 
         purchase_order = self.env['purchase.order'].create({
-            'partner_id': self.proveedor_id.id,  # Proveedor
-            'origin': self.requisition_number,   # Referencia a la adquisición
-            'order_line': order_lines,           # Líneas de productos
+            'partner_id': self.proveedor_id.id,  
+            'origin': self.requisition_number,   
+            'order_line': order_lines,           
         })
         return {
             'type': 'ir.actions.act_window',
@@ -72,25 +72,25 @@ class PurchaseAcquisition(models.Model):
         order_lines = []
         for line in self.order_line_ids:
             order_lines.append((0, 0, {
-                'product_id': line.product_id.id,  # ID del producto
-                'product_qty': line.product_qty,   # Cantidad del producto
-                'product_uom': line.product_uom.id,  # Unidad de medida
-                'price_unit': line.price_unit,     # Precio unitario
+                'product_id': line.product_id.id,
+                'product_qty': line.product_qty,
+                'product_uom': line.product_uom.id,
+                'price_unit': line.price_unit,
             }))
         
         quotation = self.env['purchase.order'].create({
-            'partner_id': self.requestor_id.partner_id.id,  # Asignar el solicitante como contacto
-            'origin': self.requisition_number,  # Referencia a la adquisición
-            'order_line': order_lines,  # Líneas de productos
+            'partner_id': self.requestor_id.partner_id.id,
+            'origin': self.requisition_number,
+            'order_line': order_lines,
         })    
         
         return {
             'type': 'ir.actions.act_window',
             'name': 'Cotización',
-            'res_model': 'purchase.order',  # Modelo de la cotización
-            'res_id': quotation.id,         # ID de la cotización creada
-            'view_mode': 'form',            # Modo de visualización (formulario)
-            'target': 'current',            # Abrir en la misma ventana
+            'res_model': 'purchase.order',
+            'res_id': quotation.id,
+            'view_mode': 'form',  
+            'target': 'current', 
         }  
 
     def action_approve(self):
@@ -211,6 +211,6 @@ class PurchaseAcquisition(models.Model):
         #Metodo para el bootn de Guardar
         self.ensure_one()
         return {
-            "type": "ir.actions.act_window_close",  # Cierra la ventana de este formulario
+            "type": "ir.actions.act_window_close",
         }
     

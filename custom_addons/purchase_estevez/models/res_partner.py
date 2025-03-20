@@ -20,7 +20,7 @@ class ResPartner(models.Model):
     buyer_id = fields.Many2one('hr.employee', string="Comprador", domain="[('department_id', '=', 1)]")     
 
  # Método para el botón "Guardar"
-    def action_guardar(self):
+    def save(self):
         self.ensure_one()        
         return {
             "type": "ir.actions.act_window_close",

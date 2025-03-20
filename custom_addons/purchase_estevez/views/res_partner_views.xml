@@ -66,8 +66,7 @@
                 </field>    
                 <field name="website" position="attributes">
                     <attribute name="placeholder"/>
-                </field>
-                <!-- Eliminar el placeholder del campo "Etiquetas" -->
+                </field>                
                 <field name="category_id" position="attributes">
                     <attribute name="placeholder"/>
                 </field>
@@ -80,15 +79,17 @@
                 </xpath>
                 <xpath expr="//group[@name='misc']" position="attributes">
                     <attribute name="invisible">1</attribute>
-                </xpath>                               
-                <!-- Agregar el botón "Guardar" dentro del oe_button_box -->
-                <xpath expr="//div[@name='button_box']" position="inside">
-                    <button string="Guardar" type="object" name="action_guardar" class="btn btn-outline-primary o_form_button_create"/>
-                </xpath>
+                </xpath>                                                             
                 <field name="lang" position="replace"/>             
-                <xpath expr="//div[@name='button_box']/button[@name='action_guardar']" position="after">
+                <xpath expr="//div[@name='button_box']" position="inside">
                     <button name="action_open_whatsapp" class="oe_stat_button" icon="fa-whatsapp" type="object" string="WhatsApp" invisible="not phone"/>
-                </xpath>
+                </xpath>   
+               <xpath expr="//notebook" position="after">
+    <div class="oe_button_box" style="text-align: right; margin-top: 16px;">
+        <button string="Guardar" type="object" name="save" class="btn-primary"/>
+        <button string="Cancelar" class="btn-secondary" special="cancel"/>
+    </div>
+</xpath>                       
             </field>
         </record>     
         <record id="view_res_partner_list_inherit" model="ir.ui.view">
