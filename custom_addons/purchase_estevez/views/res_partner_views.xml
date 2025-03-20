@@ -29,6 +29,9 @@
                 <field name="mobile" position="attributes">
                     <attribute name="string">Celular Extra</attribute>
                 </field>
+                <xpath expr="//page[@name='sales_purchases']" position="attributes">
+                    <attribute name="string">Compra</attribute>
+                </xpath>
                 
                 <!-- Agregar el campo de moneda en la sección de compras -->
                 <xpath expr="//field[@name='property_supplier_payment_term_id']" position="after">
