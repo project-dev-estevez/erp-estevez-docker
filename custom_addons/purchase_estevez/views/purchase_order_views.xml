@@ -14,15 +14,5 @@
     </record>
 
 
-    <record id="purchase_order_form_inherit_hide_requisition" model="ir.ui.view">
-        <field name="name">purchase.order.form.inherit.hide.requisition</field>
-        <field name="model">purchase.order</field>
-        <field name="inherit_id" ref="purchase_requisition.purchase_order_form_inherit"/>
-        <field name="arch" type="xml">
-            <!-- Ocultar el campo requisition_id -->
-            <field name="requisition_id" position="attributes">
-                <attribute name="invisible">1</attribute>
-            </field>
-        </field>
-    </record>
+   
 </odoo>
