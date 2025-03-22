@@ -79,18 +79,18 @@
                 </xpath>
 
                 <!-- Aplicar clases a todas las páginas dentro del notebook -->
-                <xpath expr="//notebook/page" position="attributes">
+                <!-- <xpath expr="//notebook/page" position="attributes">
                     <attribute name="class" add="bg-primary text-white shadow mb-3"/>
-                </xpath>
+                </xpath> -->
 
                 <!-- Aplicar clases a la página hr_settings -->
-                <xpath expr="//notebook/page[@name='hr_settings']" position="attributes">
+                <!-- <xpath expr="//notebook/page[@name='hr_settings']" position="attributes">
                     <attribute name="class" add="bg-primary text-white shadow mb-3"/>
-                </xpath>
+                </xpath> -->
 
                 <!-- Información de Trabajo -->
                 <xpath expr="//notebook/page[@name='public']" position="replace">
-                    <page name="public" string="Información de Trabajo" class="bg-primary text-white shadow mb-3">
+                    <page name="public" string="Información de Trabajo" >
                         <group string="Ubicación">
                             <group>
                                 <field name="address_id" context="{'show_address': 1}" options="{'highlight_first_line': True, 'no_edit': True, 'no_create': True, 'no_open': True}" domain="[('is_company', '=', True)]"/>
@@ -127,7 +127,7 @@
 
                 <!-- Información Personal -->
                 <xpath expr="//notebook/page[@name='personal_information']" position="replace">
-                    <page name="personal_information" string="Información Personal" groups="hr.group_hr_user" class="bg-primary text-white shadow mb-3">
+                    <page name="personal_information" string="Información Personal" groups="hr.group_hr_user" >
                         <group string="Contacto Personal">
                             <group>
                                 <div class="font-weight-bold">
@@ -221,45 +221,39 @@
                     </page>
                 </xpath>
 
-                <!-- Nueva página de Documentos -->
-                <xpath expr="//notebook/page[@name='personal_information']" position="after">
-                    <page name="documents" string="Documentos" class="bg-primary text-white shadow mb-3">
-                    </page>
-                </xpath>
-
                 <!-- Nueva página de Incapacidades -->
-                <xpath expr="//notebook/page[@name='documents']" position="after">
-                    <page name="disabilities" string="Incapacidades" class="bg-primary text-white shadow mb-3">
+                <xpath expr="//notebook/page[@name='personal_information']" position="after">
+                    <page name="disabilities" string="Incapacidades" >
                     </page>
                 </xpath>
 
                 <!-- Nueva página de Actas Administrativas -->
                 <xpath expr="//notebook/page[@name='disabilities']" position="after">
-                    <page name="memorandum" string="Actas Administrativas" class="bg-primary text-white shadow mb-3">
+                    <page name="memorandum" string="Actas Administrativas" >
                     </page>
                 </xpath>
 
                 <!-- Nueva página de Vacaciones y permisos -->
                 <xpath expr="//notebook/page[@name='memorandum']" position="after">
-                    <page name="vacations and permits" string="Vacaciones y Permisos" class="bg-primary text-white shadow mb-3">
+                    <page name="vacations and permits" string="Vacaciones y Permisos" >
                     </page>
                 </xpath>
 
                 <!-- Nueva página de Asignaciones -->
                 <xpath expr="//notebook/page[@name='vacations and permits']" position="after">
-                    <page name="assignments" string="Asignaciones" class="bg-primary text-white shadow mb-3">
+                    <page name="assignments" string="Asignaciones" >
                     </page>
                 </xpath>
 
                 <!-- Nueva página de Incidencias -->
                 <xpath expr="//notebook/page[@name='assignments']" position="after">
-                    <page name="incidents" string="Incidencias" class="bg-primary text-white shadow mb-3">
+                    <page name="incidents" string="Incidencias" >
                     </page>
                 </xpath>
 
                 <!-- Nueva página de Cursos -->
                 <xpath expr="//notebook/page[@name='incidents']" position="after">
-                    <page name="courses" string="Cursos" class="bg-primary text-white shadow mb-3">
+                    <page name="courses" string="Cursos" >
                     </page>
                 </xpath>
 

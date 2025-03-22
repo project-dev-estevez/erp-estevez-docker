@@ -35,6 +35,11 @@
     # only loaded in demonstration mode
     'demo': [
         'demo/demo.xml',
-    ]
+    ],
+    'assets': {
+        'web.assets_backend': [
+            'hr_estevez/static/src/css/custom_styles.css',
+        ],
+    },
 }
 
