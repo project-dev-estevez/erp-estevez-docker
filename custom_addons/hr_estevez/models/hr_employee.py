@@ -16,6 +16,12 @@ class HrEmployee(models.Model):
         for employee in self:
             employee.write({'active': True})
 
+    gender = fields.Selection([
+        ('male', 'Masculino'),
+        ('female', 'Femenino'),
+        ('other', 'Indistinto')  # Cambiar la etiqueta de 'other'
+    ], groups="hr.group_hr_user", tracking=True)
+
     # Primera Columna en la Vista de Empleados
     names = fields.Char(string='Nombres')
     last_name = fields.Char(string='Apellido Paterno')
