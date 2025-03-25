@@ -74,19 +74,9 @@
                         <field name="department_id" domain="[('direction_id', '=', direction_id)]" invisible="not direction_id" options="{'no_create': True}"/>
                         <field name="area_id" domain="[('department_id', '=', department_id)]" invisible="not department_id" options="{'no_create': True}"/>
                         <field name="job_id" domain="[('department_id', '=', department_id)]" invisible="not department_id" options="{'no_create': True}"/>
-                        <field name="parent_id" domain="[('department_id', '=', department_id)]" string="Jefe Inmediato" options="{'no_create': True}"/>
+                        <field name="parent_id" string="Jefe Inmediato" options="{'no_create': True}"/>
                     </group>
                 </xpath>
-
-                <!-- Aplicar clases a todas las páginas dentro del notebook -->
-                <!-- <xpath expr="//notebook/page" position="attributes">
-                    <attribute name="class" add="bg-primary text-white shadow mb-3"/>
-                </xpath> -->
-
-                <!-- Aplicar clases a la página hr_settings -->
-                <!-- <xpath expr="//notebook/page[@name='hr_settings']" position="attributes">
-                    <attribute name="class" add="bg-primary text-white shadow mb-3"/>
-                </xpath> -->
 
                 <!-- Información de Trabajo -->
                 <xpath expr="//notebook/page[@name='public']" position="replace">
