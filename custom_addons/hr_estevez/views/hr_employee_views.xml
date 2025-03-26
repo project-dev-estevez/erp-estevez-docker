@@ -78,18 +78,18 @@
                     </group>
                 </xpath>
 
-                <!-- Información de Trabajo -->
+                <!-- Información Laboral -->
                 <xpath expr="//notebook/page[@name='public']" position="replace">
-                    <page name="public" string="Información de Trabajo" >
+                    <page name="public" string="Información Laboral" >
                         <group string="Ubicación">
                             <group>
                                 <field name="address_id" context="{'show_address': 1}" options="{'highlight_first_line': True, 'no_edit': True, 'no_create': True, 'no_open': True}" domain="[('is_company', '=', True)]"/>
-                                <field name="work_location_id" context="{'default_address_id': address_id}" placeholder="e.g. Building 2, Remote, etc."/>
+                                <field name="work_location_id" string="Ubicación Laboral" context="{'default_address_id': address_id}" placeholder="e.g. Building 2, Remote, etc."/>
                             </group>
                         </group>
                         <group string="Contacto">
                             <group>
-                                <field name="work_email" widget="email" placeholder="e.g. johndoe@estevezjor.mx"/>
+                                <field name="work_email" string="Correo Laboral" widget="email" placeholder="e.g. johndoe@estevezjor.mx"/>
                                 <field name="work_phone" widget="phone"/>
                             </group>
                         </group>
@@ -105,7 +105,7 @@
                             <field name="departure_description"/>
                             <field name="departure_date"/>
                         </group>
-                        <group string="Horario de Trabajo">
+                        <group string="Horario Laboral">
                             <group>
                                 <field name="resource_calendar_id" help="The default working hours are set in configuration."/>
                                 <field name="id" invisible="1"/>
@@ -120,7 +120,7 @@
                     <page name="personal_information" string="Información Personal" groups="hr.group_hr_user" >
                         <group string="Contacto Personal">
                             <group>
-                                <div class="font-weight-bold">
+                                <div style="font-weight: bold;">
                                     Dirección Personal
                                 </div>
                                 <br/>
@@ -158,8 +158,8 @@
                                         </div>
                                     </div>
                                 </div>
-                                <field name="private_email" placeholder="myprivateemail@example.com"/>
-                                <field name="private_phone"/>
+                                <field name="private_email" string="Correo Electronico personal" placeholder="myprivateemail@example.com"/>
+                                <field name="private_phone" string="Telefono Personal"/>
                                 <field name="gender"/>
                             </group>                                    
                             <group>
