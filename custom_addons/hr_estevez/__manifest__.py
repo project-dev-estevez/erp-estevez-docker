@@ -29,8 +29,8 @@
         'views/hr_area_views.xml',
         'views/hr_employee_menu.xml',
         'views/hr_employee_views.xml',
-        'views/hr_contract_views.xml'
-        #"views/hr_partner_views.xml",
+        'views/hr_contract_views.xml',
+        'views/hr_memorandum_views.xml',
     ],
     # only loaded in demonstration mode
     'demo': [

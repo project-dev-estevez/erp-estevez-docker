@@ -220,6 +220,18 @@
                 <!-- Nueva página de Actas Administrativas -->
                 <xpath expr="//notebook/page[@name='disabilities']" position="after">
                     <page name="memorandum" string="Actas Administrativas" >
+                        <!-- Botón para crear una nueva acta -->
+                        <button name="action_open_memorandum_form" type="object" string="Nueva Acta" class="oe_highlight" icon="fa-plus"/>
+
+                        <!-- Tabla para mostrar las actas administrativas -->
+                        <field name="memorandum_ids" widget="one2many" context="{'default_employee_id': id}">
+                            <list>
+                                <field name="id" string="Código" readonly="1"/>
+                                <field name="create_date" string="Fecha de Creación" readonly="1"/>
+                                <field name="description" string="Descripción"/>
+                                <field name="date" string="Fecha del Acta"/>
+                            </list>
+                        </field>
                     </page>
                 </xpath>
 
