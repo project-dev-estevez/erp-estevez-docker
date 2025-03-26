@@ -19,7 +19,7 @@ class HrEmployee(models.Model):
     gender = fields.Selection([
         ('male', 'Masculino'),
         ('female', 'Femenino'),
-        ('other', 'Indistinto')  # Cambiar la etiqueta de 'other'
+        ('indistinct', 'Indistinto')  # Cambiar la etiqueta de 'other'
     ], groups="hr.group_hr_user", tracking=True)
 
     # Primera Columna en la Vista de Empleados
