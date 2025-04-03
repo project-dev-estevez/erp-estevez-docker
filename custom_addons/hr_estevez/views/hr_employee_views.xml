@@ -235,14 +235,43 @@
                     </page>
                 </xpath>
 
-                <!-- Nueva página de Vacaciones y permisos -->
+                <!-- Nueva página de Vacaciones -->
                 <xpath expr="//notebook/page[@name='memorandum']" position="after">
-                    <page name="vacations and permits" string="Vacaciones y Permisos" >
+                    <page name="vacations" string="Vacaciones">
+                        <group>
+                            <group string="Detalle Vacaciones">
+                                <field name="years_of_service" readonly="1"/>
+                                <field name="entitled_days" readonly="1"/>
+                                <field name="vacation_days_taken" readonly="1"/>
+                                <field name="vacation_days_available" readonly="1"/>
+                            </group>
+                            <group string="Detalle Periodos">                            
+                                <field name="vacation_period_ids" widget="one2many_list" context="{'default_employee_id': id}" nolabel="1" readonly="1">
+                                    <list>
+                                        <field name="period" string="Periodo"/>
+                                        <field name="entitled_days" string="Con Derecho a"/>
+                                        <field name="days_taken" string="Disfrutados"/>
+                                        <field name="days_remaining" string="Restan"/>
+                                    </list>
+                                </field>
+                                <group>
+                                    <div class="d-flex justify-content-center">
+                                        <button name="generate_vacation_periods" type="object" icon="fa-refresh" class="oe_highlight"/>
+                                    </div>
+                                </group>
+                            </group>    
+                        </group>
+                    </page>
+                </xpath>
+
+                <!-- Nueva página de Permisos -->
+                <xpath expr="//notebook/page[@name='vacations']" position="after">
+                    <page name="permits" string="Permisos" >
                     </page>
                 </xpath>
 
                 <!-- Nueva página de Asignaciones -->
-                <xpath expr="//notebook/page[@name='vacations and permits']" position="after">
+                <xpath expr="//notebook/page[@name='permits']" position="after">
                     <page name="assignments" string="Asignaciones" >
                     </page>
                 </xpath>

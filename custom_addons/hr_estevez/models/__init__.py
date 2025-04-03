@@ -7,3 +7,4 @@ from . import hr_department
 from . import hr_contract
 from . import hr_job
 from . import hr_memorandum
+from . import hr_vacation_period
