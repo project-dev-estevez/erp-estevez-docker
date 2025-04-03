@@ -1,0 +1,32 @@
+<odoo>
+    <data>
+        <!-- Vista del formulario modal -->
+        <record id="view_hr_memorandum_form" model="ir.ui.view">
+            <field name="name">hr.memorandum.form</field>
+            <field name="model">hr.memorandum</field>
+            <field name="arch" type="xml">
+                <form string="Nueva Acta Administrativa">
+                    <group>
+                        <field name="employee_id" invisible="1"/>
+                        <field name="date"/>
+                        <field name="description"/>
+                    </group>
+                    <footer>
+                        <button string="Guardar" class="oe_highlight" type="object" name="action_save_memorandum"/>
+                        <button string="Cancelar" class="btn-secondary" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <!-- Acción para abrir el formulario modal -->
+        <record id="action_hr_memorandum_form" model="ir.actions.act_window">
+            <field name="name">Nueva Acta Administrativa</field>
+            <field name="res_model">hr.memorandum</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="view_hr_memorandum_form"/>
+            <field name="target">new</field>
+            <field name="context">{'default_employee_id': active_id}</field>
+        </record>
+    </data>
+</odoo>

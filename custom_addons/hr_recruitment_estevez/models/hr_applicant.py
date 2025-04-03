@@ -290,3 +290,32 @@ class HrApplicant(models.Model):
                 record.is_examen_medico = stage_name == 'Examen Médico'
             else:
                 record.is_examen_medico = False
+
+    def create_employee_from_applicant(self):
+        self.ensure_one()
+        
+        # Llamar al método original para crear el empleado
+        action = self.candidate_id.create_employee_from_candidate()
+        employee = self.env['hr.employee'].browse(action['res_id'])
+        
+        # Actualizar los datos del empleado con información del applicant
+        employee.write({
+            'job_id': self.job_id.id,
+            'job_title': self.job_id.name,
+            'department_id': self.department_id.id,
+            'work_email': self.department_id.company_id.email or self.email_from,  # Para tener un correo válido por defecto
+            'work_phone': self.department_id.company_id.phone,
+        })
+
+        # Transferir documentos asociados al applicant al empleado
+        attachments = self.env['ir.attachment'].search([
+            ('res_model', '=', 'hr.applicant'),
+            ('res_id', '=', self.id)
+        ])
+        for attachment in attachments:
+            attachment.copy({
+                'res_model': 'hr.employee',
+                'res_id': employee.id,
+            })
+
+        return action

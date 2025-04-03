@@ -1,6 +1,6 @@
 from odoo import api, models, fields, _
 from odoo.exceptions import UserError
-from datetime import date
+from datetime import date, timedelta
 import re
 
 class HrEmployee(models.Model):
@@ -15,6 +15,12 @@ class HrEmployee(models.Model):
     def action_reactivate_employee(self):
         for employee in self:
             employee.write({'active': True})
+
+    gender = fields.Selection([
+        ('male', 'Masculino'),
+        ('female', 'Femenino'),
+        ('indistinct', 'Indistinto')  # Cambiar la etiqueta de 'other'
+    ], groups="hr.group_hr_user", tracking=True)
 
     # Primera Columna en la Vista de Empleados
     names = fields.Char(string='Nombres')
@@ -70,6 +76,146 @@ class HrEmployee(models.Model):
     ], string='Estado Civil', required=True, tracking=True)
 
     spouse_birthdate = fields.Date(string="Spouse Birthdate", groups="hr.group_hr_user", store=False)
+
+    memorandum_ids = fields.One2many('hr.memorandum', 'employee_id', string='Actas Administrativas')
+
+    years_of_service = fields.Float(
+        string="Años de Servicio",
+        compute="_compute_years_of_service",
+        store=False
+    )
+    entitled_days = fields.Float(
+        string="Con Derecho a",
+        compute="_compute_vacation_days",
+        store=False
+    )
+    vacation_days_taken = fields.Float(
+        string="Días de Vacaciones Disfrutados",
+        compute="_compute_vacation_days_taken",
+        store=False
+    )
+    vacation_days_available = fields.Float(
+        string="Días de Vacaciones Disponibles",
+        compute="_compute_vacation_days_available",
+        store=False
+    )
+
+    vacation_period_ids = fields.One2many(
+        'hr.vacation.period', 'employee_id', string="Periodos de Vacaciones"
+    )
+
+    @api.depends('contract_ids.date_start', 'contract_ids.date_end', 'years_of_service')
+    def generate_vacation_periods(self):
+        for employee in self:
+            # Eliminar periodos existentes
+            employee.vacation_period_ids.unlink()
+
+            # Verificar si hay contratos y años de servicio
+            if not employee.contract_ids or employee.years_of_service <= 0:
+                continue
+
+            # Generar periodos basados en los años de servicio
+            start_date = min(employee.contract_ids.mapped('date_start'))  # Fecha de inicio más antigua
+            years_of_service = int(employee.years_of_service)
+
+            for year in range(years_of_service):
+                # Calcular el inicio y fin del periodo basado en años calendario
+                year_start = start_date.replace(year=start_date.year + year)
+                year_end = year_start.replace(year=year_start.year + 1) - timedelta(days=1)
+
+                entitled_days = 12 + (year * 2) if year < 5 else 22  # Ejemplo de cálculo
+                days_taken = 0  # Inicialmente 0
+                self.env['hr.vacation.period'].create({
+                    'employee_id': employee.id,
+                    'year_start': year_start,
+                    'year_end': year_end,
+                    'entitled_days': entitled_days,
+                    'days_taken': days_taken,
+                })
+
+    @api.depends('contract_ids.date_start', 'contract_ids.date_end', 'contract_ids.state')
+    def _compute_years_of_service(self):
+        for employee in self:
+            total_days = 0
+            today = date.today()
+
+            # Iterar sobre todos los contratos del empleado
+            for contract in employee.contract_ids:
+                # Considerar solo contratos en estado 'open' o 'close'
+                if contract.date_start:
+                    # Si el contrato tiene fecha de fin, usarla; de lo contrario, usar la fecha actual
+                    end_date = contract.date_end or today
+                    total_days += (end_date - contract.date_start).days
+
+            # Convertir días totales en años decimales
+            employee.years_of_service = round(total_days / 365.0, 2)
+
+    @api.depends('years_of_service')
+    def _compute_vacation_days(self):
+        for employee in self:
+            years = int(employee.years_of_service)  # Convertir años de servicio a entero
+            entitled_days = 0
+
+            # Calcular días de vacaciones acumulativos según los años laborados
+            if years >= 1:
+                for i in range(1, years + 1):
+                    if i == 1:
+                        entitled_days += 12
+                    elif i == 2:
+                        entitled_days += 14
+                    elif i == 3:
+                        entitled_days += 16
+                    elif i == 4:
+                        entitled_days += 18
+                    elif i == 5:
+                        entitled_days += 20
+                    elif 6 <= i <= 10:
+                        entitled_days += 22
+                    elif 11 <= i <= 15:
+                        entitled_days += 24
+                    elif 16 <= i <= 20:
+                        entitled_days += 26
+                    elif 21 <= i <= 25:
+                        entitled_days += 28
+                    elif 26 <= i <= 30:
+                        entitled_days += 30
+                    elif 31 <= i <= 50:
+                        entitled_days += 32
+
+            # Asignar los días calculados al campo
+            employee.entitled_days = entitled_days
+
+    @api.depends('entitled_days')
+    def _compute_vacation_days_taken(self):
+        for employee in self:
+            # Inicializar el campo con 0
+            employee.vacation_days_taken = 0
+
+            # Obtener los días de vacaciones aprobados para el empleado
+            leaves = self.env['hr.leave'].search([
+                ('employee_id', '=', employee.id),
+                ('state', '=', 'validate')  # Solo considerar vacaciones aprobadas
+            ])
+
+            # Sumar los días de vacaciones aprobados
+            if leaves:
+                employee.vacation_days_taken = sum(leaves.mapped('number_of_days'))
+
+    @api.depends('entitled_days', 'vacation_days_taken')
+    def _compute_vacation_days_available(self):
+        for employee in self:
+            # Calcular los días disponibles
+            employee.vacation_days_available = employee.entitled_days - employee.vacation_days_taken
+
+    def action_open_memorandum_form(self):
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'Nueva Acta Administrativa',
+            'res_model': 'hr.memorandum',
+            'view_mode': 'form',
+            'target': 'new',
+            'context': {'default_employee_id': self.id},
+        }
 
     @api.depends('country_id')
     def _compute_is_mexico(self):

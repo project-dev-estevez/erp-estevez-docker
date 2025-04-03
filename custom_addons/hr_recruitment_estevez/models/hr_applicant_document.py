@@ -69,6 +69,16 @@ class HrApplicantDocument(models.TransientModel):
             'CURP',
             'Prueba Psicométrica',
             'Historia Clínica',
+            'Solicitud de empleo',
+            'Anexo G - Aviso de Privacidad de Candidatos',
+            'Cuestionario de Salud',
+            'Constancia de semanas cotizadas en el IMSS',
+            'Constancia de situación fiscal (SAT)',
+            'Cuenta Bancaria',
+            'Carta de retención de FONACOT',
+            'Referencias personales/laborales',
+            'Evidencia prueba de manejo',
+            'Acuse Kit de contratación',
         ]
 
         # Buscar archivos adjuntos asociados al aplicante
