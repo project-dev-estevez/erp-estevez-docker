@@ -344,3 +344,47 @@ class HrEmployee(models.Model):
             'domain': [('res_model', '=', 'hr.employee'), ('res_id', '=', self.id)],
             'context': {'default_res_model': 'hr.employee', 'default_res_id': self.id, 'create': True, 'edit': True},
         }
+
+        """Combina los documentos seleccionados en un solo PDF y lo descarga."""
+        self.ensure_one()
+        attachments = self.env['ir.attachment'].search([
+            ('res_model', '=', 'hr.employee'),
+            ('res_id', '=', self.id),
+            ('id', 'in', self.env.context.get('active_ids', []))
+        ])
+
+        if not attachments:
+            raise UserError(_("No se seleccionaron documentos para combinar."))
+
+        merger = PdfMerger()
+        for attachment in attachments:
+            if attachment.mimetype != 'application/pdf':
+                raise UserError(_("El archivo '%s' no es un PDF.") % attachment.name)
+            pdf_data = base64.b64decode(attachment.datas)
+            merger.append(io.BytesIO(pdf_data))
+
+        # Crear el PDF combinado en memoria
+        combined_pdf = io.BytesIO()
+        merger.write(combined_pdf)
+        merger.close()
+        combined_pdf.seek(0)
+
+        # Codificar el PDF combinado en base64 para la descarga
+        combined_pdf_base64 = base64.b64encode(combined_pdf.read())
+        combined_pdf_name = f"Documentos_{self.name.replace(' ', '_')}.pdf"
+
+        # Crear un registro de adjunto temporal para la descarga
+        attachment = self.env['ir.attachment'].create({
+            'name': combined_pdf_name,
+            'type': 'binary',
+            'datas': combined_pdf_base64,
+            'res_model': 'hr.employee',
+            'res_id': self.id,
+            'mimetype': 'application/pdf',
+        })
+
+        return {
+            'type': 'ir.actions.act_url',
+            'url': f'/web/content/{attachment.id}?download=true',
+            'target': 'self',
+        }
