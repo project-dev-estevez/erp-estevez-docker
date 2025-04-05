@@ -31,7 +31,7 @@
                             <group>                                               
                                 <field name="requestor_id"/>
                                 <field name="company_id"/>
-                                <field name="proveedor_id"/>
+                                <!--field name="proveedor_id"/-->
                             </group>
                             <group>
                                 <field name="direction_id"/>
@@ -45,7 +45,7 @@
                                 <field name="tipo" default="'Producto'"/>
                                 <field name="proyecto"/>
                                 <field name="segmento"/>
-                                <field name="prioridad" placeholder="Selecciona una opción"/>
+                                <!--field name="prioridad" placeholder="Selecciona una opción"/-->
                                 <field name="almacen"/>
                                 <field name="sugerencia"/>
                                 <field name="comentarios"/>                                                           
@@ -66,8 +66,11 @@
                                     <create name="add_product" string="Agregar Producto"/>
                                 </control>
                             </list>
-                        </field>                             
-                    </sheet>                
+                        </field>    
+                         <div>
+                        <button name="save_dat" string="Guardar" type="object" class="btn btn-primary"/>
+                    </div>                          
+                    </sheet>                                  
                 </form>
             </field>
         </record>               

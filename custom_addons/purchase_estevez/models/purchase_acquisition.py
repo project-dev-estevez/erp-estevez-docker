@@ -17,20 +17,20 @@ class PurchaseAcquisition(models.Model):
     job_id = fields.Many2one('hr.job', string="Puesto Solicitante", related='requestor_id.employee_id.job_id', readonly=True, store=False)      
     acquisition_id = fields.Many2one('purchase.acquisition', string='Acquisition') 
     order_line_ids = fields.One2many('purchase.acquisition.line', 'acquisition_id', string='Order Lines')      
-    proveedor_id = fields.Many2one('res.partner', string="Proveedor", required=True, domain="[('supplier_rank', '>', 0)]")
+    #proveedor_id = fields.Many2one('res.partner', string="Proveedor", required=True, domain="[('supplier_rank', '>', 0)]")
     fecha_limite_entrega = fields.Date(string='Fecha límite de entrega', required=True)    
     tipo = fields.Char(string='Tipo', required=True, default='Producto')
     proyecto = fields.Char(string='Proyecto', required=True)
     segmento = fields.Char(string='Segmento', required=True)
     product_id = fields.Many2one('product.product', string='Product', required=True)
     product_qty = fields.Float(string='Quantity', required=True, default=1.0)
-    prioridad = fields.Selection(
-        selection=[            
-            ('urgente', 'Urgente'),
-            ('recurrente', 'Stock'),
-            ('programado', 'Programado'),
-        ],
-        string='Prioridad', required=True)                   
+    #prioridad = fields.Selection(
+        #selection=[            
+            #('urgente', 'Urgente'),
+            #('recurrente', 'Stock'),
+            #('programado', 'Programado'),
+        #],
+        #string='Prioridad', required=True)                   
     almacen = fields.Char(string='Almacen', required=True)
     sugerencia = fields.Char(string='Sugerencia de proveedor', required=True)
     comentarios = fields.Char(string='Comentarios', required=True)          
