@@ -6,6 +6,15 @@
         <field name="model">hr.contract</field>
         <field name="inherit_id" ref="hr_contract.hr_contract_view_form"/>
         <field name="arch" type="xml">
+            <!-- Add a new "Guardar" button in the header -->
+            <xpath expr="//header" position="inside">
+                <button type="object"
+                        string="Guardar"
+                        class="btn-primary"
+                        icon="fa-save"
+                        name="action_save"/>
+            </xpath>
+
             <!-- Columna de la izquierda -->
             <xpath expr="//group/group[@name='top_info_left']" position="replace">
                 <group>

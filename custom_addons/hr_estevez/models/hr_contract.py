@@ -45,3 +45,8 @@ class HrContract(models.Model):
             res['department_id'] = employee.department_id.id if employee.department_id else False
             res['job_id'] = employee.job_id.id if employee.job_id else False
         return res
+    
+    def action_save(self):
+        """Manually save the record."""
+        self.ensure_one()
+        self.write(self._convert_to_write(self._cache))
