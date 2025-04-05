@@ -22,7 +22,14 @@
 
     # always loaded
     'data': [
+        # Archivos de datos
         'security/ir.model.access.csv',
+
+        # Archivos de informes
+        'report/hr_employee_remision_report.xml',
+        'report/hr_employee_remision_report_templates.xml',
+
+        # Archivos de Vistas
         'views/hr_job_views.xml',
         'views/hr_direction_views.xml',
         'views/hr_department_views.xml',
