@@ -306,5 +306,17 @@
             </field>
         </record>
 
+        <!-- Heredar la vista para eliminar el botón de contacto -->
+        <record id="view_employee_form_remove_contact_button" model="ir.ui.view">
+            <field name="name">hr.employee.form.remove.contact.button</field>
+            <field name="model">hr.employee</field>
+            <field name="inherit_id" ref="hr.view_employee_form_smartbutton_inherited"/>
+            <field name="arch" type="xml">
+                <xpath expr="//div[@name='button_box']/button[@name='action_related_contacts']" position="replace">
+                    <!-- Eliminar el botón de contacto -->
+                </xpath>
+            </field>
+        </record>
+
     </data>
 </odoo>
