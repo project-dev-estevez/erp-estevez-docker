@@ -16,7 +16,7 @@ class HrVacationPeriod(models.Model):
     def _compute_period(self):
         for record in self:
             if record.year_start and record.year_end:
-                record.period = f"{record.year_start.strftime('%Y')} - {record.year_end.strftime('%Y')}"
+                record.period = f"{record.year_start.strftime('%Y')} - {record.year_end.year + 1}"
 
     @api.depends('entitled_days', 'days_taken')
     def _compute_days_remaining(self):
