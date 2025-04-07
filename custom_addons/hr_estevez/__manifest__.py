@@ -34,6 +34,8 @@
         'report/hr_employee_carta_patronal_report_templates.xml',
         'report/hr_contract_addendum_report.xml',
         'report/hr_contract_addendum_report_templates.xml',
+        'report/hr_contract_report.xml',
+        'report/hr_contract_report_templates.xml',
 
         # Archivos de Vistas
         'views/hr_job_views.xml',
