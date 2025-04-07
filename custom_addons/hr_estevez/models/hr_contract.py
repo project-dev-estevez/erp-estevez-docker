@@ -64,6 +64,19 @@ class HrContract(models.Model):
     @api.model
     def default_get(self, fields_list):
         res = super(HrContract, self).default_get(fields_list)
+        
+        # Validar si el empleado ya tiene un contrato conflictivo
+        if 'employee_id' in res and res['employee_id']:
+            existing_contracts = self.env['hr.contract'].search([
+                ('employee_id', '=', res['employee_id']),
+                ('state', 'in', ['draft', 'open', 'close'])
+            ])
+            if existing_contracts:
+                raise exceptions.ValidationError(_(
+                    "El empleado ya tiene un contrato en curso. No se puede crear un nuevo contrato hasta no cerrar el actual."
+                ))
+        
+        # Lógica existente para cargar valores predeterminados
         if 'employee_id' in res:
             employee = self.env['hr.employee'].browse(res['employee_id'])
             res['work_location'] = employee.work_location_id.name if employee.work_location_id else ''
@@ -71,6 +84,7 @@ class HrContract(models.Model):
             res['work_area'] = employee.area_id.name if employee.area_id else ''
             res['department_id'] = employee.department_id.id if employee.department_id else False
             res['job_id'] = employee.job_id.id if employee.job_id else False
+        
         return res
     
     def action_save(self):
