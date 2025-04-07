@@ -1,0 +1,9 @@
+<odoo>
+    <record id="action_report_hr_employee_carta_patronal" model="ir.actions.report">
+        <field name="name">Carta Patronal</field>
+        <field name="model">hr.employee</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">hr_estevez.report_hr_employee_carta_patronal</field>
+        <field name="print_report_name">(object.name or 'Employee') + ' - Carta Patronal'</field>
+    </record>
+</odoo>

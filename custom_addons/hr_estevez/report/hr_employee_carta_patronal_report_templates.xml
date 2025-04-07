@@ -1,0 +1,15 @@
+<odoo>
+    <template id="report_hr_employee_carta_patronal">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <div class="container">
+                            <h1>Carta Patronal</h1>
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

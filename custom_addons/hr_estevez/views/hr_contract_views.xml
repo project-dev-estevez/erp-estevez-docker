@@ -8,11 +8,19 @@
         <field name="arch" type="xml">
             <!-- Add a new "Guardar" button in the header -->
             <xpath expr="//header" position="inside">
+
                 <button type="object"
                         string="Guardar"
                         class="btn-primary"
                         icon="fa-save"
                         name="action_save"/>
+
+                <button name="%(action_report_hr_contract_addendum)d"
+                        type="action"
+                        string="Addendum"
+                        class="btn-primary"
+                        icon="fa-file-pdf-o"/>
+
             </xpath>
 
             <!-- Columna de la izquierda -->
