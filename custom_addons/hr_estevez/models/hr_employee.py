@@ -114,26 +114,36 @@ class HrEmployee(models.Model):
             if not employee.contract_ids:
                 continue
 
-            # Ordenar contratos por fecha de inicio
-            contracts = employee.contract_ids.sorted(key=lambda c: c.date_start)
+            # Buscar el contrato con la fecha de inicio más antigua
+            base_contract = min(employee.contract_ids, key=lambda c: c.date_start)
 
-            # Inicializar variables
-            current_start_date = contracts[0].date_start
-            current_end_date = contracts[0].date_end or current_start_date + timedelta(days=365)
+            # Usar la fecha de inicio del contrato base
+            current_start_date = base_contract.date_start
+            current_end_date = base_contract.date_end or date.today()
 
-            for contract in contracts[1:]:
-                if contract.date_start <= current_end_date + timedelta(days=1):
-                    # Extender el periodo actual si los contratos son continuos o se solapan
-                    current_end_date = max(current_end_date, contract.date_end or contract.date_start + timedelta(days=365))
-                else:
-                    # Crear un periodo de vacaciones para el rango actual
-                    self._create_vacation_period(employee, current_start_date, current_end_date)
-                    # Iniciar un nuevo periodo
-                    current_start_date = contract.date_start
-                    current_end_date = contract.date_end or current_start_date + timedelta(days=365)
+            # Generar periodos de vacaciones desde la fecha de inicio hasta la fecha actual
+            while current_start_date <= current_end_date:
+                # Calcular el fin del periodo basado en el año calendario
+                year_end = current_start_date.replace(year=current_start_date.year + 1) - timedelta(days=1)
+                if year_end > current_end_date:
+                    year_end = current_end_date
 
-            # Crear el último periodo
-            self._create_vacation_period(employee, current_start_date, current_end_date)
+                # Calcular días de vacaciones según los años de servicio
+                years_of_service = current_start_date.year - base_contract.date_start.year
+                entitled_days = 12 + (years_of_service * 2) if years_of_service < 5 else 22
+                days_taken = 0  # Inicialmente 0
+
+                # Crear el periodo de vacaciones
+                self.env['hr.vacation.period'].create({
+                    'employee_id': employee.id,
+                    'year_start': current_start_date,
+                    'year_end': year_end,
+                    'entitled_days': entitled_days,
+                    'days_taken': days_taken,
+                })
+
+                # Avanzar al siguiente año
+                current_start_date = year_end + timedelta(days=1)
 
     def _create_vacation_period(self, employee, start_date, end_date):
         # Calcular el inicio y fin del periodo basado en años calendario
