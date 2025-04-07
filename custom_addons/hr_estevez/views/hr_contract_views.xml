@@ -22,10 +22,18 @@
                         icon="fa-file-pdf-o"/>
 
                 <button name="%(action_report_hr_contract)d"
-                    type="action"
-                    string="Generar Contrato"
-                    class="btn-primary"
-                    icon="fa-file-pdf-o"/>
+                        type="action"
+                        string="Generar Contrato"
+                        class="btn-primary"
+                        icon="fa-file-pdf-o"/>
+
+                <button type="object"
+                        string="Cancelar Contrato"
+                        class="btn-danger"
+                        icon="fa-ban"
+                        name="action_cancel_contract"
+                        confirm="¿Está seguro de que desea cancelar el contrato actual?"
+                        invisible="state == 'cancel'"/>
 
             </xpath>
 
@@ -89,11 +97,13 @@
         <field name="model">hr.contract</field>
         <field name="inherit_id" ref="hr_contract.hr_contract_view_tree"/>
         <field name="arch" type="xml">
+
             <xpath expr="//field[@name='date_start']" position="after">
                 <field name="create_date" string="Fecha de Creación" optional="hide"/>
                 <field name="days_to_expiry" string="Días Vencimiento" optional="hide"/>
                 <field name="create_uid" string="Creado por" widget="many2one_avatar_user" optional="hide"/>
             </xpath>
+
         </field>
     </record>
 

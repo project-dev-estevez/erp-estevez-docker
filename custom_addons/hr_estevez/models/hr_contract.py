@@ -50,3 +50,7 @@ class HrContract(models.Model):
         """Manually save the record."""
         self.ensure_one()
         self.write(self._convert_to_write(self._cache))
+
+    def action_cancel_contract(self):
+        for contract in self:
+            contract.state = 'cancel'
