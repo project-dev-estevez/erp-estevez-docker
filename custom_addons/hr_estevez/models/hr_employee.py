@@ -128,9 +128,19 @@ class HrEmployee(models.Model):
                 if year_end > current_end_date:
                     year_end = current_end_date
 
-                # Calcular días de vacaciones según los años de servicio
+                # Calcular años de servicio
                 years_of_service = current_start_date.year - base_contract.date_start.year
-                entitled_days = 12 + (years_of_service * 2) if years_of_service < 5 else 22
+
+                # Calcular días de vacaciones según los años de servicio
+                entitled_days_full_year = 12 + (years_of_service * 2) if years_of_service < 5 else 22
+
+                # Si es el último período, calcular proporcionalmente los días de vacaciones
+                if year_end == current_end_date:
+                    days_in_year = (year_end - current_start_date).days + 1
+                    entitled_days = (entitled_days_full_year / 365) * days_in_year
+                else:
+                    entitled_days = entitled_days_full_year
+
                 days_taken = 0  # Inicialmente 0
 
                 # Crear el periodo de vacaciones
@@ -138,7 +148,7 @@ class HrEmployee(models.Model):
                     'employee_id': employee.id,
                     'year_start': current_start_date,
                     'year_end': year_end,
-                    'entitled_days': entitled_days,
+                    'entitled_days': round(entitled_days, 2),  # Redondear a 2 decimales
                     'days_taken': days_taken,
                 })
 
