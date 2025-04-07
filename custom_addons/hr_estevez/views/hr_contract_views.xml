@@ -81,9 +81,19 @@
             <!-- Nuevas páginas -->
             <xpath expr="//notebook/page[@name='other']" position="after">
                 <page name="documents" string="Contrato">
-                    <!-- Aquí puedes agregar los campos y contenido de la nueva página -->
                     <group>
-                        <!-- Agrega más campos según sea necesario -->
+                        <div class="card" style="width: 18rem; margin: 10px auto;">
+                            <div class="card-body text-center">
+                                <i class="fa fa-file-pdf-o fa-5x text-danger" invisible="not document_file" aria-hidden="true"></i>
+                                <i class="fa fa-clock-o fa-2x text-warning" invisible="document_file" aria-hidden="true"></i>
+                                <h5 class="card-title mt-3" invisible="not document_file">Contrato Adjunto</h5>
+                                <h5 class="card-title mt-3" invisible="document_file">Pendiente por Adjuntar...</h5>
+                                <i class="fa fa-check fa-2x text-success" invisible="not document_file"></i>
+
+                                <!-- Campo para adjuntar el archivo -->
+                                <field name="document_file" filename="document_filename" widget="binary" string="Adjuntar Archivo" class="mt-2"/>
+                            </div>
+                        </div>
                     </group>
                 </page>
             </xpath>

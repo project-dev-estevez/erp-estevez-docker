@@ -13,6 +13,14 @@ class HrContract(models.Model):
     work_direction = fields.Char(string='Dirección', compute='_compute_employee_contract', store=True)
     work_area = fields.Char(string='Área', compute='_compute_employee_contract', store=True)
 
+    document_file = fields.Binary(string="Archivo Adjunto", help="Adjunta un único documento relacionado con el contrato.")
+    document_filename = fields.Char(string="Nombre del Archivo", compute="_compute_document_filename", store=False)
+
+    def _compute_document_filename(self):
+        for record in self:
+            # Generar el nombre del archivo dinámicamente
+            record.document_filename = f"Contrato {record.id or 'nuevo'}.pdf"
+
     def create(self, vals):
         # Obtener el empleado del contrato que se está creando
         employee_id = vals.get('employee_id')
