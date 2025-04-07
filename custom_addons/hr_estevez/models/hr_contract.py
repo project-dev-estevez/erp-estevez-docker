@@ -1,4 +1,4 @@
-from odoo import api, models, fields
+from odoo import api, models, fields, exceptions, _
 from datetime import date
 
 class HrContract(models.Model):
@@ -13,6 +13,25 @@ class HrContract(models.Model):
     work_direction = fields.Char(string='Dirección', compute='_compute_employee_contract', store=True)
     work_area = fields.Char(string='Área', compute='_compute_employee_contract', store=True)
 
+    def create(self, vals):
+        # Obtener el empleado del contrato que se está creando
+        employee_id = vals.get('employee_id')
+        if employee_id:
+            # Buscar contratos existentes del empleado en los estados 'draft', 'open', o 'close'
+            existing_contracts = self.env['hr.contract'].search([
+                ('employee_id', '=', employee_id),
+                ('state', 'in', ['draft', 'open', 'close'])
+            ])
+            if existing_contracts:
+                raise exceptions.ValidationError(_(
+                    "No se puede crear un nuevo contrato porque el empleado ya tiene un contrato registrado."
+                ))
+
+        # Establecer el estado inicial como 'open'
+        vals['state'] = 'open'    
+        
+        # Si no hay conflictos, proceder con la creación del contrato
+        return super(HrContract, self).create(vals)
 
     @api.depends('date_start', 'date_end')
     def _compute_days_to_expiry(self):
