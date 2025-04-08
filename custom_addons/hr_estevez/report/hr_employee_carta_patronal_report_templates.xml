@@ -5,7 +5,136 @@
                 <t t-call="web.external_layout">
                     <div class="page">
                         <div class="container">
-                            <h1>Carta Patronal</h1>
+                            <!-- Fecha y foto -->
+                            <div class="row">
+                                <!-- First column (blank) -->
+                                <div class="col-6">
+                                    <!-- Intentionally left blank -->
+                                </div>
+
+                                <!-- Second column (content) -->
+                                <div class="col-6 text-end">
+                                    <p class="text-uppercase">
+                                        <strong>
+                                            TLALNEPANTLA DE BAZ A <t t-esc="datetime.date.today().strftime('%d DE %B DE %Y').upper()"/>
+                                        </strong>
+                                    </p>
+
+                                    <!-- Aqui debe ir la imagen del empleado -->
+                                    <img t-att-src="'data:image/png;base64,' + doc.image_1920.decode('utf-8')" class="img-fluid rounded-circle" alt="." style="width: 120px; height: 120px"/>
+                                </div>
+                            </div>
+
+                            <!-- contenido principal -->
+                            <div class="row">
+                                A QUIEN CORRESPONDA
+                            </div>
+
+                            <div class="row mt-2">
+                                PRESENTE:
+                            </div>
+
+                            <div class="row mt-3">
+                                <p class="text-justify" style="text-align: justify;">
+                                    ME PERMITO INFORMAR A USTED, LOS DATOS QUE TENEMOS REGISTRADOS EN EL EXPEDIENTE DE EL C. 
+                                    <t t-esc="doc.name.upper()"/>
+                                    EL CUAL LABORA PARA LA EMPRESA Y CONTAMOS CON LOS SIGUIENTES DATOS EN NUESTROS REGISTROS:
+                                </p>
+                            </div>
+
+                            <div class="row mt-3">
+                                <div>
+                                    <div class="row">
+                                        <div class="col-6"><strong>FECHA DE INGRESO:</strong></div>
+                                        <div class="col-6">
+                                            <t t-esc="doc.contract_ids.filtered('date_of_entry') and doc.contract_ids.filtered('date_of_entry').sorted('date_of_entry')[0].date_of_entry.strftime('%d-%B-%Y') or 'N/A'"/>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-6"><strong>RFC:</strong></div>
+                                        <div class="col-6">
+                                            <t t-esc="doc.rfc"/>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-6"><strong>IMSS:</strong></div>
+                                        <div class="col-6">
+                                            <t t-esc="doc.nss"/>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-6"><strong>PUESTO:</strong></div>
+                                        <div class="col-6">
+                                            <t t-esc="doc.job_id.name or 'N/A'"/>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-6"><strong>DOMICILIO PARTICULAR:</strong></div>
+                                        <div class="col-6">
+                                            <t t-esc="'%s %s, %s %s, %s C.P. %s' % (
+                                                doc.private_street or '',
+                                                doc.private_street2 or '',
+                                                doc.private_colonia or '',
+                                                doc.private_city or '',
+                                                doc.private_state_id.name or '',
+                                                doc.private_zip or 'N/A'
+                                            )"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            
+                            </div>
+
+                            <div class="row mt-3">
+                                <div>
+                                    <div class="row">
+                                        <div class="col-6"><strong>NOMBRE DE LA EMPRESA:</strong></div>
+                                        <div class="col-6">
+                                            <t t-esc="doc.company_id.name"/>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-6"><strong>DOMICILIO DE LA EMPRESA:</strong></div>
+                                        <div class="col-6">  
+                                            <t t-esc="doc.company_id.partner_id.contact_address"/>
+                                        </div>
+                                    </div>
+                                </div>                            
+                            </div>
+
+                            <div class="row mt-3">
+                                <div>
+                                    <div class="row">
+                                        <div class="col-6"><strong>RFC:</strong></div>
+                                        <div class="col-6">
+                                            <t t-esc="doc.rfc"/>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-6"><strong>REGISTRO PATRONAL:</strong></div>
+                                        <div class="col-6">C5350000 10 0</div>
+                                    </div>
+                                </div>                            
+                            </div>
+                            
+                            <div class="row" style="margin-top: 80px;">
+                                <p class="text-center">
+                                    ATENTAMENTE
+                                </p>
+                            </div>
+
+                            <div class="row mt-4">
+                                <p class="text-center">
+                                    LIC. GUSTAVO JUÁREZ MENDOZADPO
+                                </p>
+                            </div>
+
+                            <div class="row">
+                                <p class="text-center">
+                                    RECURSOS HUMANOS
+                                </p>
+                            </div>
+
                         </div>
                     </div>
                 </t>
