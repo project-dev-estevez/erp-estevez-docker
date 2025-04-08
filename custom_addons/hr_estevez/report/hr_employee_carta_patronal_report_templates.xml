@@ -107,7 +107,7 @@
                                     <div class="row">
                                         <div class="col-6"><strong>RFC:</strong></div>
                                         <div class="col-6">
-                                            <t t-esc="doc.rfc"/>
+                                            <t t-esc="doc.company_id.vat or 'N/A'"/>
                                         </div>
                                     </div>
                                     <div class="row">
@@ -125,13 +125,13 @@
 
                             <div class="row mt-4">
                                 <p class="text-center">
-                                    LIC. GUSTAVO JUÁREZ MENDOZADPO
+                                    LIC. EDWIN GONZALEZ SORIA
                                 </p>
                             </div>
 
                             <div class="row">
                                 <p class="text-center">
-                                    RECURSOS HUMANOS
+                                    APODERADO LEGAL
                                 </p>
                             </div>
 

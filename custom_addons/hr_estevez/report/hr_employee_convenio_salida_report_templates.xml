@@ -8,30 +8,43 @@
                         <div class="container">
 
                             <div class="row">
-                                <div class="col-12 text-justify">
+                                <div class="col-12 text-justify" style="text-align: justify;">
                                     <strong>
-                                        CONVENIO QUE CELEBRAN POR UNA PARTE LA <strong class="text-danger">EMPRESA ESTEVEZ.JOR SERVICIOS, S.A. DE C.V.</strong>, REPRESENTADA POR EL LIC. EDWIN GONZALEZ SORIA EN SU CARÁCTER DE APODERADO LEGAL Y UNICO RESPONSABLE DE LA RELACION LABORAL, EN LO SUCESIVO “LA EMPRESA” Y POR OTRA EL C. <strong class="text-danger">CATERINE LADINO GALVIS</strong>, POR SU PROPIO DERECHO, EN SU CARÁCTER DE TRABAJADOR, EN LO SUCESIVO “EL TRABAJADOR”, CONFORME A LOS SIGUIENTES, ANTECEDENTES, DECLARACIONES Y CLAUSULAS.
+                                        CONVENIO QUE CELEBRAN POR UNA PARTE LA EMPRESA
+                                        <t t-esc="doc.company_id.name.upper()"/>, 
+                                        REPRESENTADA POR EL LIC. EDWIN GONZALEZ SORIA EN SU CARÁCTER DE APODERADO LEGAL Y UNICO RESPONSABLE DE LA RELACIÓN LABORAL, 
+                                        EN LO SUCESIVO “LA EMPRESA” Y POR OTRA EL C. 
+                                        <t t-esc="doc.name.upper()"/>, 
+                                        POR SU PROPIO DERECHO, EN SU CARÁCTER DE TRABAJADOR, EN LO SUCESIVO “EL TRABAJADOR”, 
+                                        CONFORME A LOS SIGUIENTES, ANTECEDENTES, DECLARACIONES Y CLAUSULAS.
                                     </strong>
                                 </div>
                             </div>
 
                             <div class="row mt-3">
                                 <div class="col-12 text-center">
-                                    <h4 class="font-weight-bold">A N T E C E D E N T E S</h4>
+                                    <h6 class="font-weight-bold text-decoration-underline">
+                                        <strong>A N T E C E D E N T E S</strong>
+                                    </h6>
                                 </div>
                             </div>
 
-                            <div class="row mt-1">
+                            <div class="row mt-2">
                                 <div class="col-12 text-justify">
                                     <p>
-                                        <strong>UNICO.</strong> - CON FECHA 01-SEPTIEMBRE-2024, LA EMPRESA <strong class="text-danger">ESTEVEZ.JOR SERVICIOS, S.A. DE C.V.</strong>, Y EL C. <strong class="text-danger">CATERINE LADINO GALVIS</strong>, CELEBRARON UN CONTRATO INDIVIDUAL DE TRABAJO CON EL OBJETO DE ESTABLECER Y REGULAR LA RELACION LABORAL Y LAS CONDICIONES EN QUE SE IBA A PRESTAR ESTA.
+                                        <strong>UNICO.</strong> - CON FECHA 01-SEPTIEMBRE-2024, LA EMPRESA 
+                                        <strong><t t-esc="doc.company_id.name.upper()"/></strong>, Y EL C. 
+                                        <strong><t t-esc="doc.name.upper()"/></strong>, 
+                                        CELEBRARON UN CONTRATO INDIVIDUAL DE TRABAJO CON EL OBJETO DE ESTABLECER Y REGULAR LA RELACION LABORAL Y LAS CONDICIONES EN QUE SE IBA A PRESTAR ESTA.
                                     </p>
                                 </div>
                             </div>
 
                             <div class="row mt-3">
                                 <div class="col-12 text-center">
-                                    <h4 class="font-weight-bold">D E C L A R A C I O N E S</h4>
+                                    <h6 class="font-weight-bold text-decoration-underline">
+                                        <strong>D E C L A R A C I O N E S</strong>
+                                    </h6>
                                 </div>
                             </div>
 
