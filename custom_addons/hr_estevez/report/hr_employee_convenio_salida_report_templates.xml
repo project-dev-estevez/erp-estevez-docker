@@ -31,11 +31,12 @@
 
                             <div class="row mt-2">
                                 <div class="col-12 text-justify">
-                                    <p>
-                                        <strong>UNICO.</strong> - CON FECHA 01-SEPTIEMBRE-2024, LA EMPRESA 
+                                    <p style="text-align: justify;">
+                                        <strong>UNICO.</strong> - CON FECHA 
+                                        <t t-esc="doc.contract_ids.filtered('date_of_entry') and doc.contract_ids.filtered('date_of_entry').sorted('date_of_entry')[0].date_of_entry.strftime('%d-%B-%Y').upper() or 'N/A'"/>
                                         <strong><t t-esc="doc.company_id.name.upper()"/></strong>, Y EL C. 
                                         <strong><t t-esc="doc.name.upper()"/></strong>, 
-                                        CELEBRARON UN CONTRATO INDIVIDUAL DE TRABAJO CON EL OBJETO DE ESTABLECER Y REGULAR LA RELACION LABORAL Y LAS CONDICIONES EN QUE SE IBA A PRESTAR ESTA.
+                                        CELEBRARON UN CONTRATO INDIVIDUAL DE TRABAJO CON EL OBJETO DE ESTABLECER Y REGULAR LA RELACIÓ   N LABORAL Y LAS CONDICIONES EN QUE SE IBA A PRESTAR ESTA.
                                     </p>
                                 </div>
                             </div>
@@ -50,97 +51,106 @@
 
                             <div class="row mt-2">
                                 <div class="col-12 text-justify">
-                                    <p>
-                                        <strong>I.</strong>LA EMPRESA <strong class="text-danger">ESTEVEZ.JOR SERVICIOS, S.A. DE C.V.</strong>, Y EL C. <strong class="text-danger">CATERINE LADINO GALVIS</strong>, MANIFIESTAN, QUE EN LA CELEBRACIÓN DEL PRESENTE CONVENIO, RECONOCEN MUTUAMENTE QUE NO HA EXISTIDO DOLO, MALA FE, ERROR, NI CUALQUIER OTRO VICIO DEL CONSENTIMIENTO QUE PUDIERA AFECTAR LA VALIDEZ DE ESTE INSTRUMENTO DE INEXISTENCIA O NULIDAD.
+                                    <p style="text-align: justify;">
+                                        <strong>I.</strong>LA EMPRESA <strong><t t-esc="doc.company_id.name.upper()"/></strong>, Y EL C. 
+                                        <strong><t t-esc="doc.name.upper()"/></strong>, MANIFIESTAN, QUE EN LA CELEBRACIÓN DEL PRESENTE CONVENIO, RECONOCEN MUTUAMENTE QUE NO HA EXISTIDO DOLO, MALA FE, ERROR, NI CUALQUIER OTRO VICIO DEL CONSENTIMIENTO QUE PUDIERA AFECTAR LA VALIDEZ DE ESTE INSTRUMENTO DE INEXISTENCIA O NULIDAD.
                                     </p>
                                 </div>
                             </div>
 
                             <div class="row mt-2">
                                 <div class="col-12 text-justify">
-                                    <p>
-                                        <strong>II.</strong> EL C. <strong class="text-danger">CATERINE LADINO GALVIS</strong>, EN SU CARACTER DE TRABAJADOR RECONOCE QUE EN EL CONTENIDO DEL PRESENTE CONVENIO, NO EXISTE NINGUNA RENUNCIA A SUS DE DERECHOS LABORALES NI MENOSCABO A ESTOS Y EL CONVENIO LO CELEBRA POR ASI CONVENIR A SUS INTERESES, POR SU PROPIO DERECHO, DE MANERA VOLUNTARIA, LIBRE Y ESPONTANEA SIN NINGUN TIPO DE PRESION, POR LO QUE NO EXISTE NINGUN VICIO DEL CONSENTIMIENTO QUE PUDIERA AFECTAR LA VALIDEZ DE ESTE CONVENIO DE INEXISTENCIA O NULIDAD.
+                                    <p style="text-align: justify;">
+                                        <strong>II.</strong> EL C. <strong><t t-esc="doc.name.upper()"/></strong>, EN SU CARACTER DE TRABAJADOR RECONOCE QUE EN EL CONTENIDO DEL PRESENTE CONVENIO, NO EXISTE NINGUNA RENUNCIA A SUS DE DERECHOS LABORALES NI MENOSCABO A ESTOS Y EL CONVENIO LO CELEBRA POR ASI CONVENIR A SUS INTERESES, POR SU PROPIO DERECHO, DE MANERA VOLUNTARIA, LIBRE Y ESPONTANEA SIN NINGUN TIPO DE PRESION, POR LO QUE NO EXISTE NINGUN VICIO DEL CONSENTIMIENTO QUE PUDIERA AFECTAR LA VALIDEZ DE ESTE CONVENIO DE INEXISTENCIA O NULIDAD.
                                     </p>
                                 </div>
                             </div>
 
                             <div class="row mt-2">
                                 <div class="col-12 text-justify">
-                                    <p>
-                                        <strong>III.</strong> LA EMPRESA <strong class="text-danger">ESTEVEZ.JOR SERVICIOS, S.A. DE C.V.</strong>,Y EL C <strong class="text-danger">CATERINE LADINO GALVIS</strong>, MANIFIESTAN QUE EN SU CALIDAD DE TESTIGOS ESTAN PRESENTES EN EL DESARROLLO Y FIRMA DEL PRESENTE CONVENIO LA C. JESSICA CARINA CALLEJAS VAZQUEZ, LA C. CLAUDIA PEREZ LOPEZ.
+                                    <p style="text-align: justify;">
+                                        <strong>III.</strong> LA EMPRESA <strong><t t-esc="doc.company_id.name.upper()"/></strong>,Y EL C <strong><t t-esc="doc.name.upper()"/></strong>, MANIFIESTAN QUE EN SU CALIDAD DE TESTIGOS ESTAN PRESENTES EN EL DESARROLLO Y FIRMA DEL PRESENTE CONVENIO LA C. JESSICA CARINA CALLEJAS VAZQUEZ, LA C. CLAUDIA PEREZ LOPEZ.
                                     </p>
                                 </div>
                             </div>
 
                             <div class="row mt-2">
                                 <div class="col-12 text-justify">
-                                    <p>
-                                        <strong>IV.</strong> LA EMPRESA <strong class="text-danger">ESTEVEZ.JOR SERVICIOS, S.A. DE C.V.</strong>,Y EL C <strong class="text-danger">CATERINE LADINO GALVIS</strong>,  MANIFIESTAN QUE EL PRESENTE CONVENIO LO PACTAN DE ESTA FORMA POR RESULTAR MAS PRACTICO, YA QUE EN LA EJECUCION DEL MISMO SE REALIZA EN ESTE ACTO Y DE MANERA INMEDIATA, AHORRANDO EL TIEMPO QUE SE HUBIERA REQUERIDO PARA GENERAR ESTE TRAMITE ANTE EL CENTRO DE CONCILIACION LABORAL.
+                                    <p style="text-align: justify;">
+                                        <strong>IV.</strong> LA EMPRESA <strong><t t-esc="doc.company_id.name.upper()"/></strong>,Y EL C <strong><t t-esc="doc.name.upper()"/></strong>,  MANIFIESTAN QUE EL PRESENTE CONVENIO LO PACTAN DE ESTA FORMA POR RESULTAR MAS PRACTICO, YA QUE EN LA EJECUCION DEL MISMO SE REALIZA EN ESTE ACTO Y DE MANERA INMEDIATA, AHORRANDO EL TIEMPO QUE SE HUBIERA REQUERIDO PARA GENERAR ESTE TRAMITE ANTE EL CENTRO DE CONCILIACION LABORAL.
                                     </p>
                                 </div>
                             </div>
 
                             <div class="row mt-2">
                                 <div class="col-12 text-justify">
-                                    <p>
-                                        <strong>V.</strong> LA EMPRESA <strong class="text-danger">ESTEVEZ.JOR SERVICIOS, S.A. DE C.V.</strong>,Y EL C <strong class="text-danger">CATERINE LADINO GALVIS</strong>,  SE RECONOCEN RECÍPROCAMENTE SU PERSONALIDAD Y CAPACIDAD LEGAL PARA CELEBRAR EL PRESENTE CONVENIO POR LO TANTO SE OBLIGAN EN LOS TÉRMINOS DE LAS SIGUIENTES: 
+                                    <p style="text-align: justify;">
+                                        <strong>V.</strong> LA EMPRESA <strong><t t-esc="doc.company_id.name.upper()"/></strong>,Y EL C <strong><t t-esc="doc.name.upper()"/></strong>,  SE RECONOCEN RECÍPROCAMENTE SU PERSONALIDAD Y CAPACIDAD LEGAL PARA CELEBRAR EL PRESENTE CONVENIO POR LO TANTO SE OBLIGAN EN LOS TÉRMINOS DE LAS SIGUIENTES: 
                                     </p>
                                 </div>
                             </div>
 
-                            <div class="row mt-3">
+                            <div class="row mt-4">
                                 <div class="col-12 text-center">
-                                    <h4 class="font-weight-bold">C L Á U S U L A S</h4>
+                                    <h6 class="font-weight-bold text-decoration-underline">
+                                        <strong>C L Á U S U L A S</strong>
+                                    </h6>
                                 </div>
                             </div>
 
                             <div class="row mt-2">
                                 <div class="col-12 text-justify">
-                                    <p>
-                                        <strong>PRIMERA.</strong> DECLARAN, LA EMPRESA <strong class="text-danger">ESTEVEZ.JOR SERVICIOS, S.A. DE C.V.</strong>,Y EL C <strong class="text-danger">CATERINE LADINO GALVIS</strong>,  QUE EN TERMINOS DE LA FRACCION I DEL ARTICULO 53 DE LA LEY FEDERAL DEL TRABAJO, POR ASI CONVENIR A LOS INTERESES DEL C. <strong class="text-danger">CATERINE LADINO GALVIS</strong>, POR MUTUO CONSENTIMIENTO, MANIFIESTAN Y RATIFICAN SU VOLUNTAD DE DAR POR TERMINADA LA RELACION LABORAL QUE LOS UNIA MEDIANTE EL CONTRATO INDIVIDUAL DE TRABAJO MENCIONADO EN EL CAPITULO DE ANTECEDENTES DEL PRESENTE CONVENIO.
+                                    <p style="text-align: justify;">
+                                        <strong>PRIMERA.</strong> DECLARAN, LA EMPRESA <strong><t t-esc="doc.company_id.name.upper()"/></strong>,Y EL C <strong><t t-esc="doc.name.upper()"/></strong>,  QUE EN TERMINOS DE LA FRACCION I DEL ARTICULO 53 DE LA LEY FEDERAL DEL TRABAJO, POR ASI CONVENIR A LOS INTERESES DEL C. <strong><t t-esc="doc.name.upper()"/></strong>, POR MUTUO CONSENTIMIENTO, MANIFIESTAN Y RATIFICAN SU VOLUNTAD DE DAR POR TERMINADA LA RELACION LABORAL QUE LOS UNIA MEDIANTE EL CONTRATO INDIVIDUAL DE TRABAJO MENCIONADO EN EL CAPITULO DE ANTECEDENTES DEL PRESENTE CONVENIO.
                                     </p>
                                 </div>
                             </div>
 
                             <div class="row mt-2">
                                 <div class="col-12 text-justify">
-                                    <p>
-                                        <strong>SEGUNDA.</strong> DECLARAN, EL C. <strong class="text-danger">CATERINE LADINO GALVIS</strong>,  QUE POR ASI CONVENIR A SUS INTERESES Y POR MUTUO CONSENTIMIENTO, ES SU LIBRE VOLUNTAD DAR POR TERMINADA LA RELACIÓN LABORAL QUE LO HA UNIDO CON LA EMPRESA <strong class="text-danger">ESTEVEZ.JOR SERVICIOS, S.A. DE C.V.</strong>, HASTA EL DÍA <strong class="text-danger">1 DE ABRIL DE 2025</strong> TERMINACIÓN LABORAL QUE HACE CON FUNDAMENTO EN LO DISPUESTO POR LA FRACCIÓN I DEL ARTÍCULO 53 DE LA LEY FEDERAL DEL TRABAJO.
+                                    <p style="text-align: justify;">
+                                        <strong>SEGUNDA.</strong> DECLARAN, EL C. <strong><t t-esc="doc.name.upper()"/></strong>,  QUE POR ASI CONVENIR A SUS INTERESES Y POR MUTUO CONSENTIMIENTO, ES SU LIBRE VOLUNTAD DAR POR TERMINADA LA RELACIÓN LABORAL QUE LO HA UNIDO CON LA EMPRESA <strong><t t-esc="doc.company_id.name.upper()"/></strong>, HASTA EL DÍA <strong><t t-esc="datetime.date.today().strftime('%d-%B-%Y').upper()"/></strong> TERMINACIÓN LABORAL QUE HACE CON FUNDAMENTO EN LO DISPUESTO POR LA FRACCIÓN I DEL ARTÍCULO 53 DE LA LEY FEDERAL DEL TRABAJO.
                                     </p>
                                 </div>
                             </div>
 
                             <div class="row mt-2">
                                 <div class="col-12 text-justify">
-                                    <p>
-                                        <strong>TERCERA.</strong> DECLARAN, EL C. <strong class="text-danger">CATERINE LADINO GALVIS</strong>,  QUE DURANTE EL TIEMPO QUE LABORÓ PARA LA EMPRESA <strong class="text-danger">ESTEVEZ.JOR SERVICIOS, S.A. DE C.V.</strong>, SIEMPRE RECIBIÓ DE ÉSTA DE MANERA PUNTUAL, EL PAGO DE LOS SALARIOS ORDINARIOS Y EXTRAORDINARIOS; SIEMPRE SE LE PAGARON LOS SÉPTIMOS DÍAS, DÍAS FESTIVOS, Y HORAS EXTRAS EN LAS ESCASAS OCASIONES QUE LOS LABORO, LOS SALARIOS DEVENGADOS, ASÍ COMO LAS VACACIONES, PRIMA VACACIONAL Y AGUINALDO GENERADOS EN EL TIEMPO LABORADO, COMO CONSECUENCIA NO SE LE ADEUDA NINGUNA SUMA POR DICHOS CONCEPTOS NI POR NINGÚN OTRO, Y SE LE HAN PAGADO TODAS Y CADA UNA DE LAS PRESTACIONES LEGALES Y EXTRALEGALES QUE PUDIERAN CORRESPONDERLE CONFORME A LA LEY Y A SU CONTRATO DE TRABAJO; QUE IGUALMENTE NO PADECE ENFERMEDAD PROFESIONAL CON MOTIVO Y/O DERIVADO Y/O A CONSECUENCIA DE SUS LABORES, NI HA SUFRIDO ACCIDENTE ALGUNO DE TRABAJO DENTRO DEL DESEMPEÑO DE LAS MISMAS, POR LO QUE POR ESTOS CONCEPTOS NO TIENE NINGUNA ACCIÓN O DERECHO QUE RESERVARSE PARA EJERCITARLO CON POSTERIORIDAD.
+                                    <p style="text-align: justify;">
+                                        <strong>TERCERA.</strong> DECLARAN, EL C. <strong><t t-esc="doc.name.upper()"/></strong>,  QUE DURANTE EL TIEMPO QUE LABORÓ PARA LA EMPRESA <strong><t t-esc="doc.company_id.name.upper()"/></strong>, SIEMPRE RECIBIÓ DE ÉSTA DE MANERA PUNTUAL, EL PAGO DE LOS SALARIOS ORDINARIOS Y EXTRAORDINARIOS; SIEMPRE SE LE PAGARON LOS SÉPTIMOS DÍAS, DÍAS FESTIVOS, Y HORAS EXTRAS EN LAS ESCASAS OCASIONES QUE LOS LABORO, LOS SALARIOS DEVENGADOS, ASÍ COMO LAS VACACIONES, PRIMA VACACIONAL Y AGUINALDO GENERADOS EN EL TIEMPO LABORADO, COMO CONSECUENCIA NO SE LE ADEUDA NINGUNA SUMA POR DICHOS CONCEPTOS NI POR NINGÚN OTRO, Y SE LE HAN PAGADO TODAS Y CADA UNA DE LAS PRESTACIONES LEGALES Y EXTRALEGALES QUE PUDIERAN CORRESPONDERLE CONFORME A LA LEY Y A SU CONTRATO DE TRABAJO; QUE IGUALMENTE NO PADECE ENFERMEDAD PROFESIONAL CON MOTIVO Y/O DERIVADO Y/O A CONSECUENCIA DE SUS LABORES, NI HA SUFRIDO ACCIDENTE ALGUNO DE TRABAJO DENTRO DEL DESEMPEÑO DE LAS MISMAS, POR LO QUE POR ESTOS CONCEPTOS NO TIENE NINGUNA ACCIÓN O DERECHO QUE RESERVARSE PARA EJERCITARLO CON POSTERIORIDAD.
                                     </p>
                                 </div>
                             </div>
 
                             <div class="row mt-2">
                                 <div class="col-12 text-justify">
-                                    <p>
-                                        <strong>CUARTA.</strong> DECLARAN: EL C. <strong class="text-danger">CATERINE LADINO GALVIS</strong>, QUE INICIO A PRESTAR SUS SERVICIOS PERSONALES Y SUBORDINADOS, ÚNICAMENTE Y EXCLUSIVAMENTE PARA LA EMPRESA <strong class="text-danger">ESTEVEZ.JOR SERVICIOS, S.A. DE C.V.</strong>,  A QUIEN RECONOCE COMO SU ÚNICO PATRON,  EN LOS TÉRMINOS Y CONDICIONES QUE A CONTINUACIÓN SE MENCIONAN:
+                                    <p style="text-align: justify;">
+                                        <strong>CUARTA.</strong> DECLARAN: EL C. <strong><t t-esc="doc.name.upper()"/></strong>, QUE INICIO A PRESTAR SUS SERVICIOS PERSONALES Y SUBORDINADOS, ÚNICAMENTE Y EXCLUSIVAMENTE PARA LA EMPRESA <strong><t t-esc="doc.company_id.name.upper()"/></strong>,  A QUIEN RECONOCE COMO SU ÚNICO PATRON,  EN LOS TÉRMINOS Y CONDICIONES QUE A CONTINUACIÓN SE MENCIONAN:
                                     </p>
                                 </div>
                             </div>
 
                             <div class="row mt-5">
                                 <div class="col-12">
-                                    <table class="table table-bordered">
+                                    <table class="table">
                                         <tbody>
                                             <tr>
                                                 <th class="text-left"><strong>FECHA DE INGRESO</strong></th>
-                                                <td class="text-left"><strong class="text-danger">01-SEPTIEMBRE-2024</strong></td>
+                                                <td class="text-left">
+                                                    <t t-esc="doc.contract_ids.filtered('date_of_entry') and doc.contract_ids.filtered('date_of_entry').sorted('date_of_entry')[0].date_of_entry.strftime('%d-%B-%Y').upper() or 'N/A'"/>
+                                                </td>
                                             </tr>
                                             <tr>
                                                 <th class="text-left"><strong>CATEGORÍA</strong></th>
-                                                <td class="text-left"><strong class="text-danger">IMPLEMENTADOR DE SISTEMAS WEB</strong></td>
+                                                <td class="text-left">
+                                                    <t t-esc="doc.job_id.name.upper() or 'N/A'"/>
+                                                </td>
                                             </tr>
                                             <tr>
                                                 <th class="text-left"><strong>HORARIO DE LABORES</strong></th>
-                                                <td class="text-left"><strong class="text-danger">LUNES A VIERNES DE 8:00 A 18:00. SABADO MEDIO DIA.</strong></td>
+                                                <td class="text-left">
+                                                    LUNES A VIERNES DE 8:00 A 18:00. SABADO MEDIO DIA.
+                                                </td>
                                             </tr>
                                         </tbody>
                                     </table>
@@ -149,32 +159,32 @@
 
                             <div class="row mt-5">
                                 <div class="col-12 text-justify">
-                                    <p>
-                                        <strong>QUINTA.</strong> DECLARAN, LA EMPRESA <strong class="text-danger">ESTEVEZ.JOR SERVICIOS, S.A. DE C.V.</strong>, POR CONDUCTO DEL LIC. EDWIN GONZALEZ SORIA, QUIEN COMPARECE EN SU CARÁCTER DE APODERADO LEGAL, QUE ESTÁ DE ACUERDO CON LO MANIFESTADO POR EL C. <strong class="text-danger">CATERINE LADINO GALVIS</strong>, EN LAS CLÁUSULAS, SEGUNDA, TERCERA Y CUARTA Y CONSECUENTE CON ELLO EXPRESA SU VOLUNTAD PARA DAR POR TERMINADA POR MUTUO CONSENTIMIENTO LA RELACIÓN LABORAL CON EL C. <strong class="text-danger">CATERINE LADINO GALVIS</strong>, EN TÉRMINOS DE LA FRACCIÓN I DEL ARTÍCULO 53 DE LA LEY FEDERAL DEL TRABAJO.
+                                    <p style="text-align: justify;">
+                                        <strong>QUINTA.</strong> DECLARAN, LA EMPRESA <strong><t t-esc="doc.company_id.name.upper()"/></strong>, POR CONDUCTO DEL LIC. EDWIN GONZALEZ SORIA, QUIEN COMPARECE EN SU CARÁCTER DE APODERADO LEGAL, QUE ESTÁ DE ACUERDO CON LO MANIFESTADO POR EL C. <strong><t t-esc="doc.name.upper()"/></strong>, EN LAS CLÁUSULAS, SEGUNDA, TERCERA Y CUARTA Y CONSECUENTE CON ELLO EXPRESA SU VOLUNTAD PARA DAR POR TERMINADA POR MUTUO CONSENTIMIENTO LA RELACIÓN LABORAL CON EL C. <strong><t t-esc="doc.name.upper()"/></strong>, EN TÉRMINOS DE LA FRACCIÓN I DEL ARTÍCULO 53 DE LA LEY FEDERAL DEL TRABAJO.
                                     </p>
                                 </div>
                             </div>
 
                             <div class="row mt-2">
                                 <div class="col-12 text-justify">
-                                    <p>
-                                        <strong>SEXTA.</strong> DECLARAN, LA EMPRESA <strong class="text-danger">ESTEVEZ.JOR SERVICIOS, S.A. DE C.V.</strong>, Y EL C. <strong class="text-danger">CATERINE LADINO GALVIS</strong>, COMO CONSECUENCIA DE LA TERMINACIÓN DEL CONTRATO INDIVIDUAL DE TRABAJO MENCIONADO EN EL CAPITULO DE ANTECEDENTES DEL PRESENTE CONVENIO, LA EMPRESA <strong class="text-danger">ESTEVEZ.JOR SERVICIOS, S.A. DE C.V.</strong> POR CONDUCTO DEL LIC. EDWIN GONZALEZ SORIA, QUIEN COMPARECE EN SU CARÁCTER DE APODERADO LEGAL, ENTREGA AL C. <strong class="text-danger">CATERINE LADINO GALVIS</strong>, MEDIANTE TRANSFERENCIA QUE EN COPIA SE ANEXA AL PRESENTE Y QUE FORMA PARTE INTEGRANTE DE ESTE CONVENIO, LA CANTIDAD DE <strong>$0,000.000 (CERO CERO CERO CERO PESOS 00/100 M.N.)</strong> COMO FINIQUITO DE TODAS Y CADA UNA DE LAS PRESTACIONES A QUE TUVO DERECHO EL C. <strong class="text-danger">CATERINE LADINO GALVIS</strong>, DURANTE LA RELACIÓN LABORAL QUE SE DA POR TERMINADA EL DÍA <strong class="text-danger">1 DE ABRIL DE 2025</strong>.
+                                    <p style="text-align: justify;">
+                                        <strong>SEXTA.</strong> DECLARAN, LA EMPRESA <strong><t t-esc="doc.company_id.name.upper()"/></strong>, Y EL C. <strong><t t-esc="doc.name.upper()"/></strong>, COMO CONSECUENCIA DE LA TERMINACIÓN DEL CONTRATO INDIVIDUAL DE TRABAJO MENCIONADO EN EL CAPITULO DE ANTECEDENTES DEL PRESENTE CONVENIO, LA EMPRESA <strong><t t-esc="doc.company_id.name.upper()"/></strong> POR CONDUCTO DEL LIC. EDWIN GONZALEZ SORIA, QUIEN COMPARECE EN SU CARÁCTER DE APODERADO LEGAL, ENTREGA AL C. <strong><t t-esc="doc.name.upper()"/></strong>, MEDIANTE TRANSFERENCIA QUE EN COPIA SE ANEXA AL PRESENTE Y QUE FORMA PARTE INTEGRANTE DE ESTE CONVENIO, LA CANTIDAD DE <strong>$0,000.000 (CERO CERO CERO CERO PESOS 00/100 M.N.)</strong> COMO FINIQUITO DE TODAS Y CADA UNA DE LAS PRESTACIONES A QUE TUVO DERECHO EL C. <strong><t t-esc="doc.name.upper()"/></strong>, DURANTE LA RELACIÓN LABORAL QUE SE DA POR TERMINADA EL DÍA <strong><t t-esc="datetime.date.today().strftime('%d-%B-%Y').upper()"/></strong>.
                                     </p>
                                 </div>
                             </div>
 
                             <div class="row mt-2">
                                 <div class="col-12 text-justify">
-                                    <p>
-                                        EN EL ENTENDIDO DE QUE CON ESA CANTIDAD SE LE CUBREN TOTALMENTE LAS PRESTACIONES QUE LE CORRESPONDIERON HASTA LA JORNADA NORMAL DE LABORES QUE LE CORRESPONDIÓ HASTA EL <strong class="text-danger">1 DE ABRIL DE 2025</strong> DE ACUERDO CON SU CONTRATO INDIVIDUAL DE TRABAJO Y LA LEY FEDERAL DEL TRABAJO.
+                                    <p style="text-align: justify;">
+                                        EN EL ENTENDIDO DE QUE CON ESA CANTIDAD SE LE CUBREN TOTALMENTE LAS PRESTACIONES QUE LE CORRESPONDIERON HASTA LA JORNADA NORMAL DE LABORES QUE LE CORRESPONDIÓ HASTA EL <strong><t t-esc="datetime.date.today().strftime('%d-%B-%Y').upper()"/></strong> DE ACUERDO CON SU CONTRATO INDIVIDUAL DE TRABAJO Y LA LEY FEDERAL DEL TRABAJO.
                                     </p>
                                 </div>
                             </div>
 
                             <div class="row mt-2">
                                 <div class="col-12 text-justify">
-                                    <p>
-                                        <strong>SÉPTIMA.</strong> DECLARAN: EL C. <strong class="text-danger">CATERINE LADINO GALVIS</strong>, QUE ESTA CONFORME CON LA CANTIDAD Y CONCEPTOS CITADOS POR LA EMPRESA ESTEVEZ.JOR SERVICIOS, S.A. DE C.V., EN LA CLÁUSULA ANTERIOR YA QUE EN SU OPORTUNIDAD SIEMPRE RECIBIÓ DE MANERA ININTERRUMPIDA EL PAGO DE LOS SÉPTIMOS DÍAS, DÍAS FESTIVOS, Y HORAS EXTRAS EN LAS ESCASAS OCASIONES QUE LAS LABORO, LOS SALARIOS DEVENGADOS, ASÍ COMO LAS VACACIONES, PRIMA VACACIONAL Y AGUINALDO GENERADOS EN EL TIEMPO LABORADO, COMO CONSECUENCIA  NO SE LE ADEUDA NINGUNA SUMA POR DICHOS CONCEPTOS NI POR NINGÚN OTRO, Y SE LE HAN PAGADO TODAS Y CADA UNA DE LAS PRESTACIONES LEGALES QUE PUDIERAN CORRESPONDERLE CONFORME A LA LEY FEDERAL DEL TRABAJO Y A LAS PACTADAS EN SU CONTRATO INDIVIDUAL DE TRABAJO.
+                                    <p style="text-align: justify;">
+                                        <strong>SÉPTIMA.</strong> DECLARAN: EL C. <strong><t t-esc="doc.name.upper()"/></strong>, QUE ESTA CONFORME CON LA CANTIDAD Y CONCEPTOS CITADOS POR LA EMPRESA ESTEVEZ.JOR SERVICIOS, S.A. DE C.V., EN LA CLÁUSULA ANTERIOR YA QUE EN SU OPORTUNIDAD SIEMPRE RECIBIÓ DE MANERA ININTERRUMPIDA EL PAGO DE LOS SÉPTIMOS DÍAS, DÍAS FESTIVOS, Y HORAS EXTRAS EN LAS ESCASAS OCASIONES QUE LAS LABORO, LOS SALARIOS DEVENGADOS, ASÍ COMO LAS VACACIONES, PRIMA VACACIONAL Y AGUINALDO GENERADOS EN EL TIEMPO LABORADO, COMO CONSECUENCIA  NO SE LE ADEUDA NINGUNA SUMA POR DICHOS CONCEPTOS NI POR NINGÚN OTRO, Y SE LE HAN PAGADO TODAS Y CADA UNA DE LAS PRESTACIONES LEGALES QUE PUDIERAN CORRESPONDERLE CONFORME A LA LEY FEDERAL DEL TRABAJO Y A LAS PACTADAS EN SU CONTRATO INDIVIDUAL DE TRABAJO.
 
                                     </p>
                                 </div>
@@ -182,48 +192,48 @@
 
                             <div class="row mt-2">
                                 <div class="col-12 text-justify">
-                                    <p>
-                                        <strong>OCTAVA.</strong> DECLARA: EL C. <strong class="text-danger">CATERINE LADINO GALVIS</strong>, QUE EL PRESENTE DOCUMENTO NO REPRESENTA NINGUNA RENUNCIA A SUS DERECHOS O MENOSCABO A ESTOS, POR QUE LOS DERECHOS QUE GENERO HASTA EL DIA <strong> 1 DE ABRIL DE 2025</strong> LE ESTAN SIENDO PAGADOS CONFORME A LA LEY FEDERAL DEL TRABAJO Y A LAS CONDICIONES PACTADAS EN SU CONTRATO INDIVIDUAL DE TRABAJO, MOTIVO POR EL CUAL NO SE RESERVA NINGUNA ACCIÓN O DERECHO QUE EJERCITAR EN CONTRA DE LA EMPRESA <strong class="text-danger">ESTEVEZ.JOR SERVICIOS, S.A. DE C.V.</strong>,  A QUIEN RECONOCE COMO SU UNICO PATRON, O DE QUIEN LEGALMENTE REPRESENTE SUS INTERESES, O DE LOS SOCIOS Y ACCIONISTAS DE LA MISMA, O QUIEN MAS LLEGARA A RESULTAR SER PATRÓN, PROPIETARIO O RESPONSABLE DE LA FUENTE DE TRABAJO QUE SE UBICA EN <strong>FILIBERTO GOMEZ N°46, CENTRO INSDUSTRIAL TLALNEPANTLA, TLALNEPANTLA DE BAZ, ESTADO DE MÉXICO. C.P. 54030.</strong> POR NINGÚN CONCEPTO DE TIPO LABORAL, CIVIL, PENAL, ADMINISTRATIVO O CUALQUIER OTRO, MANIFESTANDO QUE DURANTE EL TIEMPO QUE LABORÓ PARA LA EMPRESA <strong class="text-danger">ESTEVEZ.JOR SERVICIOS, S.A. DE C.V.</strong>, A QUIEN RECONOCE COMO SU ÚNICO PATRÓN LABORAL, NO SUFRIÓ ENFERMEDAD, ACCIDENTE O RIESGO DE TRABAJO DERIVADO DEL MISMO Y RECIBIÓ EL BUEN TRATO QUE LE CORRESPONDIÓ COMO TRABAJADOR DE ESTA ÚLTIMA.
+                                    <p style="text-align: justify;">
+                                        <strong>OCTAVA.</strong> DECLARA: EL C. <strong><t t-esc="doc.name.upper()"/></strong>, QUE EL PRESENTE DOCUMENTO NO REPRESENTA NINGUNA RENUNCIA A SUS DERECHOS O MENOSCABO A ESTOS, POR QUE LOS DERECHOS QUE GENERO HASTA EL DIA <strong> 1 DE ABRIL DE 2025</strong> LE ESTAN SIENDO PAGADOS CONFORME A LA LEY FEDERAL DEL TRABAJO Y A LAS CONDICIONES PACTADAS EN SU CONTRATO INDIVIDUAL DE TRABAJO, MOTIVO POR EL CUAL NO SE RESERVA NINGUNA ACCIÓN O DERECHO QUE EJERCITAR EN CONTRA DE LA EMPRESA <strong><t t-esc="doc.company_id.name.upper()"/></strong>,  A QUIEN RECONOCE COMO SU UNICO PATRON, O DE QUIEN LEGALMENTE REPRESENTE SUS INTERESES, O DE LOS SOCIOS Y ACCIONISTAS DE LA MISMA, O QUIEN MAS LLEGARA A RESULTAR SER PATRÓN, PROPIETARIO O RESPONSABLE DE LA FUENTE DE TRABAJO QUE SE UBICA EN <strong>FILIBERTO GOMEZ N°46, CENTRO INSDUSTRIAL TLALNEPANTLA, TLALNEPANTLA DE BAZ, ESTADO DE MÉXICO. C.P. 54030.</strong> POR NINGÚN CONCEPTO DE TIPO LABORAL, CIVIL, PENAL, ADMINISTRATIVO O CUALQUIER OTRO, MANIFESTANDO QUE DURANTE EL TIEMPO QUE LABORÓ PARA LA EMPRESA <strong><t t-esc="doc.company_id.name.upper()"/></strong>, A QUIEN RECONOCE COMO SU ÚNICO PATRÓN LABORAL, NO SUFRIÓ ENFERMEDAD, ACCIDENTE O RIESGO DE TRABAJO DERIVADO DEL MISMO Y RECIBIÓ EL BUEN TRATO QUE LE CORRESPONDIÓ COMO TRABAJADOR DE ESTA ÚLTIMA.
                                     </p>
                                 </div>
                             </div>
 
                             <div class="row mt-2">
                                 <div class="col-12 text-justify">
-                                    <p>
-                                        <strong>NOVENA.</strong> DECLARAN, LA EMPRESA <strong class="text-danger"> ESTEVEZ.JOR SERVICIOS, S.A. DE C.V.</strong>Y EL C.<strong class="text-danger"> CATERINE LADINO GALVIS</strong> , PARA EFECTOS DE CUMPLIR CON LOS REQUISITOS DE VALIDEZ QUE REFIERE EL SEGUNDO PARRAFO DEL ARTICULO 33 DE LA LEY FEDERAL DEL TRABAJO, QUE LA RELACION CIRCUNSTANCIADA DE LOS HECHOS QUE MOTIVAN EL PRESENTE CONVENIO ASI COMO LOS DERECHOS COMPRENDIDOS EN ÉL, SE ENCUENTRAN EXPRESADOS EN EL CAPITULO DE ANTECEDENTES, DECLARACIONES Y EN TODAS Y CADA UNA DE LAS CLAUSULAS QUE SE MENCIONAN EN EL CUERPO DEL PRESENTE CONVENIO; Y POR NO CONTENER RENUNCIA DE DERECHOS O MENOSCABO A ESTOS, POR ESTAR PACTADO DE MANERA VOLUNTARIA, LIBRE Y ESPONTANEA SIN NINGUN TIPO DE PRESION, POR QUE NO EXISTE NINGUN VICIO DEL CONSENTIMIENTO QUE PUDIERA AFECTAR LA VALIDEZ DE ESTE CONVENIO DE INEXISTENCIA O NULIDAD, POR QUE EL C. <strong class="text-danger">CATERINE LADINO GALVIS</strong> LO CELEBRA POR SU PROPIO DERECHO Y POR ASI CONVENIR A SUS INTERESES; EN ESTE ACTO LA EMPRESA <strong class="text-danger">ESTEVEZ.JOR SERVICIOS, S.A. DE C.V.</strong> Y EL C. <strong class="text-danger">CATERINE LADINO GALVIS</strong>, LO RATIFICAN EN TODAS Y CADA UNA DE SUS PARTES.
+                                    <p style="text-align: justify;">
+                                        <strong>NOVENA.</strong> DECLARAN, LA EMPRESA <strong><t t-esc="doc.company_id.name.upper()"/></strong>Y EL C.<strong><t t-esc="doc.name.upper()"/></strong> , PARA EFECTOS DE CUMPLIR CON LOS REQUISITOS DE VALIDEZ QUE REFIERE EL SEGUNDO PARRAFO DEL ARTICULO 33 DE LA LEY FEDERAL DEL TRABAJO, QUE LA RELACION CIRCUNSTANCIADA DE LOS HECHOS QUE MOTIVAN EL PRESENTE CONVENIO ASI COMO LOS DERECHOS COMPRENDIDOS EN ÉL, SE ENCUENTRAN EXPRESADOS EN EL CAPITULO DE ANTECEDENTES, DECLARACIONES Y EN TODAS Y CADA UNA DE LAS CLAUSULAS QUE SE MENCIONAN EN EL CUERPO DEL PRESENTE CONVENIO; Y POR NO CONTENER RENUNCIA DE DERECHOS O MENOSCABO A ESTOS, POR ESTAR PACTADO DE MANERA VOLUNTARIA, LIBRE Y ESPONTANEA SIN NINGUN TIPO DE PRESION, POR QUE NO EXISTE NINGUN VICIO DEL CONSENTIMIENTO QUE PUDIERA AFECTAR LA VALIDEZ DE ESTE CONVENIO DE INEXISTENCIA O NULIDAD, POR QUE EL C. <strong><t t-esc="doc.name.upper()"/></strong> LO CELEBRA POR SU PROPIO DERECHO Y POR ASI CONVENIR A SUS INTERESES; EN ESTE ACTO LA EMPRESA <strong><t t-esc="doc.company_id.name.upper()"/></strong> Y EL C. <strong><t t-esc="doc.name.upper()"/></strong>, LO RATIFICAN EN TODAS Y CADA UNA DE SUS PARTES.
                                     </p>
                                 </div>
                             </div>
 
                             <div class="row mt-2">
                                 <div class="col-12 text-justify">
-                                    <p>
-                                        <strong>DÉCIMA.</strong> SEÑALAN LAS PARTES COMO DOMICILIOS PARA EFECTO DE OIR Y RECIBIR NOTIFICACIONES Y DOCUMENTOS DERIVADOS DE LA INTERPRETACIÓN Y CUMPLIMIENTO DE ESTE CONVENIO LA EMPRESA <strong class="text-danger"> ESTEVEZ.JOR SERVICIOS, S.A. DE C.V.</strong>EL UBICADO EN<strong class="text-danger"> FILIBERTO GOMEZ N°46, CENTRO INSDUSTRIAL TLALNEPANTLA, TLALNEPANTLA DE BAZ, ESTADO DE MÉXICO. C.P. 54030.</strong> Y EL C. <strong class="text-danger">CATERINE LADINO GALVIS</strong> EL UBICADO EN REVOLUCIÓN #296, LA ROMANA TLALNEPANTLA DE BAZ, MÉXICO C.P. 54030 
+                                    <p style="text-align: justify;">
+                                        <strong>DÉCIMA.</strong> SEÑALAN LAS PARTES COMO DOMICILIOS PARA EFECTO DE OIR Y RECIBIR NOTIFICACIONES Y DOCUMENTOS DERIVADOS DE LA INTERPRETACIÓN Y CUMPLIMIENTO DE ESTE CONVENIO LA EMPRESA <strong><t t-esc="doc.company_id.name.upper()"/></strong>EL UBICADO EN<strong> FILIBERTO GOMEZ N°46, CENTRO INSDUSTRIAL TLALNEPANTLA, TLALNEPANTLA DE BAZ, ESTADO DE MÉXICO. C.P. 54030.</strong> Y EL C. <strong><t t-esc="doc.name.upper()"/></strong> EL UBICADO EN REVOLUCIÓN #296, LA ROMANA TLALNEPANTLA DE BAZ, MÉXICO C.P. 54030 
                                     </p>
                                 </div>
                             </div>
 
                             <div class="row mt-2">
                                 <div class="col-12 text-justify">
-                                    <p>
-                                        <strong>DÉCIMA PRIMERA.</strong> DECLARAN, LA EMPRESA <strong class="text-danger"> ESTEVEZ.JOR SERVICIOS, S.A. DE C.V.</strong>Y EL C.<strong class="text-danger">CATERINE LADINO GALVIS</strong>, QUE EL PRESENTE CONVENIO POR NO CONTENER CLÁUSULAS CONTRARIAS A LA MORAL O AL DERECHO Y POR ESTAR DENUNCIADO CONFORME A LO PREVISTO POR LOS ARTÍCULOS 33, Y 53, FRACCIÓN I, DE LA LEY FEDERAL DEL TRABAJO VIGENTE, SE OBLIGAN A ESTAR Y PASAR POR EL EN TODO TIEMPO Y LUGAR COMO SI SE TRATARA DE COSA JUZGADA ASI TAMBIEN A RATIFICARLO EN EL MOMENTO QUE UNA PARTE REQUIERA A LA OTRA, ANTE EL CENTRO DE CONCILIACION LABORAL Y/O TRIBUNAL LABORAL Y/O CUALQUIER AUTORIDAD DONDE SE DEBA RATIFICAR YA SEA POR QUE ASI LO REQUIERA O POR QUE SEA NECESARIO, INCURRIENDO EN UNA RESPONSABILIDAD CIVIL Y/O PENAL EN CASO DE QUE ALGUNA DE LAS PARTES NO CUMPLA CON ESTA ULTIMA DISPOSICION, SITUACION QUE TAMBIEN RATIFICAN CON LOS ALCANCES JURIDICOS QUE DE ELLA SE DERIVEN. 
+                                    <p style="text-align: justify;">
+                                        <strong>DÉCIMA PRIMERA.</strong> DECLARAN, LA EMPRESA <strong><t t-esc="doc.company_id.name.upper()"/></strong>Y EL C.<strong><t t-esc="doc.name.upper()"/></strong>, QUE EL PRESENTE CONVENIO POR NO CONTENER CLÁUSULAS CONTRARIAS A LA MORAL O AL DERECHO Y POR ESTAR DENUNCIADO CONFORME A LO PREVISTO POR LOS ARTÍCULOS 33, Y 53, FRACCIÓN I, DE LA LEY FEDERAL DEL TRABAJO VIGENTE, SE OBLIGAN A ESTAR Y PASAR POR EL EN TODO TIEMPO Y LUGAR COMO SI SE TRATARA DE COSA JUZGADA ASI TAMBIEN A RATIFICARLO EN EL MOMENTO QUE UNA PARTE REQUIERA A LA OTRA, ANTE EL CENTRO DE CONCILIACION LABORAL Y/O TRIBUNAL LABORAL Y/O CUALQUIER AUTORIDAD DONDE SE DEBA RATIFICAR YA SEA POR QUE ASI LO REQUIERA O POR QUE SEA NECESARIO, INCURRIENDO EN UNA RESPONSABILIDAD CIVIL Y/O PENAL EN CASO DE QUE ALGUNA DE LAS PARTES NO CUMPLA CON ESTA ULTIMA DISPOSICION, SITUACION QUE TAMBIEN RATIFICAN CON LOS ALCANCES JURIDICOS QUE DE ELLA SE DERIVEN. 
                                     </p>
                                 </div>
                             </div>
 
                             <div class="row mt-2">
                                 <div class="col-12 text-justify">
-                                    <p>
-                                        LEÍDO QUE FUE EN SU TOTALIDAD EL CONTENIDO DEL PRESENTE DOCUMENTO POR LA EMPRESA <strong class="text-danger"> ESTEVEZ.JOR SERVICIOS, S.A. DE C.V.</strong>EN SU CALIDAD DE PATRON Y RESPONSABLE DE LA RELACION DE TRABAJO, EL C.<strong class="text-danger">  CATERINE LADINO GALVIS</strong>, EN SU CALIDAD DE TRABAJADOR, Y LAS C. JESSICA CARINA CALLEJAS VAZQUEZ Y CLAUDIA PEREZ LOPEZ EN SU CALIDAD DE TESTIGOS, LO FIRMAN Y RATIFICAN POR CONTENER EXACTAMENTE LOS TÉRMINOS EN QUE DESEAN OBLIGARSE, EN EL MUNICIPIO DE TLALNEPANTLA DE BAZ, ESTADO DE MEXICO A <strong class="text-danger">1 DE ABRIL DE 2025.</strong>
+                                    <p style="text-align: justify;">
+                                        LEÍDO QUE FUE EN SU TOTALIDAD EL CONTENIDO DEL PRESENTE DOCUMENTO POR LA EMPRESA <strong><t t-esc="doc.company_id.name.upper()"/></strong>EN SU CALIDAD DE PATRON Y RESPONSABLE DE LA RELACION DE TRABAJO, EL C.<strong><t t-esc="doc.name.upper()"/></strong>, EN SU CALIDAD DE TRABAJADOR, Y LAS C. JESSICA CARINA CALLEJAS VAZQUEZ Y CLAUDIA PEREZ LOPEZ EN SU CALIDAD DE TESTIGOS, LO FIRMAN Y RATIFICAN POR CONTENER EXACTAMENTE LOS TÉRMINOS EN QUE DESEAN OBLIGARSE, EN EL MUNICIPIO DE TLALNEPANTLA DE BAZ, ESTADO DE MEXICO A <t t-esc="datetime.date.today().strftime('%d-%B-%Y').upper()"/>.
                                     </p>
                                 </div>
                             </div>
 
                             <div class="row" style="margin-top: 75px;">
                                 <div class="col-6 text-center">
-                                    <p class="mb-1"><strong class="text-danger">ESTEVEZ.JOR SERVICIOS, S.A. DE C.V.</strong></p>
-                                    <p class="mb-1"><sapn>RESPONSABLE DE LA RELACION DE TRABAJO</sapn></p>
+                                    <p class="mb-1"><strong><t t-esc="doc.company_id.name.upper()"/></strong></p>
+                                    <p class="mb-1"><span>RESPONSABLE DE LA RELACIÓN DE TRABAJO</span></p>
                                     <p class="mb-1 mt-5"><strong>LIC. EDWIN GONZALEZ SORIA</strong></p>
                                     <p class="mb-1"><strong>APODERADO LEGAL.</strong></p>
                                     <p class="mb-1 mt-5"><span>TESTIGO</span></p>
@@ -232,10 +242,13 @@
 
                                 <div class="col-6 text-center">
                                     <p class="mb-1"><strong>EL TRABAJADOR</strong></p>
-                                    <p class="mb-0">C.<strong class="text-danger">CATERINE LADINO GALVIS</strong></p>
+                                    <p class="mb-1"><span>.</span></p>
+                                    <p class="mb-1 mt-5"><strong><t t-esc="doc.name.upper()"/></strong></p>
+                                    <p class="mb-1"><span>.</span></p>
                                     <p class="mb-1 mt-5"><span>TESTIGO</span></p>
                                     <p class="mb-1 mt-5"><span>CLAUDIA PEREZ LOPEZ</span></p>
-                                 </div>
+                                </div>
+
                             </div>
 
                         </div>
