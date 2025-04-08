@@ -6,16 +6,22 @@
                     <div class="page">
 
                         <div class="container">
-                            <div class="d-flex justify-content-end">
-                                <div class="text-end">
-                                    <p class="mb-1"><strong>Empresa:</strong> <span class="text-danger">ESTEVEZ.JOR SERVICIOS, S.A. DE C.V.</span></p>
-                                    <p class="mb-1"><strong>Trabajador:</strong> <span class="text-danger">C. CATERINE LADINO GALVIS</span></p>
-                                    <p class="mb-1"><strong>Actividad De La Empresa:</strong> Instalacion de Fibra Optica</p>
-                                    <p class="mb-1"><strong>Domicilio:</strong> <span class="text-danger">FILIBERTO GOMEZ N°46, CENTRO INDUSTRIAL TLALNEPANTLA, TLALNEPANTLA DE BAZ, ESTADO DE MÉXICO. C.P. 54030.</span></p>
-                                </div> 
+                            <div class="row">
+                                <!-- First column (blank) -->
+                                <div class="col-6">
+                                    <!-- Intentionally left blank -->
+                                </div>
+
+                                <!-- Second column (content) -->
+                                <div class="col-6 lh-sm">
+                                    <p class="mb-1"><strong>Empresa:</strong> <span><t t-esc="doc.company_id.name"/></span></p>
+                                    <p class="mb-1"><strong>Trabajador:</strong> <span><t t-esc="doc.name"/></span></p>
+                                    <p class="mb-1"><strong>Actividad De La Empresa:</strong> Instalación de Fibra Óptica</p>
+                                    <p class="mb-1"><strong>Domicilio:</strong> <span><t t-esc="doc.company_id.partner_id.contact_address"/></span></p>
+                                </div>
                             </div>
 
-                            <div>
+                            <div class="lh-sm">
                                 <p class="mb-0"><strong>H. PRIMER TRIBUNAL LABORAL</strong></p>
                                 <p class="mb-0"><strong>DE LA REGION JUDICIAL </strong></p>
                                 <p><strong>TLALNEPANTLA.</strong></p>
@@ -27,41 +33,40 @@
                             </div>
     
                             <div class="row">
-                                <div class="col text-justify">
-                                    <p class="mb-3">
-                                        <strong>LIC. EDWIN GONZALEZ SORIA,</strong> en mi carácter de Apoderado Legal 
-                                        <strong class="text-danger">ESTEVEZ.JOR SERVICIOS, S.A. </strong><strong> DE C.V., y el C.</strong>
-                                        <strong class="text-danger">C.CATERINE LADINO GALVIS,</strong> en mi carácter de trabajador, AMBOS señalando como domicilio para oír y recibir notificaciones el ubicado en 
-                                        <span>Filiberto Gómez número 46 interior 101 (jurídico), Colonia Centro Industrial Tlalnepantla, Municipio de Tlalnepantla de Baz, Estado de México, Código Postal 54030</span>, 
-                                            ante usted respetuosamente comparecemos a exponer:
-                                    </p>
-                                    <p class="mb-0">
-                                        Que, por medio del presente ocurso, venimos a presentar el convenio que hemos celebrado por medio del cual y de común acuerdo damos por terminada la relación y/o vínculo laboral que unía en términos de la fracción I del artículo 53 de la ley federal del trabajo, a la <strong>empresa</strong> 
-                                        <strong class="text-danger">ESTEVEZ.JOR SERVICIOS, S.A. DE C.V.</strong>, con el C.
-                                        <strong class="text-danger"> CATERINE LADINO GALVIS,</strong> <strong>en su carácter de trabajador.</strong>
-                                    </p>
-                                </div>
+                                <p class="mb-3 text-justify" style="text-align: justify;">
+                                    <strong>LIC. EDWIN GONZALEZ SORIA,</strong> en mi carácter de Apoderado Legal 
+                                    <strong><t t-esc="doc.company_id.name.upper()"/> </strong><strong> DE C.V., y el C.</strong>
+                                    <strong><t t-esc="doc.name.upper()"/></strong>, en mi carácter de trabajador, AMBOS señalando como domicilio para oír y recibir notificaciones el ubicado en 
+                                    <span>Filiberto Gómez número 46 interior 101 (jurídico), Colonia Centro Industrial Tlalnepantla, Municipio de Tlalnepantla de Baz, Estado de México, Código Postal 54030</span>, 
+                                        ante usted respetuosamente comparecemos a exponer:
+                                </p>
+                            </div>
+                            <div class="row">
+                                <p class="mb-0 text-justify" style="text-align: justify;">
+                                    Que, por medio del presente ocurso, venimos a presentar el convenio que hemos celebrado por medio del cual y de común acuerdo damos por terminada la relación y/o vínculo laboral que unía en términos de la fracción I del artículo 53 de la ley federal del trabajo, a la <strong>empresa</strong> 
+                                    <strong><t t-esc="doc.company_id.name.upper()"/></strong>, con el C.
+                                    <strong> <t t-esc="doc.name.upper()"/>,</strong> <strong>en su carácter de trabajador.</strong>
+                                </p>
                             </div>
 
-
-                            <div class="row mt-5">
+                            <div class="row mt-2">
                                 <div class="col">
-                                     <p class="mb-3 text-center">
+                                     <p class="mb-3 text-justify">
                                         Ambas partes nos comprometemos a ratificar el convenio que se anexa el día y hora que esta autoridad nos señale fecha para tal efecto.
                                     </p>
-                                    <p class="mb-3 mt-5 text-center">
+                                    <p class="mb-2 mt-2 text-center">
                                         Por lo anteriormente expuesto, a este H. Tribunal, atentamente solicito.
                                     </p>
-                                    <p class="mb-3 text-center">
+                                    <p class="mb-2 text-center">
                                         <strong>Único. -</strong> Tenernos por presentado en términos del presente escrito.
                                     </p>
-                                    <p class="mb-3 text-center">
-                                        <strong>Tlalnepantla de Baz Estado De México, a <strong class="text-danger">1 DE ABRIL DE 2025</strong></strong>
+                                    <p class="mb-2 text-center">
+                                        <strong>Tlalnepantla de Baz Estado De México, a <strong><t t-esc="datetime.date.today().strftime('%d DE %B DE %Y').upper()"/></strong></strong>
                                     </p>
                                 </div>
                             </div>
                                 
-                            <div class="row mt-4">
+                            <div class="row" style="margin-top: 75px;">
                                 <div class="col-6 text-center">
                                     <p class="mb-1"><strong>LIC. EDWIN GONZALEZ SORIA</strong></p>
                                     <p class="mb-1"><strong>APODERADO LEGAL</strong></p>
@@ -69,7 +74,7 @@
                                 </div>
 
                                 <div class="col-6 text-center">
-                                    <p class="mb-1"><span>EL C. <strong class="text-danger">CATERINE LADINO GALVIS</strong></span></p>
+                                    <p class="mb-1"><span>EL C. <strong><t t-esc="doc.name.upper()"/></strong></span></p>
                                     <p class="mb-0"><span>Trabajador</span></p>
                                  </div>
                             </div>
