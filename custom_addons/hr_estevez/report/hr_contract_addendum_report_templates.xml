@@ -5,7 +5,181 @@
                 <t t-call="web.external_layout">
                     <div class="page">
                         <div class="container">
-                            <h1>Addendum</h1>
+
+                            <div class="row mt-3">
+                                <div class="col-12 text-center">
+                                    <h4 class="font-weight-bold">ADDENDUM AL CONTRATO INDIVIDUAL DE TRABAJO</h4>
+                                </div>
+                            </div>
+
+                            <div class="row mt-5">
+                                <div class="col-12 text-justify">
+                                    <p>
+                                        ADDENDUM AL CONTRATO INDIVIDUAL DE TRABAJO EL QUE CELEBRAN POR UNA PARTE LA SOCIEDAD DENOMINADA 
+                                        “ESTEVEZ.JOR SERVICIOS S.A. DE C.V..”, EN ADELANTE EL “PATRÓN”, REPRESENTADA EN ESTE ACTO POR EL C. 
+                                        EDWIN GONZALEZ SORIA Y POR OTRA PARTE EL C. <strong class="text-danger">“CATERINE LADINO GALVIS”</strong> A QUIEN EN LO SUCESIVO SE LE DENOMINARA EL “TRABAJADOR” 
+                                        PUDIENDO REFERIR A AMBOS COMO LAS “PARTES” AL TENOR DE LAS SIGUIENTES DECLARACIONES Y CLAUSULAS:
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="row mt-5">
+                                <div class="col-12 text-center">
+                                    <h5 class="font-weight-bold">DECLARACIONES</h5>
+                                </div>
+                            </div>
+                            <div class="row mt-2 ml-4">
+                                <div class="col-12 text-justify">
+                                    <p>
+                                        <strong>A.</strong> EL “PATRÓN” POR CONDUCTO DE SU REPRESENTANTE LEGAL SEÑALA QUE:
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="row mt-2 ml-4">
+                                <div class="col-12 text-justify">
+                                    <p>
+                                        <strong>1.</strong> QUE ES UNA SOCIEDAD ANÓNIMA DE CAPITAL VARIABLE DEBIDAMENTE CONSTITUIDA Y LEGALMENTE EXISTENTE DE ACUERDO CON LAS LEYES MEXICANAS, TAL Y COMO SE ACREDITA EN TÉRMINOS DE INSTRUMENTO NOTARIAL NÚMERO 46,404, DE FECHA 4 DE OCTUBRE DE 2011 PASADO ANTE LA FE DEL LIC. JOSE ORLANDO PADILLA BENITEZ, NOTARIO PÚBLICO NO. 30 DEL ESTADO DE MÉXICO Y EL APODERADO LEGAL ACREDITA SU PERSONALIDAD CON EL INSTRUMENTO NO.18,435 DE FECHA 7 DE DICIEMBRE DEL 2020 EXPEDIDO POR EL NOTARIO NO.209 LIC. JUAN CARLOS FRANCISCO DIAZ PONCE DE LEON.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="row mt-2 ml-4">
+                                <div class="col-12 text-justify">
+                                    <p>
+                                        <strong>2.</strong> SU REPRESENTANTE LEGAL CUENTA CON PLENAS Y SUFICIENTES FAC1ULTADES PARA CELEBRAR EL PRESENTE CONTRATO, MISMAS QUE NO LE HAN SIDO LIMITADAS, MODIFICADAS O REVOCADAS A LA FECHA DE CELEBRACIÓN DEL PRESENTE “ADDENDUM”, OBLIGANDO A SU PODERDANTE EN LOS TÉRMINOS Y CONDICIONES AL EFECTO ESTABLECIDO, TAL Y COMO LO ACREDITA CON EL INSTRUMENTO NOTARIAL NÚMERO 18,435, DE FECHA 07 DE DICIEMBRE DE 2020, PASADO ANTE LA FE DEL LICENCIADO JUAN CARLOS FRANCISCO DIAZ PONCE DE LEON, NOTARIO PÚBLICO NÚMERO 209 DE LA CIUDAD DE MÉXICO.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="row mt-2 ml-4">
+                                <div class="col-12 text-justify">
+                                    <p>
+                                        <strong>3.</strong> SU REGISTRO FEDERAL DE CONTRIBUYENTES ES ESE111012E79, Y MANIFIESTA QUE SE ENCUENTRA AL CORRIENTE DEL CUMPLIMIENTO DE SUS OBLIGACIONES FISCALES.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="row mt-2 ml-4">
+                                <div class="col-12 text-justify">
+                                    <p>
+                                        <strong>4.</strong> QUE ES UNA SOCIEDAD ANÓNIMA DE CAPITAL VARIABLE DEBIDAMENTE CONSTITUIDA Y LEGALMENTE EXISTENTE DE ACUERDO CON LAS LEYES MEXICANAS, TAL Y COMO SE ACREDITA EN TÉRMINOS DE INSTRUMENTO NOTARIAL NÚMERO 46,404, DE FECHA 4 DE OCTUBRE DE 2011 PASADO ANTE LA FE DEL LIC. JOSE ORLANDO PADILLA BENITEZ, NOTARIO PÚBLICO NO. 30 DEL ESTADO DE MÉXICO Y EL APODERADO LEGAL ACREDITA SU PERSONALIDAD CON EL INSTRUMENTO NO.18,435 DE FECHA 7 DE DICIEMBRE DEL 2020 EXPEDIDO POR EL NOTARIO NO.209 LIC. JUAN CARLOS FRANCISCO DIAZ PONCE DE LEON.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="row mt-2 ml-4">
+                                <div class="col-12 text-justify">
+                                    <p>
+                                        <strong>5.</strong> QUE SU REPRESENTADA CELEBRÓ CON LA PERSONA MORAL “MOVIMIENTO TECNOLOGICO, S. DE R.L. DE C.V.” EN LO SUCESIVO EL “ADMINISTRADOR” UN CONTRATO DE PRESTACIÓN DE SERVICIOS RESPECTO DE UN PLAN INTEGRAL DE PREVISIÓN SOCIAL Y COMPENSACIONES REGISTRADO EN LA COMISIÓN NACIONAL DEL SISTEMA DE AHORRO PARA EL RETIRO;
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="row mt-5 ml-4">
+                                <div class="col-12 text-justify">
+                                    <p>
+                                        <strong>B.</strong> EL “TRABAJADOR” POR SU PROPIO DERECHO SEÑALA QUE:
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="row mt-2 ml-4">
+                                <div class="col-12 text-justify">
+                                    <p>
+                                        <strong>1.</strong> TODAS Y CADA UNA DE LAS MANIFESTACIONES HECHAS EN EL CONTRATO INDIVIDUAL DE TRABAJO CELEBRADO CON EL “PATRÓN” SIGUEN SIENDO CIERTAS.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="row mt-2 ml-4">
+                                <div class="col-12 text-justify">
+                                    <p>
+                                        <strong>2.</strong> ESTÁ DE ACUERDO EN CELEBRAR EL PRESENTE INSTRUMENTO A EFECTO DE ANEXARLO AL CONTRATO INDIVIDUAL DE TRABAJO QUE TIENEN CELEBRADO CON EL “PATRÓN”, A EFECTO DE QUE FORME PARTE INTEGRAL DE ÉSTE Y DE CONFORMIDAD CON LA MANIFESTACIÓN DE SU VOLUNTAD MANIFESTADA EN LAS CLÁUSULAS CONTINUAS.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="row mt-2 ml-4">
+                                <div class="col-12 text-justify">
+                                    <p>
+                                        <strong>3.</strong> ASIMISMO, MANIFIESTA EL “TRABAJADOR” QUE, DE SER EL CASO, ESTÁ DE ACUERDO EN QUE SE DEN LOS AVISOS QUE SE REQUIERAN A LAS AUTORIDADES CORRESPONDIENTES PARA LOS EFECTOS LABORALES Y FISCALES CORRESPONDIENTES.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="row mt-5">
+                                <div class="col-12 text-center">
+                                    <h5 class="font-weight-bold">C L Á U S U L A S</h5>
+                                </div>
+                            </div>
+
+                            <div class="row mt-2">
+                                <div class="col-12 text-justify">
+                                    <p>
+                                        <span>PRIMERA.</span> - Que el “Trabajador” manifiesta que es su libre y entera voluntad que se reconfiguren sus percepciones que recibe por parte del “Patrón” para adherirse al Plan Integral de Previsión Social y Compensaciones, y que es de su pleno conocimiento y que está de acuerdo en que con el “Plan Integral de Previsión Social y Compensaciones” se reconfiguren los conceptos que integran su percepción total a efecto de que con ello se aumente su percepción actual al obtener un 3% adicional como ahorro complementario para el retiro y se obtengan beneficios adicionales por lo que solicita que las prestaciones de previsión social que le corresponden por el “Plan Integral de Previsión Social y Compensaciones” sean depositadas en la cuenta bancaria que indique el “Administrador”, que es la encargada de administrar el "Plan Integral de Previsión Social y Compensaciones", por lo anterior acepta cubrir los costos relativos a la administración del plan y los beneficios que este otorga.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="row mt-2">
+                                <div class="col-12 text-justify">
+                                    <p>
+                                        <span>SEGUNDA.</span> - En este acto el “Patrón” se da por enterado y debidamente notificado de la voluntad del “Trabajador” de adherirse al Plan Integral de Previsión Social y Compensaciones.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="row mt-2">
+                                <div class="col-12 text-justify">
+                                    <p>
+                                        <span>TERCERA.</span> - Las “Partes”, se obligan a guardar y mantener en secreto y con carácter de confidencial y no divulgar a terceras personas, ni a utilizar en beneficio propio ningún tipo de “información confidencial” generada con motivo del presente instrumento; asimismo, se obligan a no reproducir en todo o en parte y en ninguna forma la información que se genere, es decir, ambas “Partes” se comprometen a conceder y respetar un trato de reciprocidad para con la otra parte, en los casos en que cualquiera de ellas al amparo de la presente cláusula, proporcione a la otra documentación o Información Confidencial.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="row mt-2">
+                                <div class="col-12 text-justify">
+                                    <p>
+                                        <span>CUARTA.</span> - La duración del presente instrumento surte los mismos efectos del Contrato Individual de Trabajo que el “Trabajador” tiene celebrado con el “Patrón”, de igual modo, los motivos de rescisión de éste surten los mismos efectos que el contrato individual de trabajo.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="row mt-2">
+                                <div class="col-12 text-justify">
+                                    <p>
+                                        <span>QUINTA.</span> .- Finalmente, las “Partes” manifiestan y están de acuerdo en que el “Trabajador” conoce los términos y condiciones establecidos en los estatutos del "Plan Integral de Previsión Social y Compensaciones" y que firma y acepta conformidad la solicitud anexa al presente como Anexo “1” sin que para ello exista ningún vicio de su voluntad.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="row mt-5">
+                                <div class="col-12 text-justify">
+                                    <p>
+                                        <span>SEXTA.</span> - Que una vez requisitada la solicitud de mérito el trabajador queda adherido al citado “Plan Integral de Previsión Social y Compensaciones”, y el presente instrumento es un “Addendum” al contrato individual de trabajo que tienen celebrado con el “Patrón”.
+                                        Leído que fue en su totalidad el presente Addendum por las “Partes”, y bien enteradas de su contenido, lo firman al margen y al calce como constancia legal de lo actuado y por duplicado en el Estado de México,el día <strong class="text-danger">3</strong> del mes de <strong class="text-danger">ABRIL</strong> del año <strong class="text-danger">2025</strong> por no contener cláusula alguna que atente contra el derecho, la moral o las buenas costumbres.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="row" style="margin-top: 75px;">
+                                <div class="col-6 text-center">
+                                    <p class="mb-1"><sapn>EL "TRABAJADOR"</sapn></p>
+                                </div>
+                            </div>
+
+                            <div class="row" style="margin-top: 75px;">
+                                <div class="col-6 text-center">
+                                    <p>______________________________________________</p>
+                                    <p class="mb-1"><span>POR SU PROPIO DERECHO</span></p>
+                                </div>
+                                <div class="col-6 text-center">
+                                    <p>______________________________________________</p>
+                                    <p class="mb-1"><strong class="text-danger">CATERINE LADINO GALVIS</strong></p>
+                                </div>
+                            </div>
+
                         </div>
                     </div>
                 </t>
