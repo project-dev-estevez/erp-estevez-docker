@@ -38,35 +38,38 @@
                                 <field name="department_id"/>
                                 <field name="job_id"/>
                             </group>
-                        </group>                        
-                        <group string="Especificaciones">
-                            <group>                        
-                                <field name="fecha_limite_entrega"/>                            
-                                <field name="tipo" default="'Producto'"/>
-                                <field name="proyecto"/>
-                                <field name="segmento"/>
-                                <!--field name="prioridad" placeholder="Selecciona una opción"/-->
-                                <field name="almacen"/>
-                                <field name="sugerencia"/>
-                                <field name="comentarios"/>                                                           
-                            </group>
-                        </group>  
-                        <group>
-                            <group string="Especificaciones del producto">                                                                    
-                            </group>                                
-                        </group>                               
-                        <field name="order_line_ids">
-                            <list string="Productos" editable="bottom">
-                                <field name="product_id" string="Producto"/>
-                                <field name="product_qty" string="Cantidad"/>
-                                <field name="product_uom" string="Unidad de medida"/>
-                                <field name="price_unit" string="Precio"/>
-                                <field name="price_subtotal"/>
-                                <control>
-                                    <create name="add_product" string="Agregar Producto"/>
-                                </control>
-                            </list>
-                        </field>    
+                        </group>
+                        <notebook>
+                            <page string="Especificaciones" class="bg-primary text-white shadow mb-3">
+                                <group>
+                                    <group>                        
+                                        <field name="fecha_limite_entrega"/>                            
+                                        <field name="tipo" default="'Producto'"/>
+                                        <field name="proyecto"/>
+                                        <field name="segmento"/>
+                                        <!--field name="prioridad" placeholder="Selecciona una opción"/-->
+                                        <field name="almacen"/>
+                                        <field name="sugerencia"/>
+                                        <field name="comentarios"/>                                                           
+                                    </group>    
+                                </group>
+                                <h3 class="mt14 mb8">ESPECIFICACIONES DEL PRODUCTO</h3>
+                                    <field name="order_line_ids">            
+                                        <list string="Productos" editable="bottom">
+                                            <field name="product_id" string="Producto"/>
+                                            <field name="product_qty" string="Cantidad"/>
+                                            <field name="product_uom" string="Unidad de medida"/>
+                                            <field name="price_unit" string="Precio"/>
+                                            <field name="price_subtotal"/>
+                                            <control>
+                                                <create name="add_product" string="Agregar Producto"/>
+                                            </control>
+                                        </list>
+                                    </field>                                    
+                            </page>
+                        </notebook>                        
+                       
+                       
                          <div>
                         <button name="save_dat" string="Guardar" type="object" class="btn btn-primary"/>
                     </div>                          
@@ -84,7 +87,7 @@
                     <field name="proyecto" string="Proyecto"/>
                     <field name="segmento" string="Segmento"/>
                     <field name="tipo" string="Tipo de requisición"/>
-                    <field name="prioridad" string="Prioridad"/>
+                    <!--field name="prioridad" string="Prioridad"/-->
                     <field name="fecha_limite_entrega" string="Fecha limite"/>
                     <field name="state" string="Estatus"                    
                        widget="badge" 
@@ -104,11 +107,11 @@
             <field name="model">purchase.acquisition</field>
             <field name="arch" type="xml">
                 <kanban>
-                    <field name="prioridad"/>
+                    <!--field name="prioridad"/-->
                     <templates>
                         <t t-name="card">
                             <a type="open">
-                                <field name="prioridad" class="fw-bold fs-4 d-bolck ms-2"/>
+                                <!--field name="prioridad" class="fw-bold fs-4 d-bolck ms-2"/-->
                             </a>
                             <field name="requestor_id" widget="many2one_avatar_employee" options="{'display_avatar_name': True}" readonly="1" class="text-muted ms-2"/>
                             <div class="small mt-1 ms-2" groups="base.group_multi_company">
