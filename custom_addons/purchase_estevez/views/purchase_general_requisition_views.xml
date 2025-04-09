@@ -287,18 +287,18 @@
                     <templates>
                         <t t-name="card">
                             <a type="open">
-                                <field name="request_type" class="fw-bold fs-4 d-bolck ms-2"/>
+                                <field name="state" class="fw-bold fs-4 d-bolck ms-2"/>
                             </a>
                             <field name="requestor_id" widget="many2one_avatar_employee" options="{'display_avatar_name': True}" readonly="1" class="text-muted ms-2"/>
                             <div class="small mt-1 ms-2" groups="base.group_multi_company">
                                 <i class="fa fa-building-o" role="img" aria-label="Company" title="Company"/>
-                                <field name="priority" class="ms-1"/>
+                                <field name="project_id" class="ms-1"/>
                             </div>
                             <div class="row g-0 mt-3 mb-2 ms-2">
                                 <div class="col-6">
                                     <button class="btn btn-primary">                                        
-                                        Proyecto
-                                        <field name="project_id"/>
+                                        Duración:
+                                        <field name="duration_days"/>
                                     </button>
                                 </div>
                             </div>

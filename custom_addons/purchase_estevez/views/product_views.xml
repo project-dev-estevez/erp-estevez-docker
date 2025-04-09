@@ -23,23 +23,7 @@
                 </group>
             </xpath>
 
-            <xpath expr="//field[@name='sale_ok']" position="attributes">
-                <attribute name="invisible">1</attribute>
-            </xpath>
-            <xpath expr="//field[@name='list_price']" position="attributes">
-                <attribute name="invisible">1</attribute>
-            </xpath>
             
-            <field name="description_sale" position="replace"/>
-
-            <xpath expr="//field[@name='name']" position="attributes">
-                <!-- Quitar el placeholder -->
-                <attribute name="placeholder"></attribute>
-            </xpath>
-
-          <xpath expr="//field[@name='standard_price']" position="after">
-                <field name="last_cost" readonly="1" string="Último Costo"/>
-            </xpath>
     
 
         </field>
