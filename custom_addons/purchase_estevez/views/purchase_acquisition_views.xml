@@ -107,22 +107,22 @@
             <field name="model">purchase.acquisition</field>
             <field name="arch" type="xml">
                 <kanban>
-                    <!--field name="prioridad"/-->
+                    <field name="acquisition_id"/>
                     <templates>
                         <t t-name="card">
                             <a type="open">
-                                <!--field name="prioridad" class="fw-bold fs-4 d-bolck ms-2"/-->
+                                <field name="proyecto" class="fw-bold fs-4 d-bolck ms-2"/>
                             </a>
                             <field name="requestor_id" widget="many2one_avatar_employee" options="{'display_avatar_name': True}" readonly="1" class="text-muted ms-2"/>
                             <div class="small mt-1 ms-2" groups="base.group_multi_company">
-                                <i class="fa fa-building-o" role="img" aria-label="Company" title="Company"/>
-                                <field name="fecha_limite_entrega" class="ms-1"/>
+                                <i class="fa fa-building-o" role="img" aria-label="Company" title="Company"/>                                
+                                <field name="department_id" class="ms-1"/>
                             </div>
                             <div class="row g-0 mt-3 mb-2 ms-2">
-                                <div class="col-6">
-                                    <button class="btn btn-primary">
+                                <div class="col-12">
+                                    <button class="btn btn-primary">                                        
+                                        Fecha limite entrega:
                                         <field name="fecha_limite_entrega"/>
-                                        Fecha Limite
                                     </button>
                                 </div>
                             </div>
