@@ -14,12 +14,14 @@
 
                             <div class="row mt-3">
                                 <div class="col-12 text-justify">
-                                    <p>
+                                    <p style="text-align: justify;">
                                         CONTRATO INDIVIDUAL DE TRABAJO QUE CONFORME A LO ESTABLECIDO POR LOS ARTÍCULOS 24 Y 25 DE LA LEY FEDERAL DEL TRABAJO, CELEBRAN POR UNA PARTE LA EMPRESA 
-                                        <strong>ESTEVEZ.JOR SERVICIOS, S.A. DE C.V.</strong>, REPRESENTADA LEGALMENTE POR EL LIC. 
-                                        <strong>EDWIN GONZALEZ SORIA</strong>, EN SU CARÁCTER DE APODERADO LEGAL A QUIÉN EN LO SUCESIVO Y PARA EFECTOS DE ESTE CONTRATO SE LE DENOMINARÁ 
-                                        <strong>“EL PATRON”</strong>, Y POR LA OTRA POR SU PROPIO DERECHO, EL/LA C. 
-                                        <strong class="text-danger">CATERINE LADINO GALVIS</strong>, A QUIÉN EN LO SUCESIVO Y PARA EFECTOS DE ESTE CONTRATO SE LE DENOMINARÁ 
+                                        <strong class="text-decoration-underline"><t t-esc="doc.company_id.name.upper()"/></strong>, REPRESENTADA LEGALMENTE POR 
+                                        <span class="text-decoration-underline">EL LIC. <strong>EDWIN GONZALEZ SORIA</strong>, EN SU CARÁCTER DE APODERADO LEGAL </span> 
+                                        A QUIÉN EN LO SUCESIVO Y PARA EFECTOS DE ESTE CONTRATO SE LE DENOMINARÁ 
+                                        <strong>“EL PATRON”</strong>, Y POR LA OTRA POR SU PROPIO DERECHO, 
+                                        <strong class="text-decoration-underline">EL/LA C. <t t-esc="doc.employee_id.name.upper()" /> </strong>, 
+                                        A QUIÉN EN LO SUCESIVO Y PARA EFECTOS DE ESTE CONTRATO SE LE DENOMINARÁ 
                                         <strong>“EL TRABAJADOR”</strong>, AL TENOR DE LAS SIGUIENTES DECLARACIONES Y CLÁUSULAS:
                                     </p>
                                 </div>
@@ -27,7 +29,7 @@
 
                             <div class="row mt-3">
                                 <div class="col-12 text-center">
-                                    <strong class="font-weight-bold">DECLARACIONES</strong>
+                                    <strong class="font-weight-bold">DECLARACIONES:</strong>
                                 </div>
                             </div>
 
