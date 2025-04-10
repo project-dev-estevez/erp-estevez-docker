@@ -20,7 +20,7 @@
                                         <span class="text-decoration-underline">EL LIC. <strong>EDWIN GONZALEZ SORIA</strong>, EN SU CARÁCTER DE APODERADO LEGAL </span> 
                                         A QUIÉN EN LO SUCESIVO Y PARA EFECTOS DE ESTE CONTRATO SE LE DENOMINARÁ 
                                         <strong>“EL PATRON”</strong>, Y POR LA OTRA POR SU PROPIO DERECHO, 
-                                        <strong class="text-decoration-underline text-danger">EL/LA C. <t t-esc="doc.employee_id.name.upper()"/> </strong>, 
+                                        <strong class="text-decoration-underline">EL/LA C. <t t-esc="doc.employee_id.name.upper()"/> </strong>, 
                                         A QUIÉN EN LO SUCESIVO Y PARA EFECTOS DE ESTE CONTRATO SE LE DENOMINARÁ 
                                         <strong>“EL TRABAJADOR”</strong>, AL TENOR DE LAS SIGUIENTES DECLARACIONES Y CLÁUSULAS:
                                     </p>
@@ -89,7 +89,7 @@
                                 </div>
                             </div>
 
-                            <div class="row mt-5">
+                            <div class="row mt-4">
                                 <div class="col-12 text-justify">
                                     <p>
                                         <span>B.</span><strong>DE “EL TRABAJADOR”:</strong>
@@ -100,7 +100,7 @@
                             <div class="row mt-2">
                                 <div class="col-12 text-justify">
                                     <p style="text-align: justify;">
-                                        <span>1.</span><span>QUE CUENTA CON LA DISPOSICIÓN NECESARIA PARA DESEMPEÑAR LOS SERVICIOS EN EL PUESTO REQUERIDO, DE: <strong class="text-decoration-underline text-danger">IMPLEMENTADOR DE SISTEMAS WEB</strong></span>
+                                        <span>1.</span><span>QUE CUENTA CON LA DISPOSICIÓN NECESARIA PARA DESEMPEÑAR LOS SERVICIOS EN EL PUESTO REQUERIDO, DE: <strong class="text-decoration-underline"><t t-esc="doc.employee_id.job_id.name.upper()"/></strong></span>
                                     </p>
                                 </div>
                             </div>
@@ -115,35 +115,56 @@
 
                             <div class="row mt-5">
                                 <div class="col-12">
-                                    <table class="table table-bordered">
+                                    <table class="table">
                                         <tbody>
                                             <tr>
                                                 <th class="text-left"><strong>NACIONALIDAD</strong></th>
-                                                <td class="text-left"><span class="text-danger">COLOMBIANA</span></td>
+                                                <td class="text-left">
+                                                    <t t-esc="doc.employee_id.country_id.name.upper()"/>
+                                                </td>
                                             </tr>
                                             <tr>
                                                 <th class="text-left"><strong>EDAD</strong></th>
-                                                <td class="text-left"><span class="text-danger">34</span></td>
+                                                <td class="text-left">
+                                                    <t t-esc="doc.employee_id.age"/>
+                                                </td>
                                             </tr>
                                             <tr>
                                                 <th class="text-left"><strong>SEXO</strong></th>
-                                                <td class="text-left"><span class="text-danger">FEMENINO</span></td>
+                                                <td class="text-left">
+                                                    <t t-esc="doc.employee_id.gender"/>
+                                                </td>
                                             </tr>
                                             <tr>
                                                 <th class="text-left"><strong>ESTADO CIVIL</strong></th>
-                                                <td class="text-left"><span class="text-danger">SOLTERO</span></td>
+                                                <td class="text-left">
+                                                    <t t-esc="doc.employee_id.marital"/>
+                                                </td>
                                             </tr>
                                             <tr>
                                                 <th class="text-left"><strong>CURP</strong></th>
-                                                <td class="text-left"><span class="text-danger">LAGC900816MNEDLT08</span></td>
+                                                <td class="text-left">
+                                                    <t t-esc="doc.employee_id.curp"/>
+                                                </td>
                                             </tr>
                                             <tr>
                                                 <th class="text-left"><strong>RFC</strong></th>
-                                                <td class="text-left"><span class="text-danger">LAGC900816FA1</span></td>
+                                                <td class="text-left">
+                                                    <t t-esc="doc.employee_id.rfc"/>
+                                                </td>
                                             </tr>
                                             <tr>
                                                 <th class="text-left"><strong>DOMICILIO</strong></th>
-                                                <td class="text-left"><span class="text-danger">REVOLUCIÓN #296, LA ROMANA C.P. 54030 TLALNEPANTLA DE BAZ, MÉXICO</span></td>
+                                                <td class="text-left">
+                                                    <t t-esc="'%s %s, %s %s, %s C.P. %s' % (
+                                                        doc.employee_id.private_street or '',
+                                                        doc.employee_id.private_street2 or '',
+                                                        doc.employee_id.private_colonia or '',
+                                                        doc.employee_id.private_city or '',
+                                                        doc.employee_id.private_state_id.name or '',
+                                                        doc.employee_id.private_zip or 'N/A'
+                                                    )"/>
+                                                </td>
                                             </tr>
                                         </tbody>
                                     </table>
@@ -215,7 +236,7 @@
                             <div class="row mt-2">
                                 <div class="col-12 text-justify">
                                     <p style="text-align: justify;">
-                                        <strong>TERCERA.</strong><span>“EL PATRÓN”, EN ESTE ACTO CONTRATA A “EL TRABAJADOR” <strong>BAJO LA MODALIDAD DE CAPACITACIÓN INICIAL</strong>PARA QUE DESEMPEÑE EL PUESTO DE <strong class="text-decoration-underline text-danger">IMPLEMENTADOR DE SISTEMAS WEB</strong> ASÍ COMO EN CUALQUIER OTRA ACTIVIDAD ANEXA, CONEXA O RELACIONADA QUE LE ENCOMIENDE EL PATRÓN, COMPATIBLE CON EL FIN DE SU CATEGORÍA, CAPACITACIÓN Y DE SUS APTITUDES.</span>
+                                        <strong>TERCERA.</strong><span>“EL PATRÓN”, EN ESTE ACTO CONTRATA A “EL TRABAJADOR” <strong>BAJO LA MODALIDAD DE CAPACITACIÓN INICIAL</strong>PARA QUE DESEMPEÑE EL PUESTO DE <strong class="text-decoration-underline"><t t-esc="doc.employee_id.job_id.name.upper()"/></strong> ASÍ COMO EN CUALQUIER OTRA ACTIVIDAD ANEXA, CONEXA O RELACIONADA QUE LE ENCOMIENDE EL PATRÓN, COMPATIBLE CON EL FIN DE SU CATEGORÍA, CAPACITACIÓN Y DE SUS APTITUDES.</span>
                                     </p>
                                 </div>
                             </div>
@@ -231,7 +252,7 @@
                             <div class="row mt-2">
                                 <div class="col-12 text-justify">
                                     <p style="text-align: justify;">
-                                        <strong>QUINTA.</strong><span>“EL TRABAJADOR” SE OBLIGA A PRESTAR A “EL PATRÓN”, BAJO SU DIRECCIÓN Y DEPENDENCIA, SUS SERVICIOS PERSONALES COMO: <strong class="text-decoration-underline text-danger">IMPLEMENTADOR DE SISTEMAS WEB.</strong></span>
+                                        <strong>QUINTA.</strong><span>“EL TRABAJADOR” SE OBLIGA A PRESTAR A “EL PATRÓN”, BAJO SU DIRECCIÓN Y DEPENDENCIA, SUS SERVICIOS PERSONALES COMO: <strong class="text-decoration-underline"><t t-esc="doc.employee_id.job_id.name.upper()"/>.</strong></span>
                                     </p>
                                 </div>
                             </div>
@@ -790,7 +811,7 @@
                             <div class="row mt-5 justify-content-center text-center">
                                 <div class="col-6">
                                     <p>______________________________________________</p>
-                                    <p class="mb-1"><strong>C.</strong><strong class="text-danger"><t t-esc="doc.employee_id.name.upper()"/> </strong></p>
+                                    <p class="mb-1"><strong>C.</strong><strong><t t-esc="doc.employee_id.name.upper()"/> </strong></p>
                                 </div>
                             </div>
 
@@ -840,7 +861,7 @@
 
                             <div class="row mt-5">
                                 <div class="col-12 text-center">
-                                    <strong class="text-danger"><t t-esc="doc.employee_id.name.upper()"/> :</strong>
+                                    <strong><t t-esc="doc.employee_id.name.upper()"/> :</strong>
                                 </div>
                             </div>
 
@@ -854,7 +875,7 @@
 
                             <div class="row mt-5">
                                 <div class="col-12 text-justify">
-                                    <strong>C.</strong><strong class="text-danger"><t t-esc="doc.employee_id.name.upper()"/> </strong>
+                                    <strong>C.</strong><strong><t t-esc="doc.employee_id.name.upper()"/> </strong>
                                 </div>
                             </div>
 
