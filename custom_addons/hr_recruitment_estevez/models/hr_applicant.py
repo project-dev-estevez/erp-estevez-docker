@@ -136,7 +136,21 @@ class HrApplicant(models.Model):
     ], string="Estado de Aptitud", default='apto')
 
     documents_count = fields.Integer(
-        'Documents Count', compute="_compute_applicant_documents")
+        'Documents Count', 
+        compute="_compute_applicant_documents"
+    )
+    
+    user_id = fields.Many2one(
+        'res.users',
+        string="Reclutador",
+        default=lambda self: self.env.user,  # Asigna el usuario logueado por defecto
+    )
+
+    @api.model
+    def create(self, vals):
+        if 'user_id' not in vals:
+            vals['user_id'] = self.env.user.id  # Asigna el usuario logueado
+        return super(HrApplicant, self).create(vals)
     
     # Computed fields
     @api.depends('weight', 'height')
