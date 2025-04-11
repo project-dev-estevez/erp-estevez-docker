@@ -1,0 +1,134 @@
+<odoo>
+    <data>
+        <record id="action_stock_requisition" model="ir.actions.act_window">
+            <field name="name">Requisición Almacén</field>
+            <field name="res_model">stock.requisition</field>
+            <field name="view_mode">kanban,list,form</field>
+        </record>
+
+
+        <record id="view_stock_requisition_form" model="ir.ui.view">
+            <field name="name">stock.requisition.form</field>
+            <field name="model">stock.requisition</field>
+            <field name="arch" type="xml">
+                <form string="Services">
+                    <header>
+                    <button name="action_approve" string="Aprobar" type="object" class="btn-primary" invisible="state in ('rejected', 'first_approval', 'second_approval', 'approved') or requestor_id == uid"/>
+                    <button name="action_confirm_approve" string="Confirmar Aprobación" type="object" class="btn-primary" invisible="state in ('to_approve', 'rejected', 'approved') or requestor_id == uid"/>
+                    <button name="action_reject" string="Rechazar" type="object" invisible="state in ('rejected', 'approved') or requestor_id == uid"/>
+                    <field name="state" 
+                           widget="statusbar" 
+                           decoration-muted="state == 'to_approve'" 
+                           decoration-primary="state == 'first_approval'" 
+                           decoration-success="state == 'second_approval'" 
+                           decoration-danger="state == 'rejected'"/>
+                    </header>
+                <sheet>
+                    <h1>Requisición Almacén</h1>
+                    <separator string="Datos del Solicitante"/>
+                    <group>
+                        <group>
+                            
+                            <field name="requestor_id"/>
+                            <field name="company_id"/>
+                        </group>
+                        <group>
+                            
+                            <field name="department_id"/>
+                            <field name="job_id"/>
+                        </group>
+                    </group>
+                    <notebook>
+                            <page string="Especificaciones de Requisición" class="bg-primary text-white shadow mb-3">
+                                <group>
+                                    <group>                                                  
+                                        <field name="type_requisition"/>
+                                        <field name="type_warehouse"/>
+                                        <field name="project_id"/>
+                                        <field name="segment"/>
+                                        <field name="personal_type"/>
+                                        <field name="employee_id" invisible="personal_type != 'internal'"/>
+                                        <field name="contractor_id" invisible="personal_type != 'contractor'"/>
+                                        <field name="supervisor_id" invisible="personal_type != 'contractor'"/>
+                                        <field name="personal_contract_id" invisible="personal_type != 'contractor'"/>
+                                        <field name="comments" 
+                                            widget="textarea" 
+                                            placeholder="Comentarios..."
+                                            options="{'rows': 4}"/>                                                        
+                                    </group>    
+                                </group>
+                                <h3 class="mt14 mb8">ESPECIFICACIONES DEL PRODUCTO</h3>
+                                    <field name="order_line_ids">            
+                                        <list string="Productos" editable="bottom">
+                                            <field name="product_id" string="Producto"/>
+                                            <field name="product_qty" string="Cantidad"/>
+                                            <field name="product_uom" string="Unidad de medida"/>
+                                            <field name="price_unit" string="Precio"/>
+                                            <field name="price_subtotal"/>
+                                            <control>
+                                                <create name="add_product" string="Agregar Producto"/>
+                                            </control>
+                                        </list>
+                                    </field>                                    
+                            </page>
+                        </notebook>       
+                    
+                    <div class="text-center">
+                        <button name="action_save" string="Guardar" type="object" class="btn btn-primary btn-lg mt-4"/>
+                    </div>
+                </sheet>
+                </form>
+            </field>
+        </record>
+
+
+        <record id="view_stock_requisition_list" model="ir.ui.view">
+            <field name="name">stock.requisition.list</field>
+            <field name="model">stock.requisition</field> 
+            <field name="arch" type="xml">
+                <list string="Requisition">
+                    <field name="create_date" string="Fecha de creación" width="250px"/>
+                    <field name="contractor_id" string="Contratista"/>
+                    <field name="employee_id" string="Recibe"/>
+                    <field name="project_id" string="Proyecto"/>
+              
+                <button name="action_approve" string="Aprobar" type="object" icon="fa-thumbs-up" invisible="state in ('rejected', 'first_approval', 'second_approval', 'approved') or requestor_id == uid"/>
+                <button name="action_confirm_approve" string="Confirmar" type="object" icon="fa-thumbs-up" invisible="state in ('to_approve', 'rejected', 'approved') or requestor_id == uid"/>
+                <button name="action_reject" string="Rechazar" type="object" icon="fa-times" invisible="state in ('rejected', 'approved') or requestor_id == uid"/>
+                </list>
+            </field>
+        </record>
+
+        <record id="view_purchase_general_requisition_kanban" model="ir.ui.view">
+            <field name="name">stock.requisition.kanban</field>
+            <field name="model">stock.requisition</field>
+            <field name="arch" type="xml">
+                <kanban>
+                    <field name="requestor_id"/>
+          
+                    <templates>
+                        <t t-name="card">
+                            <a type="open">
+                                <field name="requestor_id" class="fw-bold fs-4 d-bolck ms-2"/>
+                            </a>
+                            <field name="requestor_id" widget="many2one_avatar_employee" options="{'display_avatar_name': True}" readonly="1" class="text-muted ms-2"/>
+                            <div class="small mt-1 ms-2" groups="base.group_multi_company">
+                                <i class="fa fa-building-o" role="img" aria-label="Company" title="Company"/>
+                                <field name="requestor_id" class="ms-1"/>
+                            </div>
+                            <div class="row g-0 mt-3 mb-2 ms-2">
+                                <div class="col-6">
+                                    <button class="btn btn-primary">                                        
+                                        Proyecto
+                                        <field name="requestor_id"/>
+                                    </button>
+                                </div>
+                            </div>
+                        </t>
+                    </templates>
+                </kanban>
+            </field>
+        </record>
+        
+    </data>
+</odoo>
