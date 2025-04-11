@@ -146,6 +146,24 @@ class HrApplicant(models.Model):
         default=lambda self: self.env.user,  # Asigna el usuario logueado por defecto
     )
 
+    def action_print_survey(self):
+        """ Always allow viewing the most recent survey response, regardless of its state """
+        self.ensure_one()
+        sorted_interviews = self.response_ids\
+            .filtered(lambda i: i.survey_id == self.survey_id)\
+            .sorted(lambda i: i.create_date, reverse=True)
+        
+        if not sorted_interviews:
+            # If no responses exist, show the survey form
+            action = self.survey_id.action_print_survey()
+            action['target'] = 'new'
+            return action
+
+        # Always show the most recent response, regardless of its state
+        action = self.survey_id.action_print_survey(answer=sorted_interviews[0])
+        action['target'] = 'new'
+        return action
+
     @api.model
     def create(self, vals):
         if 'user_id' not in vals:
