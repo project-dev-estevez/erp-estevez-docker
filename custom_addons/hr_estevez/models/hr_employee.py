@@ -57,7 +57,7 @@ class HrEmployee(models.Model):
     fiscal_zip = fields.Char(string="Fiscal ZIP")
 
     work_phone = fields.Char(string='Work Phone', compute=False)
-    coach_id = fields.Many2one('hr.employee', string='Instructor', compute=False, store=False)
+    # coach_id = fields.Many2one('hr.employee', string='Instructor', compute=False, store=False)
 
     name = fields.Char(string='Nombre Completo', compute='_compute_full_name', store=True, readonly=True)
     age = fields.Integer(string='Edad', compute='_compute_age')
