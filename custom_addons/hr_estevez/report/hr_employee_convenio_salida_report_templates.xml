@@ -33,10 +33,10 @@
                                 <div class="col-12 text-justify">
                                     <p style="text-align: justify;">
                                         <strong>UNICO.</strong> - CON FECHA 
-                                        <t t-esc="doc.contract_ids.filtered('date_of_entry') and doc.contract_ids.filtered('date_of_entry').sorted('date_of_entry')[0].date_of_entry.strftime('%d-%B-%Y').upper() or 'N/A'"/>
+                                        <t t-esc="doc.get_formatted_date_of_entry()"/>
                                         <strong><t t-esc="doc.company_id.name.upper()"/></strong>, Y EL C. 
                                         <strong><t t-esc="doc.name.upper()"/></strong>, 
-                                        CELEBRARON UN CONTRATO INDIVIDUAL DE TRABAJO CON EL OBJETO DE ESTABLECER Y REGULAR LA RELACIÓ   N LABORAL Y LAS CONDICIONES EN QUE SE IBA A PRESTAR ESTA.
+                                        CELEBRARON UN CONTRATO INDIVIDUAL DE TRABAJO CON EL OBJETO DE ESTABLECER Y REGULAR LA RELACIÓN LABORAL Y LAS CONDICIONES EN QUE SE IBA A PRESTAR ESTA.
                                     </p>
                                 </div>
                             </div>
@@ -109,7 +109,14 @@
                             <div class="row mt-2">
                                 <div class="col-12 text-justify">
                                     <p style="text-align: justify;">
-                                        <strong>SEGUNDA.</strong> DECLARAN, EL C. <strong><t t-esc="doc.name.upper()"/></strong>,  QUE POR ASI CONVENIR A SUS INTERESES Y POR MUTUO CONSENTIMIENTO, ES SU LIBRE VOLUNTAD DAR POR TERMINADA LA RELACIÓN LABORAL QUE LO HA UNIDO CON LA EMPRESA <strong><t t-esc="doc.company_id.name.upper()"/></strong>, HASTA EL DÍA <strong><t t-esc="datetime.date.today().strftime('%d-%B-%Y').upper()"/></strong> TERMINACIÓN LABORAL QUE HACE CON FUNDAMENTO EN LO DISPUESTO POR LA FRACCIÓN I DEL ARTÍCULO 53 DE LA LEY FEDERAL DEL TRABAJO.
+                                        <strong>SEGUNDA.</strong> DECLARAN, EL C. <strong><t t-esc="doc.name.upper()"/></strong>,  
+                                        QUE POR ASI CONVENIR A SUS INTERESES Y POR MUTUO CONSENTIMIENTO, ES SU LIBRE VOLUNTAD DAR POR TERMINADA LA RELACIÓN LABORAL QUE LO HA UNIDO CON LA EMPRESA 
+                                        <strong>
+                                            <t t-esc="doc.company_id.name.upper()"/>
+                                            </strong>, HASTA EL DÍA <strong>
+                                            <t t-esc="doc.get_formatted_today_date()"/>
+                                        </strong> 
+                                        TERMINACIÓN LABORAL QUE HACE CON FUNDAMENTO EN LO DISPUESTO POR LA FRACCIÓN I DEL ARTÍCULO 53 DE LA LEY FEDERAL DEL TRABAJO.
                                     </p>
                                 </div>
                             </div>
@@ -137,7 +144,7 @@
                                             <tr>
                                                 <th class="text-left"><strong>FECHA DE INGRESO</strong></th>
                                                 <td class="text-left">
-                                                    <t t-esc="doc.contract_ids.filtered('date_of_entry') and doc.contract_ids.filtered('date_of_entry').sorted('date_of_entry')[0].date_of_entry.strftime('%d-%B-%Y').upper() or 'N/A'"/>
+                                                    <t t-esc="doc.get_formatted_date_of_entry()"/>
                                                 </td>
                                             </tr>
                                             <tr>
@@ -168,7 +175,7 @@
                             <div class="row mt-2">
                                 <div class="col-12 text-justify">
                                     <p style="text-align: justify;">
-                                        <strong>SEXTA.</strong> DECLARAN, LA EMPRESA <strong><t t-esc="doc.company_id.name.upper()"/></strong>, Y EL C. <strong><t t-esc="doc.name.upper()"/></strong>, COMO CONSECUENCIA DE LA TERMINACIÓN DEL CONTRATO INDIVIDUAL DE TRABAJO MENCIONADO EN EL CAPITULO DE ANTECEDENTES DEL PRESENTE CONVENIO, LA EMPRESA <strong><t t-esc="doc.company_id.name.upper()"/></strong> POR CONDUCTO DEL LIC. EDWIN GONZALEZ SORIA, QUIEN COMPARECE EN SU CARÁCTER DE APODERADO LEGAL, ENTREGA AL C. <strong><t t-esc="doc.name.upper()"/></strong>, MEDIANTE TRANSFERENCIA QUE EN COPIA SE ANEXA AL PRESENTE Y QUE FORMA PARTE INTEGRANTE DE ESTE CONVENIO, LA CANTIDAD DE <strong>$0,000.000 (CERO CERO CERO CERO PESOS 00/100 M.N.)</strong> COMO FINIQUITO DE TODAS Y CADA UNA DE LAS PRESTACIONES A QUE TUVO DERECHO EL C. <strong><t t-esc="doc.name.upper()"/></strong>, DURANTE LA RELACIÓN LABORAL QUE SE DA POR TERMINADA EL DÍA <strong><t t-esc="datetime.date.today().strftime('%d-%B-%Y').upper()"/></strong>.
+                                        <strong>SEXTA.</strong> DECLARAN, LA EMPRESA <strong><t t-esc="doc.company_id.name.upper()"/></strong>, Y EL C. <strong><t t-esc="doc.name.upper()"/></strong>, COMO CONSECUENCIA DE LA TERMINACIÓN DEL CONTRATO INDIVIDUAL DE TRABAJO MENCIONADO EN EL CAPITULO DE ANTECEDENTES DEL PRESENTE CONVENIO, LA EMPRESA <strong><t t-esc="doc.company_id.name.upper()"/></strong> POR CONDUCTO DEL LIC. EDWIN GONZALEZ SORIA, QUIEN COMPARECE EN SU CARÁCTER DE APODERADO LEGAL, ENTREGA AL C. <strong><t t-esc="doc.name.upper()"/></strong>, MEDIANTE TRANSFERENCIA QUE EN COPIA SE ANEXA AL PRESENTE Y QUE FORMA PARTE INTEGRANTE DE ESTE CONVENIO, LA CANTIDAD DE <strong>$0,000.000 (CERO CERO CERO CERO PESOS 00/100 M.N.)</strong> COMO FINIQUITO DE TODAS Y CADA UNA DE LAS PRESTACIONES A QUE TUVO DERECHO EL C. <strong><t t-esc="doc.name.upper()"/></strong>, DURANTE LA RELACIÓN LABORAL QUE SE DA POR TERMINADA EL DÍA <strong><t t-esc="doc.get_formatted_today_date()"/></strong>.
                                     </p>
                                 </div>
                             </div>
@@ -176,7 +183,7 @@
                             <div class="row mt-2">
                                 <div class="col-12 text-justify">
                                     <p style="text-align: justify;">
-                                        EN EL ENTENDIDO DE QUE CON ESA CANTIDAD SE LE CUBREN TOTALMENTE LAS PRESTACIONES QUE LE CORRESPONDIERON HASTA LA JORNADA NORMAL DE LABORES QUE LE CORRESPONDIÓ HASTA EL <strong><t t-esc="datetime.date.today().strftime('%d-%B-%Y').upper()"/></strong> DE ACUERDO CON SU CONTRATO INDIVIDUAL DE TRABAJO Y LA LEY FEDERAL DEL TRABAJO.
+                                        EN EL ENTENDIDO DE QUE CON ESA CANTIDAD SE LE CUBREN TOTALMENTE LAS PRESTACIONES QUE LE CORRESPONDIERON HASTA LA JORNADA NORMAL DE LABORES QUE LE CORRESPONDIÓ HASTA EL <strong><t t-esc="doc.get_formatted_today_date()"/></strong> DE ACUERDO CON SU CONTRATO INDIVIDUAL DE TRABAJO Y LA LEY FEDERAL DEL TRABAJO.
                                     </p>
                                 </div>
                             </div>
@@ -225,7 +232,7 @@
                             <div class="row mt-2">
                                 <div class="col-12 text-justify">
                                     <p style="text-align: justify;">
-                                        LEÍDO QUE FUE EN SU TOTALIDAD EL CONTENIDO DEL PRESENTE DOCUMENTO POR LA EMPRESA <strong><t t-esc="doc.company_id.name.upper()"/></strong>EN SU CALIDAD DE PATRON Y RESPONSABLE DE LA RELACION DE TRABAJO, EL C.<strong><t t-esc="doc.name.upper()"/></strong>, EN SU CALIDAD DE TRABAJADOR, Y LAS C. JESSICA CARINA CALLEJAS VAZQUEZ Y CLAUDIA PEREZ LOPEZ EN SU CALIDAD DE TESTIGOS, LO FIRMAN Y RATIFICAN POR CONTENER EXACTAMENTE LOS TÉRMINOS EN QUE DESEAN OBLIGARSE, EN EL MUNICIPIO DE TLALNEPANTLA DE BAZ, ESTADO DE MEXICO A <t t-esc="datetime.date.today().strftime('%d-%B-%Y').upper()"/>.
+                                        LEÍDO QUE FUE EN SU TOTALIDAD EL CONTENIDO DEL PRESENTE DOCUMENTO POR LA EMPRESA <strong><t t-esc="doc.company_id.name.upper()"/></strong>EN SU CALIDAD DE PATRON Y RESPONSABLE DE LA RELACION DE TRABAJO, EL C.<strong><t t-esc="doc.name.upper()"/></strong>, EN SU CALIDAD DE TRABAJADOR, Y LAS C. JESSICA CARINA CALLEJAS VAZQUEZ Y CLAUDIA PEREZ LOPEZ EN SU CALIDAD DE TESTIGOS, LO FIRMAN Y RATIFICAN POR CONTENER EXACTAMENTE LOS TÉRMINOS EN QUE DESEAN OBLIGARSE, EN EL MUNICIPIO DE TLALNEPANTLA DE BAZ, ESTADO DE MEXICO A <t t-esc="doc.get_formatted_today_date()"/>.
                                     </p>
                                 </div>
                             </div>
