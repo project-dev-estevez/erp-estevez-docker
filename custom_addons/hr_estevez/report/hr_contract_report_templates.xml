@@ -857,9 +857,9 @@
                                 </div>
                             </div>
 
-                            <div class="row mt-2">
+                            <div class="row mt-2" style="page-break-before: always;">
                                 <div class="col-12">
-                                    <div class="text-right" style="text-align: right;">
+                                    <div class="text-right" style="text-align: right; margin-top: 50px;">
                                         <strong class="font-weight-bold text-right">15 DE ABRIL DE 2025</strong>
                                     </div>
                                 </div>
