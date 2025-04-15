@@ -88,6 +88,7 @@
             <field name="arch" type="xml">
                 <list string="Requisiciones">
                     <field name="create_date" string="Fecha de creación"/>
+                    <field name="contractor_id" string="Contratista"/>
                     <field name="display_receiver" string="Recibe"/>
                     <field name="project_id" string="Proyecto"/>
                     <!-- Mantén tus botones como estaban -->
