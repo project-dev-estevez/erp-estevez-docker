@@ -66,6 +66,20 @@ class StockRequisition(models.Model):
         help="Comentarios adicionales para el solicitante"
     )
 
+    display_receiver = fields.Char(
+        string="Recibe",
+        compute='_compute_display_receiver',
+        store=True
+    )
+
+    @api.depends('personal_type', 'employee_id', 'personal_contract_id')
+    def _compute_display_receiver(self):
+        for rec in self:
+            if rec.personal_type == 'internal':
+                rec.display_receiver = rec.employee_id.name or ''
+            else:
+                rec.display_receiver = rec.personal_contract_id.name or ''
+
 
 # Acciones de estado
     def action_approve(self):
