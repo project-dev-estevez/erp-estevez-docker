@@ -305,7 +305,7 @@
                                 </div>
                             </div>
                             
-                            <div class="row mt-2">
+                            <div class="row mt-5">
                                 <div class="col-12 text-justify">
                                     <p style="text-align: justify;">
                                         <span>PARA EL CASO QUE EN EL NUEVO LUGAR DE PRESTACIÓN DE SERVICIOS QUE LE FUERA ASIGNADO SE MODIFICARA EL HORARIO DE LABORES, "EL TRABAJADOR" ACEPTA ALLANARSE A DICHA MODALIDAD, SIEMPRE Y CUANDO SEA CONFORME LO QUE ESTABLECE “LA LEY”.</span>
@@ -601,7 +601,7 @@
                                 </div>
                             </div>
 
-                            <div class="row mt-5">
+                            <div class="row mt-2">
                                 <div class="col-12 text-justify">
                                     <p style="text-align: justify;">
                                         <strong>VIGESIMA SEPTIMA.</strong><span>“EN CUMPLIMIENTO A LO SEÑALADO POR LOS ARTÍCULOS 501 Y 25, AMBOS DE LA LEY, EN ESTE ACTO MANIFIESTO QUE SEÑALO COMO MI LEGITIMO BENEFICIARIO DE TODOS LOS BIENES, PRESTACIONES LEGALES, EXTRALEGALES, SALARIOS DEVENGADOS, INDEMNIZACIONES Y/O CUALQUIER OTRO CONCEPTO A QUE TENGA DERECHO O QUE HAYA GENERADO Y QUE POR LEY ME CORRESPONDA A : ___________________________________________ , PERSONA QUE EN MI AUSENCIA POR ALGUNA DE LAS CAUSAS PREVISTAS EN LOS PRECEPTOS SEÑALADOS, TIENE EL DERECHO DE RECLAMAR Y QUE SE LE PAGUEN LOS CONCEPTOS MENCIONADOS QUE POR LEY ME CORRESPONDAN, PERSONA QUE DEPENDE ECONÓMICAMENTE DE MÍ YA QUE YO ME ENCARGO DE SUFRAGAR TODOS LOS GASTOS QUE SE TIENEN EN LA CASA QUE HABITAMOS DE MANERA COMÚN, LO ANTERIOR PARA TODOS LOS EFECTOS LEGALES A QUE HAYA LUGAR.</span>
@@ -673,7 +673,7 @@
                                 </div>
                             </div>
 
-                            <div class="row mt-5">
+                            <div class="row mt-2">
                                 <div class="col-12 text-justify">
                                     <p style="text-align: justify;">
                                         <strong>TRIGESIMA SEXTA.</strong><span> EL PATRON MANIFIESTA TENER IMPLEMENTADAS LAS DISPOSICIONES PREVISTAS POR LA NOM-035-STPS-2018, FACTORES DE RIESGO PSICOSOCIAL EN EL TRABAJO-IDENTIFICACIÓN, ANÁLISIS Y PREVENCIÓN Y LA NOM-036-1-STPS-2018, FACTORES DE RIESGO ERGONÓMICO EN EL TRABAJO-IDENTIFICACIÓN, ANÁLISIS, PREVENCIÓN Y CONTROL, LOS CUALES DEBE OBSERVAR EL TRABAJADOR EN LA EJECUCION DE SUS LABORES.</span>
@@ -743,7 +743,7 @@
                                     <p><strong>“EL TRABAJADOR”</strong></p>
                                     <br/><br/><br/>
                                     <p>______________________________________________</p>
-                                    <p class="mb-1"><strong class="text-danger"><t t-esc="doc.employee_id.name.upper()" /></strong></p>
+                                    <p class="mb-1"><strong><t t-esc="doc.employee_id.name.upper()" /></strong></p>
                                 </div>
                             </div>
 
