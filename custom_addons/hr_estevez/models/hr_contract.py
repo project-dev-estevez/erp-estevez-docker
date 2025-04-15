@@ -1,5 +1,5 @@
 from odoo import api, models, fields, exceptions, _
-from datetime import date
+from datetime import date, datetime
 
 class HrContract(models.Model):
     _inherit = 'hr.contract'
@@ -137,3 +137,13 @@ class HrContract(models.Model):
     def action_cancel_contract(self):
         for contract in self:
             contract.state = 'cancel'
+
+    def get_current_month_in_spanish(self):
+        """Returns the current month in Spanish."""
+        months = {
+            'January': 'Enero', 'February': 'Febrero', 'March': 'Marzo', 'April': 'Abril',
+            'May': 'Mayo', 'June': 'Junio', 'July': 'Julio', 'August': 'Agosto',
+            'September': 'Septiembre', 'October': 'Octubre', 'November': 'Noviembre', 'December': 'Diciembre'
+        }
+        current_month = datetime.now().strftime('%B')
+        return months.get(current_month, current_month)

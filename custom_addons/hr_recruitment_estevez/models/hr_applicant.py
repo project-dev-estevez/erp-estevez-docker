@@ -136,7 +136,46 @@ class HrApplicant(models.Model):
     ], string="Estado de Aptitud", default='apto')
 
     documents_count = fields.Integer(
-        'Documents Count', compute="_compute_applicant_documents")
+        'Documents Count', 
+        compute="_compute_applicant_documents"
+    )
+    
+    user_id = fields.Many2one(
+        'res.users',
+        string="Reclutador",
+        default=lambda self: self.env.user,  # Asigna el usuario logueado por defecto
+    )
+
+    @api.depends('job_id')
+    def _compute_user(self):
+        """Override to prevent automatic assignment of user_id based on job_id."""
+        for applicant in self:
+            if not applicant.user_id:  # Solo asignar si no hay un reclutador definido
+                applicant.user_id = self.env.user
+
+    def action_print_survey(self):
+        """ Always allow viewing the most recent survey response, regardless of its state """
+        self.ensure_one()
+        sorted_interviews = self.response_ids\
+            .filtered(lambda i: i.survey_id == self.survey_id)\
+            .sorted(lambda i: i.create_date, reverse=True)
+        
+        if not sorted_interviews:
+            # If no responses exist, show the survey form
+            action = self.survey_id.action_print_survey()
+            action['target'] = 'new'
+            return action
+
+        # Always show the most recent response, regardless of its state
+        action = self.survey_id.action_print_survey(answer=sorted_interviews[0])
+        action['target'] = 'new'
+        return action
+
+    @api.model
+    def create(self, vals):
+        if 'user_id' not in vals or not vals['user_id']:
+            vals['user_id'] = self.env.user.id  # Asigna el usuario logueado por defecto
+        return super(HrApplicant, self).create(vals)
     
     # Computed fields
     @api.depends('weight', 'height')
@@ -278,8 +317,16 @@ class HrApplicant(models.Model):
             _logger.info(f"Applicant {applicant.id} blocked and notified")
 
     def write(self, vals):
+        # Validar si el postulante está bloqueado
         if 'stage_id' in vals and any(applicant.kanban_state == 'blocked' for applicant in self):
             raise UserError(_("El postulante está bloqueado y no puede avanzar en el proceso hasta que el bloqueo sea resuelto o eliminado manualmente por un usuario autorizado."))
+
+        # Preservar el reclutador (user_id) si no está en los valores
+        if 'user_id' not in vals:
+            for record in self:
+                if record.user_id:
+                    vals['user_id'] = record.user_id.id
+
         return super(HrApplicant, self).write(vals)
 
     @api.depends('stage_id.name')

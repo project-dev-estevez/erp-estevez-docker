@@ -1,6 +1,6 @@
 from odoo import api, models, fields, _
 from odoo.exceptions import UserError
-from datetime import date, timedelta
+from datetime import date, timedelta, datetime
 import re
 
 class HrEmployee(models.Model):
@@ -365,46 +365,24 @@ class HrEmployee(models.Model):
             'context': {'default_res_model': 'hr.employee', 'default_res_id': self.id, 'create': True, 'edit': True},
         }
 
-        """Combina los documentos seleccionados en un solo PDF y lo descarga."""
-        self.ensure_one()
-        attachments = self.env['ir.attachment'].search([
-            ('res_model', '=', 'hr.employee'),
-            ('res_id', '=', self.id),
-            ('id', 'in', self.env.context.get('active_ids', []))
-        ])
-
-        if not attachments:
-            raise UserError(_("No se seleccionaron documentos para combinar."))
-
-        merger = PdfMerger()
-        for attachment in attachments:
-            if attachment.mimetype != 'application/pdf':
-                raise UserError(_("El archivo '%s' no es un PDF.") % attachment.name)
-            pdf_data = base64.b64decode(attachment.datas)
-            merger.append(io.BytesIO(pdf_data))
-
-        # Crear el PDF combinado en memoria
-        combined_pdf = io.BytesIO()
-        merger.write(combined_pdf)
-        merger.close()
-        combined_pdf.seek(0)
-
-        # Codificar el PDF combinado en base64 para la descarga
-        combined_pdf_base64 = base64.b64encode(combined_pdf.read())
-        combined_pdf_name = f"Documentos_{self.name.replace(' ', '_')}.pdf"
-
-        # Crear un registro de adjunto temporal para la descarga
-        attachment = self.env['ir.attachment'].create({
-            'name': combined_pdf_name,
-            'type': 'binary',
-            'datas': combined_pdf_base64,
-            'res_model': 'hr.employee',
-            'res_id': self.id,
-            'mimetype': 'application/pdf',
-        })
-
-        return {
-            'type': 'ir.actions.act_url',
-            'url': f'/web/content/{attachment.id}?download=true',
-            'target': 'self',
-        }
+    def get_formatted_date_of_entry(self):
+        """Returns the earliest date_of_entry formatted in Spanish."""
+        for employee in self:
+            contracts = employee.contract_ids.filtered(lambda c: c.date_of_entry)
+            if contracts:
+                earliest_date = min(contracts.mapped('date_of_entry'))
+                return earliest_date.strftime('%d-%B-%Y').upper().replace(
+                    'JANUARY', 'ENERO').replace('FEBRUARY', 'FEBRERO').replace('MARCH', 'MARZO').replace(
+                    'APRIL', 'ABRIL').replace('MAY', 'MAYO').replace('JUNE', 'JUNIO').replace(
+                    'JULY', 'JULIO').replace('AUGUST', 'AGOSTO').replace('SEPTEMBER', 'SEPTIEMBRE').replace(
+                    'OCTOBER', 'OCTUBRE').replace('NOVEMBER', 'NOVIEMBRE').replace('DECEMBER', 'DICIEMBRE')
+            return 'N/A'
+        
+    def get_formatted_today_date(self):
+        """Returns today's date formatted in Spanish."""
+        today = datetime.today()
+        return today.strftime('%d de %B de %Y').upper().replace(
+            'JANUARY', 'ENERO').replace('FEBRUARY', 'FEBRERO').replace('MARCH', 'MARZO').replace(
+            'APRIL', 'ABRIL').replace('MAY', 'MAYO').replace('JUNE', 'JUNIO').replace(
+            'JULY', 'JULIO').replace('AUGUST', 'AGOSTO').replace('SEPTEMBER', 'SEPTIEMBRE').replace(
+            'OCTOBER', 'OCTUBRE').replace('NOVEMBER', 'NOVIEMBRE').replace('DECEMBER', 'DICIEMBRE')

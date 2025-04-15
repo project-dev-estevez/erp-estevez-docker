@@ -159,7 +159,7 @@
                                     <p style="text-align: justify;">
                                         <span>SEXTA.</span> - Que una vez requisitada la solicitud de mérito el trabajador queda adherido al citado “Plan Integral de Previsión Social y Compensaciones”, y el presente instrumento es un “Addendum” al contrato individual de trabajo que tienen celebrado con el “Patrón”.
                                         Leído que fue en su totalidad el presente Addendum por las “Partes”, y bien enteradas de su contenido, lo firman al margen y al calce como constancia legal de lo actuado y por duplicado en el Estado de México,
-                                        el día <t t-esc="datetime.datetime.now().day"/> del mes de <t t-esc="datetime.datetime.now().strftime('%B').upper()"/> del año <t t-esc="datetime.datetime.now().year"/> 
+                                        el día <t t-esc="datetime.datetime.now().day"/> del mes de <t t-esc="doc.get_current_month_in_spanish()"/> del año <t t-esc="datetime.datetime.now().year"/> 
                                         por no contener cláusula alguna que atente contra el derecho, la moral o las buenas costumbres.
                                     </p>
                                 </div>
