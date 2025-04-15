@@ -120,7 +120,7 @@
                                             <tr>
                                                 <th class="text-left"><strong>NACIONALIDAD</strong></th>
                                                 <td class="text-left">
-                                                    <t t-esc="doc.employee_id.country_id.name.upper()"/>
+                                                    <!-- <t t-esc="doc.employee_id.country_id.name.upper()"/> -->
                                                 </td>
                                             </tr>
                                             <tr>
@@ -225,7 +225,7 @@
                                 </div>
                             </div>
 
-                            <div class="row mt-2">
+                            <div class="row mt-5">
                                 <div class="col-12 text-justify">
                                     <p style="text-align: justify;">
                                         <strong>SEGUNDA.</strong><span>EL PRESENTE CONTRATO REGIRÁ EN TODO TIEMPO Y LUGAR LO NO ESTIPULADO EN EL MISMO POR EL “REGLAMENTO” Y POR LO ESTABLECIDO EN “LA LEY”.</span>
@@ -388,7 +388,7 @@
                             <div class="row mt-2">
                                 <div class="col-12 text-justify">
                                     <p style="text-align: justify;">
-                                        <span>DE ACUERDO A LO DISPUESTO POR EL ARTÍCULO 74 DE LA LEY FEDERAL DEL TRABAJO, SERÁN DÍAS DE DESCANSO OBLIGATORIO: EL 1 DE ENERO, EL PRIMER LUNES DE FEBRERO EN CONMEMORACIÓN DEL DIA DE PROMULGACIÓN DE LA CONSTITUCIÓN MEXICANA, EL TERCER LUNES DEL MES DE MARZO EN CONMEMORACIÓN </span>
+                                        <span>DE ACUERDO A LO DISPUESTO POR EL ARTÍCULO 74 DE LA LEY FEDERAL DEL TRABAJO, SERÁN DÍAS DE DESCANSO OBLIGATORIO: EL 1 DE ENERO, EL PRIMER LUNES DE FEBRERO EN CONMEMORACIÓN DEL DIA DE PROMULGACIÓN DE LA CONSTITUCIÓN MEXICANA, EL TERCER LUNES DEL MES DE MARZO EN CONMEMORACIÓN DEL NATALICIO DE BENITO JUAREZ, 1 DE MAYO, 16 DE SEPTIEMBRE, EL TERCER LUNES DEL MES DE NOVIEMBRE EN CONMEMORACIÓN DEL ANIVERSARIO DE LA REVOLUCION MEXICANA Y EL 1 DE DICIEMBRE DE CADA 6 AÑOS CUANDO CORRESPONDA A LA TRANSMISIÓN DEL PODER EJECUTIVO FEDERAL, EL 25 DE DICIEMBRE, EN LOS QUE SE OTORGARÁ DESCANSO A “EL TRABAJADOR” CON GOCE DE SUELDO. </span>
                                     </p>
                                 </div>
                             </div>
@@ -396,7 +396,7 @@
                             <div class="row mt-2">
                                 <div class="col-12 text-justify">
                                     <p style="text-align: justify;">
-                                        <span>DEL NATALICIO DE BENITO JUAREZ, 1 DE MAYO, 16 DE SEPTIEMBRE, EL TERCER LUNES DEL MES DE NOVIEMBRE EN CONMEMORACIÓN DEL ANIVERSARIO DE LA REVOLUCION MEXICANA Y EL 1 DE DICIEMBRE DE CADA 6 AÑOS CUANDO CORRESPONDA A LA TRANSMISIÓN DEL PODER EJECUTIVO FEDERAL, EL 25 DE DICIEMBRE, EN LOS QUE SE OTORGARÁ DESCANSO A “EL TRABAJADOR” CON GOCE DE SUELDO.</span>
+                                        <span></span>
                                     </p>
                                 </div>
                             </div>
@@ -409,7 +409,7 @@
                                 </div>
                             </div>
 
-                            <div class="row">
+                            <div class="row mt-2">
                                 <div class="col-12 text-justify">
                                     <p style="text-align: justify;">
                                         <strong>DECIMA SEGUNDA.</strong><span>CUANDO "EL TRABAJADOR" POR RAZONES ADMINISTRATIVAS TENGA QUE LABORAR EL DÍA DOMINGO, "EL PATRÓN" LE PAGARÁ, ADEMÁS DE SU SALARIO, 25% (VEINTICINCO POR CIENTO) COMO PRIMA DOMINICAL SOBRE EL SALARIO ORDINARIO DEVENGADO. INDEPENDIENTEMENTE DEL DÍA DE DESCANSO SEMANAL, AL QUE TENDRÁ DERECHO.</span>
@@ -417,7 +417,7 @@
                                 </div>
                             </div>
 
-                            <div class="row mt-5">
+                            <div class="row mt-2">
                                 <div class="col-12 text-justify">
                                     <p style="text-align: justify;">
                                         <strong>DÉCIMA TERCERA.</strong><span> "EL TRABAJADOR" TENDRÁ DERECHO A DISFRUTAR DE UN PERIODO ANUAL DE VACACIONES SEGÚN LO ESTABLECIDO EN EL ARTÍCULO 76 DE "LA LEY", TOMANDO EN CONSIDERACIÓN LA ANTIGÜEDAD DE “EL TRABAJADOR”, ASÍ COMO A DISFRUTAR DEL SALARIO EN DICHO PERIODO. DE IGUAL MODO RECIBIRÁ LA PRIMA VACACIONAL RESPECTIVA, EQUIVALENTE AL 25% DEL IMPORTE PAGADO POR CONCEPTO DE VACACIONES, LA CUAL LE SERA ENTREGADA QUINCE DIAS ANTES DE QUE COMIENZE SU PERIODO VACACIONAL.</span>
@@ -673,7 +673,7 @@
                                 </div>
                             </div>
 
-                            <div class="row mt-2">
+                            <div class="row mt-5">
                                 <div class="col-12 text-justify">
                                     <p style="text-align: justify;">
                                         <strong>TRIGESIMA SEXTA.</strong><span> EL PATRON MANIFIESTA TENER IMPLEMENTADAS LAS DISPOSICIONES PREVISTAS POR LA NOM-035-STPS-2018, FACTORES DE RIESGO PSICOSOCIAL EN EL TRABAJO-IDENTIFICACIÓN, ANÁLISIS Y PREVENCIÓN Y LA NOM-036-1-STPS-2018, FACTORES DE RIESGO ERGONÓMICO EN EL TRABAJO-IDENTIFICACIÓN, ANÁLISIS, PREVENCIÓN Y CONTROL, LOS CUALES DEBE OBSERVAR EL TRABAJADOR EN LA EJECUCION DE SUS LABORES.</span>
@@ -780,14 +780,6 @@
                             <div class="row mt-2">
                                 <div class="col-12 text-justify">
                                     <p style="text-align: justify;">
-                                        <span>QUE SUS GENERALES SON LOS SIGUIENTES:</span>
-                                    </p>
-                                </div>
-                            </div>
-
-                            <div class="row mt-2">
-                                <div class="col-12 text-justify">
-                                    <p style="text-align: justify;">
                                         <span>QUEDA AUTORIZADO EL EMPLEADOR Y/O PATRÓN <strong class="text-decoration-underline"><t t-esc="doc.company_id.name.upper()"/>.</strong> PARA UTILIZAR LA PRESENTE DECLARACIÓN PARA TODOS LOS FINES LEGALES Y ADMINISTRATIVOS A QUE HAYA LUGAR.</span>
                                     </p>
                                 </div>
@@ -837,7 +829,7 @@
 
                             <div class="row mt-2">
                                 <div class="col-12 text-justify">
-                                    <P>El suscripto de la presente es trabajador de la empresa ESTEVEZ.JOR SERVICIOS, S.A. DE C.V., toda vez que tiene celebrado individual del trabajo por tiempo CERO DIAS con esa empresa, mismo contrato que a la fecha se encuentra vigente.</P>
+                                    <p style="text-align: justify;">El suscripto de la presente es trabajador de la empresa ESTEVEZ.JOR SERVICIOS, S.A. DE C.V., toda vez que tiene celebrado individual del trabajo por tiempo CERO DIAS con esa empresa, mismo contrato que a la fecha se encuentra vigente.</p>
                                 </div>
                             </div>
 
@@ -861,7 +853,7 @@
 
                             <div class="row mt-5">
                                 <div class="col-12 text-center">
-                                    <strong><t t-esc="doc.employee_id.name.upper()"/> :</strong>
+                                    <strong><t t-esc="doc.employee_id.name.upper()"/></strong>
                                 </div>
                             </div>
 
