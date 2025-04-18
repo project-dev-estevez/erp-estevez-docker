@@ -63,6 +63,12 @@
                             type="action"
                             class="oe_highlight"
                             icon="fa-file-pdf-o"/>
+
+                    <button name="action_download_employee_documents"
+                            string="Descargar Documentos"
+                            type="object"
+                            class="oe_highlight"
+                            icon="fa-download"/>
                 </xpath>
 
                 <!-- Eliminar el grupo managers de su ubicación actual -->

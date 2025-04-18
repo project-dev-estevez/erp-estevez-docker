@@ -365,6 +365,17 @@ class HrEmployee(models.Model):
             'context': {'default_res_model': 'hr.employee', 'default_res_id': self.id, 'create': True, 'edit': True},
         }
 
+    def action_download_employee_documents(self):
+        """Genera un único PDF con todos los documentos del empleado."""
+        self.ensure_one()  # Asegúrate de que solo se procese un empleado a la vez
+
+        # Redirigir al controlador para descargar el PDF
+        return {
+            'type': 'ir.actions.act_url',
+            'url': f'/download/employee/documents/{self.id}',
+            'target': 'self',
+        }
+
     def get_formatted_date_of_entry(self):
         """Returns the earliest date_of_entry formatted in Spanish."""
         for employee in self:
