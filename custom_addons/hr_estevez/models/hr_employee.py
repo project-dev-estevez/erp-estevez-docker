@@ -104,6 +104,13 @@ class HrEmployee(models.Model):
         'hr.vacation.period', 'employee_id', string="Periodos de Vacaciones"
     )
 
+    emergency_contact_relationship = fields.Char(string="Parentesco del Primer Contacto")
+    
+    # Campos para el segundo contacto de emergencia
+    emergency_contact_2 = fields.Char(string="Segundo Contacto")
+    emergency_contact_relationship_2 = fields.Char(string="Parentesco del Segundo Contacto")
+    emergency_phone_2 = fields.Char(string="Teléfono del Segundo Contacto")
+
     @api.depends('contract_ids.date_start', 'contract_ids.date_end', 'years_of_service')
     def generate_vacation_periods(self):
         for employee in self:
@@ -332,6 +339,16 @@ class HrEmployee(models.Model):
     def _onchange_private_phone(self):
         if self.private_phone:
             self.private_phone = self._format_phone_number(self.private_phone)
+
+    @api.onchange('emergency_phone')
+    def _onchange_emergency_phone(self):
+        if self.emergency_phone:
+            self.emergency_phone = self._format_phone_number(self.emergency_phone)
+
+    @api.onchange('emergency_phone_2')
+    def _onchange_emergency_phone_2(self):
+        if self.emergency_phone_2:
+            self.emergency_phone_2 = self._format_phone_number(self.emergency_phone_2)
 
     def action_open_whatsapp(self):
         for employee in self:
