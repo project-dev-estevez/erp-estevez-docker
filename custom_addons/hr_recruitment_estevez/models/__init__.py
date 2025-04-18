@@ -9,3 +9,4 @@ from . import hr_recruitment_degree
 from . import hr_applicant_document
 from . import ir_attachment
 from . import report
+from . import survey_survey

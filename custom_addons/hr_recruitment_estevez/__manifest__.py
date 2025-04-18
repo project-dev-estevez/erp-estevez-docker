@@ -9,7 +9,7 @@
     "website": "https://estevezjorinternacional.com",
     "category": "Human Resources",
     "version": "0.1",
-    "depends": ['base', 'hr', 'hr_estevez', 'hr_recruitment', 'utm'],
+    "depends": ['base', 'hr', 'hr_estevez', 'hr_recruitment', 'survey', 'hr_recruitment_survey', 'utm'],
     "data": [
         # Archivos de seguridad
         "security/hr_recruitment_security.xml",
