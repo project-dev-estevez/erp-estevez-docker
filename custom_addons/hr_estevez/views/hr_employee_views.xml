@@ -310,354 +310,57 @@
                 <!-- Nueva página de Asignaciones -->
                 <xpath expr="//notebook/page[@name='permits']" position="after">
                     <page name="assignments" string="Asignaciones">
-                        <div class="o_notebook">
-                            <!-- Tabs principales -->
-                            <ul class="nav nav-tabs" role="tablist">
-                                <li class="nav-item">
-                                    <a class="nav-link active" data-bs-toggle="tab" href="#tab_admin" role="tab">Administrativos</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" data-bs-toggle="tab" href="#tab_high_cost" role="tab">Alto Costo</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" data-bs-toggle="tab" href="#tab_cars" role="tab">Autos</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" data-bs-toggle="tab" href="#tab_ehs" role="tab">EHS</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" data-bs-toggle="tab" href="#tab_supplies" role="tab">Insumos</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" data-bs-toggle="tab" href="#tab_spare_parts" role="tab">Refacciones</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" data-bs-toggle="tab" href="#tab_systems" role="tab">Sistemas</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" data-bs-toggle="tab" href="#tab_medical" role="tab">Área Médica</a>
-                                </li>
-                            </ul>
+                        <notebook>
+                            <page name="administrativos" string="Administrativos">
+                                <notebook>
+                                    <page name="herramientas" string="herramientas">
+                                        
+                                    </page>
 
-                            <!-- Contenido de las tabs principales -->
-                            <div class="tab-content">
-                                <!-- Tab Administrativos -->
-                                <div class="tab-pane active" id="tab_admin" role="tabpanel">
-                                    <div class="accordion" id="accordionAdmin">
-                                        <div class="accordion-item">
-                                            <h2 class="accordion-header" id="headingToolAdmin">
-                                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseToolAdmin" aria-expanded="true" aria-controls="collapseToolAdmin">
-                                                    Herramienta
-                                                </button>
-                                            </h2>
-                                            <div id="collapseToolAdmin" class="accordion-collapse collapse show" aria-labelledby="headingToolAdmin" data-bs-parent="#accordionAdmin">
-                                                <div class="accordion-body">
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="accordion-item">
-                                            <h2 class="accordion-header" id="headingFixedAssetAdmin">
-                                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFixedAssetAdmin" aria-expanded="false" aria-controls="collapseFixedAssetAdmin">
-                                                    Activo Fijo
-                                                </button>
-                                            </h2>
-                                            <div id="collapseFixedAssetAdmin" class="accordion-collapse collapse" aria-labelledby="headingFixedAssetAdmin" data-bs-parent="#accordionAdmin">
-                                                <div class="accordion-body">
-                                                    
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="accordion-item">
-                                            <h2 class="accordion-header" id="headingConsumablesAdmin">
-                                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseConsumablesAdmin" aria-expanded="false" aria-controls="collapseConsumablesAdmin">
-                                                    Consumibles
-                                                </button>
-                                            </h2>
-                                            <div id="collapseConsumablesAdmin" class="accordion-collapse collapse" aria-labelledby="headingConsumablesAdmin" data-bs-parent="#accordionAdmin">
-                                                <div class="accordion-body">
-                                                    
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+                                    <page name="uniformes" string="Activo Fijo">
+                                    </page>
 
-                                <!-- Repite la estructura para las demás tabs (Alto Costo, Autos, etc.) -->
-                                <div class="tab-pane" id="tab_high_cost" role="tabpanel">
-                                    <div class="accordion" id="accordionAdmin">
-                                        <div class="accordion-item">
-                                            <h2 class="accordion-header" id="headingToolAdmin">
-                                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseToolAdmin" aria-expanded="true" aria-controls="collapseToolAdmin">
-                                                    Herramienta
-                                                </button>
-                                            </h2>
-                                            <div id="collapseToolAdmin" class="accordion-collapse collapse show" aria-labelledby="headingToolAdmin" data-bs-parent="#accordionAdmin">
-                                                <div class="accordion-body">
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="accordion-item">
-                                            <h2 class="accordion-header" id="headingFixedAssetAdmin">
-                                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFixedAssetAdmin" aria-expanded="false" aria-controls="collapseFixedAssetAdmin">
-                                                    Activo Fijo
-                                                </button>
-                                            </h2>
-                                            <div id="collapseFixedAssetAdmin" class="accordion-collapse collapse" aria-labelledby="headingFixedAssetAdmin" data-bs-parent="#accordionAdmin">
-                                                <div class="accordion-body">
-                                                    
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="accordion-item">
-                                            <h2 class="accordion-header" id="headingConsumablesAdmin">
-                                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseConsumablesAdmin" aria-expanded="false" aria-controls="collapseConsumablesAdmin">
-                                                    Consumibles
-                                                </button>
-                                            </h2>
-                                            <div id="collapseConsumablesAdmin" class="accordion-collapse collapse" aria-labelledby="headingConsumablesAdmin" data-bs-parent="#accordionAdmin">
-                                                <div class="accordion-body">
-                                                    
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="tab-pane" id="tab_cars" role="tabpanel">
-                                    <div class="accordion" id="accordionAdmin">
-                                        <div class="accordion-item">
-                                            <h2 class="accordion-header" id="headingToolAdmin">
-                                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseToolAdmin" aria-expanded="true" aria-controls="collapseToolAdmin">
-                                                    Herramienta
-                                                </button>
-                                            </h2>
-                                            <div id="collapseToolAdmin" class="accordion-collapse collapse show" aria-labelledby="headingToolAdmin" data-bs-parent="#accordionAdmin">
-                                                <div class="accordion-body">
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="accordion-item">
-                                            <h2 class="accordion-header" id="headingFixedAssetAdmin">
-                                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFixedAssetAdmin" aria-expanded="false" aria-controls="collapseFixedAssetAdmin">
-                                                    Activo Fijo
-                                                </button>
-                                            </h2>
-                                            <div id="collapseFixedAssetAdmin" class="accordion-collapse collapse" aria-labelledby="headingFixedAssetAdmin" data-bs-parent="#accordionAdmin">
-                                                <div class="accordion-body">
-                                                    
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="accordion-item">
-                                            <h2 class="accordion-header" id="headingConsumablesAdmin">
-                                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseConsumablesAdmin" aria-expanded="false" aria-controls="collapseConsumablesAdmin">
-                                                    Consumibles
-                                                </button>
-                                            </h2>
-                                            <div id="collapseConsumablesAdmin" class="accordion-collapse collapse" aria-labelledby="headingConsumablesAdmin" data-bs-parent="#accordionAdmin">
-                                                <div class="accordion-body">
-                                                    
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="tab-pane" id="tab_ehs" role="tabpanel">
-                                    <div class="accordion" id="accordionAdmin">
-                                        <div class="accordion-item">
-                                            <h2 class="accordion-header" id="headingToolAdmin">
-                                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseToolAdmin" aria-expanded="true" aria-controls="collapseToolAdmin">
-                                                    Herramienta
-                                                </button>
-                                            </h2>
-                                            <div id="collapseToolAdmin" class="accordion-collapse collapse show" aria-labelledby="headingToolAdmin" data-bs-parent="#accordionAdmin">
-                                                <div class="accordion-body">
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="accordion-item">
-                                            <h2 class="accordion-header" id="headingFixedAssetAdmin">
-                                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFixedAssetAdmin" aria-expanded="false" aria-controls="collapseFixedAssetAdmin">
-                                                    Activo Fijo
-                                                </button>
-                                            </h2>
-                                            <div id="collapseFixedAssetAdmin" class="accordion-collapse collapse" aria-labelledby="headingFixedAssetAdmin" data-bs-parent="#accordionAdmin">
-                                                <div class="accordion-body">
-                                                    
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="accordion-item">
-                                            <h2 class="accordion-header" id="headingConsumablesAdmin">
-                                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseConsumablesAdmin" aria-expanded="false" aria-controls="collapseConsumablesAdmin">
-                                                    Consumibles
-                                                </button>
-                                            </h2>
-                                            <div id="collapseConsumablesAdmin" class="accordion-collapse collapse" aria-labelledby="headingConsumablesAdmin" data-bs-parent="#accordionAdmin">
-                                                <div class="accordion-body">
-                                                    
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="tab-pane" id="tab_supplies" role="tabpanel">
-                                    <div class="accordion" id="accordionAdmin">
-                                        <div class="accordion-item">
-                                            <h2 class="accordion-header" id="headingToolAdmin">
-                                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseToolAdmin" aria-expanded="true" aria-controls="collapseToolAdmin">
-                                                    Herramienta
-                                                </button>
-                                            </h2>
-                                            <div id="collapseToolAdmin" class="accordion-collapse collapse show" aria-labelledby="headingToolAdmin" data-bs-parent="#accordionAdmin">
-                                                <div class="accordion-body">
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="accordion-item">
-                                            <h2 class="accordion-header" id="headingFixedAssetAdmin">
-                                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFixedAssetAdmin" aria-expanded="false" aria-controls="collapseFixedAssetAdmin">
-                                                    Activo Fijo
-                                                </button>
-                                            </h2>
-                                            <div id="collapseFixedAssetAdmin" class="accordion-collapse collapse" aria-labelledby="headingFixedAssetAdmin" data-bs-parent="#accordionAdmin">
-                                                <div class="accordion-body">
-                                                    
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="accordion-item">
-                                            <h2 class="accordion-header" id="headingConsumablesAdmin">
-                                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseConsumablesAdmin" aria-expanded="false" aria-controls="collapseConsumablesAdmin">
-                                                    Consumibles
-                                                </button>
-                                            </h2>
-                                            <div id="collapseConsumablesAdmin" class="accordion-collapse collapse" aria-labelledby="headingConsumablesAdmin" data-bs-parent="#accordionAdmin">
-                                                <div class="accordion-body">
-                                                    
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="tab-pane" id="tab_spare_parts" role="tabpanel">
-                                    <div class="accordion" id="accordionAdmin">
-                                        <div class="accordion-item">
-                                            <h2 class="accordion-header" id="headingToolAdmin">
-                                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseToolAdmin" aria-expanded="true" aria-controls="collapseToolAdmin">
-                                                    Herramienta
-                                                </button>
-                                            </h2>
-                                            <div id="collapseToolAdmin" class="accordion-collapse collapse show" aria-labelledby="headingToolAdmin" data-bs-parent="#accordionAdmin">
-                                                <div class="accordion-body">
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="accordion-item">
-                                            <h2 class="accordion-header" id="headingFixedAssetAdmin">
-                                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFixedAssetAdmin" aria-expanded="false" aria-controls="collapseFixedAssetAdmin">
-                                                    Activo Fijo
-                                                </button>
-                                            </h2>
-                                            <div id="collapseFixedAssetAdmin" class="accordion-collapse collapse" aria-labelledby="headingFixedAssetAdmin" data-bs-parent="#accordionAdmin">
-                                                <div class="accordion-body">
-                                                    
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="accordion-item">
-                                            <h2 class="accordion-header" id="headingConsumablesAdmin">
-                                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseConsumablesAdmin" aria-expanded="false" aria-controls="collapseConsumablesAdmin">
-                                                    Consumibles
-                                                </button>
-                                            </h2>
-                                            <div id="collapseConsumablesAdmin" class="accordion-collapse collapse" aria-labelledby="headingConsumablesAdmin" data-bs-parent="#accordionAdmin">
-                                                <div class="accordion-body">
-                                                    
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="tab-pane" id="tab_systems" role="tabpanel">
-                                    <div class="accordion" id="accordionAdmin">
-                                        <div class="accordion-item">
-                                            <h2 class="accordion-header" id="headingToolAdmin">
-                                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseToolAdmin" aria-expanded="true" aria-controls="collapseToolAdmin">
-                                                    Herramienta
-                                                </button>
-                                            </h2>
-                                            <div id="collapseToolAdmin" class="accordion-collapse collapse show" aria-labelledby="headingToolAdmin" data-bs-parent="#accordionAdmin">
-                                                <div class="accordion-body">
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="accordion-item">
-                                            <h2 class="accordion-header" id="headingFixedAssetAdmin">
-                                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFixedAssetAdmin" aria-expanded="false" aria-controls="collapseFixedAssetAdmin">
-                                                    Activo Fijo
-                                                </button>
-                                            </h2>
-                                            <div id="collapseFixedAssetAdmin" class="accordion-collapse collapse" aria-labelledby="headingFixedAssetAdmin" data-bs-parent="#accordionAdmin">
-                                                <div class="accordion-body">
-                                                    
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="accordion-item">
-                                            <h2 class="accordion-header" id="headingConsumablesAdmin">
-                                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseConsumablesAdmin" aria-expanded="false" aria-controls="collapseConsumablesAdmin">
-                                                    Consumibles
-                                                </button>
-                                            </h2>
-                                            <div id="collapseConsumablesAdmin" class="accordion-collapse collapse" aria-labelledby="headingConsumablesAdmin" data-bs-parent="#accordionAdmin">
-                                                <div class="accordion-body">
-                                                    
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="tab-pane" id="tab_medical" role="tabpanel">
-                                    <div class="accordion" id="accordionAdmin">
-                                        <div class="accordion-item">
-                                            <h2 class="accordion-header" id="headingToolAdmin">
-                                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseToolAdmin" aria-expanded="true" aria-controls="collapseToolAdmin">
-                                                    Herramienta
-                                                </button>
-                                            </h2>
-                                            <div id="collapseToolAdmin" class="accordion-collapse collapse show" aria-labelledby="headingToolAdmin" data-bs-parent="#accordionAdmin">
-                                                <div class="accordion-body">
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="accordion-item">
-                                            <h2 class="accordion-header" id="headingFixedAssetAdmin">
-                                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFixedAssetAdmin" aria-expanded="false" aria-controls="collapseFixedAssetAdmin">
-                                                    Activo Fijo
-                                                </button>
-                                            </h2>
-                                            <div id="collapseFixedAssetAdmin" class="accordion-collapse collapse" aria-labelledby="headingFixedAssetAdmin" data-bs-parent="#accordionAdmin">
-                                                <div class="accordion-body">
-                                                    
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="accordion-item">
-                                            <h2 class="accordion-header" id="headingConsumablesAdmin">
-                                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseConsumablesAdmin" aria-expanded="false" aria-controls="collapseConsumablesAdmin">
-                                                    Consumibles
-                                                </button>
-                                            </h2>
-                                            <div id="collapseConsumablesAdmin" class="accordion-collapse collapse" aria-labelledby="headingConsumablesAdmin" data-bs-parent="#accordionAdmin">
-                                                <div class="accordion-body">
-                                                    
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                                    <page name="celulares" string="Consumibles">
+
+                                    </page>    
+
+                                </notebook>
+
+                            </page>
+                            <page name="alto_costo" string="Alto Costo">
+                                <notebook>
+                                    <page name="herramientas" string="herramientas">
+                                        
+                                    </page>
+
+                                    <page name="uniformes" string="Activo Fijo">
+                                    </page>
+                                    
+                                    <page name="celulares" string="Consumibles">
+
+                                    </page>    
+
+                                </notebook>
+                            </page>
+                            <page name="autos" string="Autos">
+                                
+                            </page>
+                            <page name="ehs" string="EHS">
+                                
+                            </page>
+                            <page name="insumos" string="Insumos">
+                                
+                            </page>
+                            <page name="refacciones" string="Refacciones">
+                                
+                            </page>
+                            <page name="sistemas" string="Sistemas">
+                                
+                            </page>
+                            <page name="area_medica" string="Área Médica">
+                                
+                            </page>
+                        </notebook>
                     </page>
                 </xpath>
 
