@@ -2,10 +2,11 @@
     'name': 'Stock Estevez',
     'version': '1.0',
     'summary': 'Modulo stock de Estevez',
-    'depends': ['stock', 'base', 'hr'],
+    'depends': ['base', 'stock', 'product', 'uom', 'hr', 'mail'],
     'author': 'Estevez.Jor',
     'category': 'Inventory',
     'data': [
+        'data/mail_templates.xml',
         'security/ir.model.access.csv',
         'views/stock_warehouse_requisition_views.xml',
         'views/stock_menu.xml'

@@ -9,12 +9,14 @@ _logger = logging.getLogger(__name__)
 class StockRequisition(models.Model):
     _name = 'stock.requisition'
     _description = 'Stock Requisition'
+    _inherit = ['mail.thread', 'mail.activity.mixin']
 
     state = fields.Selection([
         ('to_approve', 'Por Aprobar'),
         ('first_approval', 'En Curso'),
         ('rejected', 'Rechazado'),
         ('approved', 'Aprobado'),
+        ('done', 'Entregado')
     ], string="Estado", default='to_approve')
 
     # Información del solicitante
@@ -22,7 +24,15 @@ class StockRequisition(models.Model):
     company_id = fields.Many2one('res.company', string="Empresa", related='requestor_id.company_id', readonly=True, store=False)
     department_id = fields.Many2one('hr.department', string="Departamento", related='requestor_id.employee_id.department_id', readonly=True, store=False)
     job_id = fields.Many2one('hr.job', string="Puesto Solicitante", related='requestor_id.employee_id.job_id', readonly=True, store=False)
-    order_line_ids = fields.One2many('stock.requisition.line', 'requisition_id', string='Order Lines') 
+    order_line_ids = fields.One2many('stock.requisition.line', 'requisition_id', string='Order Lines')
+
+    name = fields.Char(
+        string="Referencia",
+        required=False,
+        readonly=True,
+        default=lambda self: self.env['ir.sequence'].next_by_code('stock.requisition'),
+        tracking=True  # Opcional: registra cambios en el historial
+    )
 
     state_id = fields.Many2one(
         'res.country.state',
@@ -71,6 +81,28 @@ class StockRequisition(models.Model):
         compute='_compute_display_receiver',
         store=True
     )
+
+    picking_id = fields.Many2one('stock.picking', string="Transferencia de Inventario")
+    location_id = fields.Many2one(
+        'stock.location',
+        string="Ubicación de Origen",
+        required=True,
+        default=lambda self: self.env.ref('stock.stock_location_stock')
+    )
+    location_dest_id = fields.Many2one(
+        'stock.location',
+        string="Ubicación de Destino",
+        required=True,
+        default=lambda self: self.env.ref('stock.stock_location_customers')
+    )
+    assignment_ids = fields.One2many(
+        'stock.assignment',
+        'requisition_id',
+        string="Asignaciones"
+    )
+
+    def action_done(self):
+        self.write({'state': 'done'})
 
     @api.depends('personal_type', 'employee_id', 'personal_contract_id')
     def _compute_display_receiver(self):
@@ -124,37 +156,133 @@ class StockRequisition(models.Model):
         _logger.info("Message ID: %s", message_id)
 
     def action_confirm_approve(self):
-        if self.state == 'first_approval':
-            self.state = 'approved'
+        self.ensure_one()
+        
+        if self.state != 'first_approval':
+            raise exceptions.UserError("Solo se puede confirmar aprobación desde el estado 'En Curso'")
+        
+        # Validar campos requeridos
+        if not self.location_id or not self.location_dest_id:
+            raise exceptions.UserError("Debe configurar las ubicaciones de origen y destino")
+        
+        if not self.order_line_ids:
+            raise exceptions.UserError("La requisición no tiene productos asignados")
+        
+        # Obtener tipo de operación de salida
+        picking_type = self.env.ref('stock.picking_type_out')
+        
+        # Crear transferencia de inventario
+        picking_vals = {
+            'picking_type_id': picking_type.id,
+            'location_id': self.location_id.id,
+            'location_dest_id': self.location_dest_id.id,
+            'origin': self.name,
+            'partner_id': self._get_recipient_partner().id,
+            'scheduled_date': fields.Datetime.now(),
+        }
+        
+        picking = self.env['stock.picking'].create(picking_vals)
+        
+        # Crear movimientos de inventario
+        moves = self.env['stock.move']
+        for line in self.order_line_ids:
+            if line.product_id.type != 'consu':
+                raise exceptions.UserError(
+                    f"El producto {line.product_id.name} no es almacenable. Verifique el tipo de producto."
+                )
             
-            if not self.direction_id:
-                _logger.warning("No direction ID found for the requisition")
-                return
+            move_vals = {
+                'name': line.product_id.name,
+                'product_id': line.product_id.id,
+                'product_uom_qty': line.product_qty,
+                'product_uom': line.product_uom.id,
+                'location_id': self.location_id.id,
+                'location_dest_id': self.location_dest_id.id,
+                'picking_id': picking.id,
+                'state': 'draft',
+            }
+            moves += self.env['stock.move'].create(move_vals)
+        
+        # Validar y preparar la transferencia
+        picking.action_confirm()
+        picking.action_assign()
+        
+        # Verificar disponibilidad
+        unavailable_products = []
+        for move in picking.move_ids:
+            # Usar el campo quantity (correcto para Odoo 18)
+            qty_done = sum(move.move_line_ids.mapped('quantity'))
+            if move.product_uom_qty > qty_done:
+                unavailable_products.append(move.product_id.name)
 
-            _logger.info("Direction ID found: %s", self.direction_id.id)
-            if not self.direction_id.director_id:
-                _logger.warning("No director ID found for direction ID: %s", self.direction_id.id)
-                return
-
-            _logger.info("Director ID found: %s", self.direction_id.director_id.id)
-            director_user = self.direction_id.director_id.user_id
-            if not director_user:
-                _logger.warning("No director user found for director ID: %s", self.direction_id.director_id.id)
-                return
-
-            _logger.info("Director user found: %s", director_user.id)
-            message = "La requisición de personal ha sido aprobada por %s." % self.requestor_id.name
-            subject = "Requisición Aprobada: %s" % self.requisition_number
-            partner_ids = [director_user.partner_id.id, self.requestor_id.partner_id.id]
-            message_id = self.message_post(
-                body=message,
-                subject=subject,
-                partner_ids=partner_ids,
-                message_type='notification',
-                subtype_xmlid='mail.mt_comment',
+        if unavailable_products:
+            raise exceptions.UserError(
+                f"Productos no disponibles en stock:\n- " + "\n- ".join(unavailable_products)
             )
-            _logger.info("Notification sent to director user: %s and requestor user: %s", director_user.partner_id.id, self.requestor_id.partner_id.id)
-            _logger.info("Message ID: %s", message_id)
+        
+        # Crear asignaciones
+        assignment_lines = []
+        recipient = self._get_recipient()  # Obtener receptor según tipo
+        
+        for move in picking.move_ids:
+            assignment_vals = {
+                'product_id': move.product_id.id,
+                'quantity': move.product_uom_qty,
+                'recipient_id': recipient.id,
+                'assignment_date': fields.Datetime.now(),
+                'stock_move_id': move.id,
+            }
+            assignment_lines.append((0, 0, assignment_vals))
+        
+        # Actualizar registro principal
+        self.write({
+            'state': 'approved',
+            'picking_id': picking.id,
+            'assignment_ids': assignment_lines
+        })
+        
+        # Registrar en el historial
+        self.message_post(
+            body=f"""
+            <div class="alert alert-success" role="alert">
+                <h4 class="alert-heading">Requisición aprobada y transferencia creada</h4>
+                <p>Transferencia: <a href="#" data-oe-model="stock.picking" data-oe-id="{picking.id}">{picking.name}</a></p>
+                <ul>
+                    <li>Ubicación origen: {self.location_id.complete_name}</li>
+                    <li>Ubicación destino: {self.location_dest_id.complete_name}</li>
+                    <li>Receptor: {recipient.name}</li>
+                </ul>
+            </div>
+            """
+        )
+        
+        # Notificar al solicitante
+        self._notify_approval()
+        
+        return True
+
+    def _get_recipient(self):
+        """Obtener el receptor según el tipo de personal"""
+        if self.personal_type == 'internal':
+            if not self.employee_id:
+                raise exceptions.UserError("Debe seleccionar un empleado receptor")
+            return self.employee_id
+        else:
+            if not self.personal_contract_id:
+                raise exceptions.UserError("Debe seleccionar un contratista receptor")
+            return self.personal_contract_id
+
+    def _get_recipient_partner(self):
+        """Obtener partner asociado al receptor"""
+        recipient = self._get_recipient()
+        if recipient.user_id.partner_id:
+            return recipient.user_id.partner_id
+        raise exceptions.UserError(f"El receptor {recipient.name} no tiene usuario asociado")
+
+    def _notify_approval(self):
+        """Enviar notificación de aprobación"""
+        template = self.env.ref('stock_estevez.email_template_requisition_approved')
+        template.send_mail(self.id, force_send=True)
 
     def action_reject(self):
         self.state = 'rejected'
@@ -184,6 +312,42 @@ class StockRequisition(models.Model):
         else:
             _logger.warning("Failed to send notification to partner IDs: %s", partner_ids)
 
+    def action_validate_delivery(self):
+        self.ensure_one()
+        if not self.picking_id:
+            raise UserError("No hay transferencia asociada")
+            
+        if self.picking_id.state != 'assigned':
+            raise UserError("Los productos no están disponibles")
+            
+        # Crear paquete de entrega
+        package = self.env['stock.quant.package'].create({
+            'name': f"PAQ-{self.name}",
+        })
+        
+        # Procesar cada movimiento
+        for move in self.picking_id.move_ids:
+            move.move_line_ids.write({
+                'qty_done': move.product_uom_qty,
+                'result_package_id': package.id
+            })
+        
+        # Validar la transferencia
+        self.picking_id.button_validate()
+        
+        # Actualizar estado
+        self.write({'state': 'done'})
+        
+        # Registrar en el chatter
+        message = f"""
+        <p>Materiales entregados correctamente:</p>
+        <ul>
+            <li>Paquete: {package.name}</li>
+            <li>Receptor: {self.display_receiver}</li>
+            <li>Ubicación destino: {self.location_dest_id.complete_name}</li>
+        </ul>
+        """
+        self.message_post(body=message)
 
     def action_save(self):
         # Aquí puedes agregar cualquier lógica adicional antes de guardar

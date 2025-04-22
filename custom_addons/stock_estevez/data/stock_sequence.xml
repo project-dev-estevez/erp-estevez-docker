@@ -1,0 +1,10 @@
+<odoo>
+    <data noupdate="1">
+        <record id="seq_stock_requisition" model="ir.sequence">
+            <field name="name">Secuencia de Requisiciones</field>
+            <field name="code">stock.requisition</field>
+            <field name="prefix">REQ/%(year)s/</field>
+            <field name="padding">4</field>
+        </record>
+    </data>
+</odoo>
