@@ -80,6 +80,11 @@
                                             options="{'rows': 4}"/>                                                        
                                     </group>    
                                 </group>
+                                <div invisible="state != 'to_approve_warehouse'">
+                                    <group>
+                                        <field name="warehouse_location_id" required="state == 'to_approve_warehouse'"/>
+                                    </group>
+                                </div>
                                 <h3 class="mt14 mb8">ESPECIFICACIONES DEL PRODUCTO</h3>
                                     <field name="order_line_ids">            
                                         <list string="Productos" editable="bottom">

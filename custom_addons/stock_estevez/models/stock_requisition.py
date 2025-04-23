@@ -66,6 +66,14 @@ class StockRequisition(models.Model):
     site_admin_approval_date = fields.Datetime()
     warehouse_approval_date = fields.Datetime()
 
+    warehouse_location_id = fields.Many2one(
+        'stock.location',
+        string="Ubicación de Almacén",
+        domain="[('usage', '=', 'internal')]",
+        required=False,
+        help="Seleccione la ubicación de almacén de donde se restará el material."
+    )
+
     type_warehouse = fields.Selection([
         ('general_warehouse', 'Almacén General'),
         ('foreign_warehouse', 'Almacén Foraneo')
@@ -245,19 +253,40 @@ class StockRequisition(models.Model):
             raise exceptions.UserError("Solo se puede confirmar aprobación desde el estado 'Por Aprobar Almacen'")
         
         # Validar campos requeridos
-        if not self.location_id or not self.location_dest_id:
-            raise exceptions.UserError("Debe configurar las ubicaciones de origen y destino")
+        required_fields = [
+            (self.warehouse_location_id, "Debe seleccionar una ubicación de almacén"),
+            (self.location_dest_id, "Debe configurar la ubicación destino"),
+            (self.order_line_ids, "La requisición no tiene productos asignados")
+        ]
         
-        if not self.order_line_ids:
-            raise exceptions.UserError("La requisición no tiene productos asignados")
+        for field, error_msg in required_fields:
+            if not field:
+                raise exceptions.UserError(error_msg)
         
-        # Obtener tipo de operación de salida
+        # ================== VALIDACIONES DE STOCK ==================
+        # 1. Validar stock físico en la ubicación seleccionada
+        for line in self.order_line_ids:
+            if line.product_id.type != 'product':
+                continue  # Solo validar productos almacenables
+                
+            qty_available = self.env['stock.quant']._get_available_quantity(
+                line.product_id,
+                self.warehouse_location_id
+            )
+            
+            if qty_available < line.product_qty:
+                raise exceptions.UserError(
+                    f"Stock insuficiente en {self.warehouse_location_id.complete_name}\n"
+                    f"Producto: {line.product_id.name}\n"
+                    f"Disponible: {qty_available} | Requerido: {line.product_qty}"
+                )
+        
+        # ================== CREACIÓN DE TRANSFERENCIA ==================
         picking_type = self.env.ref('stock.picking_type_out')
         
-        # Crear transferencia de inventario
         picking_vals = {
             'picking_type_id': picking_type.id,
-            'location_id': self.location_id.id,
+            'location_id': self.warehouse_location_id.id,
             'location_dest_id': self.location_dest_id.id,
             'origin': self.name,
             'partner_id': self._get_recipient_partner().id,
@@ -266,61 +295,58 @@ class StockRequisition(models.Model):
         
         picking = self.env['stock.picking'].create(picking_vals)
         
-        # Crear movimientos de inventario
+        # Crear movimientos con la ubicación correcta
         moves = self.env['stock.move']
         for line in self.order_line_ids:
-            if line.product_id.type != 'consu':
-                raise exceptions.UserError(
-                    f"El producto {line.product_id.name} no es almacenable. Verifique el tipo de producto."
-                )
-            
             move_vals = {
                 'name': line.product_id.name,
                 'product_id': line.product_id.id,
                 'product_uom_qty': line.product_qty,
-                'location_id': self.location_id.id,
+                'location_id': self.warehouse_location_id.id,
                 'location_dest_id': self.location_dest_id.id,
                 'picking_id': picking.id,
                 'state': 'draft',
             }
             moves += self.env['stock.move'].create(move_vals)
         
-        # Validar y preparar la transferencia
+        # ================== VALIDACIÓN AUTOMÁTICA ==================
         picking.action_confirm()
         picking.action_assign()
         
-        # Verificar disponibilidad
-        unavailable_products = []
-        for move in picking.move_ids:
-            qty_done = sum(move.move_line_ids.mapped('quantity'))
-            if move.product_uom_qty > qty_done:
-                unavailable_products.append(move.product_id.name)
-
-        if unavailable_products:
+        # 2. Validar reserva completa
+        unavailable_moves = picking.move_ids.filtered(
+            lambda m: sum(m.move_line_ids.mapped('quantity')) < m.product_uom_qty
+        )
+        
+        if unavailable_moves:
+            products = "\n- ".join([m.product_id.name for m in unavailable_moves])
             raise exceptions.UserError(
-                f"Productos no disponibles en stock:\n- " + "\n- ".join(unavailable_products)
+                f"Productos no reservados completamente:\n- {products}"
             )
         
+        # Marcar cantidad realizada = reservada
         for move_line in picking.move_line_ids:
-            move_line.quantity = move_line.product_uom_qty
-
-        picking._action_done()
+            move_line.quantity = move_line.quantity
         
-        # Crear asignaciones
+        picking.button_validate()
+        
+        # ================== ACTUALIZACIÓN DE REGISTRO ==================
         assignment_lines = []
-        recipient = self._get_recipient()  # Obtener receptor según tipo
-        
+        recipient = self._get_recipient()
+
         for move in picking.move_ids:
+            # Sumar las cantidades realizadas de las líneas de movimiento
+            total_done = sum(move.move_line_ids.mapped('quantity'))
+            
             assignment_vals = {
                 'product_id': move.product_id.id,
-                'quantity': move.product_uom_qty,
+                'quantity': total_done,
                 'recipient_id': recipient.id,
                 'assignment_date': fields.Datetime.now(),
                 'stock_move_id': move.id,
             }
             assignment_lines.append((0, 0, assignment_vals))
         
-        # Actualizar registro principal
         self.write({
             'state': 'done',
             'picking_id': picking.id,
@@ -329,22 +355,16 @@ class StockRequisition(models.Model):
             'warehouse_approval_date': fields.Datetime.now()
         })
         
-        # Registrar en el historial
+        # ================== NOTIFICACIONES ==================
         self.message_post(
             body=f"""
-            <div class="alert alert-success" role="alert">
-                <h4 class="alert-heading">Requisición aprobada y transferencia creada</h4>
-                <p>Transferencia: <a href="#" data-oe-model="stock.picking" data-oe-id="{picking.id}">{picking.name}</a></p>
-                <ul>
-                    <li>Ubicación origen: {self.location_id.complete_name}</li>
-                    <li>Ubicación destino: {self.location_dest_id.complete_name}</li>
-                    <li>Receptor: {recipient.name}</li>
-                </ul>
+            <div class="alert alert-success">
+                <h4>Transferencia {picking.name} completada</h4>
+                <p>Desde: {self.warehouse_location_id.complete_name}</p>
+                <p>Hacia: {self.location_dest_id.complete_name}</p>
             </div>
             """
         )
-        
-        # Notificar al solicitante
         self._notify_approval()
         
         return True
