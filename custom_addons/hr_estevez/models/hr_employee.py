@@ -414,3 +414,15 @@ class HrEmployee(models.Model):
             'APRIL', 'ABRIL').replace('MAY', 'MAYO').replace('JUNE', 'JUNIO').replace(
             'JULY', 'JULIO').replace('AUGUST', 'AGOSTO').replace('SEPTEMBER', 'SEPTIEMBRE').replace(
             'OCTOBER', 'OCTUBRE').replace('NOVEMBER', 'NOVIEMBRE').replace('DECEMBER', 'DICIEMBRE')
+    
+    def get_nationality(self):
+        translations = {
+            'Mexico': 'Mexicana',
+            'Colombia': 'Colombiana',
+            'Argentina': 'Argentina',
+            'España': 'Española',
+            # Agrega más traducciones según sea necesario
+        }
+        country_name = self.country_id.name
+        return translations.get(country_name, country_name)
+    
