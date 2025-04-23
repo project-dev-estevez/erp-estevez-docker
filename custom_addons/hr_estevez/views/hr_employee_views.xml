@@ -267,6 +267,7 @@
                                 <field name="create_date" string="Fecha de Creación" readonly="1"/>
                                 <field name="description" string="Descripción / Hechos"/>
                                 <field name="date" string="Fecha del Acta"/>
+                                
                             </list>
                         </field>
                     </page>
@@ -476,6 +477,6 @@
                 </xpath>
             </field>
         </record>
-
+        
     </data>
 </odoo>
