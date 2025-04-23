@@ -5,7 +5,7 @@
                 <t t-call="web.external_layout">
                     <div class="page">
                         <div class="container">
-                            
+
                             <div class="row mt-3">
                                 <div class="col-12 text-center">
                                     <strong class="font-weight-bold">CONTRATO INDIVIDUAL DE TRABAJO</strong>
@@ -14,16 +14,23 @@
 
                             <div class="row mt-3">
                                 <div class="col-12 text-justify">
-                                    <p style="text-align: justify;">
-                                        CONTRATO INDIVIDUAL DE TRABAJO QUE CONFORME A LO ESTABLECIDO POR LOS ARTÍCULOS 24 Y 25 DE LA LEY FEDERAL DEL TRABAJO, CELEBRAN POR UNA PARTE LA EMPRESA 
-                                        <strong class="text-decoration-underline"><t t-esc="doc.company_id.name.upper()"/></strong>, REPRESENTADA LEGALMENTE POR 
-                                        <span class="text-decoration-underline">EL LIC. <strong>EDWIN GONZALEZ SORIA</strong>, EN SU CARÁCTER DE APODERADO LEGAL </span> 
-                                        A QUIÉN EN LO SUCESIVO Y PARA EFECTOS DE ESTE CONTRATO SE LE DENOMINARÁ 
-                                        <strong>“EL PATRON”</strong>, Y POR LA OTRA POR SU PROPIO DERECHO, 
-                                        <strong class="text-decoration-underline">EL/LA C. <t t-esc="doc.employee_id.name.upper()"/> </strong>, 
-                                        A QUIÉN EN LO SUCESIVO Y PARA EFECTOS DE ESTE CONTRATO SE LE DENOMINARÁ 
-                                        <strong>“EL TRABAJADOR”</strong>, AL TENOR DE LAS SIGUIENTES DECLARACIONES Y CLÁUSULAS:
-                                    </p>
+                                    <p style="text-align: justify;"> CONTRATO INDIVIDUAL DE TRABAJO
+                                        QUE CONFORME A LO ESTABLECIDO POR LOS ARTÍCULOS 24 Y 25 DE
+                                        LA LEY FEDERAL DEL TRABAJO, CELEBRAN POR UNA PARTE LA
+                                        EMPRESA <strong class="text-decoration-underline">
+                                            <t t-esc="doc.company_id.name.upper()" />
+                                        </strong>,
+                                        REPRESENTADA LEGALMENTE POR <span
+                                            class="text-decoration-underline">EL LIC. <strong>EDWIN
+                                        GONZALEZ SORIA</strong>, EN SU CARÁCTER DE APODERADO LEGAL </span>
+                                        A QUIÉN EN LO SUCESIVO Y PARA EFECTOS DE ESTE CONTRATO SE LE
+                                        DENOMINARÁ <strong>“EL PATRON”</strong>, Y POR LA OTRA POR
+                                        SU PROPIO DERECHO, <strong class="text-decoration-underline">EL/LA
+                                        C. <t t-esc="doc.employee_id.name.upper()" />
+                                        </strong>,
+                                        A QUIÉN EN LO SUCESIVO Y PARA EFECTOS DE ESTE CONTRATO SE LE
+                                        DENOMINARÁ <strong>“EL TRABAJADOR”</strong>, AL TENOR DE LAS
+                                        SIGUIENTES DECLARACIONES Y CLÁUSULAS: </p>
                                 </div>
                             </div>
 
@@ -36,7 +43,8 @@
                             <div class="row mt-2">
                                 <div class="col-12 text-justify">
                                     <p>
-                                        <span>A.</span> <strong>DE “EL PATRON”:</strong> 
+                                        <span>A.</span>
+                                        <strong>DE “EL PATRON”:</strong>
                                     </p>
                                 </div>
                             </div>
@@ -44,7 +52,14 @@
                             <div class="row mt-2">
                                 <div class="col-12 text-justify">
                                     <p style="text-align: justify;">
-                                        <span>1.</span><span>QUE ES UNA SOCIEDAD ANÓNIMA DE CAPITAL VARIABLE DEBIDAMENTE CONSTITUIDA Y LEGALMENTE EXISTENTE DE ACUERDO CON LAS LEYES MEXICANAS, TAL Y COMO SE ACREDITA EN TÉRMINOS DE INSTRUMENTO NOTARIAL NÚMERO 46,404, DE FECHA 4 DE OCTUBRE DE 2011 PASADO ANTE LA FE DEL LIC. JOSE ORLANDO PADILLA BENITEZ, NOTARIO PÚBLICO NO. 30 DEL ESTADO DE MÉXICO</span>
+                                        <span>1.</span>
+                                        <span>QUE ES UNA SOCIEDAD ANÓNIMA DE CAPITAL VARIABLE
+                                            DEBIDAMENTE CONSTITUIDA Y LEGALMENTE EXISTENTE DE
+                                            ACUERDO CON LAS LEYES MEXICANAS, TAL Y COMO SE ACREDITA
+                                            EN TÉRMINOS DE INSTRUMENTO NOTARIAL NÚMERO 46,404, DE
+                                            FECHA 4 DE OCTUBRE DE 2011 PASADO ANTE LA FE DEL LIC.
+                                            JOSE ORLANDO PADILLA BENITEZ, NOTARIO PÚBLICO NO. 30 DEL
+                                            ESTADO DE MÉXICO</span>
                                     </p>
                                 </div>
                             </div>
@@ -52,7 +67,17 @@
                             <div class="row mt-2">
                                 <div class="col-12 text-justify">
                                     <p style="text-align: justify;">
-                                        <span>2.</span><span>SU REPRESENTANTE LEGAL CUENTA CON PLENAS Y SUFICIENTES FACULTADES PARA CELEBRAR EL PRESENTE CONTRATO, MISMAS QUE NO LE HAN SIDO LIMITADAS, MODIFICADAS O REVOCADAS A LA FECHA DE CELEBRACIÓN DEL PRESENTE “ADDENDUM”, OBLIGANDO A SU PODERDANTE EN LOS TÉRMINOS Y CONDICIONES AL EFECTO ESTABLECIDO, TAL Y COMO LO ACREDITA CON EL INSTRUMENTO NOTARIAL NÚMERO 18,435, DE FECHA 07 DE DICIEMBRE DE 2020, PASADO ANTE LA FE DEL LICENCIADO JUAN CARLOS FRANCISCO DIAZ PONCE DE LEON, NOTARIO PÚBLICO NÚMERO 209 DE LA CIUDAD DE MÉXICO.</span>
+                                        <span>2.</span>
+                                        <span>SU REPRESENTANTE LEGAL CUENTA CON PLENAS Y SUFICIENTES
+                                            FACULTADES PARA CELEBRAR EL PRESENTE CONTRATO, MISMAS
+                                            QUE NO LE HAN SIDO LIMITADAS, MODIFICADAS O REVOCADAS A
+                                            LA FECHA DE CELEBRACIÓN DEL PRESENTE “ADDENDUM”,
+                                            OBLIGANDO A SU PODERDANTE EN LOS TÉRMINOS Y CONDICIONES
+                                            AL EFECTO ESTABLECIDO, TAL Y COMO LO ACREDITA CON EL
+                                            INSTRUMENTO NOTARIAL NÚMERO 18,435, DE FECHA 07 DE
+                                            DICIEMBRE DE 2020, PASADO ANTE LA FE DEL LICENCIADO JUAN
+                                            CARLOS FRANCISCO DIAZ PONCE DE LEON, NOTARIO PÚBLICO
+                                            NÚMERO 209 DE LA CIUDAD DE MÉXICO.</span>
                                     </p>
                                 </div>
                             </div>
@@ -60,7 +85,10 @@
                             <div class="row mt-2">
                                 <div class="col-12 text-justify">
                                     <p style="text-align: justify;">
-                                        <span>3.</span><span>QUE TIENE SU DOMICILIO EN: CALLE FILIBERTO GOMEZ NUMERO 46 COLONIA CENTRO INDUSTRIAL TLALNEPANTLA, C.P. 54030, MUNICIPIO DE TLALNEPANTLA, ESTADO DE MEXICO.</span>
+                                        <span>3.</span>
+                                        <span>QUE TIENE SU DOMICILIO EN: CALLE FILIBERTO GOMEZ
+                                            NUMERO 46 COLONIA CENTRO INDUSTRIAL TLALNEPANTLA, C.P.
+                                            54030, MUNICIPIO DE TLALNEPANTLA, ESTADO DE MEXICO.</span>
                                     </p>
                                 </div>
                             </div>
@@ -68,7 +96,9 @@
                             <div class="row mt-2">
                                 <div class="col-12 text-justify">
                                     <p style="text-align: justify;">
-                                        <span>4.</span><span>QUE SU OBJETO SOCIAL CONSISTE EN LA INSTALACION Y MANTEMIENTO DE FIBRA ÓPTICA ENTRE OTROS.</span>
+                                        <span>4.</span>
+                                        <span>QUE SU OBJETO SOCIAL CONSISTE EN LA INSTALACION Y
+                                            MANTEMIENTO DE FIBRA ÓPTICA ENTRE OTROS.</span>
                                     </p>
                                 </div>
                             </div>
@@ -76,7 +106,12 @@
                             <div class="row mt-2">
                                 <div class="col-12 text-justify">
                                     <p style="text-align: justify;">
-                                        <span>5.</span><span>QUE QUIEN SUSCRIBE POR “EL PATRON”, CUENTA CON BASTANTES, AMPLIAS Y SUFICIENTES FACULTADES PARA LA CELEBRACION DE ESTE CONTRATO, LAS CUALES AL DIA DE HOY NO LE HAN SIDO REVOCADAS, RESTRINGIDAS, SUSPENDIDAS O DE ALGUNA OTRA MANERA LIMITADAS.</span>
+                                        <span>5.</span>
+                                        <span>QUE QUIEN SUSCRIBE POR “EL PATRON”, CUENTA CON
+                                            BASTANTES, AMPLIAS Y SUFICIENTES FACULTADES PARA LA
+                                            CELEBRACION DE ESTE CONTRATO, LAS CUALES AL DIA DE HOY
+                                            NO LE HAN SIDO REVOCADAS, RESTRINGIDAS, SUSPENDIDAS O DE
+                                            ALGUNA OTRA MANERA LIMITADAS.</span>
                                     </p>
                                 </div>
                             </div>
@@ -84,7 +119,15 @@
                             <div class="row mt-2">
                                 <div class="col-12 text-justify">
                                     <p style="text-align: justify;">
-                                        <span>6.</span><span>QUE CUENTA CON EL PERSONAL NECESARIO PARA EL DESARROLLO DE SUS OPERACIONES NORMALES, Y REQUIERE CONTRATAR PERSONAL QUE CUENTE CON LA DISPOSICIÓN, <strong class="text-decoration-underline">NO IMPORTANDO SU EXPERIENCIA, HABILIDAD O CONOCIMIENTOS PARA DESEMPEÑAR LOS TRABAJOS RELACIONADOS CON EL OBJETO SOCIAL DE LA EMPRESA, POR LO CUAL ES VOLUNTAD DE “EL PATRON”, CELEBRAR ESTE CONTRATO.</strong></span>
+                                        <span>6.</span>
+                                        <span>QUE CUENTA CON EL PERSONAL NECESARIO PARA EL
+                                            DESARROLLO DE SUS OPERACIONES NORMALES, Y REQUIERE
+                                            CONTRATAR PERSONAL QUE CUENTE CON LA DISPOSICIÓN, <strong
+                                                class="text-decoration-underline">NO IMPORTANDO SU
+                                            EXPERIENCIA, HABILIDAD O CONOCIMIENTOS PARA DESEMPEÑAR
+                                            LOS TRABAJOS RELACIONADOS CON EL OBJETO SOCIAL DE LA
+                                            EMPRESA, POR LO CUAL ES VOLUNTAD DE “EL PATRON”,
+                                                CELEBRAR ESTE CONTRATO.</strong></span>
                                     </p>
                                 </div>
                             </div>
@@ -92,7 +135,8 @@
                             <div class="row mt-4">
                                 <div class="col-12 text-justify">
                                     <p>
-                                        <span>B.</span><strong>DE “EL TRABAJADOR”:</strong>
+                                        <span>B.</span>
+                                        <strong>DE “EL TRABAJADOR”:</strong>
                                     </p>
                                 </div>
                             </div>
@@ -100,7 +144,14 @@
                             <div class="row mt-2">
                                 <div class="col-12 text-justify">
                                     <p style="text-align: justify;">
-                                        <span>1.</span><span>QUE CUENTA CON LA DISPOSICIÓN NECESARIA PARA DESEMPEÑAR LOS SERVICIOS EN EL PUESTO REQUERIDO, DE: <strong class="text-decoration-underline"><t t-esc="doc.employee_id.job_id.name.upper()"/></strong></span>
+                                        <span>1.</span>
+                                        <span>QUE CUENTA CON LA DISPOSICIÓN NECESARIA PARA
+                                            DESEMPEÑAR LOS SERVICIOS EN EL PUESTO REQUERIDO, DE: <strong
+                                                class="text-decoration-underline">
+                                                <t
+                                                    t-esc="doc.employee_id.job_id.name.upper() if doc.employee_id.job_id.name else 'N/A'" />
+                                            </strong>
+                                        </span>
                                     </p>
                                 </div>
                             </div>
@@ -108,7 +159,8 @@
                             <div class="row mt-2">
                                 <div class="col-12 text-justify">
                                     <p style="text-align: justify;">
-                                        <span>2.</span><span>QUE SUS GENERALES SON LOS SIGUIENTES:</span>
+                                        <span>2.</span>
+                                        <span>QUE SUS GENERALES SON LOS SIGUIENTES:</span>
                                     </p>
                                 </div>
                             </div>
@@ -118,52 +170,68 @@
                                     <table class="table">
                                         <tbody>
                                             <tr>
-                                                <th class="text-left"><strong>NACIONALIDAD</strong></th>
+                                                <th class="text-left">
+                                                    <strong>NACIONALIDAD</strong>
+                                                </th>
                                                 <td class="text-left">
-                                                    <!-- <t t-esc="doc.employee_id.country_id.name.upper()"/> -->
+                                                    <t t-esc="doc.employee_id.get_nationality()" />
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <th class="text-left"><strong>EDAD</strong></th>
+                                                <th class="text-left">
+                                                    <strong>EDAD</strong>
+                                                </th>
                                                 <td class="text-left">
-                                                    <t t-esc="doc.employee_id.age"/>
+                                                    <t t-esc="doc.employee_id.age" /> Años </td>
+                                            </tr>
+                                            <tr>
+                                                <th class="text-left">
+                                                    <strong>SEXO</strong>
+                                                </th>
+                                                <td class="text-left">
+                                                    <t
+                                                        t-esc="dict(doc.employee_id._fields['gender'].selection).get(doc.employee_id.gender, 'Desconocido').upper()" />
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <th class="text-left"><strong>SEXO</strong></th>
+                                                <th class="text-left">
+                                                    <strong>ESTADO CIVIL</strong>
+                                                </th>
                                                 <td class="text-left">
-                                                    <t t-esc="doc.employee_id.gender"/>
+                                                    <t
+                                                        t-esc="dict(doc.employee_id._fields['marital'].selection).get(doc.employee_id.marital, 'DESCONOCIDO').upper()" />
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <th class="text-left"><strong>ESTADO CIVIL</strong></th>
+                                                <th class="text-left">
+                                                    <strong>CURP</strong>
+                                                </th>
                                                 <td class="text-left">
-                                                    <t t-esc="doc.employee_id.marital"/>
+                                                    <t t-esc="doc.employee_id.curp" />
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <th class="text-left"><strong>CURP</strong></th>
+                                                <th class="text-left">
+                                                    <strong>RFC</strong>
+                                                </th>
                                                 <td class="text-left">
-                                                    <t t-esc="doc.employee_id.curp"/>
+                                                    <t t-esc="doc.employee_id.rfc" />
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <th class="text-left"><strong>RFC</strong></th>
+                                                <th class="text-left">
+                                                    <strong>DOMICILIO</strong>
+                                                </th>
                                                 <td class="text-left">
-                                                    <t t-esc="doc.employee_id.rfc"/>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <th class="text-left"><strong>DOMICILIO</strong></th>
-                                                <td class="text-left">
-                                                    <t t-esc="'%s %s, %s %s, %s C.P. %s' % (
-                                                        doc.employee_id.private_street or '',
-                                                        doc.employee_id.private_street2 or '',
-                                                        doc.employee_id.private_colonia or '',
-                                                        doc.employee_id.private_city or '',
-                                                        doc.employee_id.private_state_id.name or '',
-                                                        doc.employee_id.private_zip or 'N/A'
-                                                    )"/>
+                                                    <t
+                                                        t-esc="'%s %s, %s %s, %s C.P. %s' % (
+                                                        (doc.employee_id.private_street or '').upper(),
+                                                        (doc.employee_id.private_street2 or '').upper(),
+                                                        (doc.employee_id.private_colonia or '').upper(),
+                                                        (doc.employee_id.private_city or '').upper(),
+                                                        (doc.employee_id.private_state_id.name or '').upper(),
+                                                        (doc.employee_id.private_zip or 'N/A').upper()
+                                                    )" />
                                                 </td>
                                             </tr>
                                         </tbody>
@@ -174,7 +242,10 @@
                             <div class="row mt-3">
                                 <div class="col-12 text-justify">
                                     <p style="text-align: justify;">
-                                        <span>3.</span><span>QUE BAJO PROTESTA DE DECIR VERDAD, DECLARA QUE TODA LA INFORMACIÓN QUE HA PROPORCIONADO DE MANERA ORAL O ESCRITA A “EL PATRÓN” ES CORRECTA Y FIDEDIGNA.</span>
+                                        <span>3.</span>
+                                        <span>QUE BAJO PROTESTA DE DECIR VERDAD, DECLARA QUE TODA LA
+                                            INFORMACIÓN QUE HA PROPORCIONADO DE MANERA ORAL O
+                                            ESCRITA A “EL PATRÓN” ES CORRECTA Y FIDEDIGNA.</span>
                                     </p>
                                 </div>
                             </div>
@@ -182,7 +253,12 @@
                             <div class="row mt-2">
                                 <div class="col-12 text-justify">
                                     <p style="text-align: justify;">
-                                        <span>4.</span><span>QUE LE HAN ENTERADO Y EXPLICADO LAS CONDICIONES DE TRABAJO Y COMO CONSECUENCIA ES SU EXPRESA VOLUNTAD CELEBRAR EL PRESENTE CONTRATO EN LOS TÉRMINOS Y CONDICIONES DESCRITOS EN EL CUERPO DEL PRESENTE INSTRUMENTO.</span>
+                                        <span>4.</span>
+                                        <span>QUE LE HAN ENTERADO Y EXPLICADO LAS CONDICIONES DE
+                                            TRABAJO Y COMO CONSECUENCIA ES SU EXPRESA VOLUNTAD
+                                            CELEBRAR EL PRESENTE CONTRATO EN LOS TÉRMINOS Y
+                                            CONDICIONES DESCRITOS EN EL CUERPO DEL PRESENTE
+                                            INSTRUMENTO.</span>
                                     </p>
                                 </div>
                             </div>
@@ -190,7 +266,8 @@
                             <div class="row mt-2">
                                 <div class="col-12 text-justify">
                                     <p style="text-align: justify;">
-                                        <span>EXPUESTAS LAS ANTERIORES DECLARACIONES, AMBAS PARTES SE SOMETEN A LAS SIGUIENTES:</span>
+                                        <span>EXPUESTAS LAS ANTERIORES DECLARACIONES, AMBAS PARTES
+                                            SE SOMETEN A LAS SIGUIENTES:</span>
                                     </p>
                                 </div>
                             </div>
@@ -206,7 +283,11 @@
                             <div class="row mt-2">
                                 <div class="col-12 text-justify">
                                     <p style="text-align: justify;">
-                                        <strong>ÚNICO.</strong><span>QUE AMBAS PARTES SE RECONOCEN EL CARÁCTER CON EL QUE COMPARECEN Y MANIFIESTAN QUE ES SU DESEO CELEBRAR EL PRESENTE CONTRATO EN LOS TÉRMINOS QUE A CONTINUACIÓN SE ESTIPULAN REMITIÉNDOSE PARA TAL EFECTO A LAS SIGUIENTES:</span>
+                                        <strong>ÚNICO.</strong>
+                                        <span>QUE AMBAS PARTES SE RECONOCEN EL CARÁCTER CON EL QUE
+                                            COMPARECEN Y MANIFIESTAN QUE ES SU DESEO CELEBRAR EL
+                                            PRESENTE CONTRATO EN LOS TÉRMINOS QUE A CONTINUACIÓN SE
+                                            ESTIPULAN REMITIÉNDOSE PARA TAL EFECTO A LAS SIGUIENTES:</span>
                                     </p>
                                 </div>
                             </div>
@@ -220,7 +301,13 @@
                             <div class="row mt-2">
                                 <div class="col-12 text-justify">
                                     <p style="text-align: justify;">
-                                        <strong>PRIMERA.</strong><span>PARA EFECTOS DE COMPRENSIÓN DEL PRESENTE CONTRATO, SE DENOMINARÁ EN LO SUCESIVO A LA LEY FEDERAL DEL TRABAJO COMO "LA LEY", AL REFERIRSE AL PRESENTE DOCUMENTO COMO "EL CONTRATO", AL REGLAMENTO INTERIOR DE TRABAJO “REGLAMENTO” Y DE MANERA CONJUNTA A LOS QUE SUSCRIBEN COMO "LAS PARTES".</span>
+                                        <strong>PRIMERA.</strong>
+                                        <span>PARA EFECTOS DE COMPRENSIÓN DEL PRESENTE CONTRATO, SE
+                                            DENOMINARÁ EN LO SUCESIVO A LA LEY FEDERAL DEL TRABAJO
+                                            COMO "LA LEY", AL REFERIRSE AL PRESENTE DOCUMENTO COMO
+                                            "EL CONTRATO", AL REGLAMENTO INTERIOR DE TRABAJO
+                                            “REGLAMENTO” Y DE MANERA CONJUNTA A LOS QUE SUSCRIBEN
+                                            COMO "LAS PARTES".</span>
                                     </p>
                                 </div>
                             </div>
@@ -228,7 +315,10 @@
                             <div class="row mt-5">
                                 <div class="col-12 text-justify">
                                     <p style="text-align: justify;">
-                                        <strong>SEGUNDA.</strong><span>EL PRESENTE CONTRATO REGIRÁ EN TODO TIEMPO Y LUGAR LO NO ESTIPULADO EN EL MISMO POR EL “REGLAMENTO” Y POR LO ESTABLECIDO EN “LA LEY”.</span>
+                                        <strong>SEGUNDA.</strong>
+                                        <span>EL PRESENTE CONTRATO REGIRÁ EN TODO TIEMPO Y LUGAR LO
+                                            NO ESTIPULADO EN EL MISMO POR EL “REGLAMENTO” Y POR LO
+                                            ESTABLECIDO EN “LA LEY”.</span>
                                     </p>
                                 </div>
                             </div>
@@ -236,7 +326,17 @@
                             <div class="row mt-2">
                                 <div class="col-12 text-justify">
                                     <p style="text-align: justify;">
-                                        <strong>TERCERA.</strong><span>“EL PATRÓN”, EN ESTE ACTO CONTRATA A “EL TRABAJADOR” <strong>BAJO LA MODALIDAD DE CAPACITACIÓN INICIAL</strong>PARA QUE DESEMPEÑE EL PUESTO DE <strong class="text-decoration-underline"><t t-esc="doc.employee_id.job_id.name.upper()"/></strong> ASÍ COMO EN CUALQUIER OTRA ACTIVIDAD ANEXA, CONEXA O RELACIONADA QUE LE ENCOMIENDE EL PATRÓN, COMPATIBLE CON EL FIN DE SU CATEGORÍA, CAPACITACIÓN Y DE SUS APTITUDES.</span>
+                                        <strong>TERCERA.</strong>
+                                        <span>“EL PATRÓN”, EN ESTE ACTO CONTRATA A “EL TRABAJADOR” <strong>BAJO
+                                            LA MODALIDAD DE CAPACITACIÓN INICIAL</strong>PARA QUE
+                                            DESEMPEÑE EL PUESTO DE <strong
+                                                class="text-decoration-underline">
+                                                <t
+                                                    t-esc="doc.employee_id.job_id.name.upper() if doc.employee_id.job_id.name else 'N/A'" />
+                                            </strong>
+                                            ASÍ COMO EN CUALQUIER OTRA ACTIVIDAD ANEXA, CONEXA O
+                                            RELACIONADA QUE LE ENCOMIENDE EL PATRÓN, COMPATIBLE CON
+                                            EL FIN DE SU CATEGORÍA, CAPACITACIÓN Y DE SUS APTITUDES.</span>
                                     </p>
                                 </div>
                             </div>
@@ -244,7 +344,14 @@
                             <div class="row mt-2">
                                 <div class="col-12 text-justify">
                                     <p style="text-align: justify;">
-                                        <strong>CUARTA.</strong><span>“EL TRABAJADOR” RECONOCE Y ESTA CONFORME, DADA LA MODALIDAD DE CONTRATACIÓN DE CAPACITACIÓN INICIAL, QUE A PARTIR DE LA SUSCRIPCIÓN DEL PRESENTE CONTRATO, LA RELACIÓN LABORAL TENDRÁ UNA VIGENCIA <strong>POR</strong> <strong class="text-decoration-underline text-danger">TIEMPO DETERMINADO</strong> <strong>DE CERO DIAS NATURALES</strong>, CONTADOS A PARTIR DE LA FECHA DE SU FIRMA</span>
+                                        <strong>CUARTA.</strong>
+                                        <span>“EL TRABAJADOR” RECONOCE Y ESTA CONFORME, DADA LA
+                                            MODALIDAD DE CONTRATACIÓN DE CAPACITACIÓN INICIAL, QUE A
+                                            PARTIR DE LA SUSCRIPCIÓN DEL PRESENTE CONTRATO, LA
+                                            RELACIÓN LABORAL TENDRÁ UNA VIGENCIA <strong>POR</strong> <strong
+                                                class="text-decoration-underline text-danger">TIEMPO
+                                            DETERMINADO</strong> <strong>DE CERO DIAS NATURALES</strong>,
+                                            CONTADOS A PARTIR DE LA FECHA DE SU FIRMA</span>
                                     </p>
                                 </div>
                             </div>
@@ -252,7 +359,15 @@
                             <div class="row mt-2">
                                 <div class="col-12 text-justify">
                                     <p style="text-align: justify;">
-                                        <strong>QUINTA.</strong><span>“EL TRABAJADOR” SE OBLIGA A PRESTAR A “EL PATRÓN”, BAJO SU DIRECCIÓN Y DEPENDENCIA, SUS SERVICIOS PERSONALES COMO: <strong class="text-decoration-underline"><t t-esc="doc.employee_id.job_id.name.upper()"/>.</strong></span>
+                                        <strong>QUINTA.</strong>
+                                        <span>“EL TRABAJADOR” SE OBLIGA A PRESTAR A “EL PATRÓN”,
+                                            BAJO SU DIRECCIÓN Y DEPENDENCIA, SUS SERVICIOS
+                                            PERSONALES COMO: <strong
+                                                class="text-decoration-underline">
+                                                <t
+                                                    t-esc="doc.employee_id.job_id.name.upper() if doc.employee_id.job_id.name else 'N/A'" />
+                                            . </strong>
+                                        </span>
                                     </p>
                                 </div>
                             </div>
@@ -260,7 +375,25 @@
                             <div class="row mt-2">
                                 <div class="col-12 text-justify">
                                     <p style="text-align: justify;">
-                                        <strong>SEXTA.</strong><span>“EL TRABAJADOR” DEBE DESEMPEÑAR DICHAS ACTIVIDADES:______________________________________________________________________________________ MISMAS QUE SE DESARROLLARAN EN EL DOMICILIO UBICADO EN CALLE FILIBERTO GÓMEZ NUMERO 46 COLONIA CENTRO INDUSTRIAL TLALNEPANTLA, C.P. 54030, MUNICIPIO DE TLALNEPANTLA, ESTADO DE MEXICO., Y/O INDISTINTAMENTE EN CUALQUIER DOMICILIO O LUGAR QUE SE LE INDIQUE POR “EL PATRÓN”, EN TÉRMINOS DE LA CLAUSULA SÉPTIMA DE ESTE CONTRATO, ASIMISMO “EL TRABAJADOR” SE OBLIGA A CAPACITARSE Y DESEMPEÑAR EFICIENTEMENTE TODAS LAS OBLIGACIONES RELATIVAS A SU PUESTO, COMO LO PUEDE SER DE MANERA ENUNCIATIVA MAS NO LIMITATIVA EL: <strong class="text-decoration-underline">LABORATORIO</strong>, ASÍ COMO RENDIR INFORMES MENSUALES O CADA QUE SE LO SOLICITE EL PATRON Y/O CUALQUIER OTRA ACTIVIDAD CONEXA O RELACIONADA QUE LE ENCOMIENDE EL PATRON, COMPATIBLE CON EL FIN DE SU CAPACITACION Y DE SUS APTITUDES, MISMAS QUE SE SEÑALAN DE MANERA ENUNCIATIVA MAS NO LIMITATIVA.</span>
+                                        <strong>SEXTA.</strong>
+                                        <span>“EL TRABAJADOR” DEBE DESEMPEÑAR DICHAS
+                                            ACTIVIDADES:______________________________________________________________________________________
+                                            MISMAS QUE SE DESARROLLARAN EN EL DOMICILIO UBICADO EN
+                                            CALLE FILIBERTO GÓMEZ NUMERO 46 COLONIA CENTRO
+                                            INDUSTRIAL TLALNEPANTLA, C.P. 54030, MUNICIPIO DE
+                                            TLALNEPANTLA, ESTADO DE MEXICO., Y/O INDISTINTAMENTE EN
+                                            CUALQUIER DOMICILIO O LUGAR QUE SE LE INDIQUE POR “EL
+                                            PATRÓN”, EN TÉRMINOS DE LA CLAUSULA SÉPTIMA DE ESTE
+                                            CONTRATO, ASIMISMO “EL TRABAJADOR” SE OBLIGA A
+                                            CAPACITARSE Y DESEMPEÑAR EFICIENTEMENTE TODAS LAS
+                                            OBLIGACIONES RELATIVAS A SU PUESTO, COMO LO PUEDE SER DE
+                                            MANERA ENUNCIATIVA MAS NO LIMITATIVA EL: <strong
+                                                class="text-decoration-underline">LABORATORIO</strong>,
+                                            ASÍ COMO RENDIR INFORMES MENSUALES O CADA QUE SE LO
+                                            SOLICITE EL PATRON Y/O CUALQUIER OTRA ACTIVIDAD CONEXA O
+                                            RELACIONADA QUE LE ENCOMIENDE EL PATRON, COMPATIBLE CON
+                                            EL FIN DE SU CAPACITACION Y DE SUS APTITUDES, MISMAS QUE
+                                            SE SEÑALAN DE MANERA ENUNCIATIVA MAS NO LIMITATIVA.</span>
                                     </p>
                                 </div>
                             </div>
@@ -268,7 +401,8 @@
                             <div class="row mt-2">
                                 <div class="col-12 text-justify">
                                     <p style="text-align: justify;">
-                                        <span>EXPRESAMENTE CONVIENE “EL TRABAJADOR” EN PONER TODA SU DILIGENCIA Y EMPEÑO EN BENEFICIO DE “EL PATRON”,</span>
+                                        <span>EXPRESAMENTE CONVIENE “EL TRABAJADOR” EN PONER TODA SU
+                                            DILIGENCIA Y EMPEÑO EN BENEFICIO DE “EL PATRON”,</span>
                                     </p>
                                 </div>
                             </div>
@@ -276,7 +410,10 @@
                             <div class="row mt-2">
                                 <div class="col-12 text-justify">
                                     <p style="text-align: justify;">
-                                        <strong>SEPTIMA.</strong><span>“EL TRABAJADOR” DESARROLLARA SUS FUNCIONES EN CUALQUIER LUGAR QUE LE SEA ASIGNADO POR “EL PATRÓN”, DE ACUERDO A LAS NECESIDADES DE LA EMPRESA.</span>
+                                        <strong>SEPTIMA.</strong>
+                                        <span>“EL TRABAJADOR” DESARROLLARA SUS FUNCIONES EN
+                                            CUALQUIER LUGAR QUE LE SEA ASIGNADO POR “EL PATRÓN”, DE
+                                            ACUERDO A LAS NECESIDADES DE LA EMPRESA.</span>
                                     </p>
                                 </div>
                             </div>
@@ -284,7 +421,15 @@
                             <div class="row mt-2">
                                 <div class="col-12 text-justify">
                                     <p style="text-align: justify;">
-                                        <span>“EL TRABAJADOR” SE OBLIGA A DESEMPEÑAR SUS FUNCIONES EN LAS INSTALACIONES DE “EL PATRON” EN CUALQUIERA DE LOS DEPARTAMENTOS, SUCURSALES U OFICINAS A QUE SEA ASIGNADO O DONDE SE REQUIERA SUS SERVICIOS Ó EN EL Ó LOS LUGARES EN DONDE “EL PATRON” REALICE ACTIVIDADES Ó TENGA OPERACIONES, EN SUS DOMICILIOS Ó EN LOS DOMICILIOS DE LAS EMPRESAS A LAS QUE SE LE PRESTEN SERVICIOS POR ORDEN Y CUENTA DE “EL PATRON” EN LA REALIZACIÓN DE LAS LABORES CONTRATADAS.</span>
+                                        <span>“EL TRABAJADOR” SE OBLIGA A DESEMPEÑAR SUS FUNCIONES
+                                            EN LAS INSTALACIONES DE “EL PATRON” EN CUALQUIERA DE LOS
+                                            DEPARTAMENTOS, SUCURSALES U OFICINAS A QUE SEA ASIGNADO
+                                            O DONDE SE REQUIERA SUS SERVICIOS Ó EN EL Ó LOS LUGARES
+                                            EN DONDE “EL PATRON” REALICE ACTIVIDADES Ó TENGA
+                                            OPERACIONES, EN SUS DOMICILIOS Ó EN LOS DOMICILIOS DE
+                                            LAS EMPRESAS A LAS QUE SE LE PRESTEN SERVICIOS POR ORDEN
+                                            Y CUENTA DE “EL PATRON” EN LA REALIZACIÓN DE LAS LABORES
+                                            CONTRATADAS.</span>
                                     </p>
                                 </div>
                             </div>
@@ -292,31 +437,43 @@
                             <div class="row mt-2">
                                 <div class="col-12 text-justify">
                                     <p style="text-align: justify;">
-                                        <span>“EL TRABAJADOR” EN EL ACTO DE FIRMAR EL PRESENTE CONTRATO, RECONOCE QUE SABE Y ESTÁ ENTERADO QUE “EL PATRON” TIENE OPERACIONES EN DISTINTOS LUGARES Y ESTABLECIMIENTOS, POR LO TANTO, “EL TRABAJADOR” ACEPTA Y EXPRESA SU ENTERA CONFORMIDAD COMO CONDICIÓN DE SU CONTRATACIÓN LA MOVILIDAD DE SU LUGAR, ZONA Ó ÁREA DE TRABAJO A LAS NECESIDADES DE LA OPERACIÓN, DANDO SU CONSENTIMIENTO PARA QUE “EL PATRON” EN CUALQUIER TIEMPO MODIFIQUE LUGAR DONDE PRESTARÁ SUS SERVICIOS DENTRO DE LA REPÚBLICA MEXICANA.</span>
+                                        <span>“EL TRABAJADOR” EN EL ACTO DE FIRMAR EL PRESENTE
+                                            CONTRATO, RECONOCE QUE SABE Y ESTÁ ENTERADO QUE “EL
+                                            PATRON” TIENE OPERACIONES EN DISTINTOS LUGARES Y
+                                            ESTABLECIMIENTOS, POR LO TANTO, “EL TRABAJADOR” ACEPTA Y
+                                            EXPRESA SU ENTERA CONFORMIDAD COMO CONDICIÓN DE SU
+                                            CONTRATACIÓN LA MOVILIDAD DE SU LUGAR, ZONA Ó ÁREA DE
+                                            TRABAJO A LAS NECESIDADES DE LA OPERACIÓN, DANDO SU
+                                            CONSENTIMIENTO PARA QUE “EL PATRON” EN CUALQUIER TIEMPO
+                                            MODIFIQUE LUGAR DONDE PRESTARÁ SUS SERVICIOS DENTRO DE
+                                            LA REPÚBLICA MEXICANA.</span>
                                     </p>
                                 </div>
                             </div>
-                            
+
                             <div class="row mt-2">
                                 <div class="col-12 text-justify">
                                     <p style="text-align: justify;">
-                                        <span>EL TRABAJADOR" ACEPTA A SER REMOVIDO POR RAZONES ADMINISTRATIVAS O DE DESARROLLO DE LA ACTIVIDAD O PRESTACIÓN DEL SERVICIO CONTRATADO, DEBIENDOSE TRASLADAR AL LUGAR QUE "EL PATRÓN" LE ASIGNE, SIEMPRE Y CUANDO NO SE VEA MENOSCABADO SU SALARIO Y SU CATEGORIA, EN ESTE CASO "EL PATRÓN" LE COMUNICARÁ CON ANTICIPACIÓN LA REMOCIÓN DEL LUGAR DE PRESTACIÓN DE SERVICIOS INDICÁNDOLE EL NUEVO LUGAR ASIGNADO.</span>
+                                        <span>EL TRABAJADOR" ACEPTA A SER REMOVIDO POR RAZONES
+                                            ADMINISTRATIVAS O DE DESARROLLO DE LA ACTIVIDAD O
+                                            PRESTACIÓN DEL SERVICIO CONTRATADO, DEBIENDOSE TRASLADAR
+                                            AL LUGAR QUE "EL PATRÓN" LE ASIGNE, SIEMPRE Y CUANDO NO
+                                            SE VEA MENOSCABADO SU SALARIO Y SU CATEGORIA, EN ESTE
+                                            CASO "EL PATRÓN" LE COMUNICARÁ CON ANTICIPACIÓN LA
+                                            REMOCIÓN DEL LUGAR DE PRESTACIÓN DE SERVICIOS
+                                            INDICÁNDOLE EL NUEVO LUGAR ASIGNADO.</span>
                                     </p>
                                 </div>
                             </div>
-                            
+
                             <div class="row mt-5">
                                 <div class="col-12 text-justify">
                                     <p style="text-align: justify;">
-                                        <span>PARA EL CASO QUE EN EL NUEVO LUGAR DE PRESTACIÓN DE SERVICIOS QUE LE FUERA ASIGNADO SE MODIFICARA EL HORARIO DE LABORES, "EL TRABAJADOR" ACEPTA ALLANARSE A DICHA MODALIDAD, SIEMPRE Y CUANDO SEA CONFORME LO QUE ESTABLECE “LA LEY”.</span>
-                                    </p>
-                                </div>
-                            </div>
-                            
-                            <div class="row mt-2">
-                                <div class="col-12 text-justify">
-                                    <p style="text-align: justify;">
-                                        <strong>OCTAVA.</strong><span>LA DURACIÓN DE LA JORNADA DE TRABAJO SERÁ DE 8 HORAS DIARIAS EN UN HORARIO QUE SE COMPRENDERÁ DE LAS 08:00 AM HORAS A LAS A LAS 17:00 PM O BIEN DE LAS 9:00 AM A 18:00 HORAS O DE 7:00 AM A 16:00 HORAS, DE LUNES A VIERNES Y SÁBADOS DE 8:00 AM A 14:00 HORAS, LA DURACIÓN MÁXIMA DE LA JORNADA DE TRABAJO PODRÁ SER DE 48 HORAS SEMANALES, MISMA QUE DE CONFORMIDAD CON LO ESTABLECIDO POR EL ARTÍCULO 59 DE LA LEY FEDERAL DEL TRABAJO, “EL TRABAJADOR” Y “EL PATRÓN”, PODRÁN FIJAR DE ACUERDO A LAS NECESIDADES DE LA EMPRESA SIN QUE EXCEDA DE LAS 48 HORAS DE TRABAJO A LA SEMANA, OBSERVANDO EN TODO MOMENTO LO RELATIVO LOS TIPOS DE JORNADA Y DURACIÓN DE ESTAS QUE SE REFIEREN LOS ARTÍCULOS 60 Y 61 DE “LA LEY”.</span>
+                                        <span>PARA EL CASO QUE EN EL NUEVO LUGAR DE PRESTACIÓN DE
+                                            SERVICIOS QUE LE FUERA ASIGNADO SE MODIFICARA EL HORARIO
+                                            DE LABORES, "EL TRABAJADOR" ACEPTA ALLANARSE A DICHA
+                                            MODALIDAD, SIEMPRE Y CUANDO SEA CONFORME LO QUE
+                                            ESTABLECE “LA LEY”.</span>
                                     </p>
                                 </div>
                             </div>
@@ -324,7 +481,20 @@
                             <div class="row mt-2">
                                 <div class="col-12 text-justify">
                                     <p style="text-align: justify;">
-                                        <span>DURANTE LA JORNADA CONTINUA DE TRABAJO SE CONCEDERÁ AL TRABAJADOR UN DESCANSO DE UNA HORA INTERMEDIA EN SU JORNADA DIARIA QUE SERA DE 14:00 PM HORAS A 15:00 PM HORAS, PARA DESCANSAR Y TOMAR ALIMENTOS FUERA DEL CENTRO DE TRABAJO, TIEMPO EN EL CUAL NO ESTARA BAJO NINGUNA CIRCUNSTANCIA A DISPOSICION DEL PATRON O EJECUTANDO ACTIVIDADES O LABORES PROPIAS Y/O INHERENTES A SUS LABORES, Y TENDRA EL DÍA DOMINGO COMO SU DIA DE DESCANSO O SEPTIMO DIA.</span>
+                                        <strong>OCTAVA.</strong>
+                                        <span>LA DURACIÓN DE LA JORNADA DE TRABAJO SERÁ DE 8 HORAS
+                                            DIARIAS EN UN HORARIO QUE SE COMPRENDERÁ DE LAS 08:00 AM
+                                            HORAS A LAS A LAS 17:00 PM O BIEN DE LAS 9:00 AM A 18:00
+                                            HORAS O DE 7:00 AM A 16:00 HORAS, DE LUNES A VIERNES Y
+                                            SÁBADOS DE 8:00 AM A 14:00 HORAS, LA DURACIÓN MÁXIMA DE
+                                            LA JORNADA DE TRABAJO PODRÁ SER DE 48 HORAS SEMANALES,
+                                            MISMA QUE DE CONFORMIDAD CON LO ESTABLECIDO POR EL
+                                            ARTÍCULO 59 DE LA LEY FEDERAL DEL TRABAJO, “EL
+                                            TRABAJADOR” Y “EL PATRÓN”, PODRÁN FIJAR DE ACUERDO A LAS
+                                            NECESIDADES DE LA EMPRESA SIN QUE EXCEDA DE LAS 48 HORAS
+                                            DE TRABAJO A LA SEMANA, OBSERVANDO EN TODO MOMENTO LO
+                                            RELATIVO LOS TIPOS DE JORNADA Y DURACIÓN DE ESTAS QUE SE
+                                            REFIEREN LOS ARTÍCULOS 60 Y 61 DE “LA LEY”.</span>
                                     </p>
                                 </div>
                             </div>
@@ -332,7 +502,15 @@
                             <div class="row mt-2">
                                 <div class="col-12 text-justify">
                                     <p style="text-align: justify;">
-                                        <span>"EL TRABAJADOR" ÚNICAMENTE PODRÁ LABORAR TIEMPO EXTRAORDINARIO CUANDO "EL PATRÓN" SE LO INDIQUE Y MEDIE ORDEN POR ESCRITO, LA QUE SEÑALARÁ EL DÍA O LOS DÍAS Y EL HORARIO EN EL CUAL SE DESEMPEÑARÁ EL MISMO. PARA EL CASO DE COMPUTAR EL TIEMPO EXTRAORDINARIO LABORADO DEBERÁ "EL TRABAJADOR" RECABAR Y CONSERVAR LA ORDEN REFERIDA A FIN DE QUE EN SU MOMENTO QUEDE DEBIDAMENTE PAGADO EL TIEMPO EXTRA LABORADO; LA FALTA DE PRESENTACIÓN DE ESA ORDEN SÓLO ES IMPUTABLE A "EL TRABAJADOR". LAS PARTES MANIFIESTAN QUE SALVO ESTA FORMA QUEDA PROHIBIDO EN EL CENTRO DE TRABAJO LABORAR HORAS EXTRAS.</span>
+                                        <span>DURANTE LA JORNADA CONTINUA DE TRABAJO SE CONCEDERÁ AL
+                                            TRABAJADOR UN DESCANSO DE UNA HORA INTERMEDIA EN SU
+                                            JORNADA DIARIA QUE SERA DE 14:00 PM HORAS A 15:00 PM
+                                            HORAS, PARA DESCANSAR Y TOMAR ALIMENTOS FUERA DEL CENTRO
+                                            DE TRABAJO, TIEMPO EN EL CUAL NO ESTARA BAJO NINGUNA
+                                            CIRCUNSTANCIA A DISPOSICION DEL PATRON O EJECUTANDO
+                                            ACTIVIDADES O LABORES PROPIAS Y/O INHERENTES A SUS
+                                            LABORES, Y TENDRA EL DÍA DOMINGO COMO SU DIA DE DESCANSO
+                                            O SEPTIMO DIA.</span>
                                     </p>
                                 </div>
                             </div>
@@ -340,7 +518,31 @@
                             <div class="row mt-2">
                                 <div class="col-12 text-justify">
                                     <p style="text-align: justify;">
-                                        <strong>“EL TRABAJADOR”</strong><span>ACEPTA QUE</span><strong>“LA EMPRESA”</strong><span>SE RESERVA EL DERECHO DE MODIFICAR SU JORNADA DE TRABAJO DE ACUERDO CON LAS NECESIDADES DEL CENTRO DE TRABAJO.</span>
+                                        <span>"EL TRABAJADOR" ÚNICAMENTE PODRÁ LABORAR TIEMPO
+                                            EXTRAORDINARIO CUANDO "EL PATRÓN" SE LO INDIQUE Y MEDIE
+                                            ORDEN POR ESCRITO, LA QUE SEÑALARÁ EL DÍA O LOS DÍAS Y
+                                            EL HORARIO EN EL CUAL SE DESEMPEÑARÁ EL MISMO. PARA EL
+                                            CASO DE COMPUTAR EL TIEMPO EXTRAORDINARIO LABORADO
+                                            DEBERÁ "EL TRABAJADOR" RECABAR Y CONSERVAR LA ORDEN
+                                            REFERIDA A FIN DE QUE EN SU MOMENTO QUEDE DEBIDAMENTE
+                                            PAGADO EL TIEMPO EXTRA LABORADO; LA FALTA DE
+                                            PRESENTACIÓN DE ESA ORDEN SÓLO ES IMPUTABLE A "EL
+                                            TRABAJADOR". LAS PARTES MANIFIESTAN QUE SALVO ESTA FORMA
+                                            QUEDA PROHIBIDO EN EL CENTRO DE TRABAJO LABORAR HORAS
+                                            EXTRAS.</span>
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="row mt-2">
+                                <div class="col-12 text-justify">
+                                    <p style="text-align: justify;">
+                                        <strong>“EL TRABAJADOR”</strong>
+                                        <span>ACEPTA QUE</span>
+                                        <strong>“LA EMPRESA”</strong>
+                                        <span>SE RESERVA EL DERECHO DE MODIFICAR SU JORNADA DE
+                                            TRABAJO DE ACUERDO CON LAS NECESIDADES DEL CENTRO DE
+                                            TRABAJO.</span>
                                     </p>
                                 </div>
                             </div>
@@ -348,7 +550,32 @@
                             <div class="row mt-1">
                                 <div class="col-12 text-justify">
                                     <p style="text-align: justify;">
-                                        <strong>NOVENA.</strong><span>EL SALARIO MENSUAL QUE RECIBIRÁ</span><strong>“EL TRABAJADOR”</strong><span>POR SUS SERVICIOS SERÁ DE</span><strong>$0,000.000 (CERO CERO CERO CERO PESOS 00/100 M.N.),</strong><span>MENOS LOS DESCUENTOS DE LEY, CUOTA SINDICAL, CUALQUIER TIPO DE PRESTAMO Y/O CREDITOS, EN LA INTELIGENCIA DE QUE EN EL PAGO DE DICHA CANTIDAD SE ENCUENTRA COMPRENDIDO EL PAGO DE LOS DÍAS DE DESCANSO SEMANALES Y OBLIGATORIOS, ASÍ COMO CUALQUIER OTRA PAGO A QUE TUVIERA DERECHO EL TRABAJADOR, EL PAGO DE SALARIO SE HARÁ EN EFECTIVO Y/O MEDIANTE DEPÓSITO BANCARIO EL CUAL DESDE ESTE MOMENTO AUTORIZA EL TRABAJADOR COMO METODO DE PAGO, EN FORMA QUINCENAL LOS DÍAS QUINCE Y ÚLTIMO DÍA DE CADA MES, EN CASO DE SER DÍA INHÁBIL SE REALIZARÁ EL PAGO EL DÍA HÁBIL INMEDIATO ANTERIOR; LA RECEPCIÓN DEL DEPÓSITO BANCARIO EN LA CUENTA DE</span><strong>“EL TRABAJADOR”</strong><span>ASI COMO SU RECIBO DE PAGO GENERADO A TRAVES DE UN CFDI HARÁ LAS VECES DE RECIBO DE PAGO SALARIAL, LO QUE ACEPTA</span><strong>“EL TRABAJADOR”</strong><span>PARA LOS EFECTOS LEGALES CORRESPONDIENTES. “EL PATRÓN”, PODRÁ CAMBIAR EL SISTEMA, FECHA, LUGAR O FORMA DE PAGO SIN QUE SEA NECESARIA LA AUTORIZACIÓN DE</span><strong>“EL TRABAJADOR”.</strong>
+                                        <strong>NOVENA.</strong>
+                                        <span>EL SALARIO MENSUAL QUE RECIBIRÁ</span>
+                                        <strong>“EL TRABAJADOR”</strong>
+                                        <span>POR SUS SERVICIOS SERÁ DE</span>
+                                        <strong>$0,000.000 (CERO CERO CERO CERO PESOS 00/100 M.N.),</strong>
+                                        <span>MENOS LOS DESCUENTOS DE LEY, CUOTA SINDICAL, CUALQUIER
+                                            TIPO DE PRESTAMO Y/O CREDITOS, EN LA INTELIGENCIA DE QUE
+                                            EN EL PAGO DE DICHA CANTIDAD SE ENCUENTRA COMPRENDIDO EL
+                                            PAGO DE LOS DÍAS DE DESCANSO SEMANALES Y OBLIGATORIOS,
+                                            ASÍ COMO CUALQUIER OTRA PAGO A QUE TUVIERA DERECHO EL
+                                            TRABAJADOR, EL PAGO DE SALARIO SE HARÁ EN EFECTIVO Y/O
+                                            MEDIANTE DEPÓSITO BANCARIO EL CUAL DESDE ESTE MOMENTO
+                                            AUTORIZA EL TRABAJADOR COMO METODO DE PAGO, EN FORMA
+                                            QUINCENAL LOS DÍAS QUINCE Y ÚLTIMO DÍA DE CADA MES, EN
+                                            CASO DE SER DÍA INHÁBIL SE REALIZARÁ EL PAGO EL DÍA
+                                            HÁBIL INMEDIATO ANTERIOR; LA RECEPCIÓN DEL DEPÓSITO
+                                            BANCARIO EN LA CUENTA DE</span>
+                                        <strong>“EL TRABAJADOR”</strong>
+                                        <span>ASI COMO SU RECIBO DE PAGO GENERADO A TRAVES DE UN
+                                            CFDI HARÁ LAS VECES DE RECIBO DE PAGO SALARIAL, LO QUE
+                                            ACEPTA</span>
+                                        <strong>“EL TRABAJADOR”</strong>
+                                        <span>PARA LOS EFECTOS LEGALES CORRESPONDIENTES. “EL
+                                            PATRÓN”, PODRÁ CAMBIAR EL SISTEMA, FECHA, LUGAR O FORMA
+                                            DE PAGO SIN QUE SEA NECESARIA LA AUTORIZACIÓN DE</span>
+                                        <strong>“EL TRABAJADOR”.</strong>
                                     </p>
                                 </div>
                             </div>
@@ -356,7 +583,15 @@
                             <div class="row mt-5">
                                 <div class="col-12 text-justify">
                                     <p style="text-align: justify;">
-                                        <strong>DECIMA.</strong><span>PREVISIÓN SOCIAL “PPP”. ADEMÁS DEL SALARIO A QUE SE REFIERE EL PÁRRAFO INMEDIATO ANTERIOR, EL EMPLEADO PERCIBIRÁ, EN SU CASO, LAS PRESTACIONES DE PREVISIÓN SOCIAL DE ACUERDO AL PLAN PRIVADO DE PENSIONES QUE TIENE CONTRATADO PARA LOS TRABAJADORES PARA OTORGAR DIVERSOS BENEFICIOS A LOS MISMOS, DEBIDAMENTE REGISTRADO ANTE LA COMISIÓN NACIONAL DEL SISTEMA DE AHORRO PARA EL RETIRO (CONSAR).</span>
+                                        <strong>DECIMA.</strong>
+                                        <span>PREVISIÓN SOCIAL “PPP”. ADEMÁS DEL SALARIO A QUE SE
+                                            REFIERE EL PÁRRAFO INMEDIATO ANTERIOR, EL EMPLEADO
+                                            PERCIBIRÁ, EN SU CASO, LAS PRESTACIONES DE PREVISIÓN
+                                            SOCIAL DE ACUERDO AL PLAN PRIVADO DE PENSIONES QUE TIENE
+                                            CONTRATADO PARA LOS TRABAJADORES PARA OTORGAR DIVERSOS
+                                            BENEFICIOS A LOS MISMOS, DEBIDAMENTE REGISTRADO ANTE LA
+                                            COMISIÓN NACIONAL DEL SISTEMA DE AHORRO PARA EL RETIRO
+                                            (CONSAR).</span>
                                     </p>
                                 </div>
                             </div>
@@ -364,7 +599,19 @@
                             <div class="row mt-2">
                                 <div class="col-12 text-justify">
                                     <p style="text-align: justify;">
-                                        <span>POR TAL MOTIVO, EL TRABAJADOR ESTÁ DE ACUERDO Y EN ESTE ACTO FIRMA Y ACEPTA DE CONFORMIDAD LA SOLICITUD DE INGRESO AL PLAN PRIVADO DE PENSIONES, LOS DOCUMENTOS CORRESPONDIENTES Y EL AVISO DE PRIVACIDAD QUE SE ANEXAN AL PRESENTE CONTRATO Y FORMAN PARTE ÍNTEGRA DEL MISMO, POR LO QUE SE ACOMPAÑA PARA TAL EFECTO LA DOCUMENTACIÓN CORRESPONDIENTE, ASÍ MISMO, SOLICITA QUE LAS PRESTACIONES DE PREVISIÓN SOCIAL QUE LE CORRESPONDEN POR EL “PPP” SEAN DEPOSITADAS EN LA CUENTA BANCARIA QUE INDIQUE EL ENCARGADO DE ADMINISTRAR EL "PPP", POR LO ANTERIOR, ACEPTA CUBRIR LOS COSTOS RELATIVOS A LA ADMINISTRACIÓN DEL PLAN Y LOS BENEFICIOS QUE ESTE OTORGA.</span>
+                                        <span>POR TAL MOTIVO, EL TRABAJADOR ESTÁ DE ACUERDO Y EN
+                                            ESTE ACTO FIRMA Y ACEPTA DE CONFORMIDAD LA SOLICITUD DE
+                                            INGRESO AL PLAN PRIVADO DE PENSIONES, LOS DOCUMENTOS
+                                            CORRESPONDIENTES Y EL AVISO DE PRIVACIDAD QUE SE ANEXAN
+                                            AL PRESENTE CONTRATO Y FORMAN PARTE ÍNTEGRA DEL MISMO,
+                                            POR LO QUE SE ACOMPAÑA PARA TAL EFECTO LA DOCUMENTACIÓN
+                                            CORRESPONDIENTE, ASÍ MISMO, SOLICITA QUE LAS
+                                            PRESTACIONES DE PREVISIÓN SOCIAL QUE LE CORRESPONDEN POR
+                                            EL “PPP” SEAN DEPOSITADAS EN LA CUENTA BANCARIA QUE
+                                            INDIQUE EL ENCARGADO DE ADMINISTRAR EL "PPP", POR LO
+                                            ANTERIOR, ACEPTA CUBRIR LOS COSTOS RELATIVOS A LA
+                                            ADMINISTRACIÓN DEL PLAN Y LOS BENEFICIOS QUE ESTE
+                                            OTORGA.</span>
                                     </p>
                                 </div>
                             </div>
@@ -372,7 +619,10 @@
                             <div class="row mt-2">
                                 <div class="col-12 text-justify">
                                     <p style="text-align: justify;">
-                                        <span>FINALMENTE, EN ESTE ACTO LA EMPRESA SE DA POR ENTERADA Y DEBIDAMENTE NOTIFICADA DE LA VOLUNTAD DEL TRABAJADOR DE ADHERIRSE AL PLAN PRIVADO DE PENSIONES “PPP” Y DE SEGUIR LAS INSTRUCCIONES SOLICITADAS.</span>
+                                        <span>FINALMENTE, EN ESTE ACTO LA EMPRESA SE DA POR ENTERADA
+                                            Y DEBIDAMENTE NOTIFICADA DE LA VOLUNTAD DEL TRABAJADOR
+                                            DE ADHERIRSE AL PLAN PRIVADO DE PENSIONES “PPP” Y DE
+                                            SEGUIR LAS INSTRUCCIONES SOLICITADAS.</span>
                                     </p>
                                 </div>
                             </div>
@@ -380,7 +630,13 @@
                             <div class="row mt-2">
                                 <div class="col-12 text-justify">
                                     <p style="text-align: justify;">
-                                        <strong>DECIMA PRIMERA.</strong><span> "EL TRABAJADOR" TENDRÁ DERECHO POR CADA SEIS DÍAS DE LABORES A DESCANSAR UNO CON EL PAGO DE SALARIO DIARIO CORRESPONDIENTE, ESTE SERA CONOCIDO COMO SÉPTIMO DIA, ESTE SEPTIMO DIA O DIA DE DESCANSO SEMANAL SERA EL DIA DOMINGO O BIEN, PODRA SER DETERMINADO CONFORME A LAS NECESIDADES DE “EL PATRON”.</span>
+                                        <strong>DECIMA PRIMERA.</strong>
+                                        <span> "EL TRABAJADOR" TENDRÁ DERECHO POR CADA SEIS DÍAS DE
+                                            LABORES A DESCANSAR UNO CON EL PAGO DE SALARIO DIARIO
+                                            CORRESPONDIENTE, ESTE SERA CONOCIDO COMO SÉPTIMO DIA,
+                                            ESTE SEPTIMO DIA O DIA DE DESCANSO SEMANAL SERA EL DIA
+                                            DOMINGO O BIEN, PODRA SER DETERMINADO CONFORME A LAS
+                                            NECESIDADES DE “EL PATRON”.</span>
                                     </p>
                                 </div>
                             </div>
@@ -388,7 +644,18 @@
                             <div class="row mt-2">
                                 <div class="col-12 text-justify">
                                     <p style="text-align: justify;">
-                                        <span>DE ACUERDO A LO DISPUESTO POR EL ARTÍCULO 74 DE LA LEY FEDERAL DEL TRABAJO, SERÁN DÍAS DE DESCANSO OBLIGATORIO: EL 1 DE ENERO, EL PRIMER LUNES DE FEBRERO EN CONMEMORACIÓN DEL DIA DE PROMULGACIÓN DE LA CONSTITUCIÓN MEXICANA, EL TERCER LUNES DEL MES DE MARZO EN CONMEMORACIÓN DEL NATALICIO DE BENITO JUAREZ, 1 DE MAYO, 16 DE SEPTIEMBRE, EL TERCER LUNES DEL MES DE NOVIEMBRE EN CONMEMORACIÓN DEL ANIVERSARIO DE LA REVOLUCION MEXICANA Y EL 1 DE DICIEMBRE DE CADA 6 AÑOS CUANDO CORRESPONDA A LA TRANSMISIÓN DEL PODER EJECUTIVO FEDERAL, EL 25 DE DICIEMBRE, EN LOS QUE SE OTORGARÁ DESCANSO A “EL TRABAJADOR” CON GOCE DE SUELDO. </span>
+                                        <span>DE ACUERDO A LO DISPUESTO POR EL ARTÍCULO 74 DE LA LEY
+                                            FEDERAL DEL TRABAJO, SERÁN DÍAS DE DESCANSO OBLIGATORIO:
+                                            EL 1 DE ENERO, EL PRIMER LUNES DE FEBRERO EN
+                                            CONMEMORACIÓN DEL DIA DE PROMULGACIÓN DE LA CONSTITUCIÓN
+                                            MEXICANA, EL TERCER LUNES DEL MES DE MARZO EN
+                                            CONMEMORACIÓN DEL NATALICIO DE BENITO JUAREZ, 1 DE MAYO,
+                                            16 DE SEPTIEMBRE, EL TERCER LUNES DEL MES DE NOVIEMBRE
+                                            EN CONMEMORACIÓN DEL ANIVERSARIO DE LA REVOLUCION
+                                            MEXICANA Y EL 1 DE DICIEMBRE DE CADA 6 AÑOS CUANDO
+                                            CORRESPONDA A LA TRANSMISIÓN DEL PODER EJECUTIVO
+                                            FEDERAL, EL 25 DE DICIEMBRE, EN LOS QUE SE OTORGARÁ
+                                            DESCANSO A “EL TRABAJADOR” CON GOCE DE SUELDO. </span>
                                     </p>
                                 </div>
                             </div>
@@ -404,7 +671,12 @@
                             <div class="row mt-2">
                                 <div class="col-12 text-justify">
                                     <p style="text-align: justify;">
-                                        <span>LOS TRABAJADORES NO ESTÁN OBLIGADOS A PRESTAR SERVICIOS EN SUS DÍAS DE DESCANSO. SI SE QUEBRANTA ESTA DISPOSICIÓN, EL PATRÓN PAGARÁ AL TRABAJADOR, INDEPENDIENTEMENTE DEL SALARIO QUE LE CORRESPONDA POR EL DESCANSO, UN SALARIO DOBLE POR EL SERVICIO PRESTADO, COMO LO ESTABLECE EL ARTICULO 73 DE "LA LEY".</span>
+                                        <span>LOS TRABAJADORES NO ESTÁN OBLIGADOS A PRESTAR
+                                            SERVICIOS EN SUS DÍAS DE DESCANSO. SI SE QUEBRANTA ESTA
+                                            DISPOSICIÓN, EL PATRÓN PAGARÁ AL TRABAJADOR,
+                                            INDEPENDIENTEMENTE DEL SALARIO QUE LE CORRESPONDA POR EL
+                                            DESCANSO, UN SALARIO DOBLE POR EL SERVICIO PRESTADO,
+                                            COMO LO ESTABLECE EL ARTICULO 73 DE "LA LEY".</span>
                                     </p>
                                 </div>
                             </div>
@@ -412,7 +684,13 @@
                             <div class="row mt-2">
                                 <div class="col-12 text-justify">
                                     <p style="text-align: justify;">
-                                        <strong>DECIMA SEGUNDA.</strong><span>CUANDO "EL TRABAJADOR" POR RAZONES ADMINISTRATIVAS TENGA QUE LABORAR EL DÍA DOMINGO, "EL PATRÓN" LE PAGARÁ, ADEMÁS DE SU SALARIO, 25% (VEINTICINCO POR CIENTO) COMO PRIMA DOMINICAL SOBRE EL SALARIO ORDINARIO DEVENGADO. INDEPENDIENTEMENTE DEL DÍA DE DESCANSO SEMANAL, AL QUE TENDRÁ DERECHO.</span>
+                                        <strong>DECIMA SEGUNDA.</strong>
+                                        <span>CUANDO "EL TRABAJADOR" POR RAZONES ADMINISTRATIVAS
+                                            TENGA QUE LABORAR EL DÍA DOMINGO, "EL PATRÓN" LE PAGARÁ,
+                                            ADEMÁS DE SU SALARIO, 25% (VEINTICINCO POR CIENTO) COMO
+                                            PRIMA DOMINICAL SOBRE EL SALARIO ORDINARIO DEVENGADO.
+                                            INDEPENDIENTEMENTE DEL DÍA DE DESCANSO SEMANAL, AL QUE
+                                            TENDRÁ DERECHO.</span>
                                     </p>
                                 </div>
                             </div>
@@ -420,7 +698,16 @@
                             <div class="row mt-2">
                                 <div class="col-12 text-justify">
                                     <p style="text-align: justify;">
-                                        <strong>DÉCIMA TERCERA.</strong><span> "EL TRABAJADOR" TENDRÁ DERECHO A DISFRUTAR DE UN PERIODO ANUAL DE VACACIONES SEGÚN LO ESTABLECIDO EN EL ARTÍCULO 76 DE "LA LEY", TOMANDO EN CONSIDERACIÓN LA ANTIGÜEDAD DE “EL TRABAJADOR”, ASÍ COMO A DISFRUTAR DEL SALARIO EN DICHO PERIODO. DE IGUAL MODO RECIBIRÁ LA PRIMA VACACIONAL RESPECTIVA, EQUIVALENTE AL 25% DEL IMPORTE PAGADO POR CONCEPTO DE VACACIONES, LA CUAL LE SERA ENTREGADA QUINCE DIAS ANTES DE QUE COMIENZE SU PERIODO VACACIONAL.</span>
+                                        <strong>DÉCIMA TERCERA.</strong>
+                                        <span> "EL TRABAJADOR" TENDRÁ DERECHO A DISFRUTAR DE UN
+                                            PERIODO ANUAL DE VACACIONES SEGÚN LO ESTABLECIDO EN EL
+                                            ARTÍCULO 76 DE "LA LEY", TOMANDO EN CONSIDERACIÓN LA
+                                            ANTIGÜEDAD DE “EL TRABAJADOR”, ASÍ COMO A DISFRUTAR DEL
+                                            SALARIO EN DICHO PERIODO. DE IGUAL MODO RECIBIRÁ LA
+                                            PRIMA VACACIONAL RESPECTIVA, EQUIVALENTE AL 25% DEL
+                                            IMPORTE PAGADO POR CONCEPTO DE VACACIONES, LA CUAL LE
+                                            SERA ENTREGADA QUINCE DIAS ANTES DE QUE COMIENZE SU
+                                            PERIODO VACACIONAL.</span>
                                     </p>
                                 </div>
                             </div>
@@ -428,7 +715,13 @@
                             <div class="row mt-2">
                                 <div class="col-12 text-justify">
                                     <p style="text-align: justify;">
-                                        <strong>DÉCIMA CUARTA..</strong><span> "EL TRABAJADOR" TENDRÁ DERECHO A RECIBIR POR PARTE DE "EL PATRÓN", ANTES DEL DÍA 20 DE DICIEMBRE DE CADA AÑO, EL IMPORTE CORRESPONDIENTE A QUINCE DÍAS DE SALARIO COMO PAGO DEL AGUINALDO A QUE SE REFIERE EL ARTÍCULO 87 DE "LA LEY", O SU PARTE PROPORCIONAL DEPENDIENDO DEL TIEMPO TRABAJADO.</span>
+                                        <strong>DÉCIMA CUARTA..</strong>
+                                        <span> "EL TRABAJADOR" TENDRÁ DERECHO A RECIBIR POR PARTE DE
+                                            "EL PATRÓN", ANTES DEL DÍA 20 DE DICIEMBRE DE CADA AÑO,
+                                            EL IMPORTE CORRESPONDIENTE A QUINCE DÍAS DE SALARIO COMO
+                                            PAGO DEL AGUINALDO A QUE SE REFIERE EL ARTÍCULO 87 DE
+                                            "LA LEY", O SU PARTE PROPORCIONAL DEPENDIENDO DEL TIEMPO
+                                            TRABAJADO.</span>
                                     </p>
                                 </div>
                             </div>
@@ -436,7 +729,11 @@
                             <div class="row mt-2">
                                 <div class="col-12 text-justify">
                                     <p style="text-align: justify;">
-                                        <strong>DÉCIMA QUINTA.</strong><span>"EL TRABAJADOR" DEBERÁ PRESENTARSE PUNTUALMENTE A SUS LABORES EN EL HORARIO DE TRABAJO ESTABLECIDO Y FIRMAR LAS LISTAS DE ASISTENCIA ACOSTUMBRADAS O CHECAR SU TARJETA DE ASISTENCIA EN EL RELOJ CHECADOR DIARIAMENTE.</span>
+                                        <strong>DÉCIMA QUINTA.</strong>
+                                        <span>"EL TRABAJADOR" DEBERÁ PRESENTARSE PUNTUALMENTE A SUS
+                                            LABORES EN EL HORARIO DE TRABAJO ESTABLECIDO Y FIRMAR
+                                            LAS LISTAS DE ASISTENCIA ACOSTUMBRADAS O CHECAR SU
+                                            TARJETA DE ASISTENCIA EN EL RELOJ CHECADOR DIARIAMENTE.</span>
                                     </p>
                                 </div>
                             </div>
@@ -444,7 +741,10 @@
                             <div class="row mt-2">
                                 <div class="col-12 text-justify">
                                     <p style="text-align: justify;">
-                                        <span>EN CASO DE RETRASO Y/O FALTA DE ASISTENCIA INJUSTIFICADA, PODRÁ "EL PATRÓN" IMPONERLE CUALQUIER CORRECCIÓN DISCIPLINARIA QUE CONSIDERE APLICABLE, CONFORME AL REGLAMENTO VIGENTE.</span>
+                                        <span>EN CASO DE RETRASO Y/O FALTA DE ASISTENCIA
+                                            INJUSTIFICADA, PODRÁ "EL PATRÓN" IMPONERLE CUALQUIER
+                                            CORRECCIÓN DISCIPLINARIA QUE CONSIDERE APLICABLE,
+                                            CONFORME AL REGLAMENTO VIGENTE.</span>
                                     </p>
                                 </div>
                             </div>
@@ -452,7 +752,21 @@
                             <div class="row mt-2">
                                 <div class="col-12 text-justify">
                                     <p style="text-align: justify;">
-                                        <span>CUANDO “EL TRABAJADOR” POR CUALQUIER CIRCUNSTANCIA SE VEA OBLIGADO A FALTAR A SUS LABORES, DEBERÁ AVISAR A “EL PATRON”, A MÁS TARDAR DENTRO DE LA PRIMERA HORA DE SU JORNADA DE LABORES. EL AVISO NO JUSTIFICA LA FALTA, PUES EN TODO CASO, “EL TRABAJADOR” AL REGRESAR A SUS LABORES, DEBERÁ JUSTIFICAR SU AUSENCIA CON EL COMPROBANTE RESPECTIVO QUE EN CASO DE ENFERMEDAD SERÁ EL CERTIFICADO DE INCAPACIDAD EXPEDIDO POR EL IMSS, SI “EL TRABAJADOR” FALTARE A SUS LABORES POR CUALQUIER OTRA CAUSA, DEBERÁ JUSTIFICARLO PLENAMENTE A “EL PATRON” CON LOS COMPROBANTES QUE A JUICIO DE ÉSTA SEAN NECESARIOS. CUANDO “EL TRABAJADOR” SOLICITE PERMISOS CON O SIN GOCE DE SUELDO, DEBERÁ RECABAR, EN TODO CASO, CONSTANCIA ESCRITA DE “EL PATRON”, SIN CUYO REQUISITO SE CONSIDERARÁ FALTA INJUSTIFICADA.</span>
+                                        <span>CUANDO “EL TRABAJADOR” POR CUALQUIER CIRCUNSTANCIA SE
+                                            VEA OBLIGADO A FALTAR A SUS LABORES, DEBERÁ AVISAR A “EL
+                                            PATRON”, A MÁS TARDAR DENTRO DE LA PRIMERA HORA DE SU
+                                            JORNADA DE LABORES. EL AVISO NO JUSTIFICA LA FALTA, PUES
+                                            EN TODO CASO, “EL TRABAJADOR” AL REGRESAR A SUS LABORES,
+                                            DEBERÁ JUSTIFICAR SU AUSENCIA CON EL COMPROBANTE
+                                            RESPECTIVO QUE EN CASO DE ENFERMEDAD SERÁ EL CERTIFICADO
+                                            DE INCAPACIDAD EXPEDIDO POR EL IMSS, SI “EL TRABAJADOR”
+                                            FALTARE A SUS LABORES POR CUALQUIER OTRA CAUSA, DEBERÁ
+                                            JUSTIFICARLO PLENAMENTE A “EL PATRON” CON LOS
+                                            COMPROBANTES QUE A JUICIO DE ÉSTA SEAN NECESARIOS.
+                                            CUANDO “EL TRABAJADOR” SOLICITE PERMISOS CON O SIN GOCE
+                                            DE SUELDO, DEBERÁ RECABAR, EN TODO CASO, CONSTANCIA
+                                            ESCRITA DE “EL PATRON”, SIN CUYO REQUISITO SE
+                                            CONSIDERARÁ FALTA INJUSTIFICADA.</span>
                                     </p>
                                 </div>
                             </div>
@@ -460,7 +774,15 @@
                             <div class="row mt-2">
                                 <div class="col-12 text-justify">
                                     <p style="text-align: justify;">
-                                        <strong>DECIMA SEXTA.</strong><span> SIN PERJUICIO DE LOS ESTIPULADO EN EL PRESENTE CONTRATO Y EN LA LEY, SE RECONOCE QUE CUANDO “EL TRABAJADOR” TENGA MAS DE TRES FALTAS INJUSTIFICADAS EN UN PERIODO DE TREINTA DIAS SE PROCEDERA A APLICAR DE MANERA INMEDIATA EL SUPUESTO CONTEMPLADO EN EL ARTICULO 47, FRACCION X DE LA LEY, AL EFECTO DE RESCINDIR DE MANERA UNILATERAL LA RELACION DE TRABAJO SIN RESPONSABILIDAD PARA “EL PATRON”.</span>
+                                        <strong>DECIMA SEXTA.</strong>
+                                        <span> SIN PERJUICIO DE LOS ESTIPULADO EN EL PRESENTE
+                                            CONTRATO Y EN LA LEY, SE RECONOCE QUE CUANDO “EL
+                                            TRABAJADOR” TENGA MAS DE TRES FALTAS INJUSTIFICADAS EN
+                                            UN PERIODO DE TREINTA DIAS SE PROCEDERA A APLICAR DE
+                                            MANERA INMEDIATA EL SUPUESTO CONTEMPLADO EN EL ARTICULO
+                                            47, FRACCION X DE LA LEY, AL EFECTO DE RESCINDIR DE
+                                            MANERA UNILATERAL LA RELACION DE TRABAJO SIN
+                                            RESPONSABILIDAD PARA “EL PATRON”.</span>
                                     </p>
                                 </div>
                             </div>
@@ -468,7 +790,17 @@
                             <div class="row mt-2">
                                 <div class="col-12 text-justify">
                                     <p style="text-align: justify;">
-                                        <strong>DÉCIMA SEPTIMA.</strong><span> "EL PATRON" SE OBLIGA A CAPACITAR O A ADIESTRAR A “EL TRABAJADOR” DE ACUERDO A LOS PLANES Y PROGRAMAS QUE EXISTEN O SE ESTABLEZCAN REFERENTE A TRABAJOS EVENTUALES O TEMPORALES Y " EL EMPLEADO" POR SU PARTE SE OBLIGA A CUMPLIR CON LOS PROGRAMAS, CURSOS, SESIONES DE GRUPO Y ACTIVIDADES QUE FORMEN PARTE DE LOS MISMOS Y A PRESENTAR LOS EXÁMENES DE EVALUACIÓN DE CONOCIMIENTOS Y APTITUDES QUE LE SEAN REQUERIDOS ASÍ COMO A ATENDER LAS INDICACIONES DE LAS PERSONAS QUE IMPARTAN LA CAPACITACIÓN O ADIESTRAMIENTO.</span>
+                                        <strong>DÉCIMA SEPTIMA.</strong>
+                                        <span> "EL PATRON" SE OBLIGA A CAPACITAR O A ADIESTRAR A “EL
+                                            TRABAJADOR” DE ACUERDO A LOS PLANES Y PROGRAMAS QUE
+                                            EXISTEN O SE ESTABLEZCAN REFERENTE A TRABAJOS EVENTUALES
+                                            O TEMPORALES Y " EL EMPLEADO" POR SU PARTE SE OBLIGA A
+                                            CUMPLIR CON LOS PROGRAMAS, CURSOS, SESIONES DE GRUPO Y
+                                            ACTIVIDADES QUE FORMEN PARTE DE LOS MISMOS Y A PRESENTAR
+                                            LOS EXÁMENES DE EVALUACIÓN DE CONOCIMIENTOS Y APTITUDES
+                                            QUE LE SEAN REQUERIDOS ASÍ COMO A ATENDER LAS
+                                            INDICACIONES DE LAS PERSONAS QUE IMPARTAN LA
+                                            CAPACITACIÓN O ADIESTRAMIENTO.</span>
                                     </p>
                                 </div>
                             </div>
@@ -476,7 +808,18 @@
                             <div class="row mt-2">
                                 <div class="col-12 text-justify">
                                     <p style="text-align: justify;">
-                                        <span>“EL TRABAJADOR” SE OBLIGA A PRESENTARSE Y ASISTIR A LOS CURSOS DE CAPACITACIÓN Y ADIESTRAMIENTO, QUE SE IMPARTAN EN LA FUENTE DE TRABAJO O EN LA SECRETARIA DE TRABAJO Y PREVISION SOCIAL O EN LOS LOCALES DESIGNADOS PARA TAL EFECTO, EN LAS FECHAS Y HORARIOS QUE SE DETERMINEN, PROCURANDO QUE ESTOS SE IMPARTAN DENTRO DE LA JORNADA DE TRABAJO, AL EFECTO DE QUE ESTO LE PERMITA ELEVAR SU NIVEL DE VIDA, COMPETENCIA LABORAL Y PRODUCTIVIDAD, CONFORME A LOS PLANES Y PROGRAMAS QUE ESTABLEZCAN LAS AUTORIDADES, “EL PATRON”, O CUALQUIER OTRA DEPENDENCIA O INSTITUCION ACREDITADA, LO ANTERIOR EN BASE AL CAPÍTULO 3 BIS DEL TÍTULO IV DE “LA LEY”.</span>
+                                        <span>“EL TRABAJADOR” SE OBLIGA A PRESENTARSE Y ASISTIR A
+                                            LOS CURSOS DE CAPACITACIÓN Y ADIESTRAMIENTO, QUE SE
+                                            IMPARTAN EN LA FUENTE DE TRABAJO O EN LA SECRETARIA DE
+                                            TRABAJO Y PREVISION SOCIAL O EN LOS LOCALES DESIGNADOS
+                                            PARA TAL EFECTO, EN LAS FECHAS Y HORARIOS QUE SE
+                                            DETERMINEN, PROCURANDO QUE ESTOS SE IMPARTAN DENTRO DE
+                                            LA JORNADA DE TRABAJO, AL EFECTO DE QUE ESTO LE PERMITA
+                                            ELEVAR SU NIVEL DE VIDA, COMPETENCIA LABORAL Y
+                                            PRODUCTIVIDAD, CONFORME A LOS PLANES Y PROGRAMAS QUE
+                                            ESTABLEZCAN LAS AUTORIDADES, “EL PATRON”, O CUALQUIER
+                                            OTRA DEPENDENCIA O INSTITUCION ACREDITADA, LO ANTERIOR
+                                            EN BASE AL CAPÍTULO 3 BIS DEL TÍTULO IV DE “LA LEY”.</span>
                                     </p>
                                 </div>
                             </div>
@@ -484,7 +827,11 @@
                             <div class="row mt-2">
                                 <div class="col-12 text-justify">
                                     <p style="text-align: justify;">
-                                        <span>“EL TRABAJADOR” SE OBLIGA A OBSERVAR LAS DISPOSICIONES CONTENIDAS EN EL REGLAMENTO Y LAS NORMAS OFICIALES MEXICANAS EN MATERIA DE SEGURIDAD, SALUD Y MEDIO AMBIENTE DE TRABAJO, ASI COMO LAS QUE INDIQUEN “EL PATRON” PARA SU SEGURIDAD Y PROTECCION PERSONAL.</span>
+                                        <span>“EL TRABAJADOR” SE OBLIGA A OBSERVAR LAS DISPOSICIONES
+                                            CONTENIDAS EN EL REGLAMENTO Y LAS NORMAS OFICIALES
+                                            MEXICANAS EN MATERIA DE SEGURIDAD, SALUD Y MEDIO
+                                            AMBIENTE DE TRABAJO, ASI COMO LAS QUE INDIQUEN “EL
+                                            PATRON” PARA SU SEGURIDAD Y PROTECCION PERSONAL.</span>
                                     </p>
                                 </div>
                             </div>
@@ -492,7 +839,12 @@
                             <div class="row mt-2">
                                 <div class="col-12 text-justify">
                                     <p style="text-align: justify;">
-                                        <strong>DÉCIMA OCTAVA.</strong><span>"EL TRABAJADOR" ACEPTA SOMETERSE A LOS EXÁMENES MÉDICOS QUE PERIÓDICAMENTE ESTABLEZCA "EL PATRÓN" EN LOS TÉRMINOS DEL ARTICULO 134 FRACCIÓN X DE "LA LEY", A FIN DE MANTENER EN FORMA ÓPTIMA SUS FACULTADES FÍSICAS E INTELECTUALES, PARA EL MEJOR DESEMPEÑO DE SUS FUNCIONES.</span>
+                                        <strong>DÉCIMA OCTAVA.</strong>
+                                        <span>"EL TRABAJADOR" ACEPTA SOMETERSE A LOS EXÁMENES
+                                            MÉDICOS QUE PERIÓDICAMENTE ESTABLEZCA "EL PATRÓN" EN LOS
+                                            TÉRMINOS DEL ARTICULO 134 FRACCIÓN X DE "LA LEY", A FIN
+                                            DE MANTENER EN FORMA ÓPTIMA SUS FACULTADES FÍSICAS E
+                                            INTELECTUALES, PARA EL MEJOR DESEMPEÑO DE SUS FUNCIONES.</span>
                                     </p>
                                 </div>
                             </div>
@@ -500,7 +852,13 @@
                             <div class="row mt-2">
                                 <div class="col-12 text-justify">
                                     <p style="text-align: justify;">
-                                        <strong>DÉCIMA NOVENA.</strong><span> “EL PATRON” Y “EL TRABAJADOR” SE OBLIGAN EN TODO TIEMPO Y LUGAR A CUMPLIR CON LAS OBLIGACIONES QUE “LA LEY” LES IMPONEN EN TÉRMINOS DE LO ESTABLECIDO POR LOS ARTÍCULOS 132 AL 135, LOS CUALES LE HAN SIDO EXPLICADOS DE MANERA INTEGRA. CLARA, PRECISA, Y LOS CUALES HA COMPRENDIDO EN SU TOTALIDAD “EL TRABAJADOR.”</span>
+                                        <strong>DÉCIMA NOVENA.</strong>
+                                        <span> “EL PATRON” Y “EL TRABAJADOR” SE OBLIGAN EN TODO
+                                            TIEMPO Y LUGAR A CUMPLIR CON LAS OBLIGACIONES QUE “LA
+                                            LEY” LES IMPONEN EN TÉRMINOS DE LO ESTABLECIDO POR LOS
+                                            ARTÍCULOS 132 AL 135, LOS CUALES LE HAN SIDO EXPLICADOS
+                                            DE MANERA INTEGRA. CLARA, PRECISA, Y LOS CUALES HA
+                                            COMPRENDIDO EN SU TOTALIDAD “EL TRABAJADOR.”</span>
                                     </p>
                                 </div>
                             </div>
@@ -508,7 +866,16 @@
                             <div class="row mt-2">
                                 <div class="col-12 text-justify">
                                     <p style="text-align: justify;">
-                                        <strong>VIGÉSIMA.</strong><span>“EL TRABAJADOR” SABE Y ENTIENDE QUE TODA LA INFORMACIÓN QUE EXISTE Y LLEGUE A EXISTIR DE “EL PATRON” MOTIVO DE LA CONSECUCIÓN DE SUS FINES TIENE EL CARÁCTER DE “CONFIDENCIAL”, YA SEA INFORMACIÓN PROPIA Y/O DE TERCEROS. “EL TRABAJADOR” SABE Y ENTIENDE QUE TODA LA INFORMACIÓN QUE EXISTE Y LLEGUE A EXISTIR EN EL FOJAL MOTIVO DE LA CONSECUCIÓN DE SUS FINES TIENE EL CARÁCTER DE “CONFIDENCIAL”, YA SEA INFORMACIÓN PROPIA Y/O DE TERCEROS.</span>
+                                        <strong>VIGÉSIMA.</strong>
+                                        <span>“EL TRABAJADOR” SABE Y ENTIENDE QUE TODA LA
+                                            INFORMACIÓN QUE EXISTE Y LLEGUE A EXISTIR DE “EL PATRON”
+                                            MOTIVO DE LA CONSECUCIÓN DE SUS FINES TIENE EL CARÁCTER
+                                            DE “CONFIDENCIAL”, YA SEA INFORMACIÓN PROPIA Y/O DE
+                                            TERCEROS. “EL TRABAJADOR” SABE Y ENTIENDE QUE TODA LA
+                                            INFORMACIÓN QUE EXISTE Y LLEGUE A EXISTIR EN EL FOJAL
+                                            MOTIVO DE LA CONSECUCIÓN DE SUS FINES TIENE EL CARÁCTER
+                                            DE “CONFIDENCIAL”, YA SEA INFORMACIÓN PROPIA Y/O DE
+                                            TERCEROS.</span>
                                     </p>
                                 </div>
                             </div>
@@ -516,7 +883,26 @@
                             <div class="row mt-2">
                                 <div class="col-12 text-justify">
                                     <p style="text-align: justify;">
-                                        <span>“EL TRABAJADOR” SE OBLIGA A NO EXTRAER, HACER USO, APROVECHAR, MOSTRAR, COMUNICAR, DIVULGAR, REVELAR, NEGOCIAR, VENDER, PERMUTAR, O TRANSFERIR POR CUALQUIER MEDIO, CUALQUIER TIPO DE INFORMACIÓN QUE HASTA EL MOMENTO CONOZCA O TENGA EN SU PODER O EN UN FUTURO LLEGUE A CONOCER O LLEGUE A TENER EN SU PODER, MATERIA O CON MOTIVO DEL DESEMPEÑO DE SUS FUNCIONES O DE LOS COLABORADORES DE “EL PATRON”, POR NINGÚN MEDIO EXISTENTE O QUE LLEGARA A EXISTIR, SI NO ESTÁ EXPRESAMENTE ESTABLECIDO EN SU CONTRATO DE TRABAJO, O EN SU PERFIL DE PUESTO, U OBRA ESCRITO YA SEA EN DOCUMENTO FÍSICO O EN ELECTRÓNICO POR LA VÍA OFICIAL, EN EL QUE PERSONA FACULTADA DE EL PATRON, LE AUTORICE PARA TRANSMITIR ESPECÍFICAMENTE DETERMINADA INFORMACIÓN A DETERMINADO SUJETO O ENTIDAD. “EL TRABAJADOR” SABE Y ENTIENDE LOS ALCANCES DE ESTA CLÁUSULA, ASÍ COMO DE LA GRAVEDAD DE NO GARANTIZAR O DE VIOLAR LA “CONFIDENCIALIDAD” DE LA INFORMACIÓN MATERIA DEL PRESENTE CONTRATO, INDEPENDIENTEMENTE DE LOS DAÑOS Y PERJUICIOS QUE SE PUDIERAN OCASIONAR AL PROPIO PATRON Y/O A TERCEROS.</span>
+                                        <span>“EL TRABAJADOR” SE OBLIGA A NO EXTRAER, HACER USO,
+                                            APROVECHAR, MOSTRAR, COMUNICAR, DIVULGAR, REVELAR,
+                                            NEGOCIAR, VENDER, PERMUTAR, O TRANSFERIR POR CUALQUIER
+                                            MEDIO, CUALQUIER TIPO DE INFORMACIÓN QUE HASTA EL
+                                            MOMENTO CONOZCA O TENGA EN SU PODER O EN UN FUTURO
+                                            LLEGUE A CONOCER O LLEGUE A TENER EN SU PODER, MATERIA O
+                                            CON MOTIVO DEL DESEMPEÑO DE SUS FUNCIONES O DE LOS
+                                            COLABORADORES DE “EL PATRON”, POR NINGÚN MEDIO EXISTENTE
+                                            O QUE LLEGARA A EXISTIR, SI NO ESTÁ EXPRESAMENTE
+                                            ESTABLECIDO EN SU CONTRATO DE TRABAJO, O EN SU PERFIL DE
+                                            PUESTO, U OBRA ESCRITO YA SEA EN DOCUMENTO FÍSICO O EN
+                                            ELECTRÓNICO POR LA VÍA OFICIAL, EN EL QUE PERSONA
+                                            FACULTADA DE EL PATRON, LE AUTORICE PARA TRANSMITIR
+                                            ESPECÍFICAMENTE DETERMINADA INFORMACIÓN A DETERMINADO
+                                            SUJETO O ENTIDAD. “EL TRABAJADOR” SABE Y ENTIENDE LOS
+                                            ALCANCES DE ESTA CLÁUSULA, ASÍ COMO DE LA GRAVEDAD DE NO
+                                            GARANTIZAR O DE VIOLAR LA “CONFIDENCIALIDAD” DE LA
+                                            INFORMACIÓN MATERIA DEL PRESENTE CONTRATO,
+                                            INDEPENDIENTEMENTE DE LOS DAÑOS Y PERJUICIOS QUE SE
+                                            PUDIERAN OCASIONAR AL PROPIO PATRON Y/O A TERCEROS.</span>
                                     </p>
                                 </div>
                             </div>
@@ -524,7 +910,15 @@
                             <div class="row mt-2">
                                 <div class="col-12 text-justify">
                                     <p style="text-align: justify;">
-                                        <span>“EL TRABAJADOR” RECONOCE QUE SON PROPIEDAD EXCLUSIVA DE “EL PATRON”, EN TODO TIEMPO Y LUGAR, ARTÍCULOS, ESTUDIOS, MAQUINARIA, FOLLETOS PUBLICITARIOS, MANUALES DE PROCEDIMIENTOS, TÉCNICA, EQUIPOS, UNIDADES, HERRAMIENTAS, MATERIALES ETC., ASÍ COMO TODOS LOS DOCUMENTOS E INFORMACIÓN VERBAL QUE SE LE PROPORCIONE CON MOTIVO DE LA RELACIÓN DE TRABAJO, Y LOS QUE “EL TRABAJADOR” PREPARE O FORMULE EN RELACIÓN CON SUS SERVICIOS.</span>
+                                        <span>“EL TRABAJADOR” RECONOCE QUE SON PROPIEDAD EXCLUSIVA
+                                            DE “EL PATRON”, EN TODO TIEMPO Y LUGAR, ARTÍCULOS,
+                                            ESTUDIOS, MAQUINARIA, FOLLETOS PUBLICITARIOS, MANUALES
+                                            DE PROCEDIMIENTOS, TÉCNICA, EQUIPOS, UNIDADES,
+                                            HERRAMIENTAS, MATERIALES ETC., ASÍ COMO TODOS LOS
+                                            DOCUMENTOS E INFORMACIÓN VERBAL QUE SE LE PROPORCIONE
+                                            CON MOTIVO DE LA RELACIÓN DE TRABAJO, Y LOS QUE “EL
+                                            TRABAJADOR” PREPARE O FORMULE EN RELACIÓN CON SUS
+                                            SERVICIOS.</span>
                                     </p>
                                 </div>
                             </div>
@@ -532,7 +926,16 @@
                             <div class="row mt-2">
                                 <div class="col-12 text-justify">
                                     <p style="text-align: justify;">
-                                        <span>EN TAL VIRTUD “EL TRABAJADOR” SE OBLIGA A CUIDAR DE DICHOS INSTRUMENTOS, Y DEVOLVERLOS A “EL PATRON” AL TERMINO DE SU RELACIÓN DE TRABAJO, HACIÉNDOSE RESPONSABLE POR EL USO Y DESTINO QUE DE A LOS MISMOS Y OBLIGÁNDOSE A CUBRIR SU COSTO EN CASO DE PERDIDA, ROBO O EXTRAVIÓ, SIN NINGUNA RESPONSABILIDAD PARA “EL PATRON”, LOS CUALES LE SERÁN DESCONTADOS DIRECTAMENTE DE SUS SALARIOS EN LOS TÉRMINOS ESTABLECIDOS POR LA LEY O DE SU FINIQUITO AL TERMINO DE SU RELACIÓN LABORAL SI TUVIESE DERECHO AL MISMO.</span>
+                                        <span>EN TAL VIRTUD “EL TRABAJADOR” SE OBLIGA A CUIDAR DE
+                                            DICHOS INSTRUMENTOS, Y DEVOLVERLOS A “EL PATRON” AL
+                                            TERMINO DE SU RELACIÓN DE TRABAJO, HACIÉNDOSE
+                                            RESPONSABLE POR EL USO Y DESTINO QUE DE A LOS MISMOS Y
+                                            OBLIGÁNDOSE A CUBRIR SU COSTO EN CASO DE PERDIDA, ROBO O
+                                            EXTRAVIÓ, SIN NINGUNA RESPONSABILIDAD PARA “EL PATRON”,
+                                            LOS CUALES LE SERÁN DESCONTADOS DIRECTAMENTE DE SUS
+                                            SALARIOS EN LOS TÉRMINOS ESTABLECIDOS POR LA LEY O DE SU
+                                            FINIQUITO AL TERMINO DE SU RELACIÓN LABORAL SI TUVIESE
+                                            DERECHO AL MISMO.</span>
                                     </p>
                                 </div>
                             </div>
@@ -540,7 +943,18 @@
                             <div class="row mt-2">
                                 <div class="col-12 text-justify">
                                     <p style="text-align: justify;">
-                                        <strong>VIGESIMA PRIMERA.</strong><span>“EL TRABAJADOR” SE OBLIGA DURANTE LA VIGENCIA DE ESTE CONTRATO,  ASÍ COMO DESPUÉS DE SU TERMINACIÓN O RESCISIÓN, A NO DIVULGAR NI UTILIZAR CUALQUIER ASPECTO O INFORMACIÓN RELACIONADA CON LOS NEGOCIOS, ACTIVIDADES Y OPERACIONES DE “EL PATRON” O DE LOS CLIENTES DE ÉSTE, QUE FUERAN DE SU CONOCIMIENTO CON MOTIVO DE LA RELACIÓN DE TRABAJO, NI PROPORCIONARÁ A TERCEROS, DIRECTA O INDIRECTAMENTE, INFORMACIÓN VERBAL O POR ESCRITO SOBRE LOS MÉTODOS, SISTEMAS Y ACTIVIDADES DE CUALQUIER CLASE QUE SE RELACIONEN CON “EL PATRON” Y LOS CLIENTES DURANTE EL DESARROLLO DE SUS ACTIVIDADES.</span>
+                                        <strong>VIGESIMA PRIMERA.</strong>
+                                        <span>“EL TRABAJADOR” SE OBLIGA DURANTE LA VIGENCIA DE ESTE
+                                            CONTRATO, ASÍ COMO DESPUÉS DE SU TERMINACIÓN O
+                                            RESCISIÓN, A NO DIVULGAR NI UTILIZAR CUALQUIER ASPECTO O
+                                            INFORMACIÓN RELACIONADA CON LOS NEGOCIOS, ACTIVIDADES Y
+                                            OPERACIONES DE “EL PATRON” O DE LOS CLIENTES DE ÉSTE,
+                                            QUE FUERAN DE SU CONOCIMIENTO CON MOTIVO DE LA RELACIÓN
+                                            DE TRABAJO, NI PROPORCIONARÁ A TERCEROS, DIRECTA O
+                                            INDIRECTAMENTE, INFORMACIÓN VERBAL O POR ESCRITO SOBRE
+                                            LOS MÉTODOS, SISTEMAS Y ACTIVIDADES DE CUALQUIER CLASE
+                                            QUE SE RELACIONEN CON “EL PATRON” Y LOS CLIENTES DURANTE
+                                            EL DESARROLLO DE SUS ACTIVIDADES.</span>
                                     </p>
                                 </div>
                             </div>
@@ -548,7 +962,18 @@
                             <div class="row mt-2">
                                 <div class="col-12 text-justify">
                                     <p style="text-align: justify;">
-                                        <span>TAMPOCO DIVULGARÁ EL CONTENIDO DE LOS DOCUMENTOS, ESTUDIOS, PROGRAMAS, PROPUESTAS, ETC., EN GENERAL CUALQUIER DOCUMENTO QUE SE LE HUBIERE PROPORCIONADO O FACILITADO DURANTE EL DESEMPEÑO; IGUALMENTE QUEDA OBLIGADO A NO SERVIRSE POR SU PROVECHO PERSONAL O DE TERCEROS DE LAS PATENTES, MARCAS Y DERECHOS DE AUTOR DE “EL PATRÓN”. PARA EL CASO DE QUE “EL TRABAJADOR” INCUMPLA EL CONTENIDO DE ESTA CLAUSULA, “EL PATRÓN” PODRÁ INMEDIATAMENTE Y DE MANERA DIRECTA SOLICITARLE LE REPARE EL DAÑO MORAL Y/O PATRIMONIAL OCASIONADO CON INDEPENDENCIA DE LAS RESPONSABILIDADES CIVILES Y/O PENALES QUE PUDIERA GENERAR SU ACTUAR.</span>
+                                        <span>TAMPOCO DIVULGARÁ EL CONTENIDO DE LOS DOCUMENTOS,
+                                            ESTUDIOS, PROGRAMAS, PROPUESTAS, ETC., EN GENERAL
+                                            CUALQUIER DOCUMENTO QUE SE LE HUBIERE PROPORCIONADO O
+                                            FACILITADO DURANTE EL DESEMPEÑO; IGUALMENTE QUEDA
+                                            OBLIGADO A NO SERVIRSE POR SU PROVECHO PERSONAL O DE
+                                            TERCEROS DE LAS PATENTES, MARCAS Y DERECHOS DE AUTOR DE
+                                            “EL PATRÓN”. PARA EL CASO DE QUE “EL TRABAJADOR”
+                                            INCUMPLA EL CONTENIDO DE ESTA CLAUSULA, “EL PATRÓN”
+                                            PODRÁ INMEDIATAMENTE Y DE MANERA DIRECTA SOLICITARLE LE
+                                            REPARE EL DAÑO MORAL Y/O PATRIMONIAL OCASIONADO CON
+                                            INDEPENDENCIA DE LAS RESPONSABILIDADES CIVILES Y/O
+                                            PENALES QUE PUDIERA GENERAR SU ACTUAR.</span>
                                     </p>
                                 </div>
                             </div>
@@ -556,7 +981,33 @@
                             <div class="row mt-2">
                                 <div class="col-12 text-justify">
                                     <p style="text-align: justify;">
-                                        <span>“EL TRABAJADOR”, PARA EVITAR UNA COMPETENCIA DESLEAL, PLAGIO, O CUALQUIER OTRO ACTO QUE SE PUEDA TIPIFACAR, Y CON EL CUAL LE PUDIERAN FINCAR UNA RESPONSABILIDAD CIVIL, PENAL, MERCANTIL, SE OBLIGA EXPRESAMENTE, A NO TRABAJAR, DEDICARSE, COLABORAR, VENDER, PRESTAR SUS SERVICIOS COMO PROFESIONISTA O DE CUALQUIER OTRA FORMA O CONCEPTO, ASESORAR DE CUALQUIER FORMA O CONCEPTO, SER PROMOTOR DE VENTAS, COMISIONISTA, INTERVENIR, PARTICIPAR, O DE ALGUNA FORMA INVOLUCRARSE, RELACIONARSE O DEDICAR SUS ACTIVIDADES, TRABAJO O LABORES POR SU PROPIA CUENTA, POR SI O PARA OTROS, EN ACTIVIDADES SIMILARES QUE SE RELACIONEN CON EL GIRO QUE TIENE ESTA EMPRESA Y QUE EN EL OBJETO SOCIAL DE LA MISMA SE MENCIONAN DE MANERA ENUNCIATIVA Y NO LIMITATIVA, EL CUAL CONOCE PERFECTAMENTE DESDE ESTE MOMENTO PUES SON LAS MISMAS QUE SE MENCIONAN EN EL PROEMIO DEL PRESENTE CONTRATO, DE IGUAL FORMA” EL TRABAJADOR”, CON LOS ALCANCES MENCIONADOS, SE OBLIGA A NO ACERCARSE, DIRECTA O INDIRECTAMENTE POR SI O POR CONDUCTO DE OTRA PERSONA, CON LOS CLIENTES QUE TIENE ESTA EMPRESA A NIVEL NACIONAL Y LOS PROSPECTOS DE CLIENTES QUE PUDIERA TENER A NIVEL NACIONAL, LOS EFECTOS DE ESTA CLAUSULA SERAN DE DOS AÑOS CONTADOS A PARTIR DE QUE “EL TRABAJADOR” DEJE DE PRESTAR SUS SERVICIOS A LA EMPRESA, CUALQUIERA QUE SEA LA CAUSA O MOTIVO CON LA QUE SE DE POR TERMINADA LA RELACION DE TRABAJO, INCLUSO SI ESTE LLEGARA A DEMANDAR SE TOMARA EN CUENTA EL ULTIMO DIA QUE DIGA QUE LABORA.</span>
+                                        <span>“EL TRABAJADOR”, PARA EVITAR UNA COMPETENCIA DESLEAL,
+                                            PLAGIO, O CUALQUIER OTRO ACTO QUE SE PUEDA TIPIFACAR, Y
+                                            CON EL CUAL LE PUDIERAN FINCAR UNA RESPONSABILIDAD
+                                            CIVIL, PENAL, MERCANTIL, SE OBLIGA EXPRESAMENTE, A NO
+                                            TRABAJAR, DEDICARSE, COLABORAR, VENDER, PRESTAR SUS
+                                            SERVICIOS COMO PROFESIONISTA O DE CUALQUIER OTRA FORMA O
+                                            CONCEPTO, ASESORAR DE CUALQUIER FORMA O CONCEPTO, SER
+                                            PROMOTOR DE VENTAS, COMISIONISTA, INTERVENIR,
+                                            PARTICIPAR, O DE ALGUNA FORMA INVOLUCRARSE, RELACIONARSE
+                                            O DEDICAR SUS ACTIVIDADES, TRABAJO O LABORES POR SU
+                                            PROPIA CUENTA, POR SI O PARA OTROS, EN ACTIVIDADES
+                                            SIMILARES QUE SE RELACIONEN CON EL GIRO QUE TIENE ESTA
+                                            EMPRESA Y QUE EN EL OBJETO SOCIAL DE LA MISMA SE
+                                            MENCIONAN DE MANERA ENUNCIATIVA Y NO LIMITATIVA, EL CUAL
+                                            CONOCE PERFECTAMENTE DESDE ESTE MOMENTO PUES SON LAS
+                                            MISMAS QUE SE MENCIONAN EN EL PROEMIO DEL PRESENTE
+                                            CONTRATO, DE IGUAL FORMA” EL TRABAJADOR”, CON LOS
+                                            ALCANCES MENCIONADOS, SE OBLIGA A NO ACERCARSE, DIRECTA
+                                            O INDIRECTAMENTE POR SI O POR CONDUCTO DE OTRA PERSONA,
+                                            CON LOS CLIENTES QUE TIENE ESTA EMPRESA A NIVEL NACIONAL
+                                            Y LOS PROSPECTOS DE CLIENTES QUE PUDIERA TENER A NIVEL
+                                            NACIONAL, LOS EFECTOS DE ESTA CLAUSULA SERAN DE DOS AÑOS
+                                            CONTADOS A PARTIR DE QUE “EL TRABAJADOR” DEJE DE PRESTAR
+                                            SUS SERVICIOS A LA EMPRESA, CUALQUIERA QUE SEA LA CAUSA
+                                            O MOTIVO CON LA QUE SE DE POR TERMINADA LA RELACION DE
+                                            TRABAJO, INCLUSO SI ESTE LLEGARA A DEMANDAR SE TOMARA EN
+                                            CUENTA EL ULTIMO DIA QUE DIGA QUE LABORA.</span>
                                     </p>
                                 </div>
                             </div>
@@ -564,7 +1015,19 @@
                             <div class="row mt-2">
                                 <div class="col-12 text-justify">
                                     <p style="text-align: justify;">
-                                        <strong>VIGESIMA SEGUNDA.</strong><span> EN CASO DE QUE "EL TRABAJADOR" INCUMPLA CON LAS OBLIGACIONES A SU CARGO, PREVISTAS EN LAS CLAUSULAS QUE ANTECEDEN; PAGARÁ A "EL PATRON", INDEPENDIENTEMENTE DE LA RESPONSABILIDAD CIVIL, PENAL O MERCANTIL O CUALQUIER OTRA QUE PUDIERA TENER, ADEMAS, UNA INDEMNIZACIÓN EQUIVALENTE AL MONTO DE LOS DAÑOS Y PERJUICIOS QUE POR ESTE CONCEPTO SE GENERASEN, LA CUAL DETERMINARA “EL PATRON” SIN NECESIDAD DE QUE TENGA QUE ACREDITAR EL MONTO REQUERIDO, SOLO BASTARA CON QUE LO REQUIERA, ADEMÁS DE LAS CANTIDADES QUE SE GENEREN POR CONCEPTO DE GASTOS DE ABOGADOS Y DEL PROCEDIMIENTO JUDICIAL QUE "EL PATRON" TENGA QUE PROMOVER EN CONTRA DE "EL TRABAJADOR".</span>
+                                        <strong>VIGESIMA SEGUNDA.</strong>
+                                        <span> EN CASO DE QUE "EL TRABAJADOR" INCUMPLA CON LAS
+                                            OBLIGACIONES A SU CARGO, PREVISTAS EN LAS CLAUSULAS QUE
+                                            ANTECEDEN; PAGARÁ A "EL PATRON", INDEPENDIENTEMENTE DE
+                                            LA RESPONSABILIDAD CIVIL, PENAL O MERCANTIL O CUALQUIER
+                                            OTRA QUE PUDIERA TENER, ADEMAS, UNA INDEMNIZACIÓN
+                                            EQUIVALENTE AL MONTO DE LOS DAÑOS Y PERJUICIOS QUE POR
+                                            ESTE CONCEPTO SE GENERASEN, LA CUAL DETERMINARA “EL
+                                            PATRON” SIN NECESIDAD DE QUE TENGA QUE ACREDITAR EL
+                                            MONTO REQUERIDO, SOLO BASTARA CON QUE LO REQUIERA,
+                                            ADEMÁS DE LAS CANTIDADES QUE SE GENEREN POR CONCEPTO DE
+                                            GASTOS DE ABOGADOS Y DEL PROCEDIMIENTO JUDICIAL QUE "EL
+                                            PATRON" TENGA QUE PROMOVER EN CONTRA DE "EL TRABAJADOR".</span>
                                     </p>
                                 </div>
                             </div>
@@ -572,7 +1035,17 @@
                             <div class="row mt-2">
                                 <div class="col-12 text-justify">
                                     <p style="text-align: justify;">
-                                        <strong>VIGESIMA TERCERA.</strong><span> “EL TRABAJADOR”, DURANTE EL DESEMPEÑO DE SUS FUNCIONES SE RESPONSABILIZA POR CUALQUIER ACTO U OMISIÓN, INTENCIONAL O NEGLIGENTE QUE LLEGASE A CAUSAR DAÑO A LOS BIENES O AL PERSONAL DE “EL PATRON”, FACULTANDO A “EL PATRON” A DESCONTAR DE SUS SALARIOS EN TÉRMINOS DE LEY LAS CANTIDADES QUE RESULTEN POR LOS DAÑOS OCASIONADOS O EN SU CASO DEL FINIQUITO QUE LE PUDIERA CORRESPONDER, SIN PERJUICIO DE LAS RESPONSABILIDADES CIVILES Y/O PENALES QUE PUDIERA GENERAR SU ACTUAR.</span>
+                                        <strong>VIGESIMA TERCERA.</strong>
+                                        <span> “EL TRABAJADOR”, DURANTE EL DESEMPEÑO DE SUS
+                                            FUNCIONES SE RESPONSABILIZA POR CUALQUIER ACTO U
+                                            OMISIÓN, INTENCIONAL O NEGLIGENTE QUE LLEGASE A CAUSAR
+                                            DAÑO A LOS BIENES O AL PERSONAL DE “EL PATRON”,
+                                            FACULTANDO A “EL PATRON” A DESCONTAR DE SUS SALARIOS EN
+                                            TÉRMINOS DE LEY LAS CANTIDADES QUE RESULTEN POR LOS
+                                            DAÑOS OCASIONADOS O EN SU CASO DEL FINIQUITO QUE LE
+                                            PUDIERA CORRESPONDER, SIN PERJUICIO DE LAS
+                                            RESPONSABILIDADES CIVILES Y/O PENALES QUE PUDIERA
+                                            GENERAR SU ACTUAR.</span>
                                     </p>
                                 </div>
                             </div>
@@ -580,7 +1053,13 @@
                             <div class="row mt-2">
                                 <div class="col-12 text-justify">
                                     <p style="text-align: justify;">
-                                        <strong>VIGESIMA CUARTA.</strong><span> “EL TRABAJADOR” MANIFIESTA CONOCER PERFECTAMENTE EL ALCANCE Y PROCEDIMIENTOS DEL AVISO DE PRIVACIDAD QUE OPERA EN LA EMPRESA ESTEVEZ.JOR SERVICIOS S.A DE C.V PARA EFECTOS DE QUE SE VEA SALVAGUARDADA LA INFORMACION DE SUS DATOS PERSONALES ASI COMO LA CANCELACION EN EL USO DE ESTOS.</span>
+                                        <strong>VIGESIMA CUARTA.</strong>
+                                        <span> “EL TRABAJADOR” MANIFIESTA CONOCER PERFECTAMENTE EL
+                                            ALCANCE Y PROCEDIMIENTOS DEL AVISO DE PRIVACIDAD QUE
+                                            OPERA EN LA EMPRESA ESTEVEZ.JOR SERVICIOS S.A DE C.V
+                                            PARA EFECTOS DE QUE SE VEA SALVAGUARDADA LA INFORMACION
+                                            DE SUS DATOS PERSONALES ASI COMO LA CANCELACION EN EL
+                                            USO DE ESTOS.</span>
                                     </p>
                                 </div>
                             </div>
@@ -588,7 +1067,24 @@
                             <div class="row mt-2">
                                 <div class="col-12 text-justify">
                                     <p style="text-align: justify;">
-                                        <strong>VIGESIMA QUINTA.</strong><span>“LAS PARTES ESTABLECEN EN TÉRMINOS DE LO DISPUESTO POR LOS ARTÍCULOS 2, 3,  DE LA LEY, <strong>NORMA OFICIAL MEXICANA NMX-R-025-SCFI-2015, REFERENTE A LA IGUALDAD LABORAL Y NO DISCRIMINACIÓN</strong>QUE <strong>“EL PATRON”</strong> RESPETA PLENAMENTE LA DIGNIDAD HUMANA, PROPICIA EL TRABAJO DIGNO Y DECENTE EN TODAS LAS RELACIONES LABORALES, PROMUEVE LA IGUALDAD SUSTANTIVA ENTRE TRABAJADORES Y TRABAJADORAS, SE OTORGA LAS MISMAS OPORTUNIDADES A ESTOS, CONSIDERANDO LAS DIFERENCIAS BIOLÓGICAS, SOCIALES, Y CULTURALES DE MUJERES Y HOMBRES; POR ELLO NO EXISTE DISCRIMINACIÓN POR ORIGEN ÉTNICO O NACIONAL, IDENTIDAD DE GÉNERO, EDAD, DISCAPACIDAD, CONDICIÓN SOCIAL, CONDICIONES DE SALUD, RELIGIÓN, CONDICIÓN MIGRATORIA, OPINIONES, PREFERENCIAS SEXUALES O ESTADO CIVIL, SE PROMUEVE LA INCLUSION LABORAL Y SIN EXCEPCIÓN ALGUNA TODOS LOS TRABAJADORES TENDRÁN LOS MISMOS DERECHOS Y OBLIGACIONES.</span>
+                                        <strong>VIGESIMA QUINTA.</strong>
+                                        <span>“LAS PARTES ESTABLECEN EN TÉRMINOS DE LO DISPUESTO POR
+                                            LOS ARTÍCULOS 2, 3, DE LA LEY, <strong>NORMA OFICIAL
+                                            MEXICANA NMX-R-025-SCFI-2015, REFERENTE A LA IGUALDAD
+                                            LABORAL Y NO DISCRIMINACIÓN</strong>QUE <strong>“EL
+                                            PATRON”</strong> RESPETA PLENAMENTE LA DIGNIDAD HUMANA,
+                                            PROPICIA EL TRABAJO DIGNO Y DECENTE EN TODAS LAS
+                                            RELACIONES LABORALES, PROMUEVE LA IGUALDAD SUSTANTIVA
+                                            ENTRE TRABAJADORES Y TRABAJADORAS, SE OTORGA LAS MISMAS
+                                            OPORTUNIDADES A ESTOS, CONSIDERANDO LAS DIFERENCIAS
+                                            BIOLÓGICAS, SOCIALES, Y CULTURALES DE MUJERES Y HOMBRES;
+                                            POR ELLO NO EXISTE DISCRIMINACIÓN POR ORIGEN ÉTNICO O
+                                            NACIONAL, IDENTIDAD DE GÉNERO, EDAD, DISCAPACIDAD,
+                                            CONDICIÓN SOCIAL, CONDICIONES DE SALUD, RELIGIÓN,
+                                            CONDICIÓN MIGRATORIA, OPINIONES, PREFERENCIAS SEXUALES O
+                                            ESTADO CIVIL, SE PROMUEVE LA INCLUSION LABORAL Y SIN
+                                            EXCEPCIÓN ALGUNA TODOS LOS TRABAJADORES TENDRÁN LOS
+                                            MISMOS DERECHOS Y OBLIGACIONES.</span>
                                     </p>
                                 </div>
                             </div>
@@ -596,7 +1092,11 @@
                             <div class="row mt-2">
                                 <div class="col-12 text-justify">
                                     <p style="text-align: justify;">
-                                        <strong>VIGESIMA SEXTA.</strong><span>“EL PATRON” MANIFIESTA QUE TRATANDOSE DE MUJERES Y MENORES SE ESTARA A LO ESTABLECIDO EN EL TITULO QUINTO, TITULO QUINTO BIS, DE “LA LEY” Y DEMAS ARTICULOS Y DISPOSICIONES RELATIVAS Y APLICABLES.</span>
+                                        <strong>VIGESIMA SEXTA.</strong>
+                                        <span>“EL PATRON” MANIFIESTA QUE TRATANDOSE DE MUJERES Y
+                                            MENORES SE ESTARA A LO ESTABLECIDO EN EL TITULO QUINTO,
+                                            TITULO QUINTO BIS, DE “LA LEY” Y DEMAS ARTICULOS Y
+                                            DISPOSICIONES RELATIVAS Y APLICABLES.</span>
                                     </p>
                                 </div>
                             </div>
@@ -604,7 +1104,22 @@
                             <div class="row mt-2">
                                 <div class="col-12 text-justify">
                                     <p style="text-align: justify;">
-                                        <strong>VIGESIMA SEPTIMA.</strong><span>“EN CUMPLIMIENTO A LO SEÑALADO POR LOS ARTÍCULOS 501 Y 25, AMBOS DE LA LEY, EN ESTE ACTO MANIFIESTO QUE SEÑALO COMO MI LEGITIMO BENEFICIARIO DE TODOS LOS BIENES, PRESTACIONES LEGALES, EXTRALEGALES, SALARIOS DEVENGADOS, INDEMNIZACIONES Y/O CUALQUIER OTRO CONCEPTO A QUE TENGA DERECHO O QUE HAYA GENERADO Y QUE POR LEY ME CORRESPONDA A : ___________________________________________ , PERSONA QUE EN MI AUSENCIA POR ALGUNA DE LAS CAUSAS PREVISTAS EN LOS PRECEPTOS SEÑALADOS, TIENE EL DERECHO DE RECLAMAR Y QUE SE LE PAGUEN LOS CONCEPTOS MENCIONADOS QUE POR LEY ME CORRESPONDAN, PERSONA QUE DEPENDE ECONÓMICAMENTE DE MÍ YA QUE YO ME ENCARGO DE SUFRAGAR TODOS LOS GASTOS QUE SE TIENEN EN LA CASA QUE HABITAMOS DE MANERA COMÚN, LO ANTERIOR PARA TODOS LOS EFECTOS LEGALES A QUE HAYA LUGAR.</span>
+                                        <strong>VIGESIMA SEPTIMA.</strong>
+                                        <span>“EN CUMPLIMIENTO A LO SEÑALADO POR LOS ARTÍCULOS 501 Y
+                                            25, AMBOS DE LA LEY, EN ESTE ACTO MANIFIESTO QUE SEÑALO
+                                            COMO MI LEGITIMO BENEFICIARIO DE TODOS LOS BIENES,
+                                            PRESTACIONES LEGALES, EXTRALEGALES, SALARIOS DEVENGADOS,
+                                            INDEMNIZACIONES Y/O CUALQUIER OTRO CONCEPTO A QUE TENGA
+                                            DERECHO O QUE HAYA GENERADO Y QUE POR LEY ME CORRESPONDA
+                                            A : ___________________________________________ ,
+                                            PERSONA QUE EN MI AUSENCIA POR ALGUNA DE LAS CAUSAS
+                                            PREVISTAS EN LOS PRECEPTOS SEÑALADOS, TIENE EL DERECHO
+                                            DE RECLAMAR Y QUE SE LE PAGUEN LOS CONCEPTOS MENCIONADOS
+                                            QUE POR LEY ME CORRESPONDAN, PERSONA QUE DEPENDE
+                                            ECONÓMICAMENTE DE MÍ YA QUE YO ME ENCARGO DE SUFRAGAR
+                                            TODOS LOS GASTOS QUE SE TIENEN EN LA CASA QUE HABITAMOS
+                                            DE MANERA COMÚN, LO ANTERIOR PARA TODOS LOS EFECTOS
+                                            LEGALES A QUE HAYA LUGAR.</span>
                                     </p>
                                 </div>
                             </div>
@@ -612,7 +1127,15 @@
                             <div class="row mt-2">
                                 <div class="col-12 text-justify">
                                     <p style="text-align: justify;">
-                                        <strong>VIGESIMA OCTAVA.</strong><span>EN TEMAS DE SEGURIDAD E HIGIENE, EL TRABAJADOR, MANIFIESTA QUE SE OBLIGA A OBSERVAR TODAS LAS MEDIDAS Y NORMAS QUE APLICAN EN LA EMPRESA PARA PREVENIR ACCIDENTES, ENFERMEDADES Y LAS MEDIDAS DE SEGURIDAD E HIGIENE QUE SEÑALE LA COMISION MIXTA DE SEGURIDAD E HIGIENE O SALUD EN EL TRABAJO, QUE SE ENCUENTRA INTEGRAGA Y EN FUNCIONES EN LA EMPRESA ASI COMO LAS DISPOSICIONES QUE AL RESPECTO SEÑALEN LAS AUTORIDADES.</span>
+                                        <strong>VIGESIMA OCTAVA.</strong>
+                                        <span>EN TEMAS DE SEGURIDAD E HIGIENE, EL TRABAJADOR,
+                                            MANIFIESTA QUE SE OBLIGA A OBSERVAR TODAS LAS MEDIDAS Y
+                                            NORMAS QUE APLICAN EN LA EMPRESA PARA PREVENIR
+                                            ACCIDENTES, ENFERMEDADES Y LAS MEDIDAS DE SEGURIDAD E
+                                            HIGIENE QUE SEÑALE LA COMISION MIXTA DE SEGURIDAD E
+                                            HIGIENE O SALUD EN EL TRABAJO, QUE SE ENCUENTRA
+                                            INTEGRAGA Y EN FUNCIONES EN LA EMPRESA ASI COMO LAS
+                                            DISPOSICIONES QUE AL RESPECTO SEÑALEN LAS AUTORIDADES.</span>
                                     </p>
                                 </div>
                             </div>
@@ -620,7 +1143,13 @@
                             <div class="row mt-2">
                                 <div class="col-12 text-justify">
                                     <p style="text-align: justify;">
-                                        <strong>VIGESIMA NOVENA.</strong><span>EL PATRON LE HACE SABER AL TRABAJADOR QUE TIENE TOTAL LIBERTAD EN INTEGRAR LAS COMISIONES QUE SE INTEGREN EN LA EMPRESA CON MOTIVO DE LA CORRECTA APLICACIÓN, SUPERVISION, DE LAS CONDICIONES GENERALES DE TRABAJO Y RESPETO A SUS DERECHOS LABORALES Y A SUS DERECHOS HUMANOS.</span>
+                                        <strong>VIGESIMA NOVENA.</strong>
+                                        <span>EL PATRON LE HACE SABER AL TRABAJADOR QUE TIENE TOTAL
+                                            LIBERTAD EN INTEGRAR LAS COMISIONES QUE SE INTEGREN EN
+                                            LA EMPRESA CON MOTIVO DE LA CORRECTA APLICACIÓN,
+                                            SUPERVISION, DE LAS CONDICIONES GENERALES DE TRABAJO Y
+                                            RESPETO A SUS DERECHOS LABORALES Y A SUS DERECHOS
+                                            HUMANOS.</span>
                                     </p>
                                 </div>
                             </div>
@@ -628,7 +1157,12 @@
                             <div class="row mt-2">
                                 <div class="col-12 text-justify">
                                     <p style="text-align: justify;">
-                                        <strong>TRIGESIMA.</strong><span> EL PATRON, RESPETA, SE OBLIGA Y GARANTIZA LA LIBERTAD SINDICAL QUE EN TERMINOS DE LEY TIENE EL TRABAJADOR. Y LE OTORGARA, LOS MEDIOS NECESARIOS PARA CUMPLIMENTAR SUS DERECHOS CONSAGRADOS EN LA LEY Y EN LA CONSTITUCIÓN POLÍTICA DE LOS ESTADOS UNIDOS MEXICANOS.</span>
+                                        <strong>TRIGESIMA.</strong>
+                                        <span> EL PATRON, RESPETA, SE OBLIGA Y GARANTIZA LA LIBERTAD
+                                            SINDICAL QUE EN TERMINOS DE LEY TIENE EL TRABAJADOR. Y
+                                            LE OTORGARA, LOS MEDIOS NECESARIOS PARA CUMPLIMENTAR SUS
+                                            DERECHOS CONSAGRADOS EN LA LEY Y EN LA CONSTITUCIÓN
+                                            POLÍTICA DE LOS ESTADOS UNIDOS MEXICANOS.</span>
                                     </p>
                                 </div>
                             </div>
@@ -636,7 +1170,15 @@
                             <div class="row mt-2">
                                 <div class="col-12 text-justify">
                                     <p style="text-align: justify;">
-                                        <strong>TRIGESIMA PRIMERA.</strong><span>EL PATRON MANIFIESTA QUE TRATANDOSE DE “REPARTO DE UTILIDADES”, SI AL TRABAJADOR LE CORRESPONDE ALGUNA SUMA POR ESTE CONCEPTO LA MISMA LE SERA ENTREGADA EN LOS TIEMPOS QUE SEÑALA LA LEY, SALVO QUE EXISTAN OBJECIONES AL DICTAMEN, SI POR ALGUNA CIRCUNSTANCIA EL TRABAJADOR YA NO LABORARA PARA EL PATRON, LA CANTIDAD QUE LE CORRESPONDA PODRA RECIBIRLA EN LAS INSTALACIONES DE EL PATRON.</span>
+                                        <strong>TRIGESIMA PRIMERA.</strong>
+                                        <span>EL PATRON MANIFIESTA QUE TRATANDOSE DE “REPARTO DE
+                                            UTILIDADES”, SI AL TRABAJADOR LE CORRESPONDE ALGUNA SUMA
+                                            POR ESTE CONCEPTO LA MISMA LE SERA ENTREGADA EN LOS
+                                            TIEMPOS QUE SEÑALA LA LEY, SALVO QUE EXISTAN OBJECIONES
+                                            AL DICTAMEN, SI POR ALGUNA CIRCUNSTANCIA EL TRABAJADOR
+                                            YA NO LABORARA PARA EL PATRON, LA CANTIDAD QUE LE
+                                            CORRESPONDA PODRA RECIBIRLA EN LAS INSTALACIONES DE EL
+                                            PATRON.</span>
                                     </p>
                                 </div>
                             </div>
@@ -644,7 +1186,14 @@
                             <div class="row mt-2">
                                 <div class="col-12 text-justify">
                                     <p style="text-align: justify;">
-                                        <strong>TRIGESIMA SEGUNDA.</strong><span>EL PATRON MANIFIESTA QUE EL TRABAJADOR GOZARA LOS BENEFICIOS DE LA SEGURIDAD SOCIAL A TRAVES DEL INSTITUTO MEXICANO DEL SEGURO SOCIAL ENTIDAD DONDE SERA COTIZADO, ASI COMO EN EL INSTITUTO DEL FONDO NACIONAL DE LA VIVIENDA PARA LOS TRABAJADORES Y EL SISTEMA DE AHORRO PARA EL RETIRO. Y TENDRA ACCESO AL INSTITUTO DEL FONDO NACIONAL PARA EL CONSUMO DE LOS TRABAJADORES.</span>
+                                        <strong>TRIGESIMA SEGUNDA.</strong>
+                                        <span>EL PATRON MANIFIESTA QUE EL TRABAJADOR GOZARA LOS
+                                            BENEFICIOS DE LA SEGURIDAD SOCIAL A TRAVES DEL INSTITUTO
+                                            MEXICANO DEL SEGURO SOCIAL ENTIDAD DONDE SERA COTIZADO,
+                                            ASI COMO EN EL INSTITUTO DEL FONDO NACIONAL DE LA
+                                            VIVIENDA PARA LOS TRABAJADORES Y EL SISTEMA DE AHORRO
+                                            PARA EL RETIRO. Y TENDRA ACCESO AL INSTITUTO DEL FONDO
+                                            NACIONAL PARA EL CONSUMO DE LOS TRABAJADORES.</span>
                                     </p>
                                 </div>
                             </div>
@@ -652,7 +1201,13 @@
                             <div class="row mt-2">
                                 <div class="col-12 text-justify">
                                     <p style="text-align: justify;">
-                                        <strong>TRIGESIMA TERCERA.</strong><span>EL PATRON MANIFIESTA QUE EN EL CENTRO DE TRABAJO SE HA IMPLEMENTADO DE MANERA CONJUNTA Y DE COMUN ACUERDO CON LOS TRABAJADORES, UN PROTOCOLO PARA PREVENIR LA DISCRIMINACIÓN POR RAZONES DE GÉNERO Y ATENCIÓN DE CASOS DE VIOLENCIA Y ACOSO U HOSTIGAMIENTO SEXUAL, ASÍ COMO ERRADICAR EL TRABAJO FORZOSO E INFANTIL</span>
+                                        <strong>TRIGESIMA TERCERA.</strong>
+                                        <span>EL PATRON MANIFIESTA QUE EN EL CENTRO DE TRABAJO SE HA
+                                            IMPLEMENTADO DE MANERA CONJUNTA Y DE COMUN ACUERDO CON
+                                            LOS TRABAJADORES, UN PROTOCOLO PARA PREVENIR LA
+                                            DISCRIMINACIÓN POR RAZONES DE GÉNERO Y ATENCIÓN DE CASOS
+                                            DE VIOLENCIA Y ACOSO U HOSTIGAMIENTO SEXUAL, ASÍ COMO
+                                            ERRADICAR EL TRABAJO FORZOSO E INFANTIL</span>
                                     </p>
                                 </div>
                             </div>
@@ -660,7 +1215,16 @@
                             <div class="row mt-2">
                                 <div class="col-12 text-justify">
                                     <p style="text-align: justify;">
-                                        <strong>TRIGESIMA CUARTA.</strong><span>EL PATRON MANIFIESTA QUE CONFORME A LA LEY OTORGARA A EL TRABAJADOR PERMISO DE PATERNIDAD DE CINCO DÍAS LABORABLES CON GOCE DE SUELDO, A LOS HOMBRES TRABAJADORES, POR EL NACIMIENTO DE SUS HIJOS Y DE IGUAL MANERA EN EL CASO DE LA ADOPCIÓN DE UN INFANTE. DE IGUAL FORMA CUMPLIR CON LA DISPOSICION ESTABLECIDA POR EL ARTICULO 140 BIS DEL LA LEY DEL SEGURO SOCIAL, RESPECTO A LAS LICENCIAS POR CUIDADOS MEDICOS POR HIJOS MENORES 16 AÑOS DIAGNOSTICADOS CON CUALQUIER TIPO DE CANCER.</span>
+                                        <strong>TRIGESIMA CUARTA.</strong>
+                                        <span>EL PATRON MANIFIESTA QUE CONFORME A LA LEY OTORGARA A
+                                            EL TRABAJADOR PERMISO DE PATERNIDAD DE CINCO DÍAS
+                                            LABORABLES CON GOCE DE SUELDO, A LOS HOMBRES
+                                            TRABAJADORES, POR EL NACIMIENTO DE SUS HIJOS Y DE IGUAL
+                                            MANERA EN EL CASO DE LA ADOPCIÓN DE UN INFANTE. DE IGUAL
+                                            FORMA CUMPLIR CON LA DISPOSICION ESTABLECIDA POR EL
+                                            ARTICULO 140 BIS DEL LA LEY DEL SEGURO SOCIAL, RESPECTO
+                                            A LAS LICENCIAS POR CUIDADOS MEDICOS POR HIJOS MENORES
+                                            16 AÑOS DIAGNOSTICADOS CON CUALQUIER TIPO DE CANCER.</span>
                                     </p>
                                 </div>
                             </div>
@@ -668,7 +1232,10 @@
                             <div class="row mt-2">
                                 <div class="col-12 text-justify">
                                     <p style="text-align: justify;">
-                                        <strong>TRIGESIMA QUINTA.</strong><span>LAS PARTES ESTABLECEN QUE TRATANDOSE DE TELETRABAJO EN CASO DE QUE ESTE SE DE, SE ESTARA A LO DISPUESTO POR EL TITULO CUARTO, CAPITULO XII BIS, TELETRABAJO,</span>
+                                        <strong>TRIGESIMA QUINTA.</strong>
+                                        <span>LAS PARTES ESTABLECEN QUE TRATANDOSE DE TELETRABAJO EN
+                                            CASO DE QUE ESTE SE DE, SE ESTARA A LO DISPUESTO POR EL
+                                            TITULO CUARTO, CAPITULO XII BIS, TELETRABAJO,</span>
                                     </p>
                                 </div>
                             </div>
@@ -676,7 +1243,15 @@
                             <div class="row mt-2">
                                 <div class="col-12 text-justify">
                                     <p style="text-align: justify;">
-                                        <strong>TRIGESIMA SEXTA.</strong><span> EL PATRON MANIFIESTA TENER IMPLEMENTADAS LAS DISPOSICIONES PREVISTAS POR LA NOM-035-STPS-2018, FACTORES DE RIESGO PSICOSOCIAL EN EL TRABAJO-IDENTIFICACIÓN, ANÁLISIS Y PREVENCIÓN Y LA NOM-036-1-STPS-2018, FACTORES DE RIESGO ERGONÓMICO EN EL TRABAJO-IDENTIFICACIÓN, ANÁLISIS, PREVENCIÓN Y CONTROL, LOS CUALES DEBE OBSERVAR EL TRABAJADOR EN LA EJECUCION DE SUS LABORES.</span>
+                                        <strong>TRIGESIMA SEXTA.</strong>
+                                        <span> EL PATRON MANIFIESTA TENER IMPLEMENTADAS LAS
+                                            DISPOSICIONES PREVISTAS POR LA NOM-035-STPS-2018,
+                                            FACTORES DE RIESGO PSICOSOCIAL EN EL
+                                            TRABAJO-IDENTIFICACIÓN, ANÁLISIS Y PREVENCIÓN Y LA
+                                            NOM-036-1-STPS-2018, FACTORES DE RIESGO ERGONÓMICO EN EL
+                                            TRABAJO-IDENTIFICACIÓN, ANÁLISIS, PREVENCIÓN Y CONTROL,
+                                            LOS CUALES DEBE OBSERVAR EL TRABAJADOR EN LA EJECUCION
+                                            DE SUS LABORES.</span>
                                     </p>
                                 </div>
                             </div>
@@ -684,7 +1259,14 @@
                             <div class="row mt-2">
                                 <div class="col-12 text-justify">
                                     <p style="text-align: justify;">
-                                        <strong>TRIGESIMA SEPTIMA.</strong><span>EL PATRON MANIFIESTA A EL TRABAJADOR QUE CON EL OBJETO DE PREVENIR Y ERRADICAR EL VIRUS COVID 19 Y LAS VARIANTES EN QUE SE MANIFIESTA, TIENE IMPLEMENTADO EN EL CENTRO DE TRABAJO, MEDIDAS Y PROTOCOLOS SANITARIOS, QUE DEBERA OBSERVAR Y CUMPLIR DE MANERA OBLIGATORIA DURANTE TODA SU ESTANCIA EN EL CENTRO DE TRABAJO, ESTE O NO EN EJECUCION DE SUS FUNCIONES ASIGNADAS.</span>
+                                        <strong>TRIGESIMA SEPTIMA.</strong>
+                                        <span>EL PATRON MANIFIESTA A EL TRABAJADOR QUE CON EL OBJETO
+                                            DE PREVENIR Y ERRADICAR EL VIRUS COVID 19 Y LAS
+                                            VARIANTES EN QUE SE MANIFIESTA, TIENE IMPLEMENTADO EN EL
+                                            CENTRO DE TRABAJO, MEDIDAS Y PROTOCOLOS SANITARIOS, QUE
+                                            DEBERA OBSERVAR Y CUMPLIR DE MANERA OBLIGATORIA DURANTE
+                                            TODA SU ESTANCIA EN EL CENTRO DE TRABAJO, ESTE O NO EN
+                                            EJECUCION DE SUS FUNCIONES ASIGNADAS.</span>
                                     </p>
                                 </div>
                             </div>
@@ -692,7 +1274,24 @@
                             <div class="row mt-2">
                                 <div class="col-12 text-justify">
                                     <p style="text-align: justify;">
-                                        <strong>TRIGESIMA OCTAVA.</strong><span>AL TÉRMINO DE LA CAPACITACIÓN INICIAL, DE NO ACREDITAR COMPETENCIAS “EL TRABAJADOR”, A JUICIO “DEL PATRÓN”, SE DARÁ POR TERMINADA LA RELACIÓN DE TRABAJO SIN RESPONSABILIDAD PARA ESTE. TAMBIÉN SE PODRÁ DAR POR TERMINADA ANTES DE QUE CONCLUYA EL TÉRMINO DE LA CAPACITACIÓN INICIAL SI EL TRABAJADOR, MINTIÓ EN SU CONTRATACIÓN, EXHIBIÓ DOCUMENTOS Y/O CERTIFICADOS DE HABILIDADES FALSOS, MINTIÓ EN SUS HABILIDADES LABORALES Y DE EXPERIENCIA, MINTIÓ EN LA DISPOSICIÓN PARA VIAJAR EN CASO DE QUE SE LE REQUIERA, TIENE FALTA DE COMPROMISO CON LAS FUNCIONES ASIGNADAS, TIENE UNA MALA ACTITUD, INSULTA A SUS COMPAÑEROS, O CUALQUIER OTRA QUE AFECTE EL DESEMPEÑO DE SU TRABAJO Y LA SANA CONVIVENCIA ENTRE SUS COMPAÑEROS. CUANDO SE CONCLUYA EL PERIODO DE CAPACITACIÓN INICIAL Y “EL TRABAJADOR” ACREDITE CONTAR CON LAS COMPETENCIAS, SE LE EMITIRÁ SU CONTRATO POR TIEMPO INDETERMINADO.</span>
+                                        <strong>TRIGESIMA OCTAVA.</strong>
+                                        <span>AL TÉRMINO DE LA CAPACITACIÓN INICIAL, DE NO ACREDITAR
+                                            COMPETENCIAS “EL TRABAJADOR”, A JUICIO “DEL PATRÓN”, SE
+                                            DARÁ POR TERMINADA LA RELACIÓN DE TRABAJO SIN
+                                            RESPONSABILIDAD PARA ESTE. TAMBIÉN SE PODRÁ DAR POR
+                                            TERMINADA ANTES DE QUE CONCLUYA EL TÉRMINO DE LA
+                                            CAPACITACIÓN INICIAL SI EL TRABAJADOR, MINTIÓ EN SU
+                                            CONTRATACIÓN, EXHIBIÓ DOCUMENTOS Y/O CERTIFICADOS DE
+                                            HABILIDADES FALSOS, MINTIÓ EN SUS HABILIDADES LABORALES
+                                            Y DE EXPERIENCIA, MINTIÓ EN LA DISPOSICIÓN PARA VIAJAR
+                                            EN CASO DE QUE SE LE REQUIERA, TIENE FALTA DE COMPROMISO
+                                            CON LAS FUNCIONES ASIGNADAS, TIENE UNA MALA ACTITUD,
+                                            INSULTA A SUS COMPAÑEROS, O CUALQUIER OTRA QUE AFECTE EL
+                                            DESEMPEÑO DE SU TRABAJO Y LA SANA CONVIVENCIA ENTRE SUS
+                                            COMPAÑEROS. CUANDO SE CONCLUYA EL PERIODO DE
+                                            CAPACITACIÓN INICIAL Y “EL TRABAJADOR” ACREDITE CONTAR
+                                            CON LAS COMPETENCIAS, SE LE EMITIRÁ SU CONTRATO POR
+                                            TIEMPO INDETERMINADO.</span>
                                     </p>
                                 </div>
                             </div>
@@ -700,7 +1299,8 @@
                             <div class="row mt-2">
                                 <div class="col-12 text-justify">
                                     <p style="text-align: justify;">
-                                        <span>EXPRESAMENTE CONVIENE "EL TRABAJADOR" EN PONER TODA SU DILIGENCIA Y EMPEÑO EN BENEFICIO DE "EL PATRON</span>
+                                        <span>EXPRESAMENTE CONVIENE "EL TRABAJADOR" EN PONER TODA SU
+                                            DILIGENCIA Y EMPEÑO EN BENEFICIO DE "EL PATRON</span>
                                     </p>
                                 </div>
                             </div>
@@ -708,7 +1308,18 @@
                             <div class="row mt-2">
                                 <div class="col-12 text-justify">
                                     <p style="text-align: justify;">
-                                        <strong>TRIGESIMA NOVENA.</strong><span>LAS PARTES DESDE ESTE MOMENTO MANIFIESTAN QUE TODO LO NO ESTIPULADO EXPRESAMENTE EN ESTE CONTRATO Y QUE POR OMISIÓN NO SE INCLUYÓ PERO QUE SE ENCUENTRE CONTEMPLADO EN LA LEY, REGLAMENTO, SUS LEYES SUPLETORIAS, JURISPRUDENCIA, LA COSTUMBRE COMO FUENTE DEL DERECHO QUE NO REPRESENTE RENUNCIA DE DERECHOS Y QUE BENEFICIE Y FAVOREZCA A LOS TRABAJADORES; CONVIENEN DESDE ESTE MOMENTO EN TENERLO COMO PACTADO COMO SI A LA LETRA FUERE Y SE OBLIGAN A ESTAR Y PASAR POR DICHA REGULACIÓN CON FUNDAMENTO EN LO ESTABLECIDO POR LOS ARTÍCULOS 5, 6 Y 18 DE LA LEY FEDERAL DEL TRABAJO.</span>
+                                        <strong>TRIGESIMA NOVENA.</strong>
+                                        <span>LAS PARTES DESDE ESTE MOMENTO MANIFIESTAN QUE TODO LO
+                                            NO ESTIPULADO EXPRESAMENTE EN ESTE CONTRATO Y QUE POR
+                                            OMISIÓN NO SE INCLUYÓ PERO QUE SE ENCUENTRE CONTEMPLADO
+                                            EN LA LEY, REGLAMENTO, SUS LEYES SUPLETORIAS,
+                                            JURISPRUDENCIA, LA COSTUMBRE COMO FUENTE DEL DERECHO QUE
+                                            NO REPRESENTE RENUNCIA DE DERECHOS Y QUE BENEFICIE Y
+                                            FAVOREZCA A LOS TRABAJADORES; CONVIENEN DESDE ESTE
+                                            MOMENTO EN TENERLO COMO PACTADO COMO SI A LA LETRA FUERE
+                                            Y SE OBLIGAN A ESTAR Y PASAR POR DICHA REGULACIÓN CON
+                                            FUNDAMENTO EN LO ESTABLECIDO POR LOS ARTÍCULOS 5, 6 Y 18
+                                            DE LA LEY FEDERAL DEL TRABAJO.</span>
                                     </p>
                                 </div>
                             </div>
@@ -716,7 +1327,12 @@
                             <div class="row mt-2">
                                 <div class="col-12 text-justify">
                                     <p style="text-align: justify;">
-                                        <strong>CUADRAGÉSIMA.</strong><span>“LAS PARTES” CONVIENEN QUE EN CASO DE CONTROVERSIA SE ESTARÁ A LO ESTABLECIDO EN EL PRESENTE Y EN LO QUE FUERE OMISO SE ENTENDERÁ A LO DISPUESTO POR LA LEY FEDERAL DEL TRABAJO BAJO LA JURISDICCIÓN DEL TRIBUNAL LABORAL DEL ESTADO DE MEXICO, COMO PRIMERA OPCIÓN.</span>
+                                        <strong>CUADRAGÉSIMA.</strong>
+                                        <span>“LAS PARTES” CONVIENEN QUE EN CASO DE CONTROVERSIA SE
+                                            ESTARÁ A LO ESTABLECIDO EN EL PRESENTE Y EN LO QUE FUERE
+                                            OMISO SE ENTENDERÁ A LO DISPUESTO POR LA LEY FEDERAL DEL
+                                            TRABAJO BAJO LA JURISDICCIÓN DEL TRIBUNAL LABORAL DEL
+                                            ESTADO DE MEXICO, COMO PRIMERA OPCIÓN.</span>
                                     </p>
                                 </div>
                             </div>
@@ -724,77 +1340,144 @@
                             <div class="row mt-2">
                                 <div class="col-12 text-justify">
                                     <p style="text-align: justify;">
-                                        <span>LEÍDO QUE FUE POR LAS PARTES EL DOCUMENTO E IMPUESTOS DEL CONTENIDO Y CONSCIENTES DE LAS OBLIGACIONES QUE SE GENERAN, ASÍ COMO LAS QUE LA LEY IMPONE, LAS PARTES LO RATIFICAN EN TODAS Y CADA UNA DE SUS PARTES Y LO SUSCRIBEN POR DUPLICADO EL 15 DE ABRIL DE 2025, QUEDANDO UN EJEMPLAR EN PODER DE CADA PARTE.</span>
+                                        <span>LEÍDO QUE FUE POR LAS PARTES EL DOCUMENTO E IMPUESTOS
+                                            DEL CONTENIDO Y CONSCIENTES DE LAS OBLIGACIONES QUE SE
+                                            GENERAN, ASÍ COMO LAS QUE LA LEY IMPONE, LAS PARTES LO
+                                            RATIFICAN EN TODAS Y CADA UNA DE SUS PARTES Y LO
+                                            SUSCRIBEN POR DUPLICADO EL <t
+                                                t-esc="doc.date_start.strftime('%d de').upper()" /> <t
+                                                t-esc="doc.date_start.strftime('%B').capitalize().replace('April', 'Abril').replace('January', 'Enero').replace('February', 'Febrero').replace('March', 'Marzo').replace('May', 'Mayo').replace('June', 'Junio').replace('July', 'Julio').replace('August', 'Agosto').replace('September', 'Septiembre').replace('October', 'Octubre').replace('November', 'Noviembre').replace('December', 'Diciembre').upper()" />
+                                            , QUEDANDO UN EJEMPLAR EN PODER DE CADA PARTE.</span>
                                     </p>
                                 </div>
                             </div>
 
                             <div class="row" style="margin-top: 75px;">
                                 <div class="col-6 text-center">
-                                    <p><strong>"EL PATRON"</strong></p>
-                                    <br/><br/><br/>
+                                    <p>
+                                        <strong>"EL PATRON"</strong>
+                                    </p>
+                                    <br />
+                                    <br />
+                                    <br />
                                     <p>______________________________________________</p>
-                                    <p class="mb-1"><strong>LIC. EDWIN GONZALEZ SORIA</strong></p>
-                                    <p class="mb-1"><strong>APODERADO LEGAL</strong></p>
-                                    <p class="mb-1"><strong ><t t-esc="doc.employee_id.name.upper()" /></strong></p>
+                                    <p class="mb-1">
+                                        <strong>LIC. EDWIN GONZALEZ SORIA</strong>
+                                    </p>
+                                    <p class="mb-1">
+                                        <strong>APODERADO LEGAL</strong>
+                                    </p>
+                                    <p class="mb-1">
+                                        <strong>
+                                            <t t-esc="doc.employee_id.name.upper()" />
+                                        </strong>
+                                    </p>
                                 </div>
-                                
+
                                 <div class="col-6 text-center">
-                                    <p><strong>“EL TRABAJADOR”</strong></p>
-                                    <br/><br/><br/>
+                                    <p>
+                                        <strong>“EL TRABAJADOR”</strong>
+                                    </p>
+                                    <br />
+                                    <br />
+                                    <br />
                                     <p>______________________________________________</p>
-                                    <p class="mb-1"><strong><t t-esc="doc.employee_id.name.upper()" /></strong></p>
+                                    <p class="mb-1">
+                                        <strong>
+                                            <t t-esc="doc.employee_id.name.upper()" />
+                                        </strong>
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="row mt-5" style="page-break-before: always;">
+                                <div class="col-12 text-center">
+                                    <strong class="font-weight-bold text-decoration-underline">
+                                        MANIFESTACIÓN DE NO ADEUDO
+                                    </strong>
+                                </div>
+                            </div>
+
+                            <div class="row mt-2">
+                                <div class="col-12 text-justify">
+                                    <p style="text-align: justify;">
+                                        <span>QUIEN SUSCRIBE, C <t
+                                                t-esc="doc.employee_id.name.upper()" /> POR MEDIO
+                                            DEL PRESENTE, MANIFIESTO BAJO PROTESTA DE DECIR VERDAD
+                                            QUE A LA PRESENTE FECHA <strong
+                                                class="text-decoration-underline">NO TENGO ADEUDOS
+                                            PENDIENTES</strong> CON EL INSTITUTO DEL FONDO NACIONAL
+                                            DE LA VIVIENDA PARA LOS TRABAJADORES (INFONAVIT),
+                                            INSTITUTO DEL FONDO NACIONAL PARA EL CONSUMO DE LOS
+                                            TRABAJADORES (INFONACOT), O DESCUENTOS POR PAGO DE
+                                            PENSIÓN ALIMENTICIA DECRETADO POR LA AUTORIDAD
+                                            COMPETENTE, MOTIVO POR EL QUE RELEVO A LA EMPRESA <strong
+                                                class="text-decoration-underline"><t
+                                                    t-esc="doc.company_id.name.upper()" />.</strong>
+                                            DE LA OBLIGACIÓN DE REALIZAR DESCUENTO ALGUNO DE MI
+                                            SALARIO POR TALES CONCEPTOS.:</span>
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="row mt-2">
+                                <div class="col-12 text-justify">
+                                    <p style="text-align: justify;">
+                                        <span>PARA EL CASO DE QUE CUENTE CON ADEUDOS PENDIENTES CON
+                                            EL INSTITUTO DEL FONDO NACIONAL DE LA VIVIENDA PARA LOS
+                                            TRABAJADORES (INFONAVIT), INSTITUTO DEL FONDO NACIONAL
+                                            PARA EL CONSUMO DE LOS TRABAJADORES (INFONACOT), O
+                                            DESCUENTOS POR PAGO DE PENSIÓN ALIMENTICIA DECRETADO POR
+                                            LA AUTORIDAD COMPETENTE, AUTORIZO A LA EMPRESA <strong
+                                                class="text-decoration-underline"><t
+                                                    t-esc="doc.company_id.name.upper()" />.</strong>
+                                            PARA EFECTUAR LOS DESCUENTOS CORRESPONDIENTES EN
+                                            TÉRMINOS DE LO DISPUESTO POR LA FRACCIÓN III, V Y VII
+                                            DEL ARTÍCULO 110 DE LA LEY FEDERAL DEL TRABAJO.</span>
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="row mt-2">
+                                <div class="col-12 text-justify">
+                                    <p style="text-align: justify;">
+                                        <span>LO ANTERIOR LO MANIFIESTO BAJO PROTESTA DE DECIR
+                                            VERDAD, SABEDOR DE LAS SANCIONES QUE, EN CASO DE
+                                            INFORMACIÓN FALSA Y ENGAÑOSA, ESTABLECEN PARA EL DELITO
+                                            DE FRAUDE LOS ARTÍCULOS 386, 387, 388 Y 388 BIS DEL
+                                            CÓDIGO PENAL FEDERAL.</span>
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="row mt-2">
+                                <div class="col-12 text-justify">
+                                    <p style="text-align: justify;">
+                                        <span>QUEDA AUTORIZADO EL EMPLEADOR Y/O PATRÓN <strong
+                                                class="text-decoration-underline"><t
+                                                    t-esc="doc.company_id.name.upper()" />.</strong>
+                                            PARA UTILIZAR LA PRESENTE DECLARACIÓN PARA TODOS LOS
+                                            FINES LEGALES Y ADMINISTRATIVOS A QUE HAYA LUGAR.</span>
+                                    </p>
                                 </div>
                             </div>
 
                             <div class="row mt-5">
                                 <div class="col-12 text-center">
-                                    <strong class="font-weight-bold text-decoration-underline">MANIFESTACIÓN DE NO ADEUDO</strong>
-                                </div>
-                            </div>
-                            
-                            <div class="row mt-2">
-                                <div class="col-12 text-justify">
-                                    <p style="text-align: justify;">
-                                        <span>QUIEN SUSCRIBE, C <t t-esc="doc.employee_id.name.upper()"/> POR MEDIO DEL PRESENTE, MANIFIESTO  BAJO PROTESTA DE DECIR VERDAD QUE A LA PRESENTE FECHA <strong class="text-decoration-underline">NO TENGO ADEUDOS PENDIENTES</strong> CON EL INSTITUTO DEL FONDO NACIONAL DE LA VIVIENDA PARA LOS TRABAJADORES (INFONAVIT), INSTITUTO DEL FONDO NACIONAL PARA EL CONSUMO DE LOS TRABAJADORES (INFONACOT), O DESCUENTOS POR PAGO DE PENSIÓN ALIMENTICIA DECRETADO POR LA AUTORIDAD COMPETENTE, MOTIVO POR EL QUE RELEVO A LA EMPRESA <strong class="text-decoration-underline"><t t-esc="doc.company_id.name.upper()"/>.</strong> DE LA OBLIGACIÓN DE REALIZAR DESCUENTO ALGUNO DE MI SALARIO POR TALES CONCEPTOS.:</span>
-                                    </p>
-                                </div>
-                            </div>
-
-                            <div class="row mt-2">
-                                <div class="col-12 text-justify">
-                                    <p style="text-align: justify;">
-                                        <span>PARA EL CASO DE QUE CUENTE CON ADEUDOS PENDIENTES CON EL INSTITUTO DEL FONDO NACIONAL DE LA VIVIENDA PARA LOS TRABAJADORES (INFONAVIT), INSTITUTO DEL FONDO NACIONAL PARA EL CONSUMO DE LOS TRABAJADORES (INFONACOT), O DESCUENTOS POR PAGO DE PENSIÓN ALIMENTICIA DECRETADO POR LA AUTORIDAD COMPETENTE, AUTORIZO A LA EMPRESA <strong class="text-decoration-underline"><t t-esc="doc.company_id.name.upper()"/>.</strong> PARA EFECTUAR LOS DESCUENTOS CORRESPONDIENTES EN TÉRMINOS DE LO DISPUESTO POR LA FRACCIÓN III, V Y VII DEL ARTÍCULO 110 DE LA LEY FEDERAL DEL TRABAJO.</span>
-                                    </p>
-                                </div>
-                            </div>
-
-                            <div class="row mt-2">
-                                <div class="col-12 text-justify">
-                                    <p style="text-align: justify;">
-                                        <span>LO ANTERIOR LO MANIFIESTO BAJO PROTESTA DE DECIR VERDAD, SABEDOR DE LAS SANCIONES QUE, EN CASO DE INFORMACIÓN FALSA Y ENGAÑOSA, ESTABLECEN PARA EL DELITO DE FRAUDE LOS ARTÍCULOS 386, 387, 388 Y 388 BIS DEL CÓDIGO PENAL FEDERAL.</span>
-                                    </p>
-                                </div>
-                            </div>
-
-                            <div class="row mt-2">
-                                <div class="col-12 text-justify">
-                                    <p style="text-align: justify;">
-                                        <span>QUEDA AUTORIZADO EL EMPLEADOR Y/O PATRÓN <strong class="text-decoration-underline"><t t-esc="doc.company_id.name.upper()"/>.</strong> PARA UTILIZAR LA PRESENTE DECLARACIÓN PARA TODOS LOS FINES LEGALES Y ADMINISTRATIVOS A QUE HAYA LUGAR.</span>
-                                    </p>
-                                </div>
-                            </div>
-
-                            <div class="row mt-5">
-                                <div class="col-12 text-center">
-                                    <strong class="font-weight-bold text-decoration-underline">ESTADO DE MEXICO A 15 DE ABRIL DE 2025</strong>
+                                    <strong class="font-weight-bold text-decoration-underline">ESTADO
+                                        DE MEXICO A 
+                                        <t t-esc="doc.date_start.strftime('%d de').upper()" /> 
+                                        <t t-esc="doc.date_start.strftime('%B').capitalize().replace('April', 'Abril').replace('January', 'Enero').replace('February', 'Febrero').replace('March', 'Marzo').replace('May', 'Mayo').replace('June', 'Junio').replace('July', 'Julio').replace('August', 'Agosto').replace('September', 'Septiembre').replace('October', 'Octubre').replace('November', 'Noviembre').replace('December', 'Diciembre').upper()" />
+                                    </strong>
                                 </div>
                             </div>
 
                             <div class="row text-center">
                                 <div class="col-6 text-center">
                                     <p></p>
-                                    <br/><br/><br/>
+                                    <br />
+                                    <br />
+                                    <br />
                                     <p></p>
                                     <p></p>
                                 </div>
@@ -803,39 +1486,56 @@
                             <div class="row mt-5 justify-content-center text-center">
                                 <div class="col-6">
                                     <p>______________________________________________</p>
-                                    <p class="mb-1"><strong>C.</strong><strong><t t-esc="doc.employee_id.name.upper()"/> </strong></p>
+                                    <p class="mb-1">
+                                        <strong>C.</strong>
+                                        <strong>
+                                            <t t-esc="doc.employee_id.name.upper()" />
+                                        </strong>
+                                    </p>
                                 </div>
                             </div>
 
                             <div class="row mt-5">
                                 <div class="col-12">
                                     <div class="text-right" style="text-align: right;">
-                                        <strong class="font-weight-bold">15 DE ABRIL DE 2025</strong>
+                                        <strong class="font-weight-bold"></strong>
                                     </div>
                                 </div>
                             </div>
 
-                            <div class="row mt-2">
+                            <div class="row mt-2" style="page-break-before: always;">
                                 <div class="col-12 text-justify">
-                                    <strong>C.</strong><strong>REPRESENTANTE LEGAL DE LA EMPRESA</strong>
+                                    <strong>C.</strong>
+                                    <strong>REPRESENTANTE LEGAL DE LA EMPRESA</strong>
                                 </div>
                             </div>
 
                             <div class="row mt-2">
                                 <div class="col-12 text-justify">
-                                    <strong>C.</strong><strong><t t-esc="doc.company_id.name.upper()"/>.</strong>
+                                    <strong>C.</strong>
+                                    <strong><t t-esc="doc.company_id.name.upper()" />.</strong>
                                 </div>
                             </div>
 
                             <div class="row mt-2">
                                 <div class="col-12 text-justify">
-                                    <p style="text-align: justify;">El suscripto de la presente es trabajador de la empresa ESTEVEZ.JOR SERVICIOS, S.A. DE C.V., toda vez que tiene celebrado individual del trabajo por tiempo CERO DIAS con esa empresa, mismo contrato que a la fecha se encuentra vigente.</p>
+                                    <p style="text-align: justify;">El suscripto de la presente es
+                                        trabajador de la empresa ESTEVEZ.JOR SERVICIOS, S.A. DE
+                                        C.V., toda vez que tiene celebrado individual del trabajo
+                                        por tiempo CERO DIAS con esa empresa, mismo contrato que a
+                                        la fecha se encuentra vigente.</p>
                                 </div>
                             </div>
 
                             <div class="row mt-2">
                                 <div class="col-12 text-justify">
-                                    <P style="text-align: justify;">Manifiesto que se me ha dado a conocer el Plan de Previsión Social de la empresa ESTEVEZ.JOR SERVICIOS, S.A. DE C.V., y estoy enterado de las condiciones del mismo; y, toda vez que cumplo con los requisitos de elegibilidad del referido Plan; de manera voluntaria solicito participar de los beneficios previstos en el Plan a partir de esta fecha.</P>
+                                    <P style="text-align: justify;">Manifiesto que se me ha dado a
+                                        conocer el Plan de Previsión Social de la empresa
+                                        ESTEVEZ.JOR SERVICIOS, S.A. DE C.V., y estoy enterado de las
+                                        condiciones del mismo; y, toda vez que cumplo con los
+                                        requisitos de elegibilidad del referido Plan; de manera
+                                        voluntaria solicito participar de los beneficios previstos
+                                        en el Plan a partir de esta fecha.</P>
                                 </div>
                             </div>
 
@@ -853,39 +1553,60 @@
 
                             <div class="row mt-5">
                                 <div class="col-12 text-center">
-                                    <strong><t t-esc="doc.employee_id.name.upper()"/></strong>
+                                    <strong>
+                                        <t t-esc="doc.employee_id.name.upper()" />
+                                    </strong>
                                 </div>
                             </div>
 
                             <div class="row mt-2" style="page-break-before: always;">
                                 <div class="col-12">
-                                    <div class="text-right" style="text-align: right; margin-top: 50px;">
-                                        <strong class="font-weight-bold text-right">15 DE ABRIL DE 2025</strong>
+                                    <div class="text-right"
+                                        style="text-align: right; margin-top: 50px;">
+                                        <strong class="font-weight-bold text-right">
+                                            <t t-esc="doc.date_start.strftime('%d de').upper()" /> 
+                                            <t t-esc="doc.date_start.strftime('%B').capitalize().replace('April', 'Abril').replace('January', 'Enero').replace('February', 'Febrero').replace('March', 'Marzo').replace('May', 'Mayo').replace('June', 'Junio').replace('July', 'Julio').replace('August', 'Agosto').replace('September', 'Septiembre').replace('October', 'Octubre').replace('November', 'Noviembre').replace('December', 'Diciembre').upper()" />
+                                        </strong>
                                     </div>
                                 </div>
                             </div>
 
                             <div class="row mt-5">
                                 <div class="col-12 text-justify">
-                                    <strong>C.</strong><strong><t t-esc="doc.employee_id.name.upper()"/> </strong>
+                                    <strong>C.</strong>
+                                    <strong>
+                                        <t t-esc="doc.employee_id.name.upper()" />
+                                    </strong>
                                 </div>
                             </div>
 
                             <div class="row mt-2">
                                 <div class="col-12 text-justify">
-                                    <P style="text-align: justify;">Por medio del presente escrito y de conformidad a la solicitud presentada por usted para participar de los beneficios previstos en el Plan de Previsión Social de la empresa ESTEVEZ.JOR SERVICIOS, S.A. DE C.V. y, toda vez que el expediente que la empresa tiene a su nombre se advierte que usted cumple con los requisitos de elegibilidad establecidos en el referido Plan, comunico a usted que ha sido aceptado para gozar de los beneficios de dicho Plan con el carácter de participante.</P>
+                                    <P style="text-align: justify;">Por medio del presente escrito y
+                                        de conformidad a la solicitud presentada por usted para
+                                        participar de los beneficios previstos en el Plan de
+                                        Previsión Social de la empresa ESTEVEZ.JOR SERVICIOS, S.A.
+                                        DE C.V. y, toda vez que el expediente que la empresa tiene a
+                                        su nombre se advierte que usted cumple con los requisitos de
+                                        elegibilidad establecidos en el referido Plan, comunico a
+                                        usted que ha sido aceptado para gozar de los beneficios de
+                                        dicho Plan con el carácter de participante.</P>
                                 </div>
                             </div>
 
                             <div class="row mt-5 justify-content-center text-center">
                                 <div class="col-6">
-                                    <p class="mb-1"><strong>ATENTAMENTE</strong></p>
+                                    <p class="mb-1">
+                                        <strong>ATENTAMENTE</strong>
+                                    </p>
                                 </div>
                             </div>
 
                             <div class="row mt-2 justify-content-center text-center">
                                 <div class="col-6">
-                                    <p class="mb-1"><strong>PATRON, REPRESENTANTE LEGAL</strong></p>
+                                    <p class="mb-1">
+                                        <strong>PATRON, REPRESENTANTE LEGAL</strong>
+                                    </p>
                                 </div>
                             </div>
                         </div>

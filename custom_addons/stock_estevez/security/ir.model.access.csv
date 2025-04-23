@@ -5,3 +5,8 @@ access_stock_requisition_line_user,access_stock_requisition_line_user,model_stoc
 access_stock_assignment_user,stock.assignment.user,model_stock_assignment,base.group_user,1,0,0,0
 access_stock_assignment_manager,stock.assignment.manager,model_stock_assignment,stock.group_stock_manager,1,1,1,1
 access_custom_devolucion,access.custom.devolucion,model_custom_devolucion,,1,1,1,1
+access_stock_requisition_user,Stock Requisition User,model_stock_requisition,group_ops_creator,1,1,1,1
+access_stock_requisition_approver_ops,Stock Requisition Approver Ops,model_stock_requisition,group_ops_approver,1,1,1,1
+access_stock_requisition_approver_pm,Stock Requisition Approver PM,model_stock_requisition,group_pm_approver,1,1,1,1
+access_stock_requisition_approver_site_admin,Stock Requisition Approver Site Admin,model_stock_requisition,group_site_admin_approver,1,1,1,1
+access_stock_requisition_warehouse,Stock Requisition Warehouse,model_stock_requisition,group_warehouse,1,1,1,1

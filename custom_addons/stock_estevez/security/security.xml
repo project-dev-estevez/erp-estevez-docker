@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Grupo: Creador de Solicitudes (Operaciones) -->
+    <record id="group_ops_creator" model="res.groups">
+        <field name="name">Creador de Solicitudes (Operaciones)</field>
+        <field name="category_id" ref="base.module_category_hidden"/>
+    </record>
+
+    <!-- Grupo: Aprobador de Operaciones -->
+    <record id="group_ops_approver" model="res.groups">
+        <field name="name">Aprobador de Operaciones</field>
+        <field name="category_id" ref="base.module_category_hidden"/>
+    </record>
+
+    <!-- Grupo: Aprobador PM -->
+    <record id="group_pm_approver" model="res.groups">
+        <field name="name">Aprobador PM</field>
+        <field name="category_id" ref="base.module_category_hidden"/>
+    </record>
+
+    <!-- Grupo: Aprobador Administración de Obra -->
+    <record id="group_site_admin_approver" model="res.groups">
+        <field name="name">Aprobador Admin. Obra</field>
+        <field name="category_id" ref="base.module_category_hidden"/>
+    </record>
+
+    <!-- Grupo: Almacén -->
+    <record id="group_warehouse" model="res.groups">
+        <field name="name">Almacén</field>
+        <field name="category_id" ref="base.module_category_hidden"/>
+    </record>
+</odoo>
