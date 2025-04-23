@@ -6,12 +6,14 @@
     'author': 'Estevez.Jor',
     'category': 'Inventory',
     'data': [
+        'data/mail_templates.xml',        
         'security/security.xml',
         'data/mail_templates.xml',
         'data/stock_sequence.xml',
         'security/ir.model.access.csv',
+        'views/return_order.xml',
         'views/stock_warehouse_requisition_views.xml',
-        'views/stock_menu.xml'
+        'views/stock_menu.xml',        
     ],
     'installable': True,
     'application': False, 

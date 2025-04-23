@@ -1,0 +1,11 @@
+<odoo>
+    <data noupdate="1">
+        <record id="seq_custom_devolucion" model="ir.sequence">
+            <field name="name">Secuencia de Devoluciones</field>
+            <field name="code">custom.devolucion.sequence</field>
+            <field name="prefix">DEV-</field>
+            <field name="padding">4</field>
+            <field name="company_id" eval="False"/>
+        </record>
+    </data>
+</odoo>
