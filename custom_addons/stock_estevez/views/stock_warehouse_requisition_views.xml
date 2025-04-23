@@ -13,9 +13,31 @@
             <field name="arch" type="xml">
                 <form string="Services">
                     <header>
-                    <field name="name" readonly="1"/>
-                    <button name="action_approve" string="Aprobar" type="object" class="btn-primary" invisible="state in ('rejected', 'first_approval', 'second_approval', 'approved') or requestor_id == uid"/>
-                    <button name="action_confirm_approve" string="Confirmar Aprobación" type="object" class="btn-primary" invisible="state in ('to_approve', 'rejected', 'approved') or requestor_id == uid"/>
+                    
+                    <button name="action_submit_ops" string="Enviar Solicitud" 
+                        type="object" 
+                        invisible="state != 'draft'" 
+                        class="oe_highlight"
+                        groups="stock_estevez.group_ops_approver"/>
+            
+                    
+                    <!-- Botón: Aprobar PM -->
+                    <button name="action_approve_pm" string="Aprobar PM" 
+                            type="object" 
+                            invisible="state != 'to_approve_pm'"
+                            groups="stock_estevez.group_pm_approver"/>
+                    
+                    <!-- Botón: Aprobar Administración de Obra -->
+                    <button name="action_approve_site_admin" string="Aprobar Admin. Obra" 
+                            type="object" 
+                            invisible="state != 'to_approve_site_admin'"
+                            groups="stock_estevez.group_site_admin_approver"/>
+                    
+                    <!-- Botón: Marcar como Entregado -->
+                    <button name="action_confirm_approve" string="Entregar Material" 
+                            type="object" 
+                            invisible="state != 'to_approve_warehouse'"
+                            groups="stock_estevez.group_warehouse"/>
                     <button name="action_reject" string="Rechazar" type="object" invisible="state in ('rejected', 'approved') or requestor_id == uid"/>
                     <field name="state" 
                            widget="statusbar" 
@@ -29,7 +51,7 @@
                     <separator string="Datos del Solicitante"/>
                     <group>
                         <group>
-                            
+                            <field name="name" readonly="1"/>
                             <field name="requestor_id"/>
                             <field name="company_id"/>
                         </group>
@@ -63,9 +85,7 @@
                                         <list string="Productos" editable="bottom">
                                             <field name="product_id" string="Producto"/>
                                             <field name="product_qty" string="Cantidad"/>
-                                            <field name="product_uom" string="Unidad de medida"/>
-                                            <field name="price_unit" string="Precio"/>
-                                            <field name="price_subtotal"/>
+                                            
                                             <control>
                                                 <create name="add_product" string="Agregar Producto"/>
                                             </control>
@@ -95,7 +115,7 @@
                     <field name="contractor_id" string="Contratista"/>
                     <field name="display_receiver" string="Recibe"/>
                     <field name="project_id" string="Proyecto"/>
-                    <!-- Mantén tus botones como estaban -->
+                    
                     <button name="action_approve" string="Aprobar" type="object" icon="fa-thumbs-up" 
                             invisible="state in ('rejected', 'first_approval', 'second_approval', 'approved') or requestor_id == uid"/>
                     <button name="action_confirm_approve" string="Confirmar" type="object" icon="fa-thumbs-up" 

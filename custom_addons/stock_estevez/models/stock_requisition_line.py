@@ -12,9 +12,9 @@ class StockRequisitionLine(models.Model):
     requisition_id = fields.Many2one('stock.requisition', string='Requisition', ondelete='cascade')
     product_id = fields.Many2one('product.product', string='Product', required=True)
     product_qty = fields.Float(string='Quantity', required=True, default=1.0)
-    product_uom = fields.Many2one('uom.uom', string='Unit of Measure', required=True)
-    price_unit = fields.Float(string='Unit Price', required=True)
-    price_subtotal = fields.Float(string='Subtotal', compute='_compute_price_subtotal', store=True)    
+    #product_uom = fields.Many2one('uom.uom', string='Unit of Measure', required=True)
+    #price_unit = fields.Float(string='Unit Price', required=True)
+    #price_subtotal = fields.Float(string='Subtotal', compute='_compute_price_subtotal', store=True)    
 
     @api.depends('product_qty', 'price_unit')
     def _compute_price_subtotal(self):

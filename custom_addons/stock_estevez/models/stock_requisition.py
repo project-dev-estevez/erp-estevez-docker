@@ -12,12 +12,14 @@ class StockRequisition(models.Model):
     _inherit = ['mail.thread', 'mail.activity.mixin']
 
     state = fields.Selection([
-        ('to_approve', 'Por Aprobar'),
-        ('first_approval', 'En Curso'),
-        ('rejected', 'Rechazado'),
-        ('approved', 'Aprobado'),
-        ('done', 'Entregado')
-    ], string="Estado", default='to_approve')
+        ('draft', 'Borrador'),
+        ('to_approve_ops', 'Por Aprobar (Operaciones)'),
+        ('to_approve_pm', 'Por Aprobar (PM)'),
+        ('to_approve_site_admin', 'Por Aprobar (Administración de Obra)'),
+        ('to_approve_warehouse', 'Por Aprobar (Almacén)'),
+        ('done', 'Entregado'),
+        ('rejected', 'Rechazado')
+    ], string="Estado", default='draft', tracking=True)
 
     # Información del solicitante
     requestor_id = fields.Many2one('res.users', string="Solicitante", default=lambda self: self.env.user, required=True, readonly=True)
@@ -27,11 +29,11 @@ class StockRequisition(models.Model):
     order_line_ids = fields.One2many('stock.requisition.line', 'requisition_id', string='Order Lines')
 
     name = fields.Char(
-        string="Referencia",
-        required=False,
+        string="Folio",
+        required=True,
         readonly=True,
         default=lambda self: self.env['ir.sequence'].next_by_code('stock.requisition'),
-        tracking=True  # Opcional: registra cambios en el historial
+        tracking=True
     )
 
     state_id = fields.Many2one(
@@ -51,6 +53,18 @@ class StockRequisition(models.Model):
         ('medical_area', 'Área Médica')
 
     ], string='Almacén de Origen')
+
+    # Campos de aprobación
+    ops_approver_id = fields.Many2one('res.users', string="Aprobado por Operaciones")
+    pm_approver_id = fields.Many2one('res.users', string="Aprobado por PM")
+    site_admin_approver_id = fields.Many2one('res.users', string="Aprobador Admin. Obra")
+    warehouse_approver_id = fields.Many2one('res.users', string="Aprobado por Almacén")
+
+    # Fechas de aprobación
+    ops_approval_date = fields.Datetime()
+    pm_approval_date = fields.Datetime()
+    site_admin_approval_date = fields.Datetime()
+    warehouse_approval_date = fields.Datetime()
 
     type_warehouse = fields.Selection([
         ('general_warehouse', 'Almacén General'),
@@ -112,6 +126,75 @@ class StockRequisition(models.Model):
             else:
                 rec.display_receiver = rec.personal_contract_id.name or ''
 
+    def action_submit_ops(self):
+        self.write({
+            'state': 'to_approve_pm',
+            'ops_approver_id': self.env.user.id,
+            'ops_approval_date': fields.Datetime.now()
+        })
+        self.message_post(
+            body=f"La solicitud {self.name} requiere aprobación del PM.",
+            partner_ids=self.env.ref('stock_estevez.group_pm_approver').users.partner_id.ids
+        )
+
+
+    def action_approve_pm(self):
+        self.write({
+            'state': 'to_approve_site_admin',
+            'pm_approver_id': self.env.user.id,
+            'pm_approval_date': fields.Datetime.now()
+        })
+        self.message_post(
+            body=f"La solicitud {self.name} requiere aprobación de AO.",
+            partner_ids=self.env.ref('stock_estevez.group_site_admin_approver').users.partner_id.ids
+        )
+
+    def action_approve_site_admin(self):
+        self.write({
+            'state': 'to_approve_warehouse',
+            'site_admin_approver_id': self.env.user.id,
+            'site_admin_approval_date': fields.Datetime.now()
+        })
+        self.message_post(
+            body=f"La solicitud {self.name} requiere aprobación de Almacen.",
+            partner_ids=self.env.ref('stock_estevez.group_warehouse').users.partner_id.ids
+        )
+
+    def action_approve_warehouse(self):
+        self.write({
+            'state': 'done',
+            'warehouse_approver_id': self.env.user.id,
+            'warehouse_approval_date': fields.Datetime.now()
+        })
+
+    def action_reject(self):
+        self.write({'state': 'rejected'})
+
+    def _get_approvers(self, department):
+        # Ejemplo: Obtener el jefe del departamento
+        return self.env['hr.employee'].search([
+            ('department_id.name', 'ilike', department),
+            ('parent_id', '=', False)  # Suponiendo que el jefe no tiene supervisor
+        ]).user_id
+    
+    def _notify_approval(self, next_stage):
+        template = False
+        recipients = []
+        
+        if next_stage == 'pm':
+            template = self.env.ref('stock_estevez.email_template_approval_pm')
+            recipients = self._get_approvers('Project Management')
+        elif next_stage == 'admin':
+            template = self.env.ref('stock_estevez.email_template_approval_admin')
+            recipients = self._get_approvers('Administración de Obra')
+        elif next_stage == 'warehouse':
+            template = self.env.ref('stock_estevez.email_template_approval_warehouse')
+            recipients = self._get_approvers('Almacén')
+
+        if template and recipients:
+            template.send_mail(self.id, email_values={
+                'email_to': ','.join(recipients.mapped('email'))
+            })
 
 # Acciones de estado
     def action_approve(self):
@@ -158,8 +241,8 @@ class StockRequisition(models.Model):
     def action_confirm_approve(self):
         self.ensure_one()
         
-        if self.state != 'first_approval':
-            raise exceptions.UserError("Solo se puede confirmar aprobación desde el estado 'En Curso'")
+        if self.state != 'to_approve_warehouse':
+            raise exceptions.UserError("Solo se puede confirmar aprobación desde el estado 'Por Aprobar Almacen'")
         
         # Validar campos requeridos
         if not self.location_id or not self.location_dest_id:
@@ -195,7 +278,6 @@ class StockRequisition(models.Model):
                 'name': line.product_id.name,
                 'product_id': line.product_id.id,
                 'product_uom_qty': line.product_qty,
-                'product_uom': line.product_uom.id,
                 'location_id': self.location_id.id,
                 'location_dest_id': self.location_dest_id.id,
                 'picking_id': picking.id,
@@ -210,7 +292,6 @@ class StockRequisition(models.Model):
         # Verificar disponibilidad
         unavailable_products = []
         for move in picking.move_ids:
-            # Usar el campo quantity (correcto para Odoo 18)
             qty_done = sum(move.move_line_ids.mapped('quantity'))
             if move.product_uom_qty > qty_done:
                 unavailable_products.append(move.product_id.name)
@@ -219,6 +300,11 @@ class StockRequisition(models.Model):
             raise exceptions.UserError(
                 f"Productos no disponibles en stock:\n- " + "\n- ".join(unavailable_products)
             )
+        
+        for move_line in picking.move_line_ids:
+            move_line.quantity = move_line.product_uom_qty
+
+        picking._action_done()
         
         # Crear asignaciones
         assignment_lines = []
@@ -236,9 +322,11 @@ class StockRequisition(models.Model):
         
         # Actualizar registro principal
         self.write({
-            'state': 'approved',
+            'state': 'done',
             'picking_id': picking.id,
-            'assignment_ids': assignment_lines
+            'assignment_ids': assignment_lines,
+            'warehouse_approver_id': self.env.user.id,
+            'warehouse_approval_date': fields.Datetime.now()
         })
         
         # Registrar en el historial

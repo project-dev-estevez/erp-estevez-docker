@@ -6,7 +6,9 @@
     'author': 'Estevez.Jor',
     'category': 'Inventory',
     'data': [
+        'security/security.xml',
         'data/mail_templates.xml',
+        'data/stock_sequence.xml',
         'security/ir.model.access.csv',
         'views/stock_warehouse_requisition_views.xml',
         'views/stock_menu.xml'
