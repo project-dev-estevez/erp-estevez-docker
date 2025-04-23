@@ -317,10 +317,10 @@
                                         
                                     </page>
 
-                                    <page name="uniformes" string="Activo Fijo">
+                                    <page name="activo_fijo" string="Activo Fijo">
                                     </page>
 
-                                    <page name="celulares" string="Consumibles">
+                                    <page name="consumibles" string="Consumibles">
 
                                     </page>    
 
@@ -333,32 +333,104 @@
                                         
                                     </page>
 
-                                    <page name="uniformes" string="Activo Fijo">
+                                    <page name="activo_fijo" string="Activo Fijo">
                                     </page>
-                                    
-                                    <page name="celulares" string="Consumibles">
+
+                                    <page name="consumibles" string="Consumibles">
 
                                     </page>    
 
                                 </notebook>
                             </page>
                             <page name="autos" string="Autos">
-                                
+                                <notebook>
+                                    <page name="herramientas" string="herramientas">
+                                        
+                                    </page>
+
+                                    <page name="activo_fijo" string="Activo Fijo">
+                                    </page>
+
+                                    <page name="consumibles" string="Consumibles">
+
+                                    </page>    
+
+                                </notebook>
                             </page>
                             <page name="ehs" string="EHS">
-                                
+                                <notebook>
+                                    <page name="herramientas" string="herramientas">
+                                        
+                                    </page>
+
+                                    <page name="activo_fijo" string="Activo Fijo">
+                                    </page>
+
+                                    <page name="consumibles" string="Consumibles">
+
+                                    </page>    
+
+                                </notebook>
                             </page>
                             <page name="insumos" string="Insumos">
-                                
+                                <notebook>
+                                    <page name="herramientas" string="herramientas">
+                                        
+                                    </page>
+
+                                    <page name="activo_fijo" string="Activo Fijo">
+                                    </page>
+
+                                    <page name="consumibles" string="Consumibles">
+
+                                    </page>    
+
+                                </notebook>
                             </page>
                             <page name="refacciones" string="Refacciones">
-                                
+                                <notebook>
+                                    <page name="herramientas" string="herramientas">
+                                        
+                                    </page>
+
+                                    <page name="activo_fijo" string="Activo Fijo">
+                                    </page>
+
+                                    <page name="consumibles" string="Consumibles">
+
+                                    </page>    
+
+                                </notebook>
                             </page>
                             <page name="sistemas" string="Sistemas">
-                                
+                                <notebook>
+                                    <page name="herramientas" string="herramientas">
+                                        
+                                    </page>
+
+                                    <page name="activo_fijo" string="Activo Fijo">
+                                    </page>
+
+                                    <page name="consumibles" string="Consumibles">
+
+                                    </page>    
+
+                                </notebook>
                             </page>
                             <page name="area_medica" string="Área Médica">
-                                
+                                <notebook>
+                                    <page name="herramientas" string="herramientas">
+                                        
+                                    </page>
+
+                                    <page name="activo_fijo" string="Activo Fijo">
+                                    </page>
+
+                                    <page name="consumibles" string="Consumibles">
+
+                                    </page>    
+
+                                </notebook>
                             </page>
                         </notebook>
                     </page>
