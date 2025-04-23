@@ -4,3 +4,4 @@ access_stock_requisition_manager,stock.requisition.manager,model_stock_requisiti
 access_stock_requisition_line_user,access_stock_requisition_line_user,model_stock_requisition_line,base.group_user,1,1,1,1
 access_stock_assignment_user,stock.assignment.user,model_stock_assignment,base.group_user,1,0,0,0
 access_stock_assignment_manager,stock.assignment.manager,model_stock_assignment,stock.group_stock_manager,1,1,1,1
+access_custom_devolucion,access.custom.devolucion,model_custom_devolucion,,1,1,1,1
