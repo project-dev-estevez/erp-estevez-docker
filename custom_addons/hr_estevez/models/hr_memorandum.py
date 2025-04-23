@@ -7,7 +7,7 @@ class HrMemorandum(models.Model):
 
     employee_id = fields.Many2one('hr.employee', string='Empleado', required=True, ondelete='cascade')
     date = fields.Date(string='Fecha del Acta', required=True)
-    description = fields.Text(string='Descripción', required=True)
+    description = fields.Text(string='Descripción / Hechos', required=True)
 
     def action_save_memorandum(self):
         # Este método simplemente guarda el registro

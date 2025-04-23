@@ -265,7 +265,7 @@
                             <list>
                                 <field name="id" string="Código" readonly="1"/>
                                 <field name="create_date" string="Fecha de Creación" readonly="1"/>
-                                <field name="description" string="Descripción"/>
+                                <field name="description" string="Descripción / Hechos"/>
                                 <field name="date" string="Fecha del Acta"/>
                             </list>
                         </field>
