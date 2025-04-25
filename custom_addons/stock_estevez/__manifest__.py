@@ -6,7 +6,8 @@
     'author': 'Estevez.Jor',
     'category': 'Inventory',
     'data': [
-        'data/mail_templates.xml',        
+        'data/mail_templates.xml', 
+        'data/stock_estevez_categories.xml',       
         'security/security.xml',
         'data/mail_templates.xml',
         'data/stock_sequence.xml',

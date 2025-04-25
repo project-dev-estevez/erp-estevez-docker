@@ -44,6 +44,7 @@ class ProductTemplate(models.Model):
         string="Descripcion",
         help="Descripcion.",
         copy=False,  # No copiar el valor al duplicar el producto
+        translate=True
     )
 
     # Campo Many2one hacia res.currency (monedas disponibles)

@@ -21,3 +21,32 @@ class StockAssignment(models.Model):
         default=fields.Datetime.now
     )
     stock_move_id = fields.Many2one('stock.move', string="Movimiento de Inventario")
+    serial_number = fields.Char(string="Número de Serie")
+
+    category_type = fields.Selection(
+        selection=[
+            ('asset', 'Activo Fijo'),
+            ('tool', 'Herramienta'),
+            ('consumable', 'Consumible'),
+        ],
+        string='Tipo de Asignación',
+        compute='_compute_category_type',
+        store=True
+    )
+    
+    @api.depends('product_id.categ_id')
+    def _compute_category_type(self):
+        for record in self:
+            category = record.product_id.categ_id
+            try:
+                if category == self.env.ref('stock_estevez.category_asset'):
+                    record.category_type = 'asset'
+                elif category == self.env.ref('stock_estevez.category_tool'):
+                    record.category_type = 'tool'
+                elif category == self.env.ref('stock_estevez.category_consumable'):
+                    record.category_type = 'consumable'
+                else:
+                    record.category_type = False
+            except ValueError:
+                # Si las categorías no están instaladas, marca como False
+                record.category_type = False

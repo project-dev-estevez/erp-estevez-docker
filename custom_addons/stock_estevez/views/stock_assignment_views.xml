@@ -1,0 +1,28 @@
+<!-- stock_estevez/views/stock_assignment_views.xml -->
+<odoo>
+    <!-- Vista de lista para Herramientas -->
+    <record id="view_tool_assignment_tree" model="ir.ui.view">
+        <field name="name">stock.assignment.tool.tree</field>
+        <field name="model">stock.assignment</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="product_id"/>
+                <field name="quantity"/>
+                <field name="assignment_date"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Vista de lista para Consumibles -->
+    <record id="view_consumable_assignment_tree" model="ir.ui.view">
+        <field name="name">stock.assignment.consumable.tree</field>
+        <field name="model">stock.assignment</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="product_id"/>
+                <field name="quantity"/>
+                <field name="assignment_date"/>
+            </tree>
+        </field>
+    </record>
+</odoo>

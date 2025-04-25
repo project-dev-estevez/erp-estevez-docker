@@ -311,17 +311,21 @@
                 <xpath expr="//notebook/page[@name='permits']" position="after">
                     <page name="assignments" string="Asignaciones">
                         <notebook>
-                            <page name="administrativos" string="Administrativos">
+                            <page name="almacen_general" string="Almacen General">
                                 <notebook>
                                     <page name="herramientas" string="herramientas">
-                                        
+                                        <field name="tool_assignment_ids" 
+                                            view_id="stock_estevez.view_tool_assignment_tree"
+                                            colspan="6"/>
                                     </page>
 
                                     <page name="activo_fijo" string="Activo Fijo">
                                     </page>
 
                                     <page name="consumibles" string="Consumibles">
-
+                                        <field name="consumable_assignment_ids" 
+                                            view_id="stock_estevez.view_consumable_assignment_tree"
+                                            colspan="6"/>
                                     </page>    
 
                                 </notebook>

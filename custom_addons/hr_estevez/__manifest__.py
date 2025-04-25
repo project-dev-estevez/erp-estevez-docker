@@ -18,7 +18,7 @@
     'version': '0.2',
 
     # any module necessary for this one to work correctly
-    'depends': ['hr', 'hr_contract'],
+    'depends': ['hr', 'hr_contract', 'stock', 'product', 'stock_estevez'],
 
     # always loaded
     'data': [

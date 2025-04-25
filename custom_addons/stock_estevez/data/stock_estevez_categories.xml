@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Categoría para Activos Fijos -->
+    <record id="category_asset" model="product.category">
+        <field name="name">Activo Fijo</field>
+        <field name="parent_id" ref="product.product_category_all"/>
+    </record>
+
+    <!-- Categoría para Herramientas -->
+    <record id="category_tool" model="product.category">
+        <field name="name">Herramienta</field>
+        <field name="parent_id" ref="product.product_category_all"/>
+    </record>
+
+    <!-- Categoría para Consumibles -->
+    <record id="category_consumable" model="product.category">
+        <field name="name">Consumible</field>
+        <field name="parent_id" ref="product.product_category_all"/>
+    </record>
+</odoo>
