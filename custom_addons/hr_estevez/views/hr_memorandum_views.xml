@@ -9,7 +9,10 @@
                     <group>
                         <field name="employee_id" invisible="1"/>
                         <field name="date"/>
-                        <field name="description"/>
+                        <field name="description" widget="html"/>
+                        <field name="fraction"/>
+                        <field name="article"/>
+                        <field name="administrative_type"/>
                     </group>
                     <footer>
                         <button string="Guardar" class="oe_highlight" type="object" name="action_save_memorandum"/>
