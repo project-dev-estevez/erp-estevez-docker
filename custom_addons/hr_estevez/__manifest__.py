@@ -39,6 +39,12 @@
         'report/hr_employee_memorandum_report.xml',
         'report/hr_employee_memorandum_report_templates.xml',
 
+        # Email Templates
+        # 'data/email_template_contract_expired.xml',
+
+        # Cron Jobs
+        'data/cron_notify_expired_contracts.xml',
+
         # Archivos de Vistas
         'views/hr_job_views.xml',
         'views/hr_direction_views.xml',

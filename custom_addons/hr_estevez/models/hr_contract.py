@@ -1,5 +1,8 @@
 from odoo import api, models, fields, exceptions, _
 from datetime import date, datetime
+import logging
+
+_logger = logging.getLogger(__name__)
 
 class HrContract(models.Model):
     _inherit = 'hr.contract'
@@ -148,3 +151,38 @@ class HrContract(models.Model):
         current_month = datetime.now().strftime('%B')
         return months.get(current_month, current_month)
     
+    def notify_expired_contracts(self):
+        """Notifica a los empleados del área de gestión de empleados sobre contratos vencidos."""
+        today = date.today()
+        expired_contracts = self.search([('date_end', '<', today), ('state', '=', 'close')])
+
+        if not expired_contracts:
+            return
+
+        # Obtener empleados del área de Atracción de Talento
+        employee_management_area = self.env['hr.area'].search([('name', 'ilike', 'Atracción de Talento')], limit=1)
+
+        if not employee_management_area:
+            _logger.info("No se encontró el área de Atracción de Talento.")
+            return
+
+        employees = self.env['hr.employee'].search([('area_id', '=', employee_management_area.id)])        
+        partners = employees.mapped('user_id.partner_id')
+
+        # Enviar notificación
+        try:
+            # Crear un mensaje en un contrato específico o usar un contrato ficticio
+            notification_contract = expired_contracts[0]  # Usamos el primer contrato vencido como "anfitrión"
+            notification_contract.message_post(
+                subject=_("Contratos Vencidos"),
+                body=_("¡Atención! Se han detectado %d contratos vencidos. Por favor, revisa la lista de contratos.") % len(expired_contracts),
+                partner_ids=partners.ids,
+                subtype_xmlid='mail.mt_comment',
+                message_type='notification',
+            )
+            _logger.info("Notificación amigable enviada sobre contratos vencidos.")
+        except Exception as e:
+            _logger.error("Error al enviar la notificación: %s", str(e))
+
+        # TODO: Enviar correo
+        
