@@ -15,12 +15,12 @@
                             <div class="row mt-3">
                                 <div class="col-12 text-justify">
                                     <p style="text-align: justify;">
-                                        En Tlalnepantla, Estado de México, siendo <span class="bg-warning text-dark">las 11:00 hrs del día 15 de abril del 2025,</span> 
+                                        En Tlalnepantla, Estado de México, siendo <span class="text-dark"><t t-esc="doc.get_formatted_date()"/>,</span> 
                                         estando legalmente constituidos en el domicilio que ocupa la empresa <strong>ESTEVEZ.JOR SERVICIOS, S.A. DE C.V.,</strong>
                                         con domicilio en  Filiberto Gómez número 46 Colonia Centro Industrial Tlalnepantla, Municipio de Tlalnepantla de Baz, Estado de México,
                                         Código Postal 54030, se levanta la presente acta administrativa con fundamento en la fracción primera del artículo 132 y 134 de la Ley Federal del Trabajo,
                                         y clausula decima cuarta, decima quinta y decima octava del contrato individual de trabajo celebrado entre la empresa <strong>ESTEVEZ.JOR SERVICIOS, S.A. DE C.V.,</strong>
-                                        con el <strong>C.</strong><strong class="bg-warning text-dark">EDGAR ALAN SOLANO CANO,</strong>
+                                        con el <strong>C.</strong><strong class="text-dark"><t t-esc="doc.employee_id.display_name.upper()"/>,</strong>
                                         para dejar constancia de los hechos y circunstancias que a continuación se mencionan.
                                         <strong>------------------------------------------------------------------------------------</strong>
                                     </p>
@@ -43,7 +43,7 @@
                                 <div class="col-12 text-justify">
                                     <p style="text-align: justify;">
                                         <strong><u>COMPARECE</u></strong> 
-                                        el Trabajador el <strong>C.</strong><strong class="bg-warning text-dark">EDGAR ALAN SOLANO CANO,</strong> quien tiene la
+                                        el Trabajador el <strong>C.</strong><strong class="text-dark"><t t-esc="doc.employee_id.display_name.upper()"/>,</strong> quien tiene la
                                         categoría de <strong>AUXILIAR,</strong> de conformidad con lo establecido en la Clausula Tercera del Contrato individual de trabajo.
                                     </p>
                                 </div>
@@ -75,44 +75,21 @@
                             <div class="row mt-3">
                                 <div class="col-12 text-justify">
                                     <p  style="text-align: justify;" 
-                                        class="bg-warning text-dark">
-                                        En fecha del 15 de abril del 2025  la <strong>PAMELA DELGADO ARZATE,</strong> representante del
-                                        área de recursos humanos de la empresa <strong>ESTEVEZ.JOR SERVICIOS, S.A. DE C.V.</strong>
-                                        hace constar el reporte del trabajador <strong>EDGAR ALAN SOLANO CANO,</strong>
-                                        informando lo siguiente:
+                                        class="text-dark">
+                                        <t t-raw="doc.description"/>
                                     </p>
                                 </div>
                             </div>
 
-                            <div class="row mt-3">
-                                <div class="col-12 text-justify">
-                                    <p  style="text-align: justify;" 
-                                        class="bg-warning text-dark">
-                                        Nos informa el Supervisor de EHS JO SE EDUARDO ROSAS ROJAS que el día de hoy 
-                                        15 de abril del 2025 al realizar su recorrido en los tramos se percata que el trabajador 
-                                        <strong>EDGAR ALAN SOLANO CANO,</strong> tiene el olor característico de estado etílico, por lo cual el
-                                        supervisor decide realizar la prueba de alcoholimetría en aliento, y el resultado es de 0.05
-                                        % BAC lo cual no esta permitido para realizar las actividades asignadas.
-                                    </p>
-                                </div>
-                            </div>
-
-                            <div class="row mt-3">
-                                <div class="col-12 text-justify">
-                                    <p style="text-align: justify;">
-                                        FOTOOOOSSSSSSSS
-                                    </p>
-                                </div>
-                            </div>
-
-                            <div class="row mt-3">
+                            <div class="page" style="page-break-before: always;">
+                                <div class="row mt-3"></div>
                                 <div class="col-12 text-justify">
                                     <p style="text-align: justify;">
                                         <strong>ACTO SEGUIDO,</strong> 
-                                        se le concede el uso de la palabra al Trabajador <strong>C.</strong><strong class="bg-warning text-dark">EDGAR ALAN SOLANO CANO</strong> 
+                                        se le concede el uso de la palabra al Trabajador <strong>C.</strong><strong class="text-dark"><t t-esc="doc.employee_id.display_name.upper()"/></strong> 
                                         para que de manera libre y espontanea y sin ningun tipo de presion
                                         manifieste lo que a su derecho e intereses convenga: Manifiesta el Trabajador
-                                        <strong>C.</strong><strong class="bg-warning text-dark">EDGAR ALAN SOLANO CANO</strong> 
+                                        <strong>C.</strong><strong class="text-dark"><t t-esc="doc.employee_id.display_name.upper()"/></strong> 
                                     </p>
                                 </div>
                             </div>
@@ -121,7 +98,7 @@
                                 <div class="col-12 text-justify">
                                     <p style="text-align: justify;">
                                         <strong>ACTO SEGUIDO,</strong> 
-                                        Siendo las <span class="bg-warning text-dark">12:00 horas del día15 de abril del 2025</span>,
+                                        Siendo <span class="text-dark"><t t-esc="doc.get_formatted_date()"/></span>,
                                          se da por terminada la presente acta administrativa,
                                         dejando constancia de  todo lo actuado para los efectos legales a que haya lugar y firman al margen y calce de la misma los que en ella 
                                         intervinieron y así quisieron hacerlo adjuntando copias de sus Identificaciones quedando en poder de cada uno de los comparecientes un ejemplar de esta acta administrativa
@@ -141,7 +118,7 @@
 
                                 <div class="col-6 text-center">
                                     <p class="mb-1"><strong></strong></p>
-                                    <p class="mb-1 mt-5"><strong>C.</strong><strong class="bg-warning text-dark">EDGAR ALAN SOLANO CANO</strong></p>
+                                    <p class="mb-1 mt-5"><strong>C.</strong><strong class="text-dark"><t t-esc="doc.employee_id.display_name.upper()"/></strong></p>
                                     <p class="mb-1 mt-5"><strong>EL TRABAJADOR.</strong></p>
                                 </div>
                             </div>

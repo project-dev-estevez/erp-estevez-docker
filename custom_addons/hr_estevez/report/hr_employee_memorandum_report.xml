@@ -1,9 +1,9 @@
 <odoo>
     <record id="action_report_hr_employee_memorandum" model="ir.actions.report">
         <field name="name">Acta Administrativa</field>
-        <field name="model">hr.employee</field>
+        <field name="model">hr.memorandum</field>
         <field name="report_type">qweb-pdf</field>
         <field name="report_name">hr_estevez.report_hr_employee_memorandum</field>
-        <field name="print_report_name">(object.name or 'Employee') + ' - Acta Administrativa'</field>
+        <field name="print_report_name">'Empleado - Acta Administrativa'</field>
     </record>
 </odoo>
