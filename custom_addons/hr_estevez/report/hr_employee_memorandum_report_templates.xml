@@ -20,21 +20,33 @@
                                         con domicilio en  Filiberto Gómez número 46 Colonia Centro Industrial Tlalnepantla, Municipio de Tlalnepantla de Baz, Estado de México,
                                         Código Postal 54030, se levanta la presente acta administrativa con fundamento en la fracción primera del artículo 132 y 134 de la Ley Federal del Trabajo,
                                         y clausula decima cuarta, decima quinta y decima octava del contrato individual de trabajo celebrado entre la empresa <strong>ESTEVEZ.JOR SERVICIOS, S.A. DE C.V.,</strong>
-                                        con el <strong>C.</strong><strong class="text-dark"><t t-esc="doc.employee_id.display_name.upper()"/>,</strong>
+                                        con el<strong class="text-dark">C. <t t-esc="doc.employee_id.name.upper()"/>,</strong>
                                         para dejar constancia de los hechos y circunstancias que a continuación se mencionan.
-                                        <strong>------------------------------------------------------------------------------------</strong>
                                     </p>
+
+                                    <hr class="border-top border-dark border-2 my-2"/>
                                 </div>
                             </div>
 
                             <div class="row mt-3">
                                 <div class="col-12 text-justify">
                                     <p style="text-align: justify;">
-                                        En la presente acta <strong>COMPARECE EN REPRESENTACIÓN DE ESTEVEZ. JOR SERVICIO, S. A DE C. V</strong> 
+                                        En la presente acta <strong><span class="text-decoration-underline">COMPARECE</span> EN REPRESENTACIÓN DE ESTEVEZ.JOR SERVICIOS, S.A DE C.V</strong> 
                                         el Lic. <strong>EDWIN GONZALEZ SORIA,</strong> apoderado legal y el Lic.
                                         <strong>PAMELA DELGADO ARZATE</strong> representante del área de recursos humanos, de la empresa
                                         <strong>ESTEVEZ.JOR SERVICIOS, S.A. DE C.V.</strong>
-                                        <strong>-------------------------------------------------------------</strong>
+                                    </p>
+
+                                    <hr class="border-top border-dark border-2 my-2"/>
+                                </div>
+                            </div>
+
+                            <div class="row mt-3">
+                                <div class="col-12 text-justify">
+                                    <p style="text-align: justify;">
+                                        <strong class="text-decoration-underline">COMPARECE</strong> 
+                                        el Trabajador el <strong>C.</strong><strong class="text-dark"><t t-esc="doc.employee_id.name.upper()"/>,</strong> quien tiene la
+                                        categoría de <strong><t t-esc="doc.employee_id.job_id.name.upper()"/></strong>, de conformidad con lo establecido en la Clausula Tercera del Contrato individual de trabajo.
                                     </p>
                                 </div>
                             </div>
@@ -42,21 +54,12 @@
                             <div class="row mt-3">
                                 <div class="col-12 text-justify">
                                     <p style="text-align: justify;">
-                                        <strong><u>COMPARECE</u></strong> 
-                                        el Trabajador el <strong>C.</strong><strong class="text-dark"><t t-esc="doc.employee_id.display_name.upper()"/>,</strong> quien tiene la
-                                        categoría de <strong>AUXILIAR,</strong> de conformidad con lo establecido en la Clausula Tercera del Contrato individual de trabajo.
+                                        <strong class="text-decoration-underline">COMPARECE</strong> 
+                                        Como Testigos Presenciales en la integración de esta acta administrativa, las <strong>C. JESSICA CARINA CALLEJAS VAZQUEZ</strong>
+                                        Y <strong>CASANDRA PAULINA GUTIERREZ AGUILAR.</strong>
                                     </p>
-                                </div>
-                            </div>
 
-                            <div class="row mt-3">
-                                <div class="col-12 text-justify">
-                                    <p style="text-align: justify;">
-                                        <strong><u>COMPARECE</u></strong> 
-                                        Como Testigos Presenciales en la integración de esta acta administrativa, las <strong>C.C. JESSICA CARINA CALLEJAS VAZQUEZ</strong>
-                                        Y <strong>CASANDRA PAULINA GUTIERREZ AGUILAR. ----------------------------------------------------</strong>
-                                        
-                                    </p>
+                                    <hr class="border-top border-dark border-2 my-2"/>
                                 </div>
                             </div>
 
@@ -64,11 +67,15 @@
                                 <div class="col-12 text-justify">
                                     <p style="text-align: justify;">
                                         <strong>ACTO SEGUIDO,</strong> 
-                                        Se hace constar que la presente Acta se levanta de manera libre, espontanea,
+                                        Se hace constar que la presente Acta se levanta de manera libre, espontánea,
                                         sin que exista ningún tipo de presión, coacción, violencia, dolo y error, esta Acta se levanta a petición
                                         de las partes que intervienen en la misma en presencia de los testigos antes mencionados que darán fe de dicho acto.
                                     </p>
-                                    <strong class="text-center">---------------------------------------------------------------HECHOS--------------------------------------------------------------</strong>
+                                    <div class="d-flex align-items-center my-2">
+                                        <hr class="flex-grow-1 border-top border-dark border-2"/>
+                                        <span class="mx-3 font-weight-bold">HECHOS</span>
+                                        <hr class="flex-grow-1 border-top border-dark border-2"/>
+                                    </div>
                                 </div>
                             </div>
 
@@ -81,15 +88,15 @@
                                 </div>
                             </div>
 
-                            <div class="page" style="page-break-before: always;">
+                            <div class="page">
                                 <div class="row mt-3"></div>
                                 <div class="col-12 text-justify">
                                     <p style="text-align: justify;">
                                         <strong>ACTO SEGUIDO,</strong> 
-                                        se le concede el uso de la palabra al Trabajador <strong>C.</strong><strong class="text-dark"><t t-esc="doc.employee_id.display_name.upper()"/></strong> 
+                                        se le concede el uso de la palabra al Trabajador <strong>C.</strong><strong class="text-dark"><t t-esc="doc.employee_id.name.upper()"/></strong> 
                                         para que de manera libre y espontanea y sin ningun tipo de presion
                                         manifieste lo que a su derecho e intereses convenga: Manifiesta el Trabajador
-                                        <strong>C.</strong><strong class="text-dark"><t t-esc="doc.employee_id.display_name.upper()"/></strong> 
+                                        <strong>C.</strong><strong class="text-dark"><t t-esc="doc.employee_id.name.upper()"/></strong> 
                                     </p>
                                 </div>
                             </div>
@@ -102,7 +109,6 @@
                                          se da por terminada la presente acta administrativa,
                                         dejando constancia de  todo lo actuado para los efectos legales a que haya lugar y firman al margen y calce de la misma los que en ella 
                                         intervinieron y así quisieron hacerlo adjuntando copias de sus Identificaciones quedando en poder de cada uno de los comparecientes un ejemplar de esta acta administrativa
-                                        ------------------------------------------------------------------------------------------------------
                                     </p>
                                 </div>
                             </div>
@@ -118,7 +124,7 @@
 
                                 <div class="col-6 text-center">
                                     <p class="mb-1"><strong></strong></p>
-                                    <p class="mb-1 mt-5"><strong>C.</strong><strong class="text-dark"><t t-esc="doc.employee_id.display_name.upper()"/></strong></p>
+                                    <p class="mb-1 mt-5"><strong>C.</strong><strong class="text-dark"><t t-esc="doc.employee_id.name.upper()"/></strong></p>
                                     <p class="mb-1 mt-5"><strong>EL TRABAJADOR.</strong></p>
                                 </div>
                             </div>
