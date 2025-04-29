@@ -152,18 +152,18 @@ class HrContract(models.Model):
         return months.get(current_month, current_month)
     
     def notify_expired_contracts(self):
-        """Notifica a los empleados del área de gestión de empleados sobre contratos vencidos."""
+        """Notifica a los empleados del área de gestión de talento sobre contratos vencidos."""
         today = date.today()
         expired_contracts = self.search([('date_end', '<', today), ('state', '=', 'close')])
 
         if not expired_contracts:
             return
 
-        # Obtener empleados del área de Atracción de Talento
-        employee_management_area = self.env['hr.area'].search([('name', 'ilike', 'Atracción de Talento')], limit=1)
+        # Obtener empleados del área de Gestión de Talento
+        employee_management_area = self.env['hr.area'].search([('name', 'ilike', 'Gestión de Talento')], limit=1)
 
         if not employee_management_area:
-            _logger.info("No se encontró el área de Atracción de Talento.")
+            _logger.info("No se encontró el área de Gestión de Talento.")
             return
 
         employees = self.env['hr.employee'].search([('area_id', '=', employee_management_area.id)])        
