@@ -247,16 +247,16 @@ class StockRequisition(models.Model):
         _logger.info("Message ID: %s", message_id)
 
     def action_confirm_approve(self):
-        self.ensure_one()
+        self_sudo = self.sudo()
         
-        if self.state != 'to_approve_warehouse':
+        if self_sudo.state != 'to_approve_warehouse':
             raise exceptions.UserError("Solo se puede confirmar aprobación desde el estado 'Por Aprobar Almacen'")
         
         # Validar campos requeridos
         required_fields = [
-            (self.warehouse_location_id, "Debe seleccionar una ubicación de almacén"),
-            (self.location_dest_id, "Debe configurar la ubicación destino"),
-            (self.order_line_ids, "La requisición no tiene productos asignados")
+            (self_sudo.warehouse_location_id, "Debe seleccionar una ubicación de almacén"),
+            (self_sudo.location_dest_id, "Debe configurar la ubicación destino"),
+            (self_sudo.order_line_ids, "La requisición no tiene productos asignados")
         ]
         
         for field, error_msg in required_fields:
@@ -265,49 +265,49 @@ class StockRequisition(models.Model):
         
         # ================== VALIDACIONES DE STOCK ==================
         # 1. Validar stock físico en la ubicación seleccionada
-        for line in self.order_line_ids:
+        for line in self_sudo.order_line_ids:
             if line.product_id.type != 'product':
                 continue  # Solo validar productos almacenables
                 
-            qty_available = self.env['stock.quant']._get_available_quantity(
+            qty_available = self_sudo.env['stock.quant']._get_available_quantity(
                 line.product_id,
-                self.warehouse_location_id
+                self_sudo.warehouse_location_id
             )
             
             if qty_available < line.product_qty:
                 raise exceptions.UserError(
-                    f"Stock insuficiente en {self.warehouse_location_id.complete_name}\n"
+                    f"Stock insuficiente en {self_sudo.warehouse_location_id.complete_name}\n"
                     f"Producto: {line.product_id.name}\n"
                     f"Disponible: {qty_available} | Requerido: {line.product_qty}"
                 )
         
         # ================== CREACIÓN DE TRANSFERENCIA ==================
-        picking_type = self.env.ref('stock.picking_type_out')
+        picking_type = self_sudo.env.ref('stock.picking_type_out')
         
         picking_vals = {
             'picking_type_id': picking_type.id,
-            'location_id': self.warehouse_location_id.id,
-            'location_dest_id': self.location_dest_id.id,
-            'origin': self.name,
-            'partner_id': self._get_recipient_partner().id,
+            'location_id': self_sudo.warehouse_location_id.id,
+            'location_dest_id': self_sudo.location_dest_id.id,
+            'origin': self_sudo.name,
+            'partner_id': self_sudo._get_recipient_partner().id,
             'scheduled_date': fields.Datetime.now(),
         }
         
-        picking = self.env['stock.picking'].create(picking_vals)
+        picking = self_sudo.env['stock.picking'].create(picking_vals)
         
         # Crear movimientos con la ubicación correcta
-        moves = self.env['stock.move']
-        for line in self.order_line_ids:
+        moves = self_sudo.env['stock.move']
+        for line in self_sudo.order_line_ids:
             move_vals = {
                 'name': line.product_id.name,
                 'product_id': line.product_id.id,
                 'product_uom_qty': line.product_qty,
-                'location_id': self.warehouse_location_id.id,
-                'location_dest_id': self.location_dest_id.id,
+                'location_id': self_sudo.warehouse_location_id.id,
+                'location_dest_id': self_sudo.location_dest_id.id,
                 'picking_id': picking.id,
                 'state': 'draft',
             }
-            moves += self.env['stock.move'].create(move_vals)
+            moves += self_sudo.env['stock.move'].create(move_vals)
         
         # ================== VALIDACIÓN AUTOMÁTICA ==================
         picking.action_confirm()
@@ -332,7 +332,7 @@ class StockRequisition(models.Model):
         
         # ================== ACTUALIZACIÓN DE REGISTRO ==================
         assignment_lines = []
-        recipient = self._get_recipient()
+        recipient = self_sudo._get_recipient()
 
         for move in picking.move_ids:
             # Sumar las cantidades realizadas de las líneas de movimiento
@@ -347,25 +347,25 @@ class StockRequisition(models.Model):
             }
             assignment_lines.append((0, 0, assignment_vals))
         
-        self.write({
+        self_sudo.write({
             'state': 'done',
             'picking_id': picking.id,
             'assignment_ids': assignment_lines,
-            'warehouse_approver_id': self.env.user.id,
+            'warehouse_approver_id': self_sudo.env.user.id,
             'warehouse_approval_date': fields.Datetime.now()
         })
         
         # ================== NOTIFICACIONES ==================
-        self.message_post(
+        self_sudo.message_post(
             body=f"""
             <div class="alert alert-success">
                 <h4>Transferencia {picking.name} completada</h4>
-                <p>Desde: {self.warehouse_location_id.complete_name}</p>
-                <p>Hacia: {self.location_dest_id.complete_name}</p>
+                <p>Desde: {self_sudo.warehouse_location_id.complete_name}</p>
+                <p>Hacia: {self_sudo.location_dest_id.complete_name}</p>
             </div>
             """
         )
-        self._notify_approval()
+        self_sudo._notify_approval()
         
         return True
 

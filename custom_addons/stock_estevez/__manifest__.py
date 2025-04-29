@@ -14,6 +14,7 @@
         'security/ir.model.access.csv',
         'views/return_order.xml',
         'views/stock_warehouse_requisition_views.xml',
+        'views/stock_assignment_views.xml',
         'views/stock_menu.xml',        
     ],
     'installable': True,
