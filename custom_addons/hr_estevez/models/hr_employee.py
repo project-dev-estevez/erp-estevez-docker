@@ -78,6 +78,7 @@ class HrEmployee(models.Model):
     spouse_birthdate = fields.Date(string="Spouse Birthdate", groups="hr.group_hr_user", store=False)
 
     memorandum_ids = fields.One2many('hr.memorandum', 'employee_id', string='Actas Administrativas')
+    loan_ids = fields.One2many('hr.loan', 'employee_id', string='Préstamos y Anticipos')
 
     years_of_service = fields.Float(
         string="Años de Servicio",
@@ -285,6 +286,16 @@ class HrEmployee(models.Model):
             'type': 'ir.actions.act_window',
             'name': 'Nueva Acta Administrativa',
             'res_model': 'hr.memorandum',
+            'view_mode': 'form',
+            'target': 'new',
+            'context': {'default_employee_id': self.id},
+        }
+    
+    def action_open_loan_form(self):
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'Nuevo Préstamo o Anticipo',
+            'res_model': 'hr.loan',
             'view_mode': 'form',
             'target': 'new',
             'context': {'default_employee_id': self.id},

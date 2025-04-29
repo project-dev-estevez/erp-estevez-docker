@@ -1,0 +1,37 @@
+<odoo>
+    <data>
+        <!-- Vista del formulario modal -->
+        <record id="view_hr_loan_form" model="ir.ui.view">
+            <field name="name">hr.loan.form</field>
+            <field name="model">hr.loan</field>
+            <field name="arch" type="xml">
+                <form string="Nuevo Préstamo o Anticipo">
+                    <group>
+                        <field name="employee_id" invisible="1"/>
+                        <field name="request_date"/>
+                        <field name="application_date"/>
+                        <field name="start_payment_date"/>
+                        <field name="requested_amount"/>
+                        <field name="term"/>
+                        <field name="disbursement_type"/>
+                        <field name="discount_type"/>
+                    </group>
+                    <footer>
+                        <button string="Guardar" class="oe_highlight" type="object" name="action_save_loan"/>
+                        <button string="Cancelar" class="btn-secondary" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <!-- Acción para abrir el formulario modal -->
+        <record id="action_hr_loan_form" model="ir.actions.act_window">
+            <field name="name">Nuevo Préstamo o Anticipo</field>
+            <field name="res_model">hr.loan</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="view_hr_loan_form"/>
+            <field name="target">new</field>
+            <field name="context">{'default_employee_id': active_id}</field>
+        </record>
+    </data>
+</odoo>

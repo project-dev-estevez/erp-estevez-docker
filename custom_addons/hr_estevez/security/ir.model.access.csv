@@ -4,3 +4,4 @@ access_hr_area_user,access_hr_area_user,model_hr_area,base.group_user,1,1,1,1
 access_hr_contract_user,access_hr_contract_user,model_hr_contract,base.group_user,1,1,1,1
 access_hr_memorandum_user,access_hr_memorandum_user,model_hr_memorandum,base.group_user,1,1,1,1
 access_hr_vacation_period_user,access_hr_vacation_period_user,model_hr_vacation_period,base.group_user,1,1,1,1
+access_hr_loan_user,access_hr_loan_user,model_hr_loan,base.group_user,1,1,1,1

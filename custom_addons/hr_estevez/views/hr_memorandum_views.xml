@@ -15,7 +15,7 @@
                         <field name="administrative_type"/>
                     </group>
                     <footer>
-                        <button string="Guardar" class="oe_highlight" special="cancel" type="object" name="action_save_memorandum"/>
+                        <button string="Guardar" class="oe_highlight" type="object" name="action_save_memorandum"/>
                         <button string="Cancelar" class="btn-secondary" special="cancel"/>
                     </footer>
                 </form>

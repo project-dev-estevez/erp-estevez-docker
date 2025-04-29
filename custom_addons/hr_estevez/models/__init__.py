@@ -8,3 +8,4 @@ from . import hr_contract
 from . import hr_job
 from . import hr_memorandum
 from . import hr_vacation_period
+from . import hr_loan
