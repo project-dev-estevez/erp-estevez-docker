@@ -32,10 +32,7 @@ class HrMemorandum(models.Model):
     def action_save_memorandum(self):
         """Saves the memorandum and closes the modal."""
         self.ensure_one()  # Ensure only one record is processed
-        # Perform any additional save logic here if needed
-        return {
-            'type': 'ir.actions.act_window_close',
-        }
+
     
     def get_formatted_date(self):
         """Devuelve la fecha formateada como: 'las 11:00 hrs del día 15 de abril del 2025'."""
