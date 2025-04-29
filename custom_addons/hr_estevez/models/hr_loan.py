@@ -38,10 +38,10 @@ class HrLoan(models.Model):
         self.ensure_one()  # Ensure only one record is processed
         _logger.info("Downloading memorandum report for record: %s", self)
 
-        # return {
-        #     'type': 'ir.actions.report',
-        #     'report_name': 'hr_estevez.report_hr_employee_memorandum',
-        #     'report_type': 'qweb-pdf',
-        #     'model': self._name,
-        #     'res_id': self.id,
-        # }
+        return {
+            'type': 'ir.actions.report',
+            'report_name': 'hr_estevez.report_hr_employee_loan',
+            'report_type': 'qweb-pdf',
+            'model': self._name,
+            'res_id': self.id,
+        }
