@@ -7,14 +7,20 @@
             <field name="arch" type="xml">
                 <form string="Nuevo Préstamo o Anticipo">
                     <group>
-                        <field name="employee_id" invisible="1"/>
-                        <field name="request_date"/>
-                        <field name="application_date"/>
-                        <field name="start_payment_date"/>
-                        <field name="requested_amount"/>
-                        <field name="term"/>
-                        <field name="disbursement_type"/>
-                        <field name="discount_type"/>
+                        <group string="Información del Préstamo">
+                            <field name="employee_id" invisible="1"/>
+                            <field name="request_date"/>
+                            <field name="application_date"/>
+                            <field name="start_payment_date"/>
+                            <field name="requested_amount"/>
+                            <field name="term"/>
+                        </group>
+                        <group string="Detalles del Descuento">
+                            <field name="disbursement_type"/>
+                            <field name="discount_type"/>
+                            <field name="concept" required="1" placeholder="Ingrese el concepto del préstamo o anticipo"/>
+                            <field name="discount" required="1" placeholder="Ingrese el monto del descuento"/>
+                        </group>
                     </group>
                     <footer>
                         <button string="Guardar" class="oe_highlight" type="object" name="action_save_loan"/>

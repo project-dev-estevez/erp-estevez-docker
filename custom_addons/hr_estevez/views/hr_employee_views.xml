@@ -275,12 +275,18 @@
 
                 <!-- Nueva página de Prestamos -->
                 <xpath expr="//notebook/page[@name='memorandum']" position="after">
-                    <page name="loans" string="Prestámos" >
-                        <button name="action_open_loan_form" type="object" string="Nuevo Prestamo" class="oe_highlight" icon="fa-plus"/>
+                    <page name="loans" string="Préstamos" >
+                        <button name="action_open_loan_form" type="object" string="Nuevo Préstamo" class="oe_highlight" icon="fa-plus"/>
 
                         <field name="loan_ids" widget="one2many" context="{'default_employee_id': id}">
                             <list>
                                 <field name="id" string="Código" readonly="1"/>
+                                <field name="concept" string="Concepto" readonly="1"/>
+                                <field name="discount_type" string="Condiciones" readonly="1"/>
+                                <field name="requested_amount" string="Monto Solicitado" readonly="1"/>
+                                <field name="discount" string="Descuento" readonly="1"/>
+                                <field name="remaining_balance" string="Saldo Pendiente" readonly="1"/>
+                                <field name="installments" string="Cuotas" readonly="1"/>
                                 <button name="download_loan_report" type="object" string="Reporte" class="btn-secondary fa fa-download"/>
                             </list>
                         </field>
