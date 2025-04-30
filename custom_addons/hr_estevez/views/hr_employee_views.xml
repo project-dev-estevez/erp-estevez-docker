@@ -461,18 +461,6 @@
                     </page>
                 </xpath>
 
-                <!-- Nueva página de Incidencias -->
-                <xpath expr="//notebook/page[@name='assignments']" position="after">
-                    <page name="incidents" string="Incidencias" >
-                    </page>
-                </xpath>
-
-                <!-- Nueva página de Cursos -->
-                <xpath expr="//notebook/page[@name='incidents']" position="after">
-                    <page name="courses" string="Cursos" >
-                    </page>
-                </xpath>
-
             </field>
         </record>
 
