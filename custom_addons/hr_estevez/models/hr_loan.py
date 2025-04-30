@@ -38,8 +38,12 @@ class HrLoan(models.Model):
     @api.depends('term', 'discount')
     def _compute_installments(self):
         for record in self:
-            # Ejemplo: Genera un texto como "3 de 10" basado en las cuotas pagadas y el total
-            total_installments = int(record.term or 0)
+            try:
+                # Extraer el número del campo `term` si contiene texto como "24 meses"
+                total_installments = int(''.join(filter(str.isdigit, record.term)) or 0)
+            except ValueError:
+                total_installments = 0
+
             paid_installments = int(record.requested_amount // record.discount) if record.discount else 0
             record.installments = f"{paid_installments} de {total_installments}" if total_installments else "0 de 0"
 
