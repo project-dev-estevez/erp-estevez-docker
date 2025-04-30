@@ -5,7 +5,142 @@
                 <t t-call="web.external_layout">
                     <div class="page">
                         <div class="container">
-                            hello podo
+
+                            <div class="row mt-3">
+                                <div class="col-12 text-center">
+                                    <strong class="font-weight-bold">PRESTAMO DE NOMINA</strong>
+                                </div>
+                            </div>
+
+                            <div class="row mt-3">
+                                <div class="col-12 text-justify">
+                                    <p style="text-align: justify;">
+                                        <strong> P R E S E N T E:</strong> 
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="row mt-3">
+                                <div class="col-12 text-justify">
+                                    <p style="text-align: justify;">
+                                        De acuerdo a los estatutos y reglamentos de la empresa 
+                                        <strong>ESTEVEZ.JOR SERVICIOS S.A. DE C.V.,</strong> su servidor (a) y colaborador (a) 
+                                        <strong style="background-color: yellow;">“ALEJANDRO CHAVEZ ARCE”</strong> con el siguiente RFC 
+                                        <strong style="background-color: yellow;">“CAAA850711V46”</strong> y CURP
+                                        <strong style="background-color: yellow;">“CAAA850711HMCHRL09”</strong>, 
+                                        acepto se me realice el descuento por concepto de préstamo de nómina.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="row mt-3" style="margin-left: 50px;">
+                                <div class="col-12 text-justify">
+                                    <p style="text-align: justify;">
+                                        <strong>FECHA DE SOLICITUD:</strong> 
+                                        <strong style="background-color: yellow;">08 DE ABRIL DEL 2025</strong> 
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="row mt-3" style="margin-left: 50px;">
+                                <div class="col-12 text-justify">
+                                    <p style="text-align: justify;">
+                                        <strong>FECHA DE APLICACIÓN:</strong> 
+                                        <strong style="background-color: yellow;">15 DE ABRIL DEL 2025</strong> 
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="row mt-3" style="margin-left: 50px;">
+                                <div class="col-12 text-justify">
+                                    <p style="text-align: justify;">
+                                        <strong>MONTO:</strong> 
+                                        <strong style="background-color: yellow;">$1,200.00 (MIL DOSCIENTOS PESOS 00/100)</strong> 
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="row mt-3" style="margin-left: 50px;">
+                                <div class="col-12 text-justify">
+                                    <p style="text-align: justify;">
+                                        <strong>PLAZO:</strong> 
+                                        <strong style="background-color: yellow;">3 QUINCENAS</strong> 
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="row mt-3" style="margin-left: 50px;">
+                                <div class="col-12 text-justify">
+                                    <p style="text-align: justify;">
+                                        <strong>CUENTA:</strong> 
+                                        <span style="background-color: yellow;">012180015692373103</span> 
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="row mt-3">
+                                <div class="col-12 text-justify">
+                                    <p style="text-align: justify;">
+                                        Para amortizar la deuda autorizo a la empresa 
+                                        <strong>ESTEVEZ.JOR SERVICIOS S.A. DE C.V.,</strong> 
+                                        que inicie a cobrarme de manera (QUINCENAL), a partir del
+                                        <strong style="background-color: yellow;">15 DE ABRIL DEL 2025</strong> la cantidad de
+                                        <strong style="background-color: yellow;">$400.00 (CUATROCIENTOS PESOS M.N 00/100)</strong> 
+                                        hasta la completa liquidación del mismo.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="row mt-3">
+                                <div class="col-12 text-justify">
+                                    <p style="text-align: justify;">
+                                        Así mismo autorizo expresamente al empleador para que retenga y cobre de
+                                        mi finiquito o liquidación final los saldos que este adeudando, si llegase a finalizar
+                                        mi contrato de trabajo antes de completar el pago total de este préstamo
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="row" style="margin-top: 75px;">
+                                <div class="col-6 text-center">
+                                    <br />
+                                    <br />
+                                    <p>______________________________________________</p>
+                                    <p class="mb-1">
+                                        <strong>DRA. ESTEVEZ </strong>
+                                    </p>
+                                    <p class="mb-1">
+                                        <strong>GONZALEZ MARIA </strong>
+                                    </p>
+                                    <p class="mb-1">
+                                        <strong>FERNANDA</strong>
+                                    </p>
+                                    <p class="mb-1">
+                                        <strong>REPRESENTANTE </strong>
+                                    </p>
+                                    <p class="mb-1">
+                                        <strong>LEGAL DE</strong>
+                                    </p>
+                                </div>
+
+                                <div class="col-6 text-center">
+                                    <br />
+                                    <br />
+                                    <p>______________________________________________</p>
+                                    <p class="mb-1">
+                                        <span>ESTEVEZ JOR SERVICIOS, S.A. </span>
+                                    </p>
+                                    <p class="mb-1">
+                                        <span>DE</span>
+                                    </p>
+                                    <p class="mb-1">
+                                        <span>TRABAJADOR/EMPLEADO(A)</span>
+                                    </p>
+                                    <p class="mb-1">
+                                        <strong style="background-color: yellow;">C. ALEJANDRO CHAVEZ ARCE</strong>
+                                    </p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </t>
