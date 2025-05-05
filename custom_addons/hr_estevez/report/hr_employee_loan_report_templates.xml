@@ -6,9 +6,25 @@
                     <div class="page">
                         <div class="container">
 
+                            <div class="row">
+                                <div class="text-center">
+                                    <strong>
+                                        TLALNEPANTLA, ESTADO DE MEXICO, A 
+                                        <t t-esc="doc.employee_id.get_formatted_today_date()"/>.
+                                    </strong>
+                                </div>
+                            </div>
+
                             <div class="row mt-3">
-                                <div class="col-12 text-center">
-                                    <strong class="font-weight-bold">PRESTAMO DE NOMINA</strong>
+                                <div class="h5 col-12 text-center">
+                                    <strong class="font-weight-bold">
+                                        <t t-if="doc.disbursement_type == 'loan'">
+                                            PRÉSTAMO DE NÓMINA
+                                        </t>
+                                        <t t-elif="doc.disbursement_type == 'advance'">
+                                            ANTICIPO DE NÓMINA
+                                        </t>
+                                    </strong>
                                 </div>
                             </div>
 
@@ -24,11 +40,20 @@
                                 <div class="col-12 text-justify">
                                     <p style="text-align: justify;">
                                         De acuerdo a los estatutos y reglamentos de la empresa 
-                                        <strong>ESTEVEZ.JOR SERVICIOS S.A. DE C.V.,</strong> su servidor (a) y colaborador (a) 
-                                        <strong style="background-color: yellow;">“ALEJANDRO CHAVEZ ARCE”</strong> con el siguiente RFC 
-                                        <strong style="background-color: yellow;">“CAAA850711V46”</strong> y CURP
-                                        <strong style="background-color: yellow;">“CAAA850711HMCHRL09”</strong>, 
-                                        acepto se me realice el descuento por concepto de préstamo de nómina.
+                                        <strong>ESTEVEZ.JOR SERVICIOS S.A. DE C.V.,</strong> su servidor (a) y colaborador (a)
+                                        “<strong>
+                                            <t t-esc="doc.employee_id.name.upper()"/>
+                                        </strong>”
+                                        con el siguiente RFC 
+                                        “<strong><t t-esc="doc.employee_id.rfc"/></strong>”
+                                        y CURP
+                                        “<strong><t t-esc="doc.employee_id.curp"/></strong>”,
+                                        <t t-if="doc.disbursement_type == 'advance'">
+                                            acepto se me realice el descuento por concepto de anticipo de nómina.
+                                        </t>
+                                        <t t-elif="doc.disbursement_type == 'loan'">
+                                            me dirijo a ustedes de la manera más atenta para solicitar un préstamo con las siguientes condiciones.
+                                        </t>
                                     </p>
                                 </div>
                             </div>
@@ -37,7 +62,7 @@
                                 <div class="col-12 text-justify">
                                     <p style="text-align: justify;">
                                         <strong>FECHA DE SOLICITUD:</strong> 
-                                        <strong style="background-color: yellow;">08 DE ABRIL DEL 2025</strong> 
+                                        <t t-esc="doc.get_formatted_date(doc.request_date)"/>
                                     </p>
                                 </div>
                             </div>
@@ -46,7 +71,7 @@
                                 <div class="col-12 text-justify">
                                     <p style="text-align: justify;">
                                         <strong>FECHA DE APLICACIÓN:</strong> 
-                                        <strong style="background-color: yellow;">15 DE ABRIL DEL 2025</strong> 
+                                        <t t-esc="doc.get_formatted_date(doc.application_date)"/>
                                     </p>
                                 </div>
                             </div>
@@ -54,8 +79,8 @@
                             <div class="row mt-3" style="margin-left: 50px;">
                                 <div class="col-12 text-justify">
                                     <p style="text-align: justify;">
-                                        <strong>MONTO:</strong> 
-                                        <strong style="background-color: yellow;">$1,200.00 (MIL DOSCIENTOS PESOS 00/100)</strong> 
+                                        <strong>MONTO:</strong>
+                                        <t t-esc="doc.format_requested_amount_full()"/>
                                     </p>
                                 </div>
                             </div>
@@ -64,7 +89,7 @@
                                 <div class="col-12 text-justify">
                                     <p style="text-align: justify;">
                                         <strong>PLAZO:</strong> 
-                                        <strong style="background-color: yellow;">3 QUINCENAS</strong> 
+                                        <t t-esc="doc.term.upper()"/>
                                     </p>
                                 </div>
                             </div>
@@ -73,7 +98,7 @@
                                 <div class="col-12 text-justify">
                                     <p style="text-align: justify;">
                                         <strong>CUENTA:</strong> 
-                                        <span style="background-color: yellow;">012180015692373103</span> 
+                                        <t t-esc="doc.get_employee_bank_account()"/>
                                     </p>
                                 </div>
                             </div>
@@ -83,9 +108,17 @@
                                     <p style="text-align: justify;">
                                         Para amortizar la deuda autorizo a la empresa 
                                         <strong>ESTEVEZ.JOR SERVICIOS S.A. DE C.V.,</strong> 
-                                        que inicie a cobrarme de manera (QUINCENAL), a partir del
-                                        <strong style="background-color: yellow;">15 DE ABRIL DEL 2025</strong> la cantidad de
-                                        <strong style="background-color: yellow;">$400.00 (CUATROCIENTOS PESOS M.N 00/100)</strong> 
+                                        que inicie a cobrarme de manera 
+                                        (<t t-if="doc.discount_type == 'weekly'">SEMANAL</t>
+                                        <t t-elif="doc.discount_type == 'biweekly'">QUINCENAL</t>), 
+                                        a partir del
+                                        <strong>
+                                            <t t-esc="doc.get_formatted_date(doc.start_payment_date)"/>
+                                        </strong>
+                                        la cantidad de
+                                        <strong>
+                                            <t t-esc="doc.format_amount_per_term()"/>
+                                        </strong> 
                                         hasta la completa liquidación del mismo.
                                     </p>
                                 </div>
@@ -95,49 +128,52 @@
                                 <div class="col-12 text-justify">
                                     <p style="text-align: justify;">
                                         Así mismo autorizo expresamente al empleador para que retenga y cobre de
-                                        mi finiquito o liquidación final los saldos que este adeudando, si llegase a finalizar
+                                        mi finiquito o liquidación final los saldos que esté adeudando, si llegase a finalizar
                                         mi contrato de trabajo antes de completar el pago total de este préstamo
                                     </p>
                                 </div>
                             </div>
 
-                            <div class="row" style="margin-top: 75px;">
+                            <div class="row" style="margin-top: 70px;">
                                 <div class="col-6 text-center">
                                     <br />
-                                    <br />
                                     <p>______________________________________________</p>
-                                    <p class="mb-1">
+                                    <p style="margin-bottom: 2px;">
                                         <strong>DRA. ESTEVEZ </strong>
                                     </p>
-                                    <p class="mb-1">
+                                    <p style="margin-bottom: 2px;">
                                         <strong>GONZALEZ MARIA </strong>
                                     </p>
-                                    <p class="mb-1">
+                                    <p style="margin-bottom: 2px;">
                                         <strong>FERNANDA</strong>
                                     </p>
-                                    <p class="mb-1">
+                                    <p style="margin-bottom: 2px;">
                                         <strong>REPRESENTANTE </strong>
                                     </p>
-                                    <p class="mb-1">
+                                    <p style="margin-bottom: 2px;">
                                         <strong>LEGAL DE</strong>
+                                    </p>
+                                    <p style="margin-bottom: 2px;">
+                                        <strong>ESTEVEZ.JOR SERVICIOS, S.A. DE C.V.</strong>
                                     </p>
                                 </div>
 
                                 <div class="col-6 text-center">
                                     <br />
-                                    <br />
                                     <p>______________________________________________</p>
-                                    <p class="mb-1">
-                                        <span>ESTEVEZ JOR SERVICIOS, S.A. </span>
+                                    <p class="margin-bottom: 2px;">
+                                        <strong>ESTEVEZ JOR SERVICIOS, S.A.</strong>
                                     </p>
-                                    <p class="mb-1">
-                                        <span>DE</span>
+                                    <p class="margin-bottom: 2px;">
+                                        <strong>DE C.V</strong>
                                     </p>
-                                    <p class="mb-1">
-                                        <span>TRABAJADOR/EMPLEADO(A)</span>
+                                    <p class="margin-bottom: 2px;">
+                                        <strong>TRABAJADOR/EMPLEADO(A)</strong>
                                     </p>
-                                    <p class="mb-1">
-                                        <strong style="background-color: yellow;">C. ALEJANDRO CHAVEZ ARCE</strong>
+                                    <p class="margin-bottom: 2px;">
+                                        <strong>
+                                            C.<t t-esc="doc.employee_id.name.upper()"/>
+                                        </strong>
                                     </p>
                                 </div>
                             </div>
