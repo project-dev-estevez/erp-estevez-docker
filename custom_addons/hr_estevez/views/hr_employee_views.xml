@@ -250,7 +250,43 @@
 
                 <!-- Nueva página de Incapacidades -->
                 <xpath expr="//notebook/page[@name='personal_information']" position="after">
-                    <page name="disabilities" string="Incapacidades" >
+                    <page name="disabilities" string="Incapacidades">
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-striped o_list_view">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Folio</th>
+                                        <th>Fecha Incidente</th>
+                                        <th>Fecha Inicio</th>
+                                        <th>Fecha Fin</th>
+                                        <th>Días</th>
+                                        <th>Tipo</th>
+                                        <th>Comentarios</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>--</td>
+                                        <td>--</td>
+                                        <td>--</td>
+                                        <td>--</td>
+                                        <td>--</td>
+                                        <td>--</td>
+                                        <td>--</td>
+                                        <td>--</td>
+                                        <td>
+                                            <div>
+                                                <button type="button" class="btn btn-secondary btn-sm mb-1">
+                                                    Generar Reporte
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </page>
                 </xpath>
 
@@ -319,12 +355,95 @@
                                 </group>
                             </group>    
                         </group>
+
+                        <hr/>
+
+                        <group>
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-striped o_list_view">
+                                    <thead>
+                                        <tr>
+                                            <th>Fecha Registro</th>
+                                            <th>Fecha Inicio</th>
+                                            <th>Fecha Termino</th>
+                                            <th>Días Solicitados</th>
+                                            <th>Goce de Sueldo</th>
+                                            <th>Comentarios</th>
+                                            <th>Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>--</td>
+                                            <td>--</td>
+                                            <td>--</td>
+                                            <td>--</td>
+                                            <td>--</td>
+                                            <td>--</td>
+                                            <td>
+                                                <div>
+                                                    <button type="button" class="btn btn-secondary btn-sm mb-1">
+                                                        Generar Reporte
+                                                    </button>
+                                                </div>
+                                                <div>
+                                                    <button type="button" class="btn btn-danger btn-sm">
+                                                        Cancelar Vacaciones
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </group>
                     </page>
                 </xpath>
 
                 <!-- Nueva página de Permisos -->
                 <xpath expr="//notebook/page[@name='vacations']" position="after">
-                    <page name="permits" string="Permisos" >
+                    <page name="permits" string="Permisos">
+                        <group>
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-striped o_list_view">
+                                    <thead>
+                                        <tr>
+                                            <th>Fecha Registro</th>
+                                            <th>Fecha Inicio</th>
+                                            <th>Fecha Termino</th>
+                                            <th>Días Solicitados</th>
+                                            <th>Goce de Sueldo</th>
+                                            <th>Comentarios</th>
+                                            <th>Tipo</th>
+                                            <th>Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>--</td>
+                                            <td>--</td>
+                                            <td>--</td>
+                                            <td>--</td>
+                                            <td>--</td>
+                                            <td>--</td>
+                                            <td>--</td>
+                                            <td>
+                                                <div>
+                                                    <button type="button" class="btn btn-secondary btn-sm mb-1">
+                                                        Generar Reporte
+                                                    </button>
+                                                </div>
+                                                <div>
+                                                    <button type="button" class="btn btn-danger btn-sm">
+                                                        Cancelar Permiso
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </group>
                     </page>
                 </xpath>
 
