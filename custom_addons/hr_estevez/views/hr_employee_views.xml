@@ -277,11 +277,7 @@
                                         <td>--</td>
                                         <td>--</td>
                                         <td>
-                                            <div>
-                                                <button type="button" class="btn btn-secondary btn-sm mb-1">
-                                                    Generar Reporte
-                                                </button>
-                                            </div>
+                                            Botones de Acciones
                                         </td>
                                     </tr>
                                 </tbody>
@@ -381,7 +377,8 @@
                                             <td>--</td>
                                             <td>--</td>
                                             <td>
-                                                <div>
+                                                Botones de Acciones
+                                                <!-- <div>
                                                     <button type="button" class="btn btn-secondary btn-sm mb-1">
                                                         Generar Reporte
                                                     </button>
@@ -390,7 +387,7 @@
                                                     <button type="button" class="btn btn-danger btn-sm">
                                                         Cancelar Vacaciones
                                                     </button>
-                                                </div>
+                                                </div> -->
                                             </td>
                                         </tr>
                                     </tbody>
@@ -428,16 +425,7 @@
                                             <td>--</td>
                                             <td>--</td>
                                             <td>
-                                                <div>
-                                                    <button type="button" class="btn btn-secondary btn-sm mb-1">
-                                                        Generar Reporte
-                                                    </button>
-                                                </div>
-                                                <div>
-                                                    <button type="button" class="btn btn-danger btn-sm">
-                                                        Cancelar Permiso
-                                                    </button>
-                                                </div>
+                                                Botones de Acciones
                                             </td>
                                         </tr>
                                     </tbody>
