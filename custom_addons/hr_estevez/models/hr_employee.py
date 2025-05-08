@@ -188,7 +188,7 @@ class HrEmployee(models.Model):
                 })
 
                 # Avanzar al siguiente año
-                current_start_date = year_end + timedelta(days=1)
+                current_start_date = current_start_date.replace(year=current_start_date.year + 1)
 
     def _create_vacation_period(self, employee, start_date, end_date):
         # Calcular el inicio y fin del periodo basado en años calendario
