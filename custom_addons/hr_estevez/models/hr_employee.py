@@ -6,10 +6,15 @@ import re
 class HrEmployee(models.Model):
     _inherit = 'hr.employee'
 
-      # Método para archivar (dar de baja)
     def action_archive_employee(self):
-        for employee in self:
-            employee.write({'active': False})
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'Dar de Baja al Empleado',
+            'res_model': 'hr.employee.archive.wizard',
+            'view_mode': 'form',
+            'target': 'new',
+            'context': {'default_employee_id': self.id},
+        }
 
     # Método para reactivar
     def action_reactivate_employee(self):

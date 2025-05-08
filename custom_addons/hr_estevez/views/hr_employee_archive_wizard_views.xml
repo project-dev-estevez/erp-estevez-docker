@@ -1,0 +1,20 @@
+<odoo>
+    <record id="view_hr_employee_archive_wizard_form" model="ir.ui.view">
+        <field name="name">hr.employee.archive.wizard.form</field>
+        <field name="model">hr.employee.archive.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Archivar Empleado">
+                <group>
+                    <field name="employee_id" readonly="1" options="{'no_open': True}"/>
+                    <field name="termination_date"/>
+                    <field name="possible_rehire"/>
+                    <field name="termination_type"/>
+                </group>
+                <footer>
+                    <button string="Confirmar" type="object" name="confirm_archive" class="btn-primary"/>
+                    <button string="Cancelar" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

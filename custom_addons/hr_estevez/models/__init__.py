@@ -9,3 +9,4 @@ from . import hr_job
 from . import hr_memorandum
 from . import hr_vacation_period
 from . import hr_loan
+from . import hr_employee_archive_wizard
