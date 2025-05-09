@@ -15,7 +15,8 @@
         'views/return_order.xml',
         'views/stock_warehouse_requisition_views.xml',
         'views/stock_assignment_views.xml',
-        'views/stock_menu.xml',        
+        'views/stock_menu.xml',
+        'views/stock_warehouse.xml'
     ],
     'installable': True,
     'application': False, 

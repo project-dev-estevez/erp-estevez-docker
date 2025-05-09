@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data> 
+
+        <!-- Heredar la vista de lista -->
+        <record id="view_stock_warehouse_inherit" model="ir.ui.view">
+            <field name="name">stock.warehouse.form.inherit</field>
+            <field name="model">stock.warehouse</field>
+            <field name="inherit_id" ref="stock.view_warehouse"/>
+            <field name="arch" type="xml">
+                <!--<xpath expr="//sheet/h1/field[@name='name']" position="after">
+                    <group>
+                        <field name="type_warehouse"/>
+                    </group>
+                </xpath>-->
+            </field>
+        </record>
+
+       
+        
+    </data>
+</odoo>
