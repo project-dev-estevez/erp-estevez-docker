@@ -9,6 +9,7 @@
                     <field name="termination_date"/>
                     <field name="possible_rehire"/>
                     <field name="termination_type"/>
+                    <field name="reason"/>
                 </group>
                 <footer>
                     <button string="Confirmar" type="object" name="confirm_archive" class="btn-primary"/>
