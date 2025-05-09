@@ -6,7 +6,10 @@ class HrEmployeeArchiveWizard(models.TransientModel):
 
     employee_id = fields.Many2one('hr.employee', string='Empleado', required=True)
     termination_date = fields.Date(string='Fecha de Baja', required=True, default=fields.Date.today)
-    possible_rehire = fields.Boolean(string='Posible Recontratación')
+    possible_rehire = fields.Selection([
+        ('viable', 'Viable'),
+        ('inviable', 'Inviable'),
+    ], string='Posible Recontratación')
     termination_type = fields.Selection([
         ('voluntary_resignation', 'Renuncia Voluntaria'),
         ('contract_end', 'Término de Contrato'),
@@ -15,6 +18,7 @@ class HrEmployeeArchiveWizard(models.TransientModel):
         ('dismissal_performance', 'Despido por Bajo Desempeño'),
         ('dismissal_probity', 'Despido por Falta de Probidad'),
     ], string='Tipo de Baja', required=True)
+    reason = fields.Text(string='Motivo')
 
     def confirm_archive(self):
         """Confirma la baja del empleado."""
