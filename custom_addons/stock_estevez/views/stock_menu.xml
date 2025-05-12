@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>       
-
     <!-- Menú Principal -->
     <menuitem 
         id="requisition" 
@@ -16,6 +15,37 @@
         parent="stock.menu_stock_root"
         sequence="30"
         action="action_custom_devoluciones"
-    />   
+    />     
+          
+    <menuitem 
+        id="menu_stock_warehouse_main" 
+        name="Gestión de Almacenes" 
+        parent="stock.menu_stock_root"
+        sequence="35"
+    />
     
-</odoo>
+    <menuitem 
+        id="stock.menu_stock_warehouse" 
+        name="Almacenes" 
+        parent="stock_estevez.menu_stock_warehouse_main"
+        action="stock.action_warehouse_form" 
+        sequence="10"
+    />                   
+
+    <menuitem 
+    id="stock.menu_product_stock" 
+    name="Existencias" 
+    parent="stock_estevez.menu_stock_warehouse_main" 
+    action="stock.action_product_stock_view" 
+    sequence="20"
+/>
+    <!-- Ubicaciones -->
+    <menuitem 
+        id="stock.menu_stock_location" 
+        name="Ubicaciones" 
+        parent="stock_estevez.menu_stock_warehouse_main"
+        action="stock.action_location_form" 
+        sequence="30"
+    />  
+       
+</odoo>       
