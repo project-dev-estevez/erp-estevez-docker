@@ -6,21 +6,6 @@ import re
 class HrEmployee(models.Model):
     _inherit = 'hr.employee'
 
-    def action_archive_employee(self):
-        return {
-            'type': 'ir.actions.act_window',
-            'name': 'Dar de Baja al Empleado',
-            'res_model': 'hr.employee.archive.wizard',
-            'view_mode': 'form',
-            'target': 'new',
-            'context': {'default_employee_id': self.id},
-        }
-
-    # Método para reactivar
-    def action_reactivate_employee(self):
-        for employee in self:
-            employee.write({'active': True})
-
     gender = fields.Selection([
         ('male', 'Masculino'),
         ('female', 'Femenino'),
@@ -464,3 +449,39 @@ class HrEmployee(models.Model):
         country_name = self.country_id.name
         return translations.get(country_name, country_name)
     
+    def action_archive_employee(self):
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'Dar de Baja al Empleado',
+            'res_model': 'hr.employee.archive.wizard',
+            'view_mode': 'form',
+            'target': 'new',
+            'context': {'default_employee_id': self.id},
+        }
+
+    # Método para reactivar
+    def action_reactivate_employee(self):
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'Reactivar Empleado',
+            'res_model': 'hr.employee.reactivate.wizard',
+            'view_mode': 'form',
+            'target': 'new',
+            'context': {'default_employee_id': self.id},
+        }
+    
+    def action_view_history(self):
+        """Abre una vista modal con el historial de altas y bajas del empleado."""
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'Historial de Altas y Bajas',
+            'res_model': 'hr.employee.history',  # Modelo relacionado con el historial
+            'view_mode': 'list,form',           # Vista en modo lista y formulario
+            'target': 'new',                    # Abrir como modal
+            'domain': [('employee_id', '=', self.id)],  # Filtrar por el empleado actual
+            'context': {
+                'default_employee_id': self.id,
+                'create': False,  # Deshabilitar el botón "New"
+            },
+        }

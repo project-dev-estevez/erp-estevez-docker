@@ -5,7 +5,7 @@ class HrEmployeeArchiveWizard(models.TransientModel):
     _description = 'Wizard para Archivar Empleado'
 
     employee_id = fields.Many2one('hr.employee', string='Empleado', required=True)
-    termination_date = fields.Date(string='Fecha de Baja', required=True, default=fields.Date.today)
+    termination_date = fields.Datetime(string='Fecha de Baja', required=True, default=fields.Date.today)
     possible_rehire = fields.Selection([
         ('viable', 'Viable'),
         ('inviable', 'Inviable'),
@@ -26,5 +26,12 @@ class HrEmployeeArchiveWizard(models.TransientModel):
         self.employee_id.write({
             'active': False,
         })
-        # Aquí puedes registrar la información adicional en un modelo relacionado si es necesario.
+        # Registrar la baja en el historial
+        self.env['hr.employee.history'].create({
+            'employee_id': self.employee_id.id,
+            'date': self.termination_date,
+            'status': 'baja',
+            'reason': self.reason,
+            'possible_rehire': self.possible_rehire,
+        })
         return True

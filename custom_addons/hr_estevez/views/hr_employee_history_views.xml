@@ -1,0 +1,14 @@
+<odoo>
+    <record id="view_hr_employee_history_list" model="ir.ui.view">
+        <field name="name">hr.employee.history.list</field>
+        <field name="model">hr.employee.history</field>
+        <field name="arch" type="xml">
+            <list string="Historial de Altas y Bajas">
+                <field name="date"/>
+                <field name="status"/>
+                <field name="reason"/>
+                <field name="possible_rehire" invisible="status != 'baja'"/>
+            </list>
+        </field>
+    </record>
+</odoo>

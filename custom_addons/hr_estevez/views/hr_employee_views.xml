@@ -31,17 +31,24 @@
                 <!-- Botones del Header -->
                 <xpath expr="//header" position="inside">
                     <button name="action_archive_employee"
-                        string="Dar de baja" 
-                        type="object" 
-                        class="oe_highlight"
-                        invisible="not active"/>  <!-- Solo visible si active=True -->
+                            string="Dar de baja" 
+                            type="object" 
+                            class="btn-danger"
+                            invisible="not active"/>  <!-- Solo visible si active=True -->
                 </xpath>
                 <xpath expr="//header" position="inside">
+                    <button name="action_view_history"
+                            string="Historial Altas/Bajas"
+                            type="object"
+                            class="btn-secondary"
+                            icon="fa-history"
+                            invisible="active"/>
+
                     <button name="action_reactivate_employee"
-                        string="Dar de alta"
-                        type="object"
-                        class="oe_highlight"
-                        invisible="active"/>  <!-- Solo visible si active=False -->
+                            string="Dar de alta"
+                            type="object"
+                            class="btn-success"
+                            invisible="active"/>  <!-- Solo visible si active=False -->
                 </xpath>
 
                 <!-- Botones en el header para reportes -->

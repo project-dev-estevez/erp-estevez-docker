@@ -10,3 +10,5 @@ from . import hr_memorandum
 from . import hr_vacation_period
 from . import hr_loan
 from . import hr_employee_archive_wizard
+from . import hr_employee_reactivate_wizard
+from . import hr_employee_history
