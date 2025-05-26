@@ -22,6 +22,7 @@
         "data/ir_cron_interviews_data.xml",
         "data/ir_cron_psychometric_data.xml",
         "data/ir_cron_driving_test_data.xml",
+        # 'data/mail_templates_inherit.xml',
 
         # Archivos de informes
         'report/hr_applicant_doctor_report.xml',
@@ -31,7 +32,7 @@
         'views/hr_applicant_document_views.xml',
         'views/hr_applicant_view_form_inherit.xml',
         'views/hr_candidate_view_form_inherit.xml',
-        "views/hr_requisition_views.xml"
+        "views/hr_requisition_views.xml",
     ],
     "installable": True,
     "application": False,
