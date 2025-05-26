@@ -8,15 +8,24 @@
             <field name="model">stock.warehouse</field>
             <field name="inherit_id" ref="stock.view_warehouse"/>
             <field name="arch" type="xml">
-                <!--<xpath expr="//sheet/h1/field[@name='name']" position="after">
+                 <xpath expr="//field[@name='name']" position="after">
                     <group>
                         <field name="type_warehouse"/>
+                        <field name="sub_type_warehouse"/>
+                        <field name="warehouse_id"/>                                                                        
                     </group>
-                </xpath>-->
+                    <group invisible="sub_type_warehouse != 'project_warehouse'">
+                        <field name="project_name"/>
+                        <field name="location"/>   
+                        <field name="responsible_ag"/>   
+                        <field name="responsible_dno"/>                        
+                    </group>
+                    <group invisible="sub_type_warehouse != 'contractors_warehouse'">
+                        <field name="contractors_name"/>
+                        <field name="assignment_sheet"/>                                                  
+                    </group>
+                </xpath>
             </field>
-        </record>
-
-       
-        
+        </record>               
     </data>
 </odoo>
