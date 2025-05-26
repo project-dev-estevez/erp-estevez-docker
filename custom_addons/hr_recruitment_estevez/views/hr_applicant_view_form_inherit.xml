@@ -148,6 +148,7 @@
             <xpath expr="//field[@name='linkedin_profile']" position="after">
                 <field name="source_id"/>
                 <field name="medium_id"/>
+                <field name="project_id"/>
             </xpath>
         </field>
     </record>

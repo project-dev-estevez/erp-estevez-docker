@@ -9,7 +9,7 @@
     "website": "https://estevezjorinternacional.com",
     "category": "Human Resources",
     "version": "0.1",
-    "depends": ['base', 'hr', 'hr_estevez', 'hr_recruitment', 'survey', 'hr_recruitment_survey', 'utm'],
+    "depends": ['base', 'hr', 'hr_estevez', 'hr_recruitment', 'project', 'survey', 'hr_recruitment_survey', 'utm'],
     "data": [
         # Archivos de seguridad
         "security/hr_recruitment_security.xml",
@@ -33,6 +33,7 @@
         'views/hr_applicant_view_form_inherit.xml',
         'views/hr_candidate_view_form_inherit.xml',
         "views/hr_requisition_views.xml",
+        "views/hr_applicant_view_list_inherit.xml",
     ],
     "installable": True,
     "application": False,

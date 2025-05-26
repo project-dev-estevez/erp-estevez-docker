@@ -147,6 +147,12 @@ class HrApplicant(models.Model):
         default=lambda self: self.env.user,  # Asigna el usuario logueado por defecto
     )
 
+    project_id = fields.Many2one(
+        'project.project',
+        string='Proyecto',
+        help='Proyecto para el que se postula el candidato'
+    )
+
     @api.depends('job_id')
     def _compute_user(self):
         """Override to prevent automatic assignment of user_id based on job_id."""

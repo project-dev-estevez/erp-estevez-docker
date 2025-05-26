@@ -1,0 +1,37 @@
+<odoo>
+  <!-- Vista lista personalizada -->
+  <record id="hr_applicant_list_custom" model="ir.ui.view">
+    <field name="name">hr.applicant.list.custom</field>
+    <field name="model">hr.applicant</field>
+    <field name="arch" type="xml">
+      <list string="General Postulantes" default_order="create_date desc">
+        <field name="create_date" string="Fecha"/>
+        <field name="user_id" string="Reclutador"/>
+        <field name="partner_name" string="Nombre del Candidato"/>
+        <field name="source_id" string="Fuente de Reclutamiento"/>
+        <field name="project_id" string="Proyecto"/>
+        <field name="job_id" string="Puesto de Trabajo"/>
+        <field name="stage_id" string="Estado Actual"/>
+        <field name="date_closed" string="Fecha de Contratación/Rechazo"/>
+        <field name="refuse_reason_id" string="Motivo de Rechazo"/>
+        <field name="applicant_notes" string="Comentarios"/>
+      </list>
+    </field>
+  </record>
+
+  <!-- Acción para la vista personalizada -->
+  <record id="action_hr_applicant_list_custom" model="ir.actions.act_window">
+    <field name="name">Informe General de Candidatos</field>
+    <field name="res_model">hr.applicant</field>
+    <field name="view_mode">list,form</field>
+    <field name="view_id" ref="hr_applicant_list_custom"/>
+    <field name="context">{}</field>
+  </record>
+
+  <!-- Menú dentro de Reporting -->
+  <menuitem id="menu_hr_applicant_list_custom"
+          name="Informe General"
+          parent="hr_recruitment.report_hr_recruitment"
+          action="action_hr_applicant_list_custom"
+          sequence="100"/>
+</odoo>
