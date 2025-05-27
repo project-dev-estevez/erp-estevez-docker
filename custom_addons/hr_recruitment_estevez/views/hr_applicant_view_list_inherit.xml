@@ -13,6 +13,7 @@
         <field name="job_id" string="Puesto de Trabajo"/>
         <field name="stage_id" string="Estado Actual"/>
         <field name="date_closed" string="Fecha de Contratación/Rechazo"/>
+        <field name="process_duration" string="Duración"/>
         <field name="refuse_reason_id" string="Motivo de Rechazo"/>
         <field name="applicant_notes" string="Comentarios"/>
       </list>

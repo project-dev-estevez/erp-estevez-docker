@@ -153,6 +153,25 @@ class HrApplicant(models.Model):
         help='Proyecto para el que se postula el candidato'
     )
 
+    process_duration = fields.Char(
+        string='Duración',
+        compute='_compute_process_duration',
+        store=False
+    )
+
+    @api.depends('create_date', 'date_closed')
+    def _compute_process_duration(self):
+        for rec in self:
+            if rec.create_date:
+                end_date = rec.date_closed or fields.Datetime.now()
+                duration = end_date - rec.create_date
+                days = duration.days
+                hours = duration.seconds // 3600
+                minutes = (duration.seconds % 3600) // 60
+                rec.process_duration = f"{days}d {hours}h {minutes}m"
+            else:
+                rec.process_duration = ''
+
     @api.depends('job_id')
     def _compute_user(self):
         """Override to prevent automatic assignment of user_id based on job_id."""
