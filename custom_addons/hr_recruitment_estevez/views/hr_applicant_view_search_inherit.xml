@@ -1,0 +1,17 @@
+<odoo>
+  <record id="hr_applicant_view_search_bis_inherit_estevez" model="ir.ui.view">
+    <field name="name">hr.applicant.view.search.bis.inherit.estevez</field>
+    <field name="model">hr.applicant</field>
+    <field name="inherit_id" ref="hr_recruitment.hr_applicant_view_search_bis"/>
+    <field name="arch" type="xml">
+      <!-- Cambia el string del filtro Candidate -->
+      <xpath expr="//filter[@name='candidate']" position="attributes">
+        <attribute name="string">Candidato</attribute>
+      </xpath>
+      <!-- Cambia el string del filtro Responsible -->
+      <xpath expr="//filter[@name='responsible']" position="attributes">
+        <attribute name="string">Reclutador</attribute>
+      </xpath>
+    </field>
+  </record>
+</odoo>

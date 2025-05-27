@@ -34,6 +34,7 @@
         'views/hr_candidate_view_form_inherit.xml',
         "views/hr_requisition_views.xml",
         "views/hr_applicant_view_list_inherit.xml",
+        "views/hr_applicant_view_search_inherit.xml",
     ],
     "installable": True,
     "application": False,
