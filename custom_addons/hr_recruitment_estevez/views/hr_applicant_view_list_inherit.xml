@@ -6,17 +6,18 @@
     <field name="arch" type="xml">
       <list string="General Postulantes" default_order="create_date desc">
         <field name="create_date" string="Fecha"/>
-        <field name="user_id" string="Reclutador"/>
-        <field name="partner_name" string="Nombre del Candidato"/>
-        <field name="source_id" string="Fuente de Reclutamiento"/>
-        <field name="project_id" string="Proyecto"/>
+        <field name="user_id" string="Reclutador" widget="many2one_avatar_user"/>
+        <field name="partner_name" string="Candidato"/>
         <field name="job_id" string="Puesto de Trabajo"/>
-        <field name="stage_id" string="Estado Actual"/>
-        <field name="date_closed" string="Fecha de Contratación" optional="show"/>
-        <field name="refuse_date" string="Fecha de Rechazo" optional="show"/>
-        <field name="process_duration" string="Duración"/>
-        <field name="refuse_reason_id" string="Motivo de Rechazo"/>
-        <field name="applicant_notes" string="Comentarios"/>
+        <field name="project_id" string="Proyecto" optional="hide"/>
+        <field name="source_id" string="Fuente de Reclutamiento" optional="hide"/>
+        <field name="stage_id" string="Etapa Actual" optional="hide"/>
+        <field name="date_closed" string="Fecha de Contratación" optional="hide"/>
+        <field name="refuse_date" string="Fecha de Rechazo" optional="hide"/>
+        <field name="process_duration" string="Duración" optional="hide"/>
+        <field name="refuse_reason_id" string="Motivo de Rechazo" optional="hide"/>
+        <field name="applicant_notes" string="Comentarios" optional="hide"/>
+        <field name="priority" string="Calificación" optional="hide" widget="priority"/>
       </list>
     </field>
   </record>
