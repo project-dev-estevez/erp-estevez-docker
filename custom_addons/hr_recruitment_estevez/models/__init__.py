@@ -1,3 +1,4 @@
+from . import hr_requisition_tag
 from . import hr_requisition
 from . import hr_job
 from . import hr_requisition_uniform

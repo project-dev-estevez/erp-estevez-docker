@@ -49,20 +49,22 @@ class HrRequisition(models.Model):
     ], string="Tipo de Puesto", required=True)
     workstation_direction_id = fields.Many2one('hr.direction', string="Dirección del Puesto", required=True)
     workstation_department_id = fields.Many2one('hr.department', string="Departamento del Puesto", domain="[('direction_id', '=', workstation_direction_id)]", required=True)
+    workstation_area_id = fields.Many2one('hr.area', string="Área del Puesto", domain="[('department_id', '=', workstation_department_id)]", required=True)
     workstation_job_id = fields.Many2one('hr.job', string="Puesto Solicitado", domain="[('department_id', '=', workstation_department_id)]", required=True)
-    project = fields.Char(string="ID de Proyecto")
+    project_id = fields.Many2one('project.project', string="Proyecto")
     number_of_vacancies = fields.Integer(string="Número de Vacantes")
-    work_schedule = fields.Many2one('resource.calendar', string="Horario de Jornada Laboral", required=True)
+    work_schedule = fields.Many2one('resource.calendar', string="Horario de Jornada Laboral")
     gender = fields.Selection([
         ('male', 'Masculino'),
         ('female', 'Femenino'),
-        ('other', 'Otro'),
+        ('indistinct', 'Indistinto'),
+        ('other', 'Otro')
     ], string="Género")
-    age_range_min = fields.Integer(string="Edad Mínima", required=True)
-    age_range_max = fields.Integer(string="Edad Máxima", required=True)
+    age_range_min = fields.Integer(string="Edad Mínima", required=True, default=18)
+    age_range_max = fields.Integer(string="Edad Máxima", required=True, default=60)
     years_of_experience = fields.Integer(string="Años de Experiencia", required=True)
     general_functions = fields.Text(string="Funciones Generales del Puesto")
-    academic_degree_id = fields.Many2one('hr.recruitment.degree', string="Escolaridad o Grado Académico", required=True)
+    academic_degree_id = fields.Many2one('hr.recruitment.degree', string="Escolaridad o Grado Académico")
     software_ids = fields.Many2many('hr.requisition.software', string="Software que se utilizará por el empleado")
 
     # Equipo requerido
@@ -70,6 +72,10 @@ class HrRequisition(models.Model):
     cellular_equipment_required = fields.Boolean(string="¿Requiere Equipo Celular?", default=False)
     uniform_ids = fields.Many2many('hr.requisition.uniform', string="Uniformes")
     epp_ids = fields.Many2many('hr.requisition.epp', string="Equipo de Protección Personal")
+
+    # Tags de la requisición
+    tag_ids = fields.Many2many('hr.requisition.tag', string="Etiquetas")
+    observations = fields.Text(string="Observaciones de la Vacante")
 
     _sql_constraints = [
         ('check_years_of_experience', 'CHECK(years_of_experience >= 0)', 'Los años de experiencia no pueden ser un número negativo.')
