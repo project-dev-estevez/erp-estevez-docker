@@ -46,11 +46,11 @@ class HrRequisition(models.Model):
     job_type = fields.Selection([
         ('administrative', 'Administrativo'),
         ('operational', 'Operativo'),
-    ], string="Tipo de Puesto", required=True)
-    workstation_direction_id = fields.Many2one('hr.direction', string="Dirección del Puesto", required=True)
-    workstation_department_id = fields.Many2one('hr.department', string="Departamento del Puesto", domain="[('direction_id', '=', workstation_direction_id)]", required=True)
-    workstation_area_id = fields.Many2one('hr.area', string="Área del Puesto", domain="[('department_id', '=', workstation_department_id)]", required=True)
-    workstation_job_id = fields.Many2one('hr.job', string="Puesto Solicitado", domain="[('department_id', '=', workstation_department_id)]", required=True)
+    ], string="Tipo de Puesto")
+    workstation_direction_id = fields.Many2one('hr.direction', string="Dirección del Puesto")
+    workstation_department_id = fields.Many2one('hr.department', string="Departamento del Puesto", domain="[('direction_id', '=', workstation_direction_id)]")
+    workstation_area_id = fields.Many2one('hr.area', string="Área del Puesto", domain="[('department_id', '=', workstation_department_id)]")
+    workstation_job_id = fields.Many2one('hr.job', string="Puesto Solicitado", domain="[('department_id', '=', workstation_department_id)]")
     project_id = fields.Many2one('project.project', string="Proyecto")
     number_of_vacancies = fields.Integer(string="Número de Vacantes")
     work_schedule = fields.Many2one('resource.calendar', string="Horario de Jornada Laboral")
