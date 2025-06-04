@@ -36,7 +36,16 @@
         "views/hr_applicant_view_list_general_report_inherit.xml",
         "views/hr_job_view_list_general_report_inherit.xml",
         "views/hr_applicant_view_search_inherit.xml",
+
+        # Sweet Alert
+        'views/sweet_alert_templates.xml',
+        'views/sweet_alert_views.xml',
     ],
+    'assets': {
+        'web.assets_backend': [
+            'static/src/js/tabs_navigation.js',
+        ],
+    },
     "installable": True,
     "application": False,
     "i18n": ["i18n/es_419.po", "i18n/es.po"],
