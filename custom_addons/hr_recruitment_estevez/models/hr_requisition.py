@@ -9,6 +9,16 @@ class HrRequisition(models.Model):
     _description = 'Requisición de Personal'
     _inherit = ['mail.thread']
 
+    wizard_step = fields.Selection(
+        selection=[
+            ('especificaciones', 'Especificaciones de Requisición'),
+            ('datos_puesto', 'Datos del puesto'),
+            ('equipo', 'Equipo requerido')
+        ],
+        string='Paso actual',
+        default='especificaciones'
+    )
+
     state = fields.Selection([
         ('to_approve', 'Por Aprobar'),
         ('first_approval', 'En Curso'),
@@ -249,4 +259,66 @@ class HrRequisition(models.Model):
         self.ensure_one()
         self.write({'state': self.state})  # Esto guarda el registro
         _logger.info("Requisición guardada con éxito")
+        # Crear acción de retorno
+        action = {
+            'type': 'ir.actions.act_window',
+            'res_model': self._name,
+            'res_id': self.id,
+            'views': [(False, 'form')],
+            'target': 'current',
+        }
+        
+        return {
+        'effect': {
+            'type': 'rainbow_man',
+            'message': '¡Requisición completada exitosamente!',
+            'fadeout': 'slow',
+            'next': {
+                'type': 'ir.actions.act_window',
+                'res_model': self._name,
+                'res_id': self.id,
+                'views': [(False, 'form')],
+                'target': 'current',
+            }
+        }
+    }
+    
+    def action_previous(self):
+        steps = {
+            'datos_puesto': 'especificaciones',
+            'equipo': 'datos_puesto'
+        }
+        for record in self:
+            record.wizard_step = steps.get(record.wizard_step, 'especificaciones')
+        return False
+    
+    def action_next(self):
+        # Validación de paso actual
+        error_messages = {
+            'especificaciones': "Debe completar todos los campos obligatorios en 'Especificaciones'",
+            'datos_puesto': "Faltan datos importantes en 'Datos del puesto'"
+        }
+        
+        # Aquí puedes agregar validaciones específicas por paso
+        # Por ejemplo, si en el paso 'especificaciones' hay un campo obligatorio:
+        if self.wizard_step == 'especificaciones':
+            if not self.requisition_type:  # Reemplaza con tu campo real
+                raise UserError(error_messages['especificaciones'])
+        elif self.wizard_step == 'datos_puesto':
+            if not self.job_type:  # Reemplaza con tu campo real
+                raise UserError(error_messages['datos_puesto'])
+        
+        steps = {
+            'especificaciones': 'datos_puesto',
+            'datos_puesto': 'equipo'
+        }
+        for record in self:
+            record.wizard_step = steps.get(record.wizard_step, 'equipo')
+        return False
+    
+    def set_wizard_step(self, step):
+        self.ensure_one()
+        valid_steps = ['especificaciones', 'datos_puesto', 'equipo']
+        if step in valid_steps:
+            self.wizard_step = step
         return True
