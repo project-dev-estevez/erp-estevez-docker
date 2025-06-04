@@ -15,7 +15,7 @@ class HRCandidate(models.Model):
         if self.partner_name:
             # Buscar candidatos distintos a este, con el mismo nombre
             existing = self.env['hr.candidate'].search([
-                ('partner_name', '=', self.partner_name),
+                ('partner_name', 'ilike', self.partner_name),
                 ('id', '!=', self.id),
             ])
             if existing:
