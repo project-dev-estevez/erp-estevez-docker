@@ -11,3 +11,4 @@ from . import hr_applicant_document
 from . import ir_attachment
 from . import report
 from . import survey_survey
+from . import hr_candidate_custom

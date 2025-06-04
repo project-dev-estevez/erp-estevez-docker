@@ -36,10 +36,8 @@
         "views/hr_applicant_view_list_general_report_inherit.xml",
         "views/hr_job_view_list_general_report_inherit.xml",
         "views/hr_applicant_view_search_inherit.xml",
-
-        # Sweet Alert
-        'views/sweet_alert_templates.xml',
-        'views/sweet_alert_views.xml',
+        "views/hr_applicant_view_search_inherit.xml",        
+        "views/hr_candidate_custom_views.xml"
     ],
     'assets': {
         'web.assets_backend': [
