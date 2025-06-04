@@ -1,0 +1,21 @@
+<odoo>
+  <data>
+    <record id="your_custom_view_id" model="ir.ui.view">
+      <field name="name">hr.candidate.view.form.inherit.placeholder</field>
+      <field name="model">hr.candidate</field>
+      <field name="inherit_id" ref="hr_recruitment.hr_candidate_view_form"/>
+      <field name="arch" type="xml">
+        <xpath expr="//field[@name='partner_name']" position="attributes">
+          <attribute name="placeholder">Nombre del candidato</attribute>
+        </xpath>
+        <xpath expr="//field[@name='user_id']" position="attributes">
+      <attribute name="string">Reclutador</attribute>
+    </xpath>
+     <xpath expr="//group/field[@name='company_id'][@groups='base.group_multi_company']" position="after">
+          <field name="source_id" string="Fuente de reclutamiento"/>
+        </xpath>
+      </field>
+    </record>  
+  </data>
+</odoo>
+
