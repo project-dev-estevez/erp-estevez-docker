@@ -130,7 +130,7 @@
                     <!-- Paso 2: Datos del puesto -->
                     <div invisible="wizard_step != 'datos_puesto'">
                         <group string="Datos del puesto">
-                            <group>
+                            
                                 <group string="Información del Puesto">
                                     <field name="job_type"/>
                                     <field name="workstation_direction_id" options="{'no_quick_create': True, 'no_create_edit': True}"/>
@@ -159,7 +159,7 @@
                                     <field name="academic_degree_id" options="{'no_quick_create': True, 'no_create_edit': True}"/>
                                     <field name="software_ids" widget="many2many_tags"/>
                                 </group>
-                            </group>
+                            
                         </group>
                     </div>
                     
