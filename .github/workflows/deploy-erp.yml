@@ -1,0 +1,17 @@
+name: Deploy Estevez ERP in Compute Engine
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    name: Deploy in Production
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Hola Mundo
+        run: echo "¡Hola Mundo desde GitHub Actions!"
