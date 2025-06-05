@@ -10,8 +10,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+      - name: Listar Directorios
+        run: ls -l
 
-      - name: Hola Mundo
-        run: echo "¡Hola Mundo desde GitHub Actions!"
+      - name: Version SO
+        run: cat /etc/os-release
