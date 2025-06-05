@@ -1,0 +1,20 @@
+name: Deploy Estevez ERP in Compute Engine
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    name: Deploy in Production
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Listar Directorios
+        run: ls -l
+
+      - name: Version SO
+        run: cat /etc/os-release
