@@ -1,1 +1,5 @@
-echo "Cambiando a usuario odoo18 y listando el home:"
+#!/bin/bash
+set -e
+
+echo "📁 Listando contenido del directorio actual:"
+ls -la
