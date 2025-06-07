@@ -32,6 +32,20 @@ jobs:
           ssh_private_key: '${{ secrets.GCP_SSH_PRIVATE_KEY }}'
           command: |
             echo "✅ Conectado a la VM"
-            sudo su - odoo18 -c "ls -l ~"
-
-
+            echo "📂 Mostrando contenido del home de odoo18:"
+            sudo su - odoo18 -c "ls -la ~"
+            
+            echo "🚀 Entrando al directorio de Odoo..."
+            ODOO_DIR=$(sudo su - odoo18 -c "echo \$ODOO_DIR")
+            if [ -z "$ODOO_DIR" ]; then
+              echo "⚠️ Variable ODOO_DIR no definida, usando valor por defecto"
+              ODOO_DIR="/opt/odoo18"
+            fi
+            
+            echo "🔍 Contenido de $ODOO_DIR:"
+            sudo su - odoo18 -c "ls -la $ODOO_DIR"
+            
+            echo "🔄 Verificando servicios de Odoo:"
+            sudo su - odoo18 -c "ps aux | grep odoo"
+            
+            echo "🏁 Proceso completado"
