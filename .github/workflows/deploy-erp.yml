@@ -32,6 +32,6 @@ jobs:
           ssh_private_key: '${{ secrets.GCP_SSH_PRIVATE_KEY }}'
           command: |
             echo "✅ Conectado a la VM"
-            uname -a
+            sudo su - odoo18 -c "ls -l ~"
 
 
