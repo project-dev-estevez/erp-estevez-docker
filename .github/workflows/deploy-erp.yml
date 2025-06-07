@@ -30,7 +30,10 @@ jobs:
           instance_name: '${{ secrets.GCP_INSTANCE_NAME }}'
           zone: '${{ secrets.GCP_INSTANCE_ZONE }}'
           ssh_private_key: '${{ secrets.GCP_SSH_PRIVATE_KEY }}'
-          script: '${{ github.workspace }}/config/deploy-script.sh'
+          command: |
+            echo "Reiniciando el servicio odoo18..."
+            sudo systemctl restart odoo18
+            echo "Servicio odoo18 reiniciado correctamente."
 
       - id: 'test'
         run: |-
