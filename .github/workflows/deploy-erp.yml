@@ -31,10 +31,16 @@ jobs:
           zone: '${{ secrets.GCP_INSTANCE_ZONE }}'
           ssh_private_key: '${{ secrets.GCP_SSH_PRIVATE_KEY }}'
           command: |
-            echo "Entrando como odoo18 y copiando custom-addons..."
+            echo "Entrando como odoo18 y actualizando el repo..."
             sudo su - odoo18 -c "
-              cd ~/odoo-erp &&
-              rsync -av --ignore-existing ~/custom-addons/ /opt/odoo18/custom-addons/
+              cd /opt/odoo18
+              if [ ! -d odoo-erp-docker ]; then
+                git clone https://github.com/project-dev-estevez/erp-estevez-docker odoo-erp-docker
+              else
+                cd odoo-erp-docker && git pull
+              fi
+              cd /opt/odoo18/odoo-erp-docker
+              rsync -av --delete ./custom_addons/ /opt/odoo18/odoo-erp/custom_addons/
             "
             echo "Archivos copiados. Reiniciando el servicio odoo18..."
             sudo systemctl restart odoo18
