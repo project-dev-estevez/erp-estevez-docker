@@ -5,7 +5,7 @@
     <field name="model">hr.applicant</field>
     <field name="arch" type="xml">
       <list string="General Postulantes" default_order="create_date desc">
-        <field name="create_date" string="Fecha"/>
+        <field name="create_date" string="Fecha y Hora"/>
         <field name="user_id" string="Reclutador" widget="many2one_avatar_user"/>
         <field name="partner_name" string="Candidato"/>
         <field name="job_id" string="Puesto de Trabajo"/>

@@ -31,7 +31,12 @@ jobs:
           zone: '${{ secrets.GCP_INSTANCE_ZONE }}'
           ssh_private_key: '${{ secrets.GCP_SSH_PRIVATE_KEY }}'
           command: |
-            echo "Reiniciando el servicio odoo18..."
+            echo "Entrando como odoo18 y copiando custom-addons..."
+            sudo su - odoo18 -c "
+              cd ~/odoo-erp &&
+              rsync -av --ignore-existing ~/custom-addons/ /opt/odoo18/custom-addons/
+            "
+            echo "Archivos copiados. Reiniciando el servicio odoo18..."
             sudo systemctl restart odoo18
             echo "Servicio odoo18 reiniciado correctamente."
 
