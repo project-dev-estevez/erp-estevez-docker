@@ -31,6 +31,7 @@ jobs:
           zone: '${{ secrets.GCP_INSTANCE_ZONE }}'
           ssh_private_key: '${{ secrets.GCP_SSH_PRIVATE_KEY }}'
           command: |
+            set -x
             echo "✅ Conectado a la VM"
             echo "📂 Mostrando contenido del home de odoo18:"
             sudo su - odoo18 -c "ls -la ~"
