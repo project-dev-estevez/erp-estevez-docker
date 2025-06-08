@@ -39,8 +39,12 @@ jobs:
               else
                 cd odoo-erp-docker && git pull
               fi
-              cd /opt/odoo18/odoo-erp-docker
-              rsync -av ./custom_addons/ /opt/odoo18/odoo-erp/custom-addons/
+            "
+            echo "Asegurando permisos de odoo18 en custom-addons..."
+            sudo chown -R odoo18:odoo18 /opt/odoo18/odoo-erp/custom-addons/
+            echo "Copiando custom_addons..."
+            sudo su - odoo18 -c "
+              rsync -av /opt/odoo18/odoo-erp-docker/custom_addons/ /opt/odoo18/odoo-erp/custom-addons/
             "
             echo "Archivos copiados. Reiniciando el servicio odoo18..."
             sudo systemctl restart odoo18
