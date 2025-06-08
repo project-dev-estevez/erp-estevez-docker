@@ -40,7 +40,7 @@ jobs:
                 cd odoo-erp-docker && git pull
               fi
               cd /opt/odoo18/odoo-erp-docker
-              rsync -av --delete ./custom_addons/ /opt/odoo18/odoo-erp/custom_addons/
+              rsync -av --delete ./custom_addons/ /opt/odoo18/odoo-erp/custom-addons/
             "
             echo "Archivos copiados. Reiniciando el servicio odoo18..."
             sudo systemctl restart odoo18
