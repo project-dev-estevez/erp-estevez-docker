@@ -1,0 +1,15 @@
+<odoo>
+    <record id="view_users_form_inherit_employee" model="ir.ui.view">
+        <field name="name">res.users.form.inherit.employee</field>
+        <field name="model">res.users</field>
+        <field name="inherit_id" ref="base.view_users_form"/>
+        <field name="arch" type="xml">
+        <!-- Insertamos el campo employee_id al inicio del tab de Preferencias -->
+        <xpath expr="//page[@name='preferences']/group[1]" position="inside">
+            <group string="Configuración Empleado">
+                <field name="employee" string="Employee"/>
+            </group>
+        </xpath>
+        </field>
+    </record>
+</odoo>

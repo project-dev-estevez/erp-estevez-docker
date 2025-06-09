@@ -8,13 +8,46 @@ jobs:
   deploy:
     name: Deploy in Production
     runs-on: ubuntu-latest
+    environment: production
+    permissions:
+      contents: read
+      id-token: write
 
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
+      - id: 'auth'
+        name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: '${{ secrets.GCP_SA_KEY }}'
 
-      - name: Listar Directorios
-        run: ls -l
+      - id: 'compute-ssh'
+        name: SSH into GCE instance
+        uses: 'google-github-actions/ssh-compute@v1'
+        with:
+          instance_name: '${{ secrets.GCP_INSTANCE_NAME }}'
+          zone: '${{ secrets.GCP_INSTANCE_ZONE }}'
+          ssh_private_key: '${{ secrets.GCP_SSH_PRIVATE_KEY }}'
+          command: |
+            echo "Entrando como odoo18 y actualizando el repo..."
+            sudo su - odoo18 -c "
+              cd /opt/odoo18
+              if [ ! -d odoo-erp-docker ]; then
+                git clone https://github.com/project-dev-estevez/erp-estevez-docker odoo-erp-docker
+              else
+                cd odoo-erp-docker && git pull
+              fi
+            "
+            echo "Asegurando permisos de odoo18 en custom-addons..."
+            sudo chown -R odoo18:odoo18 /opt/odoo18/odoo-erp/custom-addons/
+            echo "Copiando custom_addons..."
+            sudo su - odoo18 -c "
+              rsync -av /opt/odoo18/odoo-erp-docker/custom_addons/ /opt/odoo18/odoo-erp/custom-addons/
+            "
+            echo "Archivos copiados. Reiniciando el servicio odoo18..."
+            sudo systemctl restart odoo18
+            echo "Servicio odoo18 reiniciado correctamente."
 
-      - name: Version SO
-        run: cat /etc/os-release
+      - id: 'test'
+        run: |-
+          echo '${{ steps.compute-ssh.outputs.stdout }}'
+          echo '${{ steps.compute-ssh.outputs.stderr }}'

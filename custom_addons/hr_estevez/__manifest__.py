@@ -48,6 +48,7 @@
         'data/cron_notify_expired_contracts.xml',
 
         # Archivos de Vistas
+        'views/hr_user_base_inherit_views.xml',
         'views/hr_job_views.xml',
         'views/hr_direction_views.xml',
         'views/hr_department_views.xml',
