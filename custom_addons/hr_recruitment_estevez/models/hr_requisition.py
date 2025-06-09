@@ -87,9 +87,39 @@ class HrRequisition(models.Model):
     tag_ids = fields.Many2many('hr.requisition.tag', string="Etiquetas")
     observations = fields.Text(string="Observaciones de la Vacante")
 
+    is_published = fields.Boolean(
+        string='Vacante Publicada',
+        default=False,
+        copy=False,
+        tracking=True
+    )
+    publish_date = fields.Datetime(
+        string='Fecha de Publicación',
+        copy=False
+    )
+    close_date = fields.Datetime(
+        string='Fecha de Cierre',
+        copy=False
+    )
+
     _sql_constraints = [
         ('check_years_of_experience', 'CHECK(years_of_experience >= 0)', 'Los años de experiencia no pueden ser un número negativo.')
     ]
+
+    # Nuevo campo computado
+    publication_status = fields.Char(
+        string='Estado Publicación',
+        compute='_compute_publication_status',
+        store=False
+    )
+    
+    @api.depends('state', 'is_published')
+    def _compute_publication_status(self):
+        for record in self:
+            if record.state != 'approved':
+                record.publication_status = ''
+            else:
+                record.publication_status = 'Abierta' if record.is_published else 'Cerrada'
 
     # Acciones de estado
     def action_approve(self):
@@ -322,3 +352,83 @@ class HrRequisition(models.Model):
         if step in valid_steps:
             self.wizard_step = step
         return True
+    
+    def action_publish_vacancy(self):
+        self.ensure_one()
+        
+        if self.state != 'approved':
+            raise UserError("Solo puedes publicar vacantes aprobadas")
+        
+        if self.is_published:
+            raise UserError("La vacante ya está publicada")
+        
+        # Actualizar la requisición
+        self.write({
+            'is_published': True,
+            'publish_date': fields.Datetime.now(),
+            'close_date': False
+        })
+        
+        # Actualizar el puesto de trabajo asociado
+        if self.workstation_job_id:
+            self.workstation_job_id.write({
+                'is_published': True,
+            
+            })
+        
+        # Notificación con recarga automática
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': 'Vacante Publicada',
+                'message': 'La vacante ha sido aperturada correctamente',
+                'sticky': False,
+                'type': 'success',
+                'next': {
+                    'type': 'ir.actions.act_window',
+                    'res_model': self._name,
+                    'res_id': self.id,
+                    'views': [(False, 'form')],
+                    'target': 'current',
+                }
+            }
+        }
+
+    def action_close_vacancy(self):
+        self.ensure_one()
+        
+        if not self.is_published:
+            raise UserError("La vacante no está publicada")
+        
+        # Actualizar la requisición
+        self.write({
+            'is_published': False,
+            'close_date': fields.Datetime.now()
+        })
+        
+        # Actualizar el puesto de trabajo asociado
+        if self.workstation_job_id:
+            self.workstation_job_id.write({
+                'is_published': False,
+                
+            })
+        
+        # Notificación con recarga automática
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': 'Vacante Cerrada',
+                'message': 'La vacante ha sido cerrada correctamente',
+                'sticky': False,
+                'type': 'warning',
+                'next': {
+                    'type': 'ir.actions.act_window',
+                    'res_model': self._name,
+                    'res_id': self.id,
+                    'views': [(False, 'form')],
+                    'target': 'current',
+                }
+            }
+        }
