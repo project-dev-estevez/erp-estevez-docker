@@ -159,6 +159,15 @@ class HrApplicant(models.Model):
         store=False
     )
 
+    # Sobrescribir el campo candidate_id para cambiar su etiqueta
+    candidate_id = fields.Many2one(
+        'hr.candidate', 
+        required=True, 
+        index=True,
+        string='Candidato',  # Cambiar el string que se muestra
+        help='Candidato asociado a esta solicitud'
+    )
+
     @api.depends('create_date', 'date_closed')
     def _compute_process_duration(self):
         for rec in self:

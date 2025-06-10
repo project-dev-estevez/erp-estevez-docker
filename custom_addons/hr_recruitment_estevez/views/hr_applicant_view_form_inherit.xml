@@ -146,8 +146,8 @@
 
             <!-- Agregar los campos debajo de linkedin_profile -->
             <xpath expr="//field[@name='linkedin_profile']" position="after">
-                <field name="source_id"/>
-                <field name="medium_id"/>
+                <field name="source_id" string="Fuente de Reclutamiento"/>
+                <!-- <field name="medium_id"/> -->
                 <field name="project_id"/>
             </xpath>
         </field>
