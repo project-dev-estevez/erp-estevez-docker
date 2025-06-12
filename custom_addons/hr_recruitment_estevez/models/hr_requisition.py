@@ -8,6 +8,10 @@ class HrRequisition(models.Model):
     _name = 'hr.requisition'
     _description = 'Requisición de Personal'
     _inherit = ['mail.thread']
+    _rec_name = 'name'
+
+    name = fields.Char(string="Nombre", compute="_compute_name", store=True)
+    workstation_job_id = fields.Many2one('hr.job', string="Puesto")
 
     wizard_step = fields.Selection(
         selection=[
@@ -112,6 +116,11 @@ class HrRequisition(models.Model):
         compute='_compute_publication_status',
         store=False
     )
+
+    @api.depends('workstation_job_id')
+    def _compute_name(self):
+        for record in self:
+            record.name = f"Requisición - {record.workstation_job_id.name or 'Sin Puesto'}"
     
     @api.depends('state', 'is_published')
     def _compute_publication_status(self):
