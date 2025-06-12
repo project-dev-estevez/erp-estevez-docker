@@ -63,7 +63,7 @@
                 </header>
 
                 <sheet>
-                    <h1>Requisición de Personal</h1>
+                    <h1>Requisición de Personal - <field name="workstation_job_id" readonly="1" nolabel="1" widget="label"/></h1>
                     
                     <!-- Barra de navegación mejorada -->
                     <div class="o_wizard_nav d-flex justify-content-between border-bottom mb-4">
@@ -92,7 +92,7 @@
                                 <span class="nav-links" 
                                       style="cursor: pointer; display: block; padding: 10px;"
                                       data-step="datos_puesto">
-                                    Datos del puesto
+                                    Descripción del puesto requerido
                                 </span>
                                 <div class="step-indicator" invisible="wizard_step != 'datos_puesto'"/>
                             </div>
@@ -144,9 +144,9 @@
                     
                     <!-- Paso 2: Datos del puesto -->
                     <div invisible="wizard_step != 'datos_puesto'">
-                        <group string="Datos del puesto">
+                        <group>
                             
-                                <group string="Información del Puesto">
+                                <group string="Detalles del puesto">
                                     <field name="job_type"/>
                                     <field name="workstation_direction_id" options="{'no_quick_create': True, 'no_create_edit': True}"/>
                                     <field name="workstation_department_id" options="{'no_quick_create': True, 'no_create_edit': True}"/>
