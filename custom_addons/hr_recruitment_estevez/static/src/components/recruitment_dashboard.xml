@@ -11,7 +11,7 @@
                                 <div class="d-flex align-items-center justify-content-between">
                                     <h1 class="text-primary fw-bold">Dashboard Reclutamiento</h1>
                                     <div>
-                                        <select class="form-select">
+                                        <select class="form-select" t-model="state.period" t-on-change="onPeriodChange">
                                             <option value="0">Seleccionar Período</option>
                                             <option value="7">Últimos 7 días</option>
                                             <option value="30">Últimos 30 días</option>
@@ -24,9 +24,15 @@
                         </div>
                     </div>
                     <div class="row">
-                        <KpiCard name="'Quotations'" value="10" percentage="6"/>
+                        <!-- Vacantes cubiertas en un rango de tiempo -->
+                        <KpiCard name="'Postulaciones'" 
+                                 value="state.filledVacancies.value" 
+                                 percentage="state.filledVacancies.percentage"/>
+
                         <KpiCard name="'Orders'" value="20" percentage="20"/>
                         <KpiCard name="'Revenues'" value="'30.50K'" percentage="-3"/>
+                        <KpiCard name="'Average Order'" value="'2.5K'" percentage="-10"/>
+                        <KpiCard name="'Average Order'" value="'2.5K'" percentage="-10"/>
                         <KpiCard name="'Average Order'" value="'2.5K'" percentage="-10"/>
                     </div>
                     <div class="row">
