@@ -32,6 +32,7 @@
         'views/hr_applicant_document_views.xml',
         'views/hr_applicant_view_form_inherit.xml',
         'views/hr_candidate_view_form_inherit.xml',
+        "views/hr_recruitment_menu_views.xml",
         "views/hr_requisition_views.xml",
         "views/hr_applicant_view_list_general_report_inherit.xml",
         "views/hr_job_view_list_general_report_inherit.xml",
@@ -42,6 +43,9 @@
     'assets': {
         'web.assets_backend': [
             'static/src/js/tabs_navigation.js',
+            'hr_recruitment_estevez/static/src/components/**/*.js',
+            'hr_recruitment_estevez/static/src/components/**/*.xml',
+            'hr_recruitment_estevez/static/src/components/**/*.scss',
         ],
     },
     "installable": True,
