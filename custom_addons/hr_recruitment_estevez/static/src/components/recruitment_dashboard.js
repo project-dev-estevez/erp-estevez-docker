@@ -240,7 +240,9 @@ export class RecruitmentDashboard extends Component {
             }
         }
         const previousAverageDays = previousCount ? (previousTotalDays / previousCount) : 0;
-        this.state.averageHiringTime.previousValue = ((averageDays - previousAverageDays) / previousAverageDays) * 100;
+        this.state.averageHiringTime.previousValue = previousAverageDays
+            ? (((averageDays - previousAverageDays) / previousAverageDays) * 100).toFixed(2)
+            : 0;
     }
 
 }
