@@ -9,6 +9,81 @@ const { DateTime } = luxon;
 
 export class RecruitmentDashboard extends Component {
 
+    getPastelColors(count) {
+        const colors = [];
+        for (let i = 0; i < count; i++) {
+            const hue = Math.floor((360 / count) * i + Math.random() * 30);
+            colors.push(`hsl(${hue}, 70%, 85%)`);
+        }
+        return colors;
+    }
+
+    async getTopRecruitments() {
+        const domain = [
+            "|",
+            ["active", "=", true],
+            ["application_status", "=", "refused"]
+        ];
+
+        if (this.state.period > 0) {
+            domain.push(["create_date", ">", this.state.currentDate]);
+        }
+
+        const data = await this.orm.readGroup("hr.applicant", domain, ["user_id"], ["user_id"]);
+
+        this.state.topRecruitments = {
+            data: {
+                labels: data.map(item => item.user_id[1] || "Desconocido"),
+                datasets: [
+                    {
+                        label: "Postulaciones",
+                        data: data.map(item => item.user_id_count),
+                        backgroundColor: this.getPastelColors(data.length)
+                    }
+                ]
+            }
+        };
+    }
+
+    async getSourceRecruitment() {
+        const domain = [
+            "|",
+            ["active", "=", true],
+            ["application_status", "=", "refused"]
+        ];
+
+        if (this.state.period > 0) {
+            domain.push(["create_date", ">", this.state.currentDate]);
+        }
+
+        const data = await this.orm.readGroup(
+            "hr.applicant",
+            domain,
+            ["source_id"],
+            ["source_id"]
+        );
+
+        // Procesamiento de datos más robusto
+        const sourcesData = data.map(r => ({
+            label: (r.source_id && r.source_id[1]) || "Sin fuente",
+            count: r.source_id_count,
+            sourceId: r.source_id ? r.source_id[0] : null
+        }));
+
+        this.state.sourceRecruitment = {
+            data: {
+                labels: sourcesData.map(item => item.label),
+                datasets: [
+                    {
+                        label: "Fuentes de Postulación",
+                        data: sourcesData.map(item => item.count),
+                        backgroundColor: this.getPastelColors(sourcesData.length)
+                    }
+                ]
+            }
+        };
+    }
+
     setup() {
         this.state = useState({
             // Postulaciones Totales
@@ -50,6 +125,8 @@ export class RecruitmentDashboard extends Component {
         this.actionservice = useService("action");
 
         onWillStart(async () => {
+            await this.getTopRecruitments();
+            await this.getSourceRecruitment();
             await this.onPeriodChange();
         });
     }

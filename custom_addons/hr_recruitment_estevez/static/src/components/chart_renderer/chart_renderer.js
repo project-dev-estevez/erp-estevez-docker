@@ -18,24 +18,9 @@ export class ChartRenderer extends Component {
         new Chart(this.chartRef.el,
         {
           type: this.props.type,
-          data: {
-            labels: [
-                'Red',
-                'Blue',
-                'Yellow'
-              ],
-              datasets: [
-              {
-                label: 'My First Dataset',
-                data: [300, 50, 100],
-                hoverOffset: 4
-              },{
-                label: 'My Second Dataset',
-                data: [100, 70, 150],
-                hoverOffset: 4
-              }]
-          },
+          data: this.props.config.data,
           options: {
+            indexAxis: 'y',
             responsive: true,
             plugins: {
               legend: {
