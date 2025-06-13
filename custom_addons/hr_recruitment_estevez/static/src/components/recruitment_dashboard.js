@@ -48,13 +48,7 @@ export class RecruitmentDashboard extends Component {
         this.orm = useService("orm");
 
         onWillStart(async () => {
-            this.getDates();
-            await this.getTotalApplicants();
-            await this.getInProgressApplicants();
-            await this.getPreselectedApplicants();
-            await this.getRejectedApplicants();
-            await this.getHiredApplicants();
-            await this.getAverageHiringTime();
+            await this.onPeriodChange();
         });
     }
 
@@ -66,6 +60,11 @@ export class RecruitmentDashboard extends Component {
     async onPeriodChange() {
         this.getDates();
         await this.getTotalApplicants();
+        await this.getInProgressApplicants();
+        await this.getPreselectedApplicants();
+        await this.getRejectedApplicants();
+        await this.getHiredApplicants();
+        await this.getAverageHiringTime();
     }
 
     async getTotalApplicants() {
