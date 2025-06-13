@@ -25,27 +25,33 @@
                     </div>
                     <div class="row">
                         <!-- Vacantes cubiertas en un rango de tiempo -->
-                        <KpiCard name="'Postulaciones'" 
+                        <KpiCard onClick.bind="viewTotalApplicants"
+                                 name="'Postulaciones'" 
                                  value="state.totalApplicants.value" 
                                  percentage="state.totalApplicants.percentage"/>
 
-                        <KpiCard name="'En Progreso'" 
+                        <KpiCard onClick.bind="viewInProgressApplicants"
+                                 name="'En Progreso'" 
                                  value="state.inProgressApplicants.value" 
                                  percentage="state.inProgressApplicants.percentage"/>
 
-                        <KpiCard name="'Preseleccionados'" 
+                        <KpiCard onClick.bind="viewPreselectedApplicants"
+                                 name="'Preseleccionados'" 
                                  value="state.preselectedApplicants.value" 
                                  percentage="state.preselectedApplicants.percentage"/>
 
-                        <KpiCard name="'Rechazados'" 
+                        <KpiCard onClick.bind="viewRejectedApplicants"
+                                 name="'Rechazados'" 
                                  value="state.rejectedApplicants.value" 
                                  percentage="state.rejectedApplicants.percentage"/>
 
-                        <KpiCard name="'Contratados'" 
+                        <KpiCard onClick.bind="viewHiredApplicants"
+                                 name="'Contratados'" 
                                  value="state.hiredApplicants.value" 
                                  percentage="state.hiredApplicants.percentage"/>
 
-                        <KpiCard name="'Tiempo Promedio (Días)'" 
+                        <KpiCard onClick.bind="viewAverageHiringTime"
+                                 name="'Tiempo Promedio de Contratación en Días'" 
                                  value="state.averageHiringTime.value" 
                                  percentage="state.averageHiringTime.previousValue"
                                  showPercentage="false"/>
