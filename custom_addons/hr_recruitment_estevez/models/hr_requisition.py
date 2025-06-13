@@ -126,7 +126,7 @@ class HrRequisition(models.Model):
     def _compute_publication_status(self):
         for record in self:
             if record.state != 'approved':
-                record.publication_status = ''
+                record.publication_status = 'Por Activar'
             else:
                 record.publication_status = 'Abierta' if record.is_published else 'Cerrada'
 

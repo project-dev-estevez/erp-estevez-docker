@@ -20,7 +20,8 @@
                 <field name="publication_status" string="Estado" 
                        widget="badge"
                        decoration-success="publication_status == 'Abierta'"
-                       decoration-danger="publication_status == 'Cerrada'"/>
+                       decoration-danger="publication_status == 'Cerrada'"
+                       decoration-warning="publication_status == 'Por Activar'"/>
                 <field name="state" 
                        optional="show"
                        widget="badge" 
