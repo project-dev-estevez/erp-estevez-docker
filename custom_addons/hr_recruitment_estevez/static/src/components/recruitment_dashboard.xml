@@ -26,14 +26,29 @@
                     <div class="row">
                         <!-- Vacantes cubiertas en un rango de tiempo -->
                         <KpiCard name="'Postulaciones'" 
-                                 value="state.filledVacancies.value" 
-                                 percentage="state.filledVacancies.percentage"/>
+                                 value="state.totalApplicants.value" 
+                                 percentage="state.totalApplicants.percentage"/>
 
-                        <KpiCard name="'Orders'" value="20" percentage="20"/>
-                        <KpiCard name="'Revenues'" value="'30.50K'" percentage="-3"/>
-                        <KpiCard name="'Average Order'" value="'2.5K'" percentage="-10"/>
-                        <KpiCard name="'Average Order'" value="'2.5K'" percentage="-10"/>
-                        <KpiCard name="'Average Order'" value="'2.5K'" percentage="-10"/>
+                        <KpiCard name="'En Progreso'" 
+                                 value="state.inProgressApplicants.value" 
+                                 percentage="state.inProgressApplicants.percentage"/>
+
+                        <KpiCard name="'Preseleccionados'" 
+                                 value="state.preselectedApplicants.value" 
+                                 percentage="state.preselectedApplicants.percentage"/>
+
+                        <KpiCard name="'Rechazados'" 
+                                 value="state.rejectedApplicants.value" 
+                                 percentage="state.rejectedApplicants.percentage"/>
+
+                        <KpiCard name="'Contratados'" 
+                                 value="state.hiredApplicants.value" 
+                                 percentage="state.hiredApplicants.percentage"/>
+
+                        <KpiCard name="'Tiempo Promedio (Días)'" 
+                                 value="state.averageHiringTime.value" 
+                                 percentage="state.averageHiringTime.previousValue"
+                                 showPercentage="false"/>
                     </div>
                     <div class="row">
                         <div class="col-lg-6 m-0 p-0">
