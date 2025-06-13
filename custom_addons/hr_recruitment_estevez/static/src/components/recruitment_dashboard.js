@@ -45,7 +45,9 @@ export class RecruitmentDashboard extends Component {
             currentDate: DateTime.now().minus({ days: 30 }).toISODate(),
             previusDate: DateTime.now().minus({ days: 60 }).toISODate()
         })
+
         this.orm = useService("orm");
+        this.actionservice = useService("action");
 
         onWillStart(async () => {
             await this.onPeriodChange();
@@ -59,12 +61,15 @@ export class RecruitmentDashboard extends Component {
 
     async onPeriodChange() {
         this.getDates();
-        await this.getTotalApplicants();
-        await this.getInProgressApplicants();
-        await this.getPreselectedApplicants();
-        await this.getRejectedApplicants();
-        await this.getHiredApplicants();
-        await this.getAverageHiringTime();
+
+        await Promise.all([
+            this.getTotalApplicants(),
+            this.getInProgressApplicants(),
+            this.getPreselectedApplicants(),
+            this.getRejectedApplicants(),
+            this.getHiredApplicants(),
+            this.getAverageHiringTime()
+        ]);
     }
 
     async getTotalApplicants() {
@@ -243,6 +248,93 @@ export class RecruitmentDashboard extends Component {
         this.state.averageHiringTime.previousValue = previousAverageDays
             ? (((averageDays - previousAverageDays) / previousAverageDays) * 100).toFixed(2)
             : 0;
+    }
+
+    viewTotalApplicants() {
+        const context = { active_test: false };
+        let domain = [];
+        if (this.state.period > 0) {
+            domain.push(["create_date", ">", this.state.currentDate]);
+        }
+
+        this.actionservice.doAction({
+            type: "ir.actions.act_window",
+            name: "Postulaciones",
+            res_model: "hr.applicant",
+            domain: domain,
+            views: [[false, "list"], [false, "form"]],
+            context: context,
+        });
+    }
+
+    viewInProgressApplicants() {
+        let domain = [["application_status", "=", "ongoing"]];
+        if (this.state.period > 0) {
+            domain.push(["create_date", ">", this.state.currentDate]);
+        }
+
+        this.actionservice.doAction({
+            type: "ir.actions.act_window",
+            name: "Postulaciones en Progreso",
+            res_model: "hr.applicant",
+            domain: domain,
+            views: [[false, "list"], [false, "form"]],
+        });
+    }
+
+    viewPreselectedApplicants() {
+        let domain = [
+            ["stage_id.sequence", ">", 4],
+            ["application_status", "!=", "hired"]
+        ];
+        if (this.state.period > 0) {
+            domain.push(["create_date", ">", this.state.currentDate]);
+        }
+
+        this.actionservice.doAction({
+            type: "ir.actions.act_window",
+            name: "Postulaciones Preseleccionadas",
+            res_model: "hr.applicant",
+            domain: domain,
+            views: [[false, "list"], [false, "form"]],
+        });
+    }
+
+    viewRejectedApplicants() {
+        const context = { active_test: false };
+        let domain = [["application_status", "=", "refused"]];
+        if (this.state.period > 0) {
+            domain.push(["create_date", ">", this.state.currentDate]);
+        }
+
+        this.actionservice.doAction({
+            type: "ir.actions.act_window",
+            name: "Postulaciones Rechazadas",
+            res_model: "hr.applicant",
+            domain: domain,
+            views: [[false, "list"], [false, "form"]],
+            context: context
+        });
+    }
+
+    viewHiredApplicants() {
+        let domain = [["application_status", "=", "hired"]];
+        if (this.state.period > 0) {
+            domain.push(["create_date", ">", this.state.currentDate]);
+        }
+
+        this.actionservice.doAction({
+            type: "ir.actions.act_window",
+            name: "Postulaciones Contratadas",
+            res_model: "hr.applicant",
+            domain: domain,
+            views: [[false, "list"], [false, "form"]]
+        });
+    }
+
+    viewAverageHiringTime() {
+        // No-op to avoid errors
+        return;
     }
 
 }
