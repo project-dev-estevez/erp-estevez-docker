@@ -19,7 +19,7 @@
         <field name="arch" type="xml">
             <form string="Documentos del Aplicante">
                 <group>
-                    <h1>Cateee estoy prgresando</h1>
+                    <!--h1>Cateee estoy prgresando</h1-->
                     <field name="name"/>
                     <field name="datas" string="File"/>
                     <field name="create_date" string="Uploaded On"/>
