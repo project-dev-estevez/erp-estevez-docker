@@ -28,27 +28,27 @@
                         <KpiCard onClick.bind="viewTotalApplicants"
                                  name="'Postulaciones'" 
                                  value="state.totalApplicants.value" 
-                                 percentage="state.totalApplicants.percentage"/>
+                                 showpercentage="false"/>
 
                         <KpiCard onClick.bind="viewInProgressApplicants"
                                  name="'En Progreso'" 
                                  value="state.inProgressApplicants.value" 
-                                 percentage="state.inProgressApplicants.percentage"/>
+                                 showpercentage="false"/>
 
                         <KpiCard onClick.bind="viewPreselectedApplicants"
                                  name="'Preseleccionados'" 
                                  value="state.preselectedApplicants.value" 
-                                 percentage="state.preselectedApplicants.percentage"/>
+                                 showpercentage="false"/>
 
                         <KpiCard onClick.bind="viewRejectedApplicants"
                                  name="'Rechazados'" 
                                  value="state.rejectedApplicants.value" 
-                                 percentage="state.rejectedApplicants.percentage"/>
+                                 showpercentage="false"/>
 
                         <KpiCard onClick.bind="viewHiredApplicants"
                                  name="'Contratados'" 
                                  value="state.hiredApplicants.value" 
-                                 percentage="state.hiredApplicants.percentage"/>
+                                 showpercentage="false"/>
 
                         <KpiCard onClick.bind="viewAverageHiringTime"
                                  name="'Tiempo Promedio de Contratación en Días'" 
