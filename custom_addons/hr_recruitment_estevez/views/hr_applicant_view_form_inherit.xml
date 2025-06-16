@@ -140,15 +140,21 @@
             </xpath>
 
             <!-- Eliminar el grupo "Sourcing" del notebook -->
-            <xpath expr="//notebook/page[@name='application_details']/group/group[field[@name='source_id']]" position="replace">
-                <!-- Eliminar el grupo "Sourcing" -->
-            </xpath>
+            <xpath expr="//notebook/page[@name='application_details']/group/group[field[@name='source_id']]" position="replace"/>
+
 
             <!-- Agregar los campos debajo de linkedin_profile -->
             <xpath expr="//field[@name='linkedin_profile']" position="after">
-                <field name="source_id" string="Fuente de Reclutamiento" required="1"/>
-                <!-- <field name="medium_id"/> -->
+                <field name="source_id" required="1"/>                
                 <field name="project_id"/>
+            </xpath> 
+            
+            <!-- Agregar los campos debajo de linkedin_profile -->
+            <xpath expr="//field[@name='job_id']" position="replace">
+                <field name="job_id" string="Puesto de trabajo" required="1"/>                                
+            </xpath>  
+            <xpath expr="//field[@name='user_id']" position="replace">
+                <field name="user_id" string="Reclutador" required="1"/>                                
             </xpath>            
         </field>
     </record>

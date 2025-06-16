@@ -9,7 +9,8 @@ _logger = logging.getLogger(__name__)
 
 class HrApplicant(models.Model):
     _inherit = 'hr.applicant'
-
+    
+    
     is_examen_medico = fields.Boolean(compute="_compute_is_examen_medico")
 
     # *********Formulario de historia clinica *********
@@ -168,6 +169,13 @@ class HrApplicant(models.Model):
         help='Candidato asociado a esta solicitud'
     )
 
+    source_id = fields.Many2one(
+        'utm.source',
+        string='Fuente de Reclutamiento',
+        ondelete='restrict',
+        override=True
+    )
+
     @api.depends('create_date', 'date_closed')
     def _compute_process_duration(self):
         for rec in self:
@@ -272,6 +280,14 @@ class HrApplicant(models.Model):
     def _onchange_partner_phone(self):
         if self.partner_phone:
             self.partner_phone = self._format_phone_number(self.partner_phone)
+
+    @api.onchange('candidate_id')
+    def _onchange_candidate_id_fill_info(self):
+        if self.candidate_id:            
+            self.phone = self.candidate_id.partner_phone            
+            self.source_id = self.candidate_id.source_id.id            
+            self.job_id = self.candidate_id.job_ids.id           
+
 
     def action_open_whatsapp(self):
         for applicant in self:

@@ -13,6 +13,11 @@ class HrCandidate(models.Model):
         'hr.job',
         string = 'Puesto de Trabajo'
     )
+
+    source_id = fields.Many2one(
+        'utm.source',
+        string='Fuente de Reclutamiento'
+    )
       
     def action_open_documents(self):
         self.env['hr.applicant.document'].search([]).unlink()
