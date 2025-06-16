@@ -28,27 +28,32 @@
                         <KpiCard onClick.bind="viewTotalApplicants"
                                  name="'Postulaciones'" 
                                  value="state.totalApplicants.value" 
-                                 percentage="state.totalApplicants.percentage"/>
+                                 percentage="state.totalApplicants.percentage"
+                                 showPercentage="false"/>
 
                         <KpiCard onClick.bind="viewInProgressApplicants"
                                  name="'En Progreso'" 
                                  value="state.inProgressApplicants.value" 
-                                 percentage="state.inProgressApplicants.percentage"/>
+                                 percentage="state.inProgressApplicants.percentage"
+                                 showPercentage="false"/>
 
                         <KpiCard onClick.bind="viewPreselectedApplicants"
                                  name="'Preseleccionados'" 
                                  value="state.preselectedApplicants.value" 
-                                 percentage="state.preselectedApplicants.percentage"/>
+                                 percentage="state.preselectedApplicants.percentage"
+                                 showPercentage="false"/>
 
                         <KpiCard onClick.bind="viewRejectedApplicants"
                                  name="'Rechazados'" 
                                  value="state.rejectedApplicants.value" 
-                                 percentage="state.rejectedApplicants.percentage"/>
+                                 percentage="state.rejectedApplicants.percentage"
+                                 showPercentage="false"/>
 
                         <KpiCard onClick.bind="viewHiredApplicants"
                                  name="'Contratados'" 
                                  value="state.hiredApplicants.value" 
-                                 percentage="state.hiredApplicants.percentage"/>
+                                 percentage="state.hiredApplicants.percentage"
+                                 showPercentage="false"/>
 
                         <KpiCard onClick.bind="viewAverageHiringTime"
                                  name="'Tiempo Promedio de Contratación en Días'" 
