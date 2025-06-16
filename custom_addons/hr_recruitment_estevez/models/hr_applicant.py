@@ -281,7 +281,7 @@ class HrApplicant(models.Model):
                 # Verificar si el número ya tiene un código de país
                 if not phone.startswith('52'):
                     phone = '52' + phone
-                message = "Hola"
+                message = "Hola! Queremos comunicarnos contigo!"
                 url = f"https://wa.me/{phone}?text={message}"
                 _logger.info(f"Opening WhatsApp with phone number: {phone}")
                 return {
