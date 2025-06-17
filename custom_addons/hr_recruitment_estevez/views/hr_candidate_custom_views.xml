@@ -8,19 +8,8 @@
         <xpath expr="//form" position="attributes">
           <attribute name="delete">false</attribute>
         </xpath>
-        <xpath expr="//div[@name='button_box']" position="inside">                 
-          <div groups="base.group_user" invisible="not whatsapp_url">
-            <button class="oe_stat_button"
-                    type="object"
-                    icon="fa-whatsapp"
-                    name="action_open_whatsapp">
-              <div class="o_stat_info">
-                <span class="o_stat_text">WhatsApp</span>
-              </div>
-            </button>            
-          </div>
-          <button class="oe_stat_button" name="action_open_documents" type="object" icon="fa-file-text-o" string="Documentos"/> 
-          <button name="action_open_whatsapp" class="oe_stat_button" icon="fa-whatsapp" type="object" string="WhatsAHolapp" invisible="not partner_phone"/>
+        <xpath expr="//div[@name='button_box']" position="inside">                                     
+          <button name="action_open_whatsapp" class="oe_stat_button" icon="fa-whatsapp" type="object" string="Whatsapp" invisible="not partner_phone"/>
           <button class="oe_stat_button" name="action_open_documents" type="object" icon="fa-file-text-o" string="Documentos"/>
         </xpath>
         <xpath expr="//field[@name='partner_name']" position="attributes">

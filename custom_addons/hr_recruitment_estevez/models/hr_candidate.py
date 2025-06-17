@@ -17,13 +17,7 @@ class HrCandidate(models.Model):
     source_id = fields.Many2one(
         'utm.source',
         string='Fuente de Reclutamiento'
-    )
-
-    whatsapp_url = fields.Char(
-        string='WhatsApp URL',Add commentMore actions
-        compute='_compute_whatsapp_url',
-        store=False
-    )
+    )    
       
     def action_open_documents(self):
         self.env['hr.applicant.document'].search([]).unlink()
