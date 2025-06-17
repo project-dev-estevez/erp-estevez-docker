@@ -1,0 +1,40 @@
+<odoo>
+  <data>
+    <record id="your_custom_view_id" model="ir.ui.view">
+      <field name="name">hr.candidate.view.form.inherit.placeholder</field>
+      <field name="model">hr.candidate</field>
+      <field name="inherit_id" ref="hr_recruitment.hr_candidate_view_form"/>
+      <field name="arch" type="xml">
+        <xpath expr="//form" position="attributes">
+          <attribute name="delete">false</attribute>
+        </xpath>
+        <xpath expr="//div[@name='button_box']" position="inside">                                     
+          <button name="action_open_whatsapp" class="oe_stat_button" icon="fa-whatsapp" type="object" string="Whatsapp" invisible="not partner_phone"/>
+          <button class="oe_stat_button" name="action_open_documents" type="object" icon="fa-file-text-o" string="Documentos"/>
+        </xpath>
+        <xpath expr="//group/group/field[@name='type_id']" position="after">
+            <field name="rfc"/>
+        </xpath>
+        <xpath expr="//field[@name='partner_name']" position="attributes">
+          <attribute name="placeholder">Nombre del candidato</attribute>
+        </xpath>
+        <xpath expr="//field[@name='user_id']" position="attributes">
+          <attribute name="string">Reclutador</attribute>
+        </xpath>
+        <xpath expr="//group/field[@name='company_id'][@groups='base.group_multi_company']" position="after">
+          <field name="source_id" string="Fuente de reclutamiento" required="1"/>
+        </xpath>
+        <xpath expr="//button[@name='create_employee_from_candidate']" position="attributes">
+            <attribute name="invisible">1</attribute> <!-- Siempre oculto -->
+        </xpath>
+        <xpath expr="//field[@name='source_id']" position="after">
+            <field name="job_ids" widget="many2many_tags" required="1"/>
+        </xpath>
+        <xpath expr="//field[@name='partner_phone']" position="attributes">
+          <attribute name="required">1</attribute>  <!-- Obligatorio -->
+        </xpath>                
+      </field>
+    </record>  
+  </data>
+</odoo>
+

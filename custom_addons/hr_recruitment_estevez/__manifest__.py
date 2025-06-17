@@ -39,6 +39,7 @@
         "views/hr_applicant_view_search_inherit.xml",
         "views/hr_applicant_view_search_inherit.xml",        
         #"views/hr_candidate_custom_views.xml"
+        "views/hr_candidate_view_form.xml"
     ],
     'assets': {
         'web.assets_backend': [
