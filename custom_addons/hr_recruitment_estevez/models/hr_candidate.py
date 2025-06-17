@@ -18,6 +18,12 @@ class HrCandidate(models.Model):
         'utm.source',
         string='Fuente de Reclutamiento'
     )
+
+    whatsapp_url = fields.Char(
+        string='WhatsApp URL',Add commentMore actions
+        compute='_compute_whatsapp_url',
+        store=False
+    )
       
     def action_open_documents(self):
         self.env['hr.applicant.document'].search([]).unlink()
@@ -51,6 +57,7 @@ class HrCandidate(models.Model):
                 }
             else:
                 raise UserError("The applicant does not have a phone number.")
+                
     
     def action_open_whatsapp(self):
         for applicant in self:
