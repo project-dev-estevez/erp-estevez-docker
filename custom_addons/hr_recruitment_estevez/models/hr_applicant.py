@@ -154,6 +154,14 @@ class HrApplicant(models.Model):
         help='Proyecto para el que se postula el candidato'
     )
 
+    source_id = fields.Many2one(
+        'utm.source',        
+        required = True,
+        string='Fuente de reclutamiento',
+        help='Fuente de reclutamiento',
+        ondelete='restrict'       
+    )
+
     process_duration = fields.Char(
         string='Duración',
         compute='_compute_process_duration',
@@ -167,14 +175,8 @@ class HrApplicant(models.Model):
         index=True,
         string='Candidato',  # Cambiar el string que se muestra
         help='Candidato asociado a esta solicitud'
-    )
+    )    
 
-    source_id = fields.Many2one(
-        'utm.source',
-        string='Fuente de Reclutamiento',
-        ondelete='restrict',
-        override=True
-    )
 
     @api.depends('create_date', 'date_closed')
     def _compute_process_duration(self):
