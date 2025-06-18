@@ -7,7 +7,7 @@ _logger = logging.getLogger(__name__)
 class HrRequisition(models.Model):
     _name = 'hr.requisition'
     _description = 'Requisición de Personal'
-    _inherit = ['mail.thread']
+    _inherit = ['mail.thread', 'mail.activity.mixin']
     _rec_name = 'name'
 
     name = fields.Char(string="Nombre", compute="_compute_name", store=True)
@@ -28,7 +28,7 @@ class HrRequisition(models.Model):
         ('first_approval', 'En Curso'),
         ('rejected', 'Rechazado'),
         ('approved', 'Aprobado'),
-    ], string="Estado", default='to_approve')
+    ], string="Estado", default='to_approve', track_visibility='onchange')
 
     requisition_number = fields.Char(string='Formato de Solicitud', readonly=True, default='DA-F0-TH-006')
     # Información del solicitante
@@ -160,6 +160,7 @@ class HrRequisition(models.Model):
             return
 
         _logger.info("Immediate supervisor user found: %s", immediate_supervisor_user.id)
+        
         message = "La requisición de personal ha sido aprobada por %s." % self.requestor_id.name
         subject = "Requisición Aprobada: %s" % self.requisition_number
         message_id = self.message_post(
@@ -172,6 +173,19 @@ class HrRequisition(models.Model):
         _logger.info("Notification sent to immediate supervisor user: %s", immediate_supervisor_user.partner_id.id)
         _logger.info("Message ID: %s", message_id)
 
+
+    def action_reset_to_draft(self):
+        for record in self:
+            # Solo permite restablecer si está aprobado o rechazado
+            if record.state in ['approved', 'rejected']:
+                # Volver al estado inicial (ajusta según tu flujo)
+                record.state = 'to_approve'
+                
+                # Opcional: Resetear campos relacionados
+                record.is_published = False
+    
+        return True
+    
     def action_confirm_approve(self):
         if self.state == 'first_approval':
             self.state = 'approved'

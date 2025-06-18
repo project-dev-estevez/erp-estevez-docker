@@ -32,11 +32,11 @@
                 <button name="action_approve" string="Aprobar" type="object" icon="fa-thumbs-up" invisible="state in ('rejected', 'first_approval', 'second_approval', 'approved') or requestor_id == uid"/>
                 <button name="action_confirm_approve" string="Confirmar" type="object" icon="fa-thumbs-up" invisible="state in ('to_approve', 'rejected', 'approved') or requestor_id == uid"/>
                 <button name="action_reject" string="Rechazar" type="object" icon="fa-times" invisible="state in ('rejected', 'approved') or requestor_id == uid"/>
+                <button name="action_reset_to_draft" string="Restablecer" type="object" icon="fa-refresh" invisible= "state not in ('approved','rejected')"/>
             </list>
         </field>
     </record>
 
-    <!-- Vista de formulario para requisiciones -->
     <record id="view_hr_requisition_form" model="ir.ui.view">
         <field name="name">hr.requisition.form</field>
         <field name="model">hr.requisition</field>
@@ -61,9 +61,14 @@
                     <button name="action_close_vacancy" type="object" string="Cerrar Vacante"
                         class="btn-danger"
                         invisible="not (state == 'approved' and is_published)"/>
-                </header>
 
-                <sheet>
+                    <button name="action_reset_to_draft" string="Restablecer" type="object"
+                        class="btn-secondary"
+                        invisible="state not in ('approved','rejected')"/>
+                </header>
+                
+        
+                    <sheet>
                     <h1>Requisición de Personal - <field name="workstation_job_id" readonly="1" nolabel="1" widget="label"/></h1>
                     
                     <!-- Barra de navegación mejorada -->
@@ -222,9 +227,14 @@
                         </div>
                     </div>
                 </sheet>
-                
-                <!-- Estilos mejorados para la barra de navegación -->
-                <style>
+                        
+           
+                    
+                  
+
+
+                     <style>
+                    /* Estilos para la barra de navegación */
                     .o_wizard_nav .nav-tabs {
                         display: flex;
                         justify-content: space-between;
@@ -297,10 +307,15 @@
                         margin-top: 30px;
                         padding-top: 20px;
                     }
+
+                 
                 </style>
+                
             </form>
         </field>
     </record>
+
+ 
 
     <!-- Vista de search para requisiciones -->
     <record id="view_hr_requisition_search" model="ir.ui.view">
