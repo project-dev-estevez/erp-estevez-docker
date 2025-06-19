@@ -8,7 +8,7 @@
                 <div class="o_row">
                     <field name="is_google_meet" string="Usar Google Meet"/>
                     <field name="videocall_location" string="Enlace Meet" 
-                           attrs="{'invisible': [('is_google_meet', '=', False)]}" 
+                           invisible="[('is_google_meet', '=', False)]" 
                            widget="url"/>
                 </div>
             </xpath>
