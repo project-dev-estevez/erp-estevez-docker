@@ -1,4 +1,5 @@
-from odoo import models, fields, api
+from odoo import models, fields, api, _
+from odoo.exceptions import UserError
 import uuid
 import logging
 from odoo.addons.google_calendar.utils.google_calendar import GoogleCalendarService
@@ -14,9 +15,14 @@ class CalendarEvent(models.Model):
         help="Genera un enlace de Google Meet al sincronizar"
     )
     
-    # Método clave para forzar la generación de Meet
+    # 1. Desactivar completamente las videollamadas de Odoo
+    @api.model
+    def _init_videocall(self):
+        return False  # Desactiva completamente la generación de videollamadas de Odoo
+    
+    # 2. Método para crear Google Meet
     def _create_google_meet(self):
-        if not self.is_google_meet or self.videocall_location:
+        if not self.is_google_meet or self.videocall_location or not self.google_id:
             return
             
         service = GoogleCalendarService(self.env['google.service'])
@@ -45,30 +51,24 @@ class CalendarEvent(models.Model):
                 _logger.error("Google no devolvió enlace Meet")
         except Exception as e:
             _logger.exception("Error creando Google Meet: %s", str(e))
-
-    # Ejecutar después de sincronizar
+    
+    # 3. Sincronización con Google Calendar
     def _sync_odoo2google(self, google_service):
         res = super()._sync_odoo2google(google_service)
         if self.is_google_meet and self.google_id:
-            # Esperar 10 segundos para que Google procese
+            # Esperar 5 segundos para que Google procese
             self.env.cr.commit()
             import time
-            time.sleep(10)
+            time.sleep(5)
             self._create_google_meet()
         return res
     
+    # 4. Método manual para generación
     def force_create_meet(self):
-        """
-        Método para forzar la creación de un enlace Meet manualmente
-        """
         for record in self:
             if not record.google_id:
                 raise UserError(_("Primero sincroniza el evento con Google Calendar"))
-            
-            # Llamamos al método que crea el Meet
             record._create_google_meet()
-            
-            # Mostramos mensaje de confirmación
             return {
                 'type': 'ir.actions.client',
                 'tag': 'display_notification',
