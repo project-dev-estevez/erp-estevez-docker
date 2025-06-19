@@ -4,7 +4,8 @@
         <field name="model">calendar.event</field>
         <field name="inherit_id" ref="calendar.view_calendar_event_form"/>
         <field name="arch" type="xml">
-            <xpath expr="//field[@name='location']" position="after">
+            <!-- Reemplazar completamente la sección de videollamada de Odoo -->
+            <xpath expr="//field[@name='videocall_location']" position="replace">
                 <div class="o_row">
                     <field name="is_google_meet" string="Usar Google Meet"/>
                     <field name="videocall_location" string="Enlace Meet" 
