@@ -5,7 +5,7 @@
         <field name="inherit_id" ref="calendar.view_calendar_event_form"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='location']" position="after">
-                <field name="videocall_location" string="Meet URL" widget="url"/>
+                <field name="videocall_location" string="Google Meet URL" widget="url"/>
             </xpath>
         </field>
     </record>
