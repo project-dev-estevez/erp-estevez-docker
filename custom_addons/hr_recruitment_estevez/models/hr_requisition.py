@@ -43,7 +43,7 @@ class HrRequisition(models.Model):
         ('new_creation', 'Puesto de nueva creación'),
         ('replacement', 'Reposición de personal'),
         ('new_vacancy', 'Nueva vacante')
-    ], string="Tipo de Requisición", required=True)
+    ], string="Tipo de Requisición", required=True, help="Tipo de solicitud")
     employee_id = fields.Many2one('hr.employee', string="Empleado a Reemplazar")
     vacancy_reason = fields.Selection([
         ('voluntary_retirement', 'Retiro Voluntario'),
@@ -74,8 +74,22 @@ class HrRequisition(models.Model):
         ('indistinct', 'Indistinto'),
         ('other', 'Otro')
     ], string="Género")
-    age_range_min = fields.Integer(string="Edad Mínima", required=True, default=18)
-    age_range_max = fields.Integer(string="Edad Máxima", required=True, default=60)
+
+    # Versión mejorada usando comprensión de listas
+    age_range_min = fields.Selection(
+        selection=[(str(i), str(i)) for i in range(18, 61)],  # 18 a 60
+        string="Edad Mínima",
+        default='18'
+    )
+
+    age_range_max = fields.Selection(
+        selection=[(str(i), str(i)) for i in range(60, 17, -1)],
+        string="Edad Máxima",
+        default='60'
+    )
+        
+    #age_range_min = fields.Integer(string="Edad Mínima", default=18)
+    # age_range_max = fields.Integer(string="Edad Máxima", default=60)
     years_of_experience = fields.Integer(string="Años de Experiencia", required=True)
     general_functions = fields.Text(string="Funciones Generales del Puesto")
     academic_degree_id = fields.Many2one('hr.recruitment.degree', string="Escolaridad o Grado Académico")
@@ -250,12 +264,18 @@ class HrRequisition(models.Model):
     @api.constrains('age_range_min', 'age_range_max')
     def _check_age_range(self):
         for record in self:
-            if record.age_range_min < 18:
-                raise ValidationError("La edad mínima debe ser al menos 18 años.")
-            if record.age_range_max > 100:
-                raise ValidationError("La edad máxima debe ser como máximo 100 años.")
-            if record.age_range_min > record.age_range_max:
-                raise ValidationError("La edad mínima no puede ser mayor que la edad máxima.")
+            # Convertir a enteros
+            min_age = int(record.age_range_min) if record.age_range_min else 0
+            max_age = int(record.age_range_max) if record.age_range_max else 0
+        
+            if min_age < 18:
+                raise ValidationError("La edad mínima no puede ser menor a 18 años")
+            
+            if max_age <= min_age:
+                raise ValidationError("La edad máxima debe ser mayor que la mínima")
+            
+            if max_age > 60:
+                raise ValidationError("La edad máxima no puede exceder los 60 años")
 
     # Si es para un reemplazo se debe de seleccionar el empleado a reemplazar
     @api.constrains('requisition_type', 'employee_id')
