@@ -10,6 +10,10 @@ const { DateTime } = luxon;
 export class RecruitmentDashboard extends Component {
 
     setup() {
+        const now = DateTime.now();
+        const startOfMonth = now.startOf('month').toISODate();
+        const endOfMonth = now.endOf('month').toISODate();
+
         this.state = useState({
             // Postulaciones Totales
             totalApplicants: {
@@ -47,7 +51,9 @@ export class RecruitmentDashboard extends Component {
 
             period: 30,
             currentDate: DateTime.now().minus({ days: 30 }).toISODate(),
-            previusDate: DateTime.now().minus({ days: 60 }).toISODate()
+            previusDate: DateTime.now().minus({ days: 60 }).toISODate(),
+            startDate: startOfMonth,
+            endDate: endOfMonth,
         })
 
         this.orm = useService("orm");
@@ -59,6 +65,12 @@ export class RecruitmentDashboard extends Component {
             await this.getIndicatorsSourceRecruitment();
             await this.onPeriodChange();
         });
+    }
+
+    onDateRangeChange() {
+        this.getTopRecruitments();
+        this.getSourceRecruitment();
+        this.getIndicatorsSourceRecruitment();
     }
 
     getDates() {
