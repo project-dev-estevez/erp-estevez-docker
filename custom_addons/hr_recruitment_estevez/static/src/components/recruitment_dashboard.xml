@@ -56,7 +56,7 @@
                                  showPercentage="false"/>
 
                         <KpiCard onClick.bind="viewAverageHiringTime"
-                                 name="'Tiempo Promedio de Contratación en Días'" 
+                                 name="'Tiempo Promedio de Contratación'" 
                                  value="state.averageHiringTime.value" 
                                  percentage="state.averageHiringTime.previousValue"
                                  showPercentage="false"/>
