@@ -9,6 +9,16 @@ const { DateTime } = luxon;
 
 export class RecruitmentDashboard extends Component {
 
+    _addDateRangeToDomain(domain = []) {
+        if (this.state.startDate) {
+            domain.push(["create_date", ">=", this.state.startDate]);
+        }
+        if (this.state.endDate) {
+            domain.push(["create_date", "<=", this.state.endDate]);
+        }
+        return domain;
+    }
+
     setup() {
         const now = DateTime.now();
         const startOfMonth = now.startOf('month').toISODate();
@@ -18,40 +28,33 @@ export class RecruitmentDashboard extends Component {
             // Postulaciones Totales
             totalApplicants: {
                 value: 0,
-                percentage: 0,
             },
             // Postulaciones En Progreso
             inProgressApplicants: {
                 value: 0,
-                percentage: 0,
             },
             // Candidatos Preseleccionados
             preselectedApplicants: {
                 value: 0,
-                percentage: 0,
             },
             // Postulaciones Rechazadas
             rejectedApplicants: {
                 value: 0,
-                percentage: 0,
             },
             // Contrataciones Realizadas
             hiredApplicants: {
                 value: 0,
-                percentage: 0,
             },
             // Tiempo promedio de contratación
             averageHiringTime: {
                 value: 0,
-                previousValue: 0,
             },
             // Fuentes de Reclutamiento
             sourceRecruitment: {},
-            indicatorsSourceRecruitment: {},
+            indicatorsSourceRecruitment: {
+                sources: []
+            },
 
-            period: 30,
-            currentDate: DateTime.now().minus({ days: 30 }).toISODate(),
-            previusDate: DateTime.now().minus({ days: 60 }).toISODate(),
             startDate: startOfMonth,
             endDate: endOfMonth,
         })
@@ -60,22 +63,30 @@ export class RecruitmentDashboard extends Component {
         this.actionservice = useService("action");
 
         onWillStart(async () => {
-            await this.getTopRecruitments();
-            await this.getSourceRecruitment();
-            await this.getIndicatorsSourceRecruitment();
-            await this.onPeriodChange();
+            await this.loadAllData();
         });
     }
 
     onDateRangeChange() {
-        this.getTopRecruitments();
-        this.getSourceRecruitment();
-        this.getIndicatorsSourceRecruitment();
+        if (this.state.startDate && this.state.endDate && this.state.endDate < this.state.startDate) {
+            // Corrige automáticamente o muestra un mensaje
+            this.state.endDate = this.state.startDate;
+        }
+        this.loadAllData();        
     }
 
-    getDates() {
-        this.state.currentDate = DateTime.now().minus({ days: this.state.period }).toISODate();
-        this.state.previusDate = DateTime.now().minus({ days: this.state.period * 2 }).toISODate();
+    async loadAllData() {        
+        await Promise.all([
+            this.getTopRecruitments(),
+            this.getSourceRecruitment(),
+            this.getIndicatorsSourceRecruitment(),
+            this.getTotalApplicants(),
+            this.getInProgressApplicants(),
+            this.getPreselectedApplicants(),
+            this.getRejectedApplicants(),
+            this.getHiredApplicants(),
+            this.getAverageHiringTime()
+        ]);
     }
 
     getPastelColors(count) {
@@ -88,15 +99,13 @@ export class RecruitmentDashboard extends Component {
     }
 
     async getTopRecruitments() {
-        const domain = [
+        let domain = [
             "|",
             ["active", "=", true],
             ["application_status", "=", "refused"]
         ];
 
-        if (this.state.period > 0) {
-            domain.push(["create_date", ">", this.state.currentDate]);
-        }
+        domain = this._addDateRangeToDomain(domain);
 
         // Total postulaciones por reclutador
         const totalData = await this.orm.readGroup(
@@ -133,9 +142,11 @@ export class RecruitmentDashboard extends Component {
             return { label, total, hired, percentage };
         });
 
-        const labels = totalData.map(r => (r.user_id && r.user_id[1]) || "Desconocido");
-        const totalCounts = totalData.map(r => r.user_id_count);
-        const hiredCounts = totalData.map(r => hiredMap[(r.user_id && r.user_id[1]) || "Desconocido"] || 0);
+        // Si no hay datos, asegúrate de pasar arrays vacíos
+        const labels = recruiterStats.length ? recruiterStats.map(r => r.label) : [];
+        const totalCounts = recruiterStats.length ? recruiterStats.map(r => r.total) : [];
+        const hiredCounts = recruiterStats.length ? recruiterStats.map(r => r.hired) : [];
+
 
         this.state.topRecruitments = {
             data: {
@@ -168,18 +179,19 @@ export class RecruitmentDashboard extends Component {
                 }
             }
         };
+
+        // Forzar refresco
+        this.state.topRecruitments = { ...this.state.topRecruitments };
     }
 
     async getSourceRecruitment() {
-        const domain = [
+        let domain = [
             "|",
             ["active", "=", true],
             ["application_status", "=", "refused"]
         ];
 
-        if (this.state.period > 0) {
-            domain.push(["create_date", ">", this.state.currentDate]);
-        }
+        domain = this._addDateRangeToDomain(domain);
 
         const data = await this.orm.readGroup(
             "hr.applicant",
@@ -188,37 +200,41 @@ export class RecruitmentDashboard extends Component {
             ["source_id"]
         );
 
-        // Procesamiento de datos más robusto
         const sourcesData = data.map(r => ({
             label: (r.source_id && r.source_id[1]) || "Sin fuente",
             count: r.source_id_count,
             sourceId: r.source_id ? r.source_id[0] : null
         }));
 
+        // Si no hay datos, asegúrate de pasar arrays vacíos
+        const labels = sourcesData.length ? sourcesData.map(item => item.label) : [];
+        const counts = sourcesData.length ? sourcesData.map(item => item.count) : [];
+        const colors = sourcesData.length ? this.getPastelColors(sourcesData.length) : [];
+
         this.state.sourceRecruitment = {
             data: {
-                labels: sourcesData.map(item => item.label),
+                labels: labels,
                 datasets: [
                     {
                         label: "Fuentes de Postulación",
-                        data: sourcesData.map(item => item.count),
-                        backgroundColor: this.getPastelColors(sourcesData.length)
+                        data: counts,
+                        backgroundColor: colors
                     }
                 ]
             }
         };
+        // Forzar refresco
+        this.state.sourceRecruitment = { ...this.state.sourceRecruitment };
     }
 
     async getIndicatorsSourceRecruitment() {
-        const domain = [
+        let domain = [
             "|",
             ["active", "=", true],
             ["application_status", "=", "refused"]
         ];
 
-        if (this.state.period > 0) {
-            domain.push(["create_date", ">", this.state.currentDate]);
-        }
+        domain = this._addDateRangeToDomain(domain);
 
         // 1. Agrupa por source_id para obtener el total de candidatos por fuente
         const totalData = await this.orm.readGroup(
@@ -261,62 +277,21 @@ export class RecruitmentDashboard extends Component {
 
     }
 
-    async onPeriodChange() {
-        this.getDates();
-
-        await Promise.all([
-            this.getTotalApplicants(),
-            this.getInProgressApplicants(),
-            this.getPreselectedApplicants(),
-            this.getRejectedApplicants(),
-            this.getHiredApplicants(),
-            this.getAverageHiringTime()
-        ]);
-    }
-
     async getTotalApplicants() {
         const context = { context: { active_test: false } };
         let domain = [];
-        if (this.state.period > 0) {
-            domain.push(["create_date", ">", this.state.currentDate]);
-        }
+        domain = this._addDateRangeToDomain(domain);
 
         const data = await this.orm.searchCount("hr.applicant", domain, context);
         this.state.totalApplicants.value = data;
-
-        // Periodo previo
-        let previousDomain = [];
-        if (this.state.period > 0) {
-            previousDomain.push(
-                ["create_date", ">", this.state.previusDate],
-                ["create_date", "<=", this.state.currentDate]
-            );
-        }
-        const previousData = await this.orm.searchCount("hr.applicant", previousDomain, context);
-        const percentage = ((data - previousData) / previousData) * 100;
-        this.state.totalApplicants.percentage = percentage.toFixed(2) || 0;
     }
 
     async getInProgressApplicants() {
         let domain = [["application_status", "=", "ongoing"]];
-        if (this.state.period > 0) {
-            domain.push(["create_date", ">", this.state.currentDate]);
-        }
+        domain = this._addDateRangeToDomain(domain);
 
         const data = await this.orm.searchCount("hr.applicant", domain);
         this.state.inProgressApplicants.value = data;
-
-        // Periodo previo
-        let previousDomain = [["application_status", "=", "ongoing"]];
-        if (this.state.period > 0) {
-            previousDomain.push(
-                ["create_date", ">", this.state.previusDate],
-                ["create_date", "<=", this.state.currentDate]
-            );
-        }
-        const previousData = await this.orm.searchCount("hr.applicant", previousDomain);
-        const percentage = ((data - previousData) / previousData) * 100;
-        this.state.inProgressApplicants.percentage = percentage.toFixed(2) || 0;
     }
 
     async getPreselectedApplicants() {
@@ -325,79 +300,32 @@ export class RecruitmentDashboard extends Component {
             ["stage_id.sequence", ">", 4],
             ["application_status", "!=", "hired"]
         ];
-        if (this.state.period > 0) {
-            domain.push(["create_date", ">", this.state.currentDate]);
-        }
+        domain = this._addDateRangeToDomain(domain);
 
         const data = await this.orm.searchCount("hr.applicant", domain);
         this.state.preselectedApplicants.value = data;
-
-        // Periodo previo
-        let previousDomain = [
-            ["stage_id.sequence", ">", 4], 
-            ["application_status", "!=", "hired"]
-        ];
-        if (this.state.period > 0) {
-            previousDomain.push(
-                ["create_date", ">", this.state.previusDate],
-                ["create_date", "<=", this.state.currentDate]
-            );
-        }
-        const previousData = await this.orm.searchCount("hr.applicant", previousDomain);
-        const percentage = ((data - previousData) / previousData) * 100;
-        this.state.preselectedApplicants.percentage = percentage.toFixed(2) || 0;
     }
 
     async getRejectedApplicants() {
         const context = { context: { active_test: false } };
         let domain = [["application_status", "=", "refused"]];
-        if (this.state.period > 0) {
-            domain.push(["create_date", ">", this.state.currentDate]);
-        }
+        domain = this._addDateRangeToDomain(domain);
 
         const data = await this.orm.searchCount("hr.applicant", domain, context);
         this.state.rejectedApplicants.value = data;
-
-        // Periodo previo
-        let previousDomain = [["application_status", "=", "refused"]];
-        if (this.state.period > 0) {
-            previousDomain.push(
-                ["create_date", ">", this.state.previusDate],
-                ["create_date", "<=", this.state.currentDate]
-            );
-        }
-        const previousData = await this.orm.searchCount("hr.applicant", previousDomain, context);
-        const percentage = ((data - previousData) / previousData) * 100;
-        this.state.rejectedApplicants.percentage = percentage.toFixed(2) || 0;
     }
 
     async getHiredApplicants() {
         let domain = [["application_status", "=", "hired"]];
-        if (this.state.period > 0) {
-            domain.push(["create_date", ">", this.state.currentDate]);
-        }
+        domain = this._addDateRangeToDomain(domain);
 
         const data = await this.orm.searchCount("hr.applicant", domain);
         this.state.hiredApplicants.value = data;
-
-        // Periodo previo
-        let previousDomain = [["application_status", "=", "hired"]];
-        if (this.state.period > 0) {
-            previousDomain.push(
-                ["create_date", ">", this.state.previusDate],
-                ["create_date", "<=", this.state.currentDate]
-            );
-        }
-        const previousData = await this.orm.searchCount("hr.applicant", previousDomain);
-        const percentage = ((data - previousData) / previousData) * 100;
-        this.state.hiredApplicants.percentage = percentage.toFixed(2) || 0;
     }
 
     async getAverageHiringTime() {
         let domain = [["application_status", "=", "hired"]];
-        if (this.state.period > 0) {
-            domain.push(["create_date", ">", this.state.currentDate]);
-        }
+        domain = this._addDateRangeToDomain(domain);
 
         const applicants = await this.orm.searchRead('hr.applicant', domain, ["create_date", "date_closed"]);
         if (!applicants.length) {
@@ -419,45 +347,12 @@ export class RecruitmentDashboard extends Component {
 
         const averageDays = count ? (totalDays / count) : 0;
         this.state.averageHiringTime.value = averageDays.toFixed(2);
-
-        // Periodo previo
-        let previousDomain = [["application_status", "=", "hired"]];
-        if (this.state.period > 0) {
-            previousDomain.push(
-                ["create_date", ">", this.state.previusDate],
-                ["create_date", "<=", this.state.currentDate]
-            );
-        }
-
-        const previousApplicants = await this.orm.searchRead('hr.applicant', previousDomain, ["create_date", "date_closed"]);
-        if (!previousApplicants.length) {
-            return 0;
-        }
-
-        let previousTotalDays = 0;
-        let previousCount = 0;
-        for (const applicant of previousApplicants) {
-            if (applicant.create_date && applicant.date_closed) {
-                const created = new Date(applicant.create_date);
-                const closed = new Date(applicant.date_closed);
-                const diffTime = closed - created;
-                const diffDays = diffTime / (1000 * 60 * 60 * 24);
-                previousTotalDays += diffDays;
-                previousCount += 1;
-            }
-        }
-        const previousAverageDays = previousCount ? (previousTotalDays / previousCount) : 0;
-        this.state.averageHiringTime.previousValue = previousAverageDays
-            ? (((averageDays - previousAverageDays) / previousAverageDays) * 100).toFixed(2)
-            : 0;
     }
 
     viewTotalApplicants() {
         const context = { active_test: false };
         let domain = [];
-        if (this.state.period > 0) {
-            domain.push(["create_date", ">", this.state.currentDate]);
-        }
+        domain = this._addDateRangeToDomain(domain);
 
         this.actionservice.doAction({
             type: "ir.actions.act_window",
@@ -471,9 +366,7 @@ export class RecruitmentDashboard extends Component {
 
     viewInProgressApplicants() {
         let domain = [["application_status", "=", "ongoing"]];
-        if (this.state.period > 0) {
-            domain.push(["create_date", ">", this.state.currentDate]);
-        }
+        domain = this._addDateRangeToDomain(domain);
 
         this.actionservice.doAction({
             type: "ir.actions.act_window",
@@ -489,9 +382,7 @@ export class RecruitmentDashboard extends Component {
             ["stage_id.sequence", ">", 4],
             ["application_status", "!=", "hired"]
         ];
-        if (this.state.period > 0) {
-            domain.push(["create_date", ">", this.state.currentDate]);
-        }
+        domain = this._addDateRangeToDomain(domain);
 
         this.actionservice.doAction({
             type: "ir.actions.act_window",
@@ -505,9 +396,7 @@ export class RecruitmentDashboard extends Component {
     viewRejectedApplicants() {
         const context = { active_test: false };
         let domain = [["application_status", "=", "refused"]];
-        if (this.state.period > 0) {
-            domain.push(["create_date", ">", this.state.currentDate]);
-        }
+        domain = this._addDateRangeToDomain(domain);
 
         this.actionservice.doAction({
             type: "ir.actions.act_window",
@@ -521,9 +410,7 @@ export class RecruitmentDashboard extends Component {
 
     viewHiredApplicants() {
         let domain = [["application_status", "=", "hired"]];
-        if (this.state.period > 0) {
-            domain.push(["create_date", ">", this.state.currentDate]);
-        }
+        domain = this._addDateRangeToDomain(domain);
 
         this.actionservice.doAction({
             type: "ir.actions.act_window",

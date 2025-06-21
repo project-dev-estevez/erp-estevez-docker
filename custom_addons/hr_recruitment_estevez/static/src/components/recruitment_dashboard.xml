@@ -13,11 +13,20 @@
                                     <div class="d-flex gap-2">
                                         <div>
                                             <label class="form-label mb-0 me-2">Desde:</label>
-                                            <input type="date" t-model="state.startDate" class="form-control" style="min-width: 140px;" t-on-change="onDateRangeChange"/>
+                                            <input type="date" 
+                                                   t-model="state.startDate" 
+                                                   class="form-control" 
+                                                   style="min-width: 170px;" 
+                                                   t-on-change="onDateRangeChange"/>
                                         </div>
                                         <div>
                                             <label class="form-label mb-0 me-2">Hasta:</label>
-                                            <input type="date" t-model="state.endDate" class="form-control" style="min-width: 140px;" t-on-change="onDateRangeChange"/>
+                                            <input type="date" 
+                                                   t-model="state.endDate" 
+                                                   class="form-control" 
+                                                   style="min-width: 170px;" 
+                                                   t-on-change="onDateRangeChange"
+                                                   t-att-min="state.startDate"/>
                                         </div>
                                     </div>
                                 </div>
