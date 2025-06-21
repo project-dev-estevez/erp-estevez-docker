@@ -152,18 +152,44 @@ export class RecruitmentDashboard extends Component {
             domain.push(["create_date", ">", this.state.currentDate]);
         }
 
-        const data = await this.orm.readGroup(
+        // 1. Agrupa por source_id para obtener el total de candidatos por fuente
+        const totalData = await this.orm.readGroup(
             "hr.applicant",
             domain,
             ["source_id"],
             ["source_id"]
         );
 
-        // Extrae los nombres de las fuentes
-        const sources = data.map(r => (r.source_id && r.source_id[1]) || "Sin fuente");
+        // 2. Agrupa por source_id solo los contratados
+        const hiredDomain = [
+            ...domain,
+            ["application_status", "=", "hired"]
+        ];
+        const hiredData = await this.orm.readGroup(
+            "hr.applicant",
+            hiredDomain,
+            ["source_id"],
+            ["source_id"]
+        );
 
-        // Guarda el array de strings en el estado
-        this.state.indicatorsSourceRecruitment.sources = sources;
+        // 3. Indexa los contratados por source_id para fácil acceso
+        const hiredMap = {};
+        for (const r of hiredData) {
+            const key = (r.source_id && r.source_id[1]) || "Sin fuente";
+            hiredMap[key] = r.source_id_count;
+        }
+
+        // 4. Construye el array de indicadores
+        const indicators = totalData.map(r => {
+            const label = (r.source_id && r.source_id[1]) || "Sin fuente";
+            const total = r.source_id_count;
+            const hired = hiredMap[label] || 0;
+            const percentage = total > 0 ? ((hired / total) * 100).toFixed(2) : "0.00";
+            return { label, total, hired, percentage };
+        });
+
+        // 5. Guarda en el estado
+        this.state.indicatorsSourceRecruitment.sources = indicators;
 
     }
 
