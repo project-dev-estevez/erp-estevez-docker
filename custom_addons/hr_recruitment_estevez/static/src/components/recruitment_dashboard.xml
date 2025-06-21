@@ -81,7 +81,35 @@
                                         <span class="fa fa-arrow-right text-white"/>
                                     </div>
                                 </div>
-                                <ChartRenderer type="'pie'" title="'Fuentes de Reclutamiento'" config="state.sourceRecruitment"/>
+                                
+                                <div class="row">
+                                    <div class="col-6">
+                                        <ChartRenderer type="'pie'" title="'Fuentes de Reclutamiento'" config="state.sourceRecruitment"/>
+                                    </div>
+                                    <div class="col-6">
+                                        <h3 class="text-primary fw-bold">Inidicadores de Reclutamiento</h3>
+                                        <table class="table table-borderless align-middle">
+                                            <thead>
+                                                <tr>
+                                                    <th>Fuente</th>
+                                                    <th class="text-end"># Candidatos</th>
+                                                    <th class="text-end"># Contratados</th>
+                                                    <th class="text-end">% Contratación</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <t t-foreach="state.indicatorsSourceRecruitment.sources" t-as="source" t-key="source">
+                                                    <tr>
+                                                        <td><span t-esc="source"/></td>
+                                                        <td class="text-end">-</td>
+                                                        <td class="text-end">-</td>
+                                                        <td class="text-end">-</td>
+                                                    </tr>
+                                                </t>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>

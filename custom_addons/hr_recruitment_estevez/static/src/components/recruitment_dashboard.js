@@ -9,6 +9,63 @@ const { DateTime } = luxon;
 
 export class RecruitmentDashboard extends Component {
 
+    setup() {
+        this.state = useState({
+            // Postulaciones Totales
+            totalApplicants: {
+                value: 0,
+                percentage: 0,
+            },
+            // Postulaciones En Progreso
+            inProgressApplicants: {
+                value: 0,
+                percentage: 0,
+            },
+            // Candidatos Preseleccionados
+            preselectedApplicants: {
+                value: 0,
+                percentage: 0,
+            },
+            // Postulaciones Rechazadas
+            rejectedApplicants: {
+                value: 0,
+                percentage: 0,
+            },
+            // Contrataciones Realizadas
+            hiredApplicants: {
+                value: 0,
+                percentage: 0,
+            },
+            // Tiempo promedio de contratación
+            averageHiringTime: {
+                value: 0,
+                previousValue: 0,
+            },
+            // Fuentes de Reclutamiento
+            sourceRecruitment: {},
+            indicatorsSourceRecruitment: {},
+
+            period: 30,
+            currentDate: DateTime.now().minus({ days: 30 }).toISODate(),
+            previusDate: DateTime.now().minus({ days: 60 }).toISODate()
+        })
+
+        this.orm = useService("orm");
+        this.actionservice = useService("action");
+
+        onWillStart(async () => {
+            await this.getTopRecruitments();
+            await this.getSourceRecruitment();
+            await this.getIndicatorsSourceRecruitment();
+            await this.onPeriodChange();
+        });
+    }
+
+    getDates() {
+        this.state.currentDate = DateTime.now().minus({ days: this.state.period }).toISODate();
+        this.state.previusDate = DateTime.now().minus({ days: this.state.period * 2 }).toISODate();
+    }
+
     getPastelColors(count) {
         const colors = [];
         for (let i = 0; i < count; i++) {
@@ -84,56 +141,30 @@ export class RecruitmentDashboard extends Component {
         };
     }
 
-    setup() {
-        this.state = useState({
-            // Postulaciones Totales
-            totalApplicants: {
-                value: 0,
-                percentage: 0,
-            },
-            // Postulaciones En Progreso
-            inProgressApplicants: {
-                value: 0,
-                percentage: 0,
-            },
-            // Candidatos Preseleccionados
-            preselectedApplicants: {
-                value: 0,
-                percentage: 0,
-            },
-            // Postulaciones Rechazadas
-            rejectedApplicants: {
-                value: 0,
-                percentage: 0,
-            },
-            // Contrataciones Realizadas
-            hiredApplicants: {
-                value: 0,
-                percentage: 0,
-            },
-            // Tiempo promedio de contratación
-            averageHiringTime: {
-                value: 0,
-                previousValue: 0,
-            },
-            period: 30,
-            currentDate: DateTime.now().minus({ days: 30 }).toISODate(),
-            previusDate: DateTime.now().minus({ days: 60 }).toISODate()
-        })
+    async getIndicatorsSourceRecruitment() {
+        const domain = [
+            "|",
+            ["active", "=", true],
+            ["application_status", "=", "refused"]
+        ];
 
-        this.orm = useService("orm");
-        this.actionservice = useService("action");
+        if (this.state.period > 0) {
+            domain.push(["create_date", ">", this.state.currentDate]);
+        }
 
-        onWillStart(async () => {
-            await this.getTopRecruitments();
-            await this.getSourceRecruitment();
-            await this.onPeriodChange();
-        });
-    }
+        const data = await this.orm.readGroup(
+            "hr.applicant",
+            domain,
+            ["source_id"],
+            ["source_id"]
+        );
 
-    getDates() {
-        this.state.currentDate = DateTime.now().minus({ days: this.state.period }).toISODate();
-        this.state.previusDate = DateTime.now().minus({ days: this.state.period * 2 }).toISODate();
+        // Extrae los nombres de las fuentes
+        const sources = data.map(r => (r.source_id && r.source_id[1]) || "Sin fuente");
+
+        // Guarda el array de strings en el estado
+        this.state.indicatorsSourceRecruitment.sources = sources;
+
     }
 
     async onPeriodChange() {
