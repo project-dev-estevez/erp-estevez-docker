@@ -86,18 +86,74 @@ export class RecruitmentDashboard extends Component {
             domain.push(["create_date", ">", this.state.currentDate]);
         }
 
-        const data = await this.orm.readGroup("hr.applicant", domain, ["user_id"], ["user_id"]);
+        // Total postulaciones por reclutador
+        const totalData = await this.orm.readGroup(
+            "hr.applicant",
+            domain,
+            ["user_id"],
+            ["user_id"]
+        );
+
+        // Solo contratados por reclutador
+        const hiredDomain = [
+            ...domain,
+            ["application_status", "=", "hired"]
+        ];
+        const hiredData = await this.orm.readGroup(
+            "hr.applicant",
+            hiredDomain,
+            ["user_id"],
+            ["user_id"]
+        );
+
+        const hiredMap = {};
+        for (const r of hiredData) {
+            const key = (r.user_id && r.user_id[1]) || "Desconocido";
+            hiredMap[key] = r.user_id_count;
+        }
+
+        // Calcula porcentaje y prepara datos para tooltip
+        const recruiterStats = totalData.map(r => {
+            const label = (r.user_id && r.user_id[1]) || "Desconocido";
+            const total = r.user_id_count;
+            const hired = hiredMap[label] || 0;
+            const percentage = total > 0 ? ((hired / total) * 100).toFixed(2) : "0.00";
+            return { label, total, hired, percentage };
+        });
+
+        const labels = totalData.map(r => (r.user_id && r.user_id[1]) || "Desconocido");
+        const totalCounts = totalData.map(r => r.user_id_count);
+        const hiredCounts = totalData.map(r => hiredMap[(r.user_id && r.user_id[1]) || "Desconocido"] || 0);
 
         this.state.topRecruitments = {
             data: {
-                labels: data.map(item => item.user_id[1] || "Desconocido"),
+                labels: labels,
                 datasets: [
                     {
-                        label: "Postulaciones",
-                        data: data.map(item => item.user_id_count),
-                        backgroundColor: this.getPastelColors(data.length)
+                        label: "Total Postulaciones",
+                        data: totalCounts,
+                        backgroundColor: "hsl(210, 70%, 85%)"
+                    },
+                    {
+                        label: "Contratados",
+                        data: hiredCounts,
+                        backgroundColor: "hsl(140, 70%, 85%)"
                     }
                 ]
+            },
+            options: {
+                indexAxis: 'y',
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            afterBody: (context) => {
+                                const idx = context[0].dataIndex;
+                                const stat = recruiterStats[idx];
+                                return `Porcentaje de contratación: ${stat.percentage}%`;
+                            }
+                        }
+                    }
+                }
             }
         };
     }

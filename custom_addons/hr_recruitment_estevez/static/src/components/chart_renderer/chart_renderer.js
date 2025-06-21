@@ -15,27 +15,46 @@ export class ChartRenderer extends Component {
     }
 
     renderChart(){
-        new Chart(this.chartRef.el,
-        {
-          type: this.props.type,
-          data: this.props.config.data,
-          options: {
-            indexAxis: 'y',
-            responsive: true,
-            plugins: {
+      // Opciones por defecto
+      const defaultOptions = {
+          indexAxis: 'y',
+          responsive: true,
+          plugins: {
               legend: {
-                position: 'bottom',
+                  position: 'bottom',
               },
               title: {
-                display: true,
-                text: this.props.title,
-                position: 'bottom',
+                  display: true,
+                  text: this.props.title,
+                  position: 'bottom',
               }
-            }
-          },
-        }
-      );
-    }
+          }
+      };
+      // Mezcla las opciones por defecto con las que recibes por props (si existen)
+      const options = {
+          ...defaultOptions,
+          ...(this.props.config.options || {}),
+          plugins: {
+              ...defaultOptions.plugins,
+              ...(this.props.config.options?.plugins || {}),
+              legend: {
+                  ...defaultOptions.plugins.legend,
+                  ...(this.props.config.options?.plugins?.legend || {}),
+              },
+              title: {
+                  ...defaultOptions.plugins.title,
+                  ...(this.props.config.options?.plugins?.title || {}),
+              }
+          }
+      };
+
+      new Chart(this.chartRef.el, {
+        type: this.props.type,
+        data: this.props.config.data,
+        options: options,
+      }
+    );
+  }
 }
 
 ChartRenderer.template = "owl.ChartRenderer"
