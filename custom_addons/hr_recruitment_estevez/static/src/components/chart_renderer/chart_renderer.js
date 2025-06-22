@@ -8,7 +8,9 @@ export class ChartRenderer extends Component {
         this.chartRef = useRef("chart");
         this.chartInstance = null;
         onWillStart(async ()=>{
-            await loadJS("https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js")
+            await loadJS("https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js");
+            await loadJS("https://cdn.jsdelivr.net/npm/chartjs-chart-funnel@4.2.4/build/index.umd.min.js");
+            await loadJS("https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js");
         })
 
         onMounted(()=>this.renderChart());
@@ -16,6 +18,9 @@ export class ChartRenderer extends Component {
     }
 
     renderChart() {
+        if (window.Chart && window.Chart.register && window.ChartDataLabels) {
+            window.Chart.register(window.ChartDataLabels);
+        }
         // Destruye la instancia previa si existe
         if (this.chartInstance) {
             this.chartInstance.destroy();

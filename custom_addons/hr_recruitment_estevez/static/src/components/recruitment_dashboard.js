@@ -49,11 +49,20 @@ export class RecruitmentDashboard extends Component {
             averageHiringTime: {
                 value: 0,
             },
+            // Postulaciones por Reclutador
+            topRecruitments: {},
             // Fuentes de Reclutamiento
             sourceRecruitment: {},
             indicatorsSourceRecruitment: {
                 sources: []
             },
+            // Motivos de Rechazo
+            rejectionReasons: {
+                candidate: {},
+                company: {},
+            },
+            // Embudo de Etaoas
+            funnelRecruitment: {},
 
             startDate: startOfMonth,
             endDate: endOfMonth,
@@ -85,7 +94,9 @@ export class RecruitmentDashboard extends Component {
             this.getPreselectedApplicants(),
             this.getRejectedApplicants(),
             this.getHiredApplicants(),
-            this.getAverageHiringTime()
+            this.getAverageHiringTime(),
+            this.getRejectionReasons(),
+            this.getFunnelRecruitment()
         ]);
     }
 
@@ -96,6 +107,78 @@ export class RecruitmentDashboard extends Component {
             colors.push(`hsl(${hue}, 70%, 85%)`);
         }
         return colors;
+    }
+
+    async getFunnelRecruitment() {
+        // 1. Obtener todas las etapas ordenadas por secuencia
+        const stages = await this.orm.searchRead(
+            "hr.recruitment.stage",
+            [],
+            ["id", "name", "sequence"]
+        );
+        stages.sort((a, b) => a.sequence - b.sequence);
+
+        // 2. Agrupar applicants por etapa
+        let domain = [];
+        domain = this._addDateRangeToDomain(domain);
+
+        const data = await this.orm.readGroup(
+            "hr.applicant",
+            domain,
+            ["stage_id"],
+            ["stage_id"]
+        );
+
+        // 3. Mapear los resultados a las etapas (para que salgan todas aunque estén en 0)
+        const stageCountMap = {};
+        for (const r of data) {
+            if (r.stage_id && r.stage_id[0]) {
+                stageCountMap[r.stage_id[0]] = r.stage_id_count;
+            }
+        }
+
+        const labels = stages.map(s => s.name);
+        const counts = stages.map(s => stageCountMap[s.id] || 0);
+        const colors = this.getPastelColors(labels.length);
+
+        // 4. Guardar en el estado para el funnel
+        this.state.funnelRecruitment = {
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: "Candidatos",
+                    data: counts,
+                    backgroundColor: colors
+                }]
+            },
+            options: {
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: (context) => {
+                                const etapa = labels[context.dataIndex];
+                                const total = counts[context.dataIndex];
+                                return `${etapa}: ${total} candidatos`;
+                            }
+                        }
+                    },
+                    datalabels: {
+                        anchor: 'center',
+                        align: 'center',
+                        color: '#000', // Negro
+                        font: {
+                            weight: 'bold',
+                            size: 10 // Más pequeño
+                        },
+                        formatter: (value, context) => {
+                            const etapa = labels[context.dataIndex];
+                            return `${etapa}\n${value}`;
+                        }
+                    }
+                }
+            }
+        };
     }
 
     async getTopRecruitments() {
@@ -347,6 +430,96 @@ export class RecruitmentDashboard extends Component {
 
         const averageDays = count ? (totalDays / count) : 0;
         this.state.averageHiringTime.value = averageDays.toFixed(2);
+    }
+
+    async getRejectionReasons() {
+        const context = { context: { active_test: false } };
+        let domain = [["application_status", "=", "refused"]];
+        domain = this._addDateRangeToDomain(domain);
+
+        // Agrupa por motivo de rechazo
+        const data = await this.orm.readGroup(
+            "hr.applicant",
+            domain,
+            ["refuse_reason_id"],
+            ["refuse_reason_id"],
+            context
+        );
+
+        // Separa en declinaciones de candidatos y rechazos de empresa
+        const candidateDeclines = [];
+        const companyRejections = [];
+
+        for (const r of data) {
+            const label = (r.refuse_reason_id && r.refuse_reason_id[1]) || "Sin motivo";
+            const count = r.refuse_reason_id_count;
+            if (label.toLowerCase().includes("declino")) {
+                candidateDeclines.push({ label, count });
+            } else {
+                companyRejections.push({ label, count });
+            }
+        }
+
+        // Datos para ChartRenderer
+        const pastelCandidate = this.getPastelColors(candidateDeclines.length);
+        const pastelCompany = this.getPastelColors(companyRejections.length);
+
+        // Calcula el total de cada grupo para el porcentaje
+        const totalCandidate = candidateDeclines.reduce((sum, x) => sum + x.count, 0);
+        const totalCompany = companyRejections.reduce((sum, x) => sum + x.count, 0);
+
+        this.state.rejectionReasons.candidate = {
+            data: {
+                labels: candidateDeclines.map(x => x.label),
+                datasets: [{
+                    label: "Declinaciones Candidatos",
+                    data: candidateDeclines.map(x => x.count),
+                    backgroundColor: pastelCandidate
+                }]
+            },
+            options: {
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            afterBody: (context) => {
+                                const idx = context[0].dataIndex;
+                                const count = candidateDeclines[idx].count;
+                                const percent = totalCandidate > 0 ? ((count / totalCandidate) * 100).toFixed(2) : "0.00";
+                                return `Porcentaje de rechazo: ${percent}%`;
+                            }
+                        }
+                    }
+                }
+            }
+        };
+
+        this.state.rejectionReasons.company = {
+            data: {
+                labels: companyRejections.map(x => x.label),
+                datasets: [{
+                    label: "Rechazos Empresa",
+                    data: companyRejections.map(x => x.count),
+                    backgroundColor: pastelCompany
+                }]
+            },
+            options: {
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            afterBody: (context) => {
+                                const idx = context[0].dataIndex;
+                                const count = companyRejections[idx].count;
+                                const percent = totalCompany > 0 ? ((count / totalCompany) * 100).toFixed(2) : "0.00";
+                                return `Porcentaje de rechazo: ${percent}%`;
+                            }
+                        }
+                    }
+                }
+            }
+        };
+
+        // Forzar refresco
+        this.state.rejectionReasons = { ...this.state.rejectionReasons };
     }
 
     viewTotalApplicants() {

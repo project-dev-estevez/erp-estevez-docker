@@ -2,9 +2,10 @@
 
 <templates xml:space="preserve">
     <t t-name="recruitment.dashboard" owl="1">
-        <div class="vh-100 overflow-auto bg-muted">
+        <div class="vh-100 overflow-auto bg-muted mb-5 pb-5">
             <div class="row m-3">
                 <div class="col-lg-12">
+                    <!-- Titulo y filtro -->
                     <div class="row">
                         <div class="col m-0 p-0">
                             <div class="shadow-sm border m-2 p-4 bg-white">
@@ -33,6 +34,7 @@
                             </div>
                         </div>
                     </div>
+                    <!-- KPIs principales -->
                     <div class="row">
                         <div class="col">
                             <KpiCard onClick.bind="viewTotalApplicants"
@@ -82,6 +84,7 @@
                                      showPercentage="false"/>
                         </div>
                     </div>
+                    <!-- Postulaciones por reclutador y fuentes de reclutamiento -->
                     <div class="row">
                         <div class="col-lg-6 m-0 p-0">
                             <div class="shadow-sm border m-2 p-4 bg-white">
@@ -97,7 +100,7 @@
                         <div class="col-lg-6 m-0 p-0">
                             <div class="shadow-sm border m-2 p-4 bg-white">
                                 <div class="d-flex align-items-center justify-content-between">
-                                    <!-- <h3 class="text-primary fw-bold">Fuentes de Reclutamiento</h3> -->
+                                    <h3 class="text-primary fw-bold">Fuentes</h3>
                                     <div class="px-3 py-1 bg-primary cursor-pointer">
                                         <span class="fa fa-arrow-right text-white"/>
                                     </div>
@@ -136,6 +139,42 @@
                             </div>
                         </div>
                     </div>
+                    <!-- Motivos de rechazo y embudo de contratación... -->
+                    <div class="row">
+                        <div class="col-lg-6 m-0 p-0">
+                            <div class="shadow-sm border m-2 p-4 bg-white">
+                                <div class="d-flex align-items-center justify-content-center">
+                                    <h3 class="text-primary text-center fw-bold">Motivos de Rechazo</h3>
+                                </div>
+                                <div class="row mt-2">
+                                    <div class="col">
+                                        <!-- <div class="text-center">
+                                            <span class="h4">Declinaciones Candidatos</span>
+                                        </div> -->
+                                        <ChartRenderer type="'bar'" config="state.rejectionReasons.candidate"/>
+                                    </div>
+                                    <div class="col">
+                                        <!-- <div class="text-center">
+                                            <span class="h4">Declinaciones Empresa</span>
+                                        </div> -->
+                                        <ChartRenderer type="'bar'" config="state.rejectionReasons.company"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6 m-0 p-0">
+                            <div class="shadow-sm border m-2 p-4 bg-white">
+                                <div class="d-flex align-items-center justify-content-center">
+                                    <h3 class="text-primary fw-bold">Embudo de Etapas</h3>
+                                    <!-- <div class="px-3 py-1 bg-primary cursor-pointer">
+                                        <span class="fa fa-arrow-right text-white"/>
+                                    </div> -->
+                                </div>
+                                <ChartRenderer type="'funnel'" config="state.funnelRecruitment"/>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </div>
