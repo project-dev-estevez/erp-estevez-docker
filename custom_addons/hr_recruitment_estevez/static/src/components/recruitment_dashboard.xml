@@ -8,25 +8,25 @@
                     <div class="row">
                         <div class="col m-0 p-0">
                             <div class="shadow-sm border m-2 p-4 bg-white">
-                                <div class="d-flex align-items-center justify-content-between">
-                                    <h1 class="text-primary fw-bold">Dashboard Reclutamiento</h1>
-                                    <div class="d-flex gap-2">
+                                <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-md-between">
+                                    <h1 class="text-primary fw-bold mb-3 mb-md-0 text-center text-md-start">Dashboard Reclutamiento</h1>
+                                    <div class="d-flex gap-2 w-100 w-md-auto justify-content-center">
                                         <div>
                                             <label class="form-label mb-0 me-2">Desde:</label>
                                             <input type="date" 
-                                                   t-model="state.startDate" 
-                                                   class="form-control" 
-                                                   style="min-width: 170px;" 
-                                                   t-on-change="onDateRangeChange"/>
+                                                t-model="state.startDate" 
+                                                class="form-control" 
+                                                style="min-width: 170px;" 
+                                                t-on-change="onDateRangeChange"/>
                                         </div>
                                         <div>
                                             <label class="form-label mb-0 me-2">Hasta:</label>
                                             <input type="date" 
-                                                   t-model="state.endDate" 
-                                                   class="form-control" 
-                                                   style="min-width: 170px;" 
-                                                   t-on-change="onDateRangeChange"
-                                                   t-att-min="state.startDate"/>
+                                                t-model="state.endDate" 
+                                                class="form-control" 
+                                                style="min-width: 170px;" 
+                                                t-on-change="onDateRangeChange"
+                                                t-att-min="state.startDate"/>
                                         </div>
                                     </div>
                                 </div>
@@ -34,42 +34,53 @@
                         </div>
                     </div>
                     <div class="row">
-                        <!-- Vacantes cubiertas en un rango de tiempo -->
-                        <KpiCard onClick.bind="viewTotalApplicants"
-                                 name="'Postulaciones'" 
-                                 value="state.totalApplicants.value" 
-                                 percentage="state.totalApplicants.percentage"
-                                 showPercentage="false"/>
+                        <div class="col">
+                            <KpiCard onClick.bind="viewTotalApplicants"
+                                     name="'Postulaciones'" 
+                                     value="state.totalApplicants.value" 
+                                     percentage="state.totalApplicants.percentage"
+                                     showPercentage="false"/>
+                        </div>
 
-                        <KpiCard onClick.bind="viewInProgressApplicants"
-                                 name="'En Progreso'" 
-                                 value="state.inProgressApplicants.value" 
-                                 percentage="state.inProgressApplicants.percentage"
-                                 showPercentage="false"/>
+                        <div class="col">
+                            <KpiCard onClick.bind="viewInProgressApplicants"
+                                     name="'En Progreso'" 
+                                     value="state.inProgressApplicants.value" 
+                                     percentage="state.inProgressApplicants.percentage"
+                                     showPercentage="false"/>
+                        </div>
 
-                        <KpiCard onClick.bind="viewPreselectedApplicants"
-                                 name="'Preseleccionados'" 
-                                 value="state.preselectedApplicants.value" 
-                                 percentage="state.preselectedApplicants.percentage"
-                                 showPercentage="false"/>
+                        <div class="col">
+                            <KpiCard onClick.bind="viewPreselectedApplicants"
+                                     name="'Preseleccionados'" 
+                                     value="state.preselectedApplicants.value" 
+                                     percentage="state.preselectedApplicants.percentage"
+                                     showPercentage="false"/>
+                        </div>
 
-                        <KpiCard onClick.bind="viewRejectedApplicants"
-                                 name="'Rechazados'" 
-                                 value="state.rejectedApplicants.value" 
-                                 percentage="state.rejectedApplicants.percentage"
-                                 showPercentage="false"/>
+                        <div class="col">
+                            <KpiCard onClick.bind="viewRejectedApplicants"
+                                     name="'Rechazados'" 
+                                     value="state.rejectedApplicants.value" 
+                                     percentage="state.rejectedApplicants.percentage"
+                                     showPercentage="false"/>
+                        </div>
 
-                        <KpiCard onClick.bind="viewHiredApplicants"
-                                 name="'Contratados'" 
-                                 value="state.hiredApplicants.value" 
-                                 percentage="state.hiredApplicants.percentage"
-                                 showPercentage="false"/>
+                        <div class="col">
+                            <KpiCard onClick.bind="viewHiredApplicants"
+                                     name="'Contratados'" 
+                                     value="state.hiredApplicants.value" 
+                                     percentage="state.hiredApplicants.percentage"
+                                     showPercentage="false"/>
+                        </div>
 
-                        <KpiCard onClick.bind="viewAverageHiringTime"
-                                 name="'Tiempo Promedio de Contratación'" 
-                                 value="state.averageHiringTime.value" 
-                                 percentage="state.averageHiringTime.previousValue"
-                                 showPercentage="false"/>
+                        <div class="col">
+                            <KpiCard onClick.bind="viewAverageHiringTime"
+                                     name="'Tiempo Promedio'" 
+                                     value="state.averageHiringTime.value" 
+                                     percentage="state.averageHiringTime.previousValue"
+                                     showPercentage="false"/>
+                        </div>
                     </div>
                     <div class="row">
                         <div class="col-lg-6 m-0 p-0">
@@ -86,7 +97,7 @@
                         <div class="col-lg-6 m-0 p-0">
                             <div class="shadow-sm border m-2 p-4 bg-white">
                                 <div class="d-flex align-items-center justify-content-between">
-                                    <h3 class="text-primary fw-bold">Fuentes de Reclutamiento</h3>
+                                    <!-- <h3 class="text-primary fw-bold">Fuentes de Reclutamiento</h3> -->
                                     <div class="px-3 py-1 bg-primary cursor-pointer">
                                         <span class="fa fa-arrow-right text-white"/>
                                     </div>
@@ -98,26 +109,28 @@
                                     </div>
                                     <div class="col-12 col-md-6">
                                         <h3 class="text-primary fw-bold">Inidicadores de Reclutamiento</h3>
-                                        <table class="table table-borderless align-middle">
-                                            <thead>
-                                                <tr>
-                                                    <th>Fuente</th>
-                                                    <th class="text-end"># Candidatos</th>
-                                                    <th class="text-end"># Contratados</th>
-                                                    <th class="text-end">% Contratación</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <t t-foreach="state.indicatorsSourceRecruitment.sources" t-as="item" t-key="item.label">
+                                        <div class="table-responsive">
+                                            <table class="table table-borderless align-middle">
+                                                <thead>
                                                     <tr>
-                                                        <td><span t-esc="item.label"/></td>
-                                                        <td class="text-end"><span t-esc="item.total"/></td>
-                                                        <td class="text-end"><span t-esc="item.hired"/></td>
-                                                        <td class="text-end"><span t-esc="item.percentage"/>%</td>
+                                                        <th>Fuente</th>
+                                                        <th class="text-end"># Candidatos</th>
+                                                        <th class="text-end"># Contratados</th>
+                                                        <th class="text-end">% Contratación</th>
                                                     </tr>
-                                                </t>
-                                            </tbody>
-                                        </table>
+                                                </thead>
+                                                <tbody>
+                                                    <t t-foreach="state.indicatorsSourceRecruitment.sources" t-as="item" t-key="item.label">
+                                                        <tr>
+                                                            <td><span t-esc="item.label"/></td>
+                                                            <td class="text-end"><span t-esc="item.total"/></td>
+                                                            <td class="text-end"><span t-esc="item.hired"/></td>
+                                                            <td class="text-end"><span t-esc="item.percentage"/>%</td>
+                                                        </tr>
+                                                    </t>
+                                                </tbody>
+                                            </table>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
