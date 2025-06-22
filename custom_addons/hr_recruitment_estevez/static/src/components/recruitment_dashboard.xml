@@ -117,7 +117,7 @@
                                                 <thead>
                                                     <tr>
                                                         <th>Fuente</th>
-                                                        <th class="text-end"># Candidatos</th>
+                                                        <!-- <th class="text-end"># Candidatos</th> -->
                                                         <th class="text-end"># Contratados</th>
                                                         <th class="text-end">% Contratación</th>
                                                     </tr>
@@ -126,7 +126,7 @@
                                                     <t t-foreach="state.indicatorsSourceRecruitment.sources" t-as="item" t-key="item.label">
                                                         <tr>
                                                             <td><span t-esc="item.label"/></td>
-                                                            <td class="text-end"><span t-esc="item.total"/></td>
+                                                            <!-- <td class="text-end"><span t-esc="item.total"/></td> -->
                                                             <td class="text-end"><span t-esc="item.hired"/></td>
                                                             <td class="text-end"><span t-esc="item.percentage"/>%</td>
                                                         </tr>
