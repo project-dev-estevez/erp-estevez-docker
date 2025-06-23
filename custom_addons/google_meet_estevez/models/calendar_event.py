@@ -16,6 +16,7 @@ class CalendarEvent(models.Model):
         help="Genera un enlace de Google Meet al sincronizar"
     )
     
+    
     # Método mejorado para crear Google Meet
     def _create_google_meet(self):
         if not self.is_google_meet or self.videocall_location or not self.google_id:
@@ -99,3 +100,16 @@ class CalendarEvent(models.Model):
             # Intentar crear Meet después de sincronizar
             self._create_google_meet()
         return res
+    
+    def _compute_show_meet_button(self):
+        for event in self:
+            event.show_meet_button = (
+                event.is_google_meet and 
+                not event.videocall_location and
+                event.google_id
+            )
+    
+    show_meet_button = fields.Boolean(
+        compute="_compute_show_meet_button",
+        string="Mostrar botón Meet"
+    )
