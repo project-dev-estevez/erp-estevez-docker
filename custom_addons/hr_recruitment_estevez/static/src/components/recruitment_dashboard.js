@@ -259,6 +259,40 @@ export class RecruitmentDashboard extends Component {
                             }
                         }
                     }
+                },
+                onClick: async (event, elements) => {
+                    if (elements.length === 0) return;
+                    const element = elements[0];
+                    const index = element.index;
+                    const datasetIndex = element.datasetIndex;
+                    const stat = this.state.topRecruitments.recruiterStats[index];
+                    
+                    // Determinar qué dataset se hizo clic (0 = Postulaciones, 1 = Contratados)
+                    const status = datasetIndex === 0 ? 'all' : 'hired';
+                    
+                    // Construir dominio de búsqueda
+                    let domain = [];
+                    if (stat.user_id) {
+                        domain.push(['user_id', '=', stat.user_id[0]]);
+                    } else {
+                        domain.push(['user_id', '=', false]);
+                    }
+                    
+                    if (status === 'hired') {
+                        domain.push(['application_status', '=', 'hired']);
+                    }
+                    
+                    // Abrir vista de postulantes
+                    this.actionService.doAction({
+                        type: 'ir.actions.act_window',
+                        name: datasetIndex === 0 ? 'Postulaciones' : 'Contratados',
+                        res_model: 'hr.applicant',
+                        views: [[false, 'list'], [false, 'form']],
+                        domain: domain,
+                        context: {
+                            search_default_user_id: true
+                        }
+                    });
                 }
             }
         };
