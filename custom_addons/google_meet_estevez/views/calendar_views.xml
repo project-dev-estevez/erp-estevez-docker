@@ -1,34 +1,33 @@
-<record id="view_calendar_event_form_inherited" model="ir.ui.view">
-    <field name="name">calendar.event.form.inherit.meet</field>
-    <field name="model">calendar.event</field>
-    <field name="inherit_id" ref="calendar.view_calendar_event_form"/>
-    <field name="arch" type="xml">
-        <!-- Botón para generar Meet -->
-        <xpath expr="//field[@name='location']" position="after">
-            <button 
-                name="force_create_meet"
-                string="Generar Meet ahora" 
-                type="object" 
-                class="btn-primary"
-                attrs="{
-                    'invisible': [
-                        '|', 
-                        ('videocall_location', '!=', False),
-                        ('is_google_meet', '=', False)
-                    ]
-                }"/>
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_calendar_event_form_inherited" model="ir.ui.view">
+        <field name="name">calendar.event.form.inherit.meet</field>
+        <field name="model">calendar.event</field>
+        <field name="inherit_id" ref="calendar.view_calendar_event_form"/>
+        <field name="arch" type="xml">
+            
+            <!-- Campo is_google_meet primero -->
+            <xpath expr="//field[@name='location']" position="before">
+                <field name="is_google_meet"/>
+            </xpath>
+            
+            <!-- Botón y campo Meet después -->
+            <xpath expr="//field[@name='location']" position="after">
+                <button 
+                    name="force_create_meet"
+                    string="Generar Meet ahora" 
+                    type="object" 
+                    class="btn-primary"
+                    attrs="{'invisible': ['|', ('videocall_location', '!=', False), ('is_google_meet', '=', False)]}"/>
+                <field name="videocall_location" widget="url" string="Enlace Meet" readonly="1"/>
                 <button 
                     name="force_create_meet"
                     string="Generar Meet ahora2" 
                     type="object" 
                     class="btn-primary"
                     attrs="{'invisible': [('show_meet_button', '=', False)]}"/>
-            <field name="videocall_location" widget="url" string="Enlace Meet" readonly="1"/>
-        </xpath>
-        
-        <!-- Añade el campo is_google_meet si no está visible -->
-        <xpath expr="//field[@name='location']" position="before">
-            <field name="is_google_meet"/>
-        </xpath>
-    </field>
-</record>
+            </xpath>
+            
+        </field>
+    </record>
+</odoo>
