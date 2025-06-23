@@ -5,15 +5,16 @@
         <field name="inherit_id" ref="calendar.view_calendar_event_form"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='location']" position="after">
-                <div class="o_row">
-                    <field name="is_google_meet" string="Usar Google Meet"/>
-                    <field name="videocall_location" string="Enlace Meet" 
-                           invisible="[('is_google_meet', '=', False)]" 
-                           widget="url"/>
-                    <button name="force_create_meet" string="Generar Meet Ahora" 
-                            type="object" 
-                            class="oe_highlight"
-                            invisible="[('videocall_location', '!=', False)]"/>
+                <div class="o_row" style="margin: 10px 0; padding: 10px; background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 5px;">
+                    <div class="d-flex align-items-center">
+                        <field name="is_google_meet" string="Usar Google Meet" class="me-3"/>
+                        <button name="force_create_meet" 
+                                string="Generar Meet Ahora" 
+                                type="object" 
+                                class="btn btn-primary"
+                                invisible="[('videocall_location', '!=', False)]"/>
+                    </div>
+                    <field name="videocall_location" string="Enlace Google Meet" widget="url" class="mt-2" readonly="1"/>
                 </div>
             </xpath>
         </field>
