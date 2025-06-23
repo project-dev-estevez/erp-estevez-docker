@@ -10,11 +10,27 @@ _logger = logging.getLogger(__name__)
 class CalendarEvent(models.Model):
     _inherit = 'calendar.event'
     
+    # Mantener campos existentes
     is_google_meet = fields.Boolean(
         string="Usar Google Meet",
-        default=True,
-        help="Genera un enlace de Google Meet al sincronizar"
+        default=True
     )
+    
+    # Campo computado para control de visibilidad
+    show_meet_button = fields.Boolean(
+        string="Mostrar botón Meet",
+        compute="_compute_show_meet_button",
+        store=True
+    )
+    
+    @api.depends('is_google_meet', 'videocall_location', 'google_id')
+    def _compute_show_meet_button(self):
+        for event in self:
+            event.show_meet_button = (
+                event.is_google_meet and 
+                not event.videocall_location and
+                bool(event.google_id)
+            )
     
     
     # Método mejorado para crear Google Meet

@@ -18,14 +18,8 @@
                     string="Generar Meet ahora" 
                     type="object" 
                     class="btn-primary"
-                    attrs="{'invisible': ['|', ('videocall_location', '!=', False), ('is_google_meet', '=', False)]}"/>
+                    invisible="show_meet_button == False"/>
                 <field name="videocall_location" widget="url" string="Enlace Meet" readonly="1"/>
-                <button 
-                    name="force_create_meet"
-                    string="Generar Meet ahora2" 
-                    type="object" 
-                    class="btn-primary"
-                    attrs="{'invisible': [('show_meet_button', '=', False)]}"/>
             </xpath>
             
         </field>
