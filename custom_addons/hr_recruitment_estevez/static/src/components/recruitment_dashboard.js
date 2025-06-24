@@ -78,14 +78,15 @@ export class RecruitmentDashboard extends Component {
 
     async openRecruitmentList(userId, onlyHired) {
         // 1) Arranca con el filtro de fecha
-        let domain = [];
+        let domain = [
+            "|",
+            ["active", "=", true],
+            ["application_status", "=", "refused"]
+          ];
         domain = this._addDateRangeToDomain(domain);
     
         // 2) Filtra por reclutador y registro activo
-        domain.push(
-          ["user_id", "=", userId],
-          ["active", "=", true]
-        );
+        domain.push(["user_id", "=", userId]);
     
         // 3) Si venías del dataset de “Contratados”, añade también ese filtro
         if (onlyHired) {
@@ -95,7 +96,7 @@ export class RecruitmentDashboard extends Component {
         // 4) Lanza la acción con la lista de vistas
         await this.actionService.doAction({
             type: 'ir.actions.act_window',
-            name: 'Postulaciones de ' + (onlyHired ? 'Contratados' : 'Todos'),
+            name: onlyHired ? 'Contratados' : 'Postulaciones',
             res_model: 'hr.applicant',
             views: [[false, 'list'], [false, 'form']],
             domain: domain,
