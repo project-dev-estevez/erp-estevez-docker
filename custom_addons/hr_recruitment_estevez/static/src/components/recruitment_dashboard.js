@@ -104,6 +104,28 @@ export class RecruitmentDashboard extends Component {
         });
     }
 
+    async openSourceRecruitmentList(sourceId) {
+        let domain = [];
+        domain = this._addDateRangeToDomain(domain);
+    
+        // Filtra por source_id
+        if (sourceId) {
+            domain.push(["source_id", "=", sourceId]);
+        } else {
+            // opcional: mostrar también los sin fuente
+            domain.push(["source_id", "=", false]);
+        }
+    
+        await this.actionService.doAction({
+            type: 'ir.actions.act_window',
+            name: 'Postulaciones por Fuente',
+            res_model: 'hr.applicant',
+            views: [[false, 'list'], [false, 'form']],
+            domain: domain,
+            context: { active_test: false },
+        });
+    }
+
     onDateRangeChange() {
         if (this.state.startDate && this.state.endDate && this.state.endDate < this.state.startDate) {
             // Corrige automáticamente o muestra un mensaje
@@ -303,37 +325,54 @@ export class RecruitmentDashboard extends Component {
             ["active", "=", true],
             ["application_status", "=", "refused"]
         ];
-
         domain = this._addDateRangeToDomain(domain);
-
+    
         const data = await this.orm.readGroup(
             "hr.applicant",
             domain,
             ["source_id"],
             ["source_id"]
         );
-
+    
+        // Ahora guardamos el id junto con el label y el count:
         const sourcesData = data.map(r => ({
-            label: (r.source_id && r.source_id[1]) || "Sin fuente",
-            count: r.source_id_count,
-            sourceId: r.source_id ? r.source_id[0] : null
+            sourceId:   r.source_id ? r.source_id[0] : null,
+            label:      (r.source_id && r.source_id[1]) || "Sin fuente",
+            count:      r.source_id_count,
         }));
-
-        // Si no hay datos, asegúrate de pasar arrays vacíos
-        const labels = sourcesData.length ? sourcesData.map(item => item.label) : [];
-        const counts = sourcesData.length ? sourcesData.map(item => item.count) : [];
-        const colors = sourcesData.length ? this.getPastelColors(sourcesData.length) : [];
-
+    
+        const labels = sourcesData.map(s => s.label);
+        const counts = sourcesData.map(s => s.count);
+        const colors = this.getPastelColors(labels.length);
+    
         this.state.sourceRecruitment = {
             data: {
-                labels: labels,
-                datasets: [
-                    {
-                        label: "Fuentes de Postulación",
-                        data: counts,
-                        backgroundColor: colors
+                labels,
+                datasets: [{
+                    label: "Fuentes de Postulación",
+                    data: counts,
+                    backgroundColor: colors,
+                }]
+            },
+            // guardamos meta con el sourceId
+            meta: sourcesData,
+            options: {
+                onClick: (event, activeElements) => {
+                    if (!activeElements.length) return;
+                    const { index } = activeElements[0];
+                    const src = this.state.sourceRecruitment.meta[index];
+                    this.openSourceRecruitmentList(src.sourceId);
+                },
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: ctx => {
+                                const src = sourcesData[ctx.dataIndex];
+                                return `${src.label}: ${src.count}`;
+                            }
+                        }
                     }
-                ]
+                }
             }
         };
         // Forzar refresco
