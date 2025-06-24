@@ -596,7 +596,7 @@ export class RecruitmentDashboard extends Component {
         let domain = [];
         domain = this._addDateRangeToDomain(domain);
 
-        this.actionservice.doAction({
+        this.actionService.doAction({
             type: "ir.actions.act_window",
             name: "Postulaciones",
             res_model: "hr.applicant",
@@ -610,7 +610,7 @@ export class RecruitmentDashboard extends Component {
         let domain = [["application_status", "=", "ongoing"]];
         domain = this._addDateRangeToDomain(domain);
 
-        this.actionservice.doAction({
+        this.actionService.doAction({
             type: "ir.actions.act_window",
             name: "Postulaciones en Progreso",
             res_model: "hr.applicant",
@@ -626,7 +626,7 @@ export class RecruitmentDashboard extends Component {
         ];
         domain = this._addDateRangeToDomain(domain);
 
-        this.actionservice.doAction({
+        this.actionService.doAction({
             type: "ir.actions.act_window",
             name: "Postulaciones Preseleccionadas",
             res_model: "hr.applicant",
@@ -640,7 +640,7 @@ export class RecruitmentDashboard extends Component {
         let domain = [["application_status", "=", "refused"]];
         domain = this._addDateRangeToDomain(domain);
 
-        this.actionservice.doAction({
+        this.actionService.doAction({
             type: "ir.actions.act_window",
             name: "Postulaciones Rechazadas",
             res_model: "hr.applicant",
@@ -654,7 +654,7 @@ export class RecruitmentDashboard extends Component {
         let domain = [["application_status", "=", "hired"]];
         domain = this._addDateRangeToDomain(domain);
 
-        this.actionservice.doAction({
+        this.actionService.doAction({
             type: "ir.actions.act_window",
             name: "Postulaciones Contratadas",
             res_model: "hr.applicant",
