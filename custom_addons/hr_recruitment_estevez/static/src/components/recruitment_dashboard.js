@@ -69,10 +69,33 @@ export class RecruitmentDashboard extends Component {
         })
 
         this.orm = useService("orm");
-        this.actionservice = useService("action");
+        this.actionService = useService("action");
 
         onWillStart(async () => {
             await this.loadAllData();
+        });
+    }
+
+    async openRecruitmentList(userId, onlyHired) {
+        const domain = [
+            ["user_id", "=", userId],
+            ["active", "=", true],
+        ];
+        if (onlyHired) {
+            domain.push(["application_status", "=", "hired"]);
+        }
+        await this.actionService.doAction({
+            type: 'ir.actions.act_window',
+            name: 'Applicants',
+            res_model: 'hr.applicant',
+            domain: domain,
+            views: [
+                [false, 'list'], 
+                [false, 'form']
+            ],
+            context: {
+                active_test: false
+            },
         });
     }
 
@@ -218,81 +241,49 @@ export class RecruitmentDashboard extends Component {
 
         // Calcula porcentaje y prepara datos para tooltip
         const recruiterStats = totalData.map(r => {
-            const label = (r.user_id && r.user_id[1]) || "Desconocido";
+            const id   = (r.user_id && r.user_id[0]) || false;
+            const name = (r.user_id && r.user_id[1]) || "Desconocido";
             const total = r.user_id_count;
-            const hired = hiredMap[label] || 0;
+            const hired = hiredMap[name] || 0;
             const percentage = total > 0 ? ((hired / total) * 100).toFixed(2) : "0.00";
-            return { label, total, hired, percentage };
+            return { id, name, total, hired, percentage };
         });
 
         // Si no hay datos, asegúrate de pasar arrays vacíos
-        const labels = recruiterStats.length ? recruiterStats.map(r => r.label) : [];
+        const labels = recruiterStats.length ? recruiterStats.map(r => r.name) : [];
         const totalCounts = recruiterStats.length ? recruiterStats.map(r => r.total) : [];
         const hiredCounts = recruiterStats.length ? recruiterStats.map(r => r.hired) : [];
 
 
+        
         this.state.topRecruitments = {
-            data: {
-                labels: labels,
-                datasets: [
-                    {
-                        label: "Total Postulaciones",
-                        data: totalCounts,
-                        backgroundColor: "hsl(210, 70%, 85%)"
-                    },
-                    {
-                        label: "Contratados",
-                        data: hiredCounts,
-                        backgroundColor: "hsl(140, 70%, 85%)"
-                    }
-                ]
-            },
+            data: { labels, datasets: [
+                { label: "Total Postulaciones", data: totalCounts, backgroundColor: "hsl(210,70%,85%)" },
+                { label: "Contratados",          data: hiredCounts, backgroundColor: "hsl(140,70%,85%)" }
+            ]},
+            // lo guardamos aquí:
+            meta: recruiterStats,
             options: {
                 indexAxis: 'y',
+                onClick: (event, activeElements, chart) => {
+                    if (!activeElements.length) {
+                      return;
+                    }
+                    const { datasetIndex, index } = activeElements[0];
+                    const stat = this.state.topRecruitments.meta[index];
+                    // si datasetIndex === 1 => contratados, else total
+                    const onlyHired = datasetIndex === 1;
+                    this.openRecruitmentList(stat.id, onlyHired);
+                  },
                 plugins: {
                     tooltip: {
                         callbacks: {
-                            afterBody: (context) => {
-                                const idx = context[0].dataIndex;
-                                const stat = recruiterStats[idx];
+                            afterBody: ctx => {
+                                const stat = recruiterStats[ctx[0].dataIndex];
                                 return `Porcentaje de contratación: ${stat.percentage}%`;
                             }
                         }
                     }
-                },
-                onClick: async (event, elements) => {
-                    if (elements.length === 0) return;
-                    const element = elements[0];
-                    const index = element.index;
-                    const datasetIndex = element.datasetIndex;
-                    const stat = this.state.topRecruitments.recruiterStats[index];
-                    
-                    // Determinar qué dataset se hizo clic (0 = Postulaciones, 1 = Contratados)
-                    const status = datasetIndex === 0 ? 'all' : 'hired';
-                    
-                    // Construir dominio de búsqueda
-                    let domain = [];
-                    if (stat.user_id) {
-                        domain.push(['user_id', '=', stat.user_id[0]]);
-                    } else {
-                        domain.push(['user_id', '=', false]);
-                    }
-                    
-                    if (status === 'hired') {
-                        domain.push(['application_status', '=', 'hired']);
-                    }
-                    
-                    // Abrir vista de postulantes
-                    this.actionService.doAction({
-                        type: 'ir.actions.act_window',
-                        name: datasetIndex === 0 ? 'Postulaciones' : 'Contratados',
-                        res_model: 'hr.applicant',
-                        views: [[false, 'list'], [false, 'form']],
-                        domain: domain,
-                        context: {
-                            search_default_user_id: true
-                        }
-                    });
                 }
             }
         };
