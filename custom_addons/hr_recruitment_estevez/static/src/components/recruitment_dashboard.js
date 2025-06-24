@@ -126,6 +126,25 @@ export class RecruitmentDashboard extends Component {
         });
     }
 
+    async openRequisitionList(stateCode) {
+        let domain = [];
+        domain = this._addDateRangeToDomain(domain);
+        if (stateCode === 'approved_open') {
+            domain.push(['state', '=', 'approved'], ['is_published', '=', true]);
+        } else if (stateCode === 'approved_closed') {
+            domain.push(['state', '=', 'approved'], ['is_published', '=', false]);
+        } else if (stateCode) {
+            domain.push(['state', '=', stateCode]);
+        }
+        await this.actionService.doAction({
+        type: 'ir.actions.act_window',
+        name: 'Requisiciones',
+        res_model: 'hr.requisition',
+        views: [[false,'list'],[false,'form']],
+        domain: domain,
+        });
+    }
+
     onDateRangeChange() {
         if (this.state.startDate && this.state.endDate && this.state.endDate < this.state.startDate) {
             // Corrige automáticamente o muestra un mensaje
@@ -146,7 +165,8 @@ export class RecruitmentDashboard extends Component {
             this.getHiredApplicants(),
             this.getAverageHiringTime(),
             this.getRejectionReasons(),
-            this.getFunnelRecruitment()
+            this.getFunnelRecruitment(),
+            this.getRequisitionStats()
         ]);
     }
 
@@ -317,6 +337,118 @@ export class RecruitmentDashboard extends Component {
 
         // Forzar refresco
         this.state.topRecruitments = { ...this.state.topRecruitments };
+    }
+
+    async getRequisitionStats() {
+        let domain = [];
+        domain = this._addDateRangeToDomain(domain);
+    
+        const data = await this.orm.readGroup(
+            'hr.requisition',
+            domain,
+            ['state'],
+            ['state']
+        );
+        //Convertir a un map
+        const countMap = {};
+        data.forEach(r => {
+          countMap[r.state] = r.state_count;
+        });
+        //Definir labels y conteos en orden
+        const labels = [
+          'Total',
+          'Por Activar',  // to_approve
+          'Abiertas',     // approved & is_published = true
+          'Cerradas'      // approved & is_published = false
+        ];
+        // Total = suma de todos
+        const total = data.reduce((sum, r) => sum + r.state_count, 0);
+        // Contar cada estado
+        const countToApprove = countMap['to_approve'] || 0;
+        const countApprovedOpen = await this.orm.searchCount(
+          'hr.requisition',
+          [...domain, ['state', '=', 'approved'], ['is_published', '=', true]]
+        );
+        const countApprovedClosed = await this.orm.searchCount(
+          'hr.requisition',
+          [...domain, ['state', '=', 'approved'], ['is_published', '=', false]]
+        );
+        //Guardar meta para el click
+        const meta = [
+          { state: null },               // para “Total”
+          { state: 'to_approve' },
+          { state: 'approved_open' },    // código interno
+          { state: 'approved_closed' },
+        ];
+        const counts = [
+          total,
+          countToApprove,
+          countApprovedOpen,
+          countApprovedClosed,
+        ];
+    
+        this.state.requisitionStats = {
+          data: {
+            labels,
+            datasets: [{
+              label: 'Requisiciones',
+              data: counts,
+              backgroundColor: this.getPastelColors(labels.length),
+            }]
+          },
+          meta,
+          options: {
+            indexAxis: 'x',
+            scales: {
+                x: {
+                  beginAtZero: true,
+                  ticks: { autoSkip: false }
+                },
+                y: {
+                  beginAtZero: true,
+                },
+            },
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'bottom',
+                    labels: {
+                        generateLabels: chart => {
+                            // labels[] = ['Total','Por Activar','Abiertas','Cerradas']
+                            // backgroundColor[] = color por cada barra
+                            const data = chart.data;
+                            return data.labels.map((lbl, i) => ({
+                                text: lbl,
+                                fillStyle: data.datasets[0].backgroundColor[i],
+                                hidden: chart.getDataVisibility(i) === false,
+                                index: i,
+                            }));
+                        }
+                    }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: ctx => `${labels[ctx.dataIndex]}: ${counts[ctx.dataIndex]}`
+                    }
+                }
+            },
+            onClick: (event, active) => {
+              if (!active.length) return;
+              const idx = active[0].index;
+              const item = this.state.requisitionStats.meta[idx];
+              this.openRequisitionList(item.state);
+            },
+            plugins: {
+              tooltip: {
+                callbacks: {
+                  label: ctx => `${labels[ctx.dataIndex]}: ${counts[ctx.dataIndex]}`
+                }
+              }
+            }
+          }
+        };
+        // fuerza el update
+        this.state.requisitionStats = { ...this.state.requisitionStats };
     }
 
     async getSourceRecruitment() {
