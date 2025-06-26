@@ -211,74 +211,76 @@ async openRequisitionList(stateCode) {
     }
 
     async getFunnelRecruitment() {
-        // 1. Obtener todas las etapas ordenadas por secuencia
+        // 1) Determinar jobId desde el select
+        const rawJid = this.state.selectedVacancyId;
+        const jobId  = rawJid && rawJid !== 'false' 
+                     ? parseInt(rawJid, 10) 
+                     : null;
+    
+        // 2) Cargar todas las etapas en orden
         const stages = await this.orm.searchRead(
             "hr.recruitment.stage",
             [],
             ["id", "name", "sequence"]
         );
         stages.sort((a, b) => a.sequence - b.sequence);
-
-        // 2. Agrupar applicants por etapa
-        let domain = [];
-        domain = this._addDateRangeToDomain(domain);
-
+    
+        // 3) Construir dominio: rango de fechas + job_id (si hay)
+        let domain = this._addDateRangeToDomain([]);
+        if (jobId) {
+            domain.push(['job_id', '=', jobId]);
+        }
+    
+        // 4) Leer grupo por etapa
         const data = await this.orm.readGroup(
             "hr.applicant",
             domain,
             ["stage_id"],
             ["stage_id"]
         );
-
-        // 3. Mapear los resultados a las etapas (para que salgan todas aunque estén en 0)
+    
+        // 5) Mapa etapa → conteo
         const stageCountMap = {};
         for (const r of data) {
             if (r.stage_id && r.stage_id[0]) {
                 stageCountMap[r.stage_id[0]] = r.stage_id_count;
             }
         }
-
+    
+        // 6) Generar arrays
         const labels = stages.map(s => s.name);
         const counts = stages.map(s => stageCountMap[s.id] || 0);
         const colors = this.getPastelColors(labels.length);
-
-        // 4. Guardar en el estado para el funnel
-        this.state.funnelRecruitment = {
-            data: {
-                labels: labels,
-                datasets: [{
-                    label: "Candidatos",
-                    data: counts,
-                    backgroundColor: colors
-                }]
-            },
-            options: {
-                plugins: {
-                    legend: { display: false },
-                    tooltip: {
-                        callbacks: {
-                            label: (context) => {
-                                const etapa = labels[context.dataIndex];
-                                const total = counts[context.dataIndex];
-                                return `${etapa}: ${total} candidatos`;
-                            }
+    
+        // 7) Opciones para mostrar % sobre el total de esta vacante
+        const total = counts.reduce((a,b) => a+b, 0) || 1;
+        const options = {
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: ctx => {
+                            const n = counts[ctx.dataIndex];
+                            const pct = ((n/total)*100).toFixed(1);
+                            return `${labels[ctx.dataIndex]}: ${n} candidatos (${pct}%)`;
                         }
-                    },
-                    datalabels: {
-                        anchor: 'center',
-                        align: 'center',
-                        color: '#000', // Negro
-                        font: {
-                            weight: 'bold',
-                            size: 10 // Más pequeño
-                        },
-                        formatter: (value, context) => {
-                            const etapa = labels[context.dataIndex];
-                            return `${etapa}\n${value}`;
-                        }
+                    }
+                },
+                datalabels: {
+                    anchor: 'center',
+                    align: 'center',
+                    formatter: val => {
+                        const pct = ((val/total)*100).toFixed(0);
+                        return `${val}\n${pct}%`;
                     }
                 }
             }
+        };
+    
+        // 8) Actualizar el state
+        this.state.funnelRecruitment = {
+            data: { labels, datasets: [{ label: "Candidatos", data: counts, backgroundColor: colors }] },
+            options
         };
     }
 
