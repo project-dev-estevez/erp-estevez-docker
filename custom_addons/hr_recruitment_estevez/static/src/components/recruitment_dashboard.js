@@ -483,11 +483,11 @@ async openRequisitionList(stateCode) {
     }
 
     async getVacancyMetrics() {
-        // 1) Leer el job seleccionado y parsear a número
+        // Leer el job seleccionado y parsear a número
         const rawJid = this.state.selectedVacancyId;
         const jobId  = rawJid && rawJid !== 'false' ? parseInt(rawJid, 10) : null;
     
-        // 2) Obtener la última requisición aprobada para ese job
+        // Obtener la última requisición aprobada para ese job
         let lastReq = null;
         if (jobId) {
             const reqs = await this.orm.searchRead(
@@ -502,25 +502,24 @@ async openRequisitionList(stateCode) {
             lastReq = reqs[0] || null;
         }
     
-        // 3) Preparar dominio y contexto
         const baseDomain = this._addDateRangeToDomain([]);
         if (jobId) {
             baseDomain.push(['job_id','=', jobId]);
         }
         const rpcContext = { context: { active_test: false } };
     
-        // 4) Declarar variables de métricas
+        // Declarar variables de métricas
         let totalApps = 0, hired = 0, refused = 0;
         let topReason = '';
         let status    = 'Global';
         let openDur   = '';
     
-        // 5) Contar applicants
+        // Contar applicants
         totalApps = await this.orm.searchCount('hr.applicant', baseDomain, rpcContext);
         hired     = await this.orm.searchCount('hr.applicant', [...baseDomain, ['application_status','=', 'hired']], rpcContext);
         refused   = await this.orm.searchCount('hr.applicant', [...baseDomain, ['application_status','=', 'refused']], rpcContext);
     
-        // 6) Agrupar motivos de rechazo
+        // Agrupar motivos de rechazo
         const rg = await this.orm.readGroup(
             'hr.applicant',
             [...baseDomain, ['application_status','=', 'refused']],
@@ -533,23 +532,44 @@ async openRequisitionList(stateCode) {
             topReason = rg[0].refuse_reason_id[1] || '';
         }
     
-        // 7) Estado y duración según la última requisición aprobada
+        // Estado y duración según la última requisición aprobada
         if (lastReq && lastReq.publish_date) {
-            const pub = DateTime.fromISO(lastReq.publish_date);
-            const cls = lastReq.close_date ? DateTime.fromISO(lastReq.close_date) : null;
-            status = cls ? 'Cerrada' : 'Abierta';
-    
-            // Duración en días completos (+1 para incluir el día de publicación)
-            const end     = cls || DateTime.now();
-            const diffObj = end.diff(pub, 'days').toObject();
-            const rawDays = diffObj.days || 0;
-            const diffDays = Math.floor(rawDays) + 1;
-            openDur = `${diffDays} día${diffDays !== 1 ? 's' : ''}`;
+            // Parseamos publish_date y close_date
+            let pubDT = DateTime.fromISO(lastReq.publish_date);
+            if (!pubDT.isValid) {
+                pubDT = DateTime.fromJSDate(new Date(lastReq.publish_date));
+            }
+            let closeDT = lastReq.close_date
+                ? DateTime.fromISO(lastReq.close_date)
+                : null;
+            if (lastReq.close_date && (!closeDT || !closeDT.isValid)) {
+                closeDT = DateTime.fromJSDate(new Date(lastReq.close_date));
+            }
+        
+            // Fecha "base" de comparación: hoy
+            const nowDT = DateTime.now();
+        
+            // Si está cerrada, tiempo desde closeDT hasta hoy
+            // Si está abierta, tiempo desde pubDT hasta hoy
+            const startDT = closeDT ? closeDT : pubDT;
+            status = closeDT ? 'Cerrada' : 'Abierta';
+        
+            // Calculamos diff sobre nowDT - startDT
+            const diff = nowDT.diff(startDT, ['days','hours']).toObject();
+            const days  = Math.floor(diff.days  || 0);
+            const hours = Math.floor(diff.hours || 0);
+        
+            // Formateamos
+            openDur = `${days} día${days !== 1 ? 's' : ''}`;
+            if (hours) {
+                openDur += ` y ${hours} hora${hours !== 1 ? 's' : ''}`;
+            }
         } else if (jobId) {
-            status = 'Por Activar';
+            status  = 'Por Activar';
+            openDur = '—';
         }
     
-        // 8) Actualizar el state
+        // Actualizar el state
         this.state.vacancyMetrics = {
             status,
             openDuration:   openDur,

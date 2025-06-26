@@ -170,37 +170,62 @@
 
                         <div class="col-lg-6 m-0 p-0">
                             <div class="shadow-sm border m-2 p-4 bg-white">
-                          
-                        <label class="form-label">Vacante:</label>
-                        <select class="form-select"
-                                t-model="state.selectedVacancyId"
-                                t-on-change="getVacancyMetrics">
-                            <option t-att-value="false">Todas las vacantes</option>
-                            <t t-foreach="state.vacancyOptions" t-as="v" t-key="v.id">
-                            <option t-att-value="v.id"><t t-esc="v.name"/></option>
-                            </t>
-                        </select>
-                        
-                            <div class="d-flex flex-wrap gap-3">
+                                <!-- Selector -->
+                                <div class="mb-3">
+                                <label class="form-label">Vacante:</label>
+                                <select class="form-select"
+                                        t-model="state.selectedVacancyId"
+                                        t-on-change="getVacancyMetrics">
+                                    <option t-att-value="false">Todas las vacantes</option>
+                                    <t t-foreach="state.vacancyOptions" t-as="v" t-key="v.id">
+                                    <option t-att-value="v.id"><t t-esc="v.name"/></option>
+                                    </t>
+                                </select>
+                                </div>
+                                <!-- Métricas en vertical -->
+                                <div class="d-flex flex-column gap-2">
+                                <!-- Estado con badge grande -->
                                 <div>
-                                <strong>Estado:</strong>
-                                <span t-attf-class="badge 
-                                    #{ state.vacancyMetrics.status === 'Abierta'  ? 'bg-success' : 
+                                    <strong>Estado:</strong>
+                                    <span t-attf-class="badge fs-6 
+                                        #{ state.vacancyMetrics.status === 'Abierta'  ? 'bg-success' : 
                                         state.vacancyMetrics.status === 'Cerrada'  ? 'bg-danger'  : 
                                         'bg-warning text-dark' }">
                                     <t t-esc="state.vacancyMetrics.status"/>
-                                </span>
+                                    </span>
                                 </div>
-                                <div><strong>Tiempo Abierta:</strong> <span><t t-esc="state.vacancyMetrics.openDuration || '—'"/></span></div>
-                                <div><strong>Postulaciones:</strong> <t t-esc="state.vacancyMetrics.applicants"/></div>
-                                <div><strong>Contratados:</strong>  <t t-esc="state.vacancyMetrics.hired"/></div>
-                                <div><strong>Rechazados:</strong>   <t t-esc="state.vacancyMetrics.refused"/></div>
-                                <div><strong>Motivo Frecuente:</strong>
-                                <t t-esc="state.vacancyMetrics.topRefuseReason || '—'"/>
+                                <!-- Tiempo -->
+                                <div>
+                                    <strong>Tiempo:</strong><br/>
+                                    <small class="text-muted">
+                                    <t t-esc="state.vacancyMetrics.openDuration || '—'"/>
+                                    </small>
+                                </div>
+                                <!-- Postulaciones -->
+                                <div>
+                                    <strong>Postulaciones:</strong><br/>
+                                    <span class="fs-5"><t t-esc="state.vacancyMetrics.applicants"/></span>
+                                </div>
+                                <!-- Contratados -->
+                                <div>
+                                    <strong>Contratados:</strong><br/>
+                                    <span class="fs-5 text-success"><t t-esc="state.vacancyMetrics.hired"/></span>
+                                </div>
+                                <!-- Rechazados -->
+                                <div>
+                                    <strong>Rechazados:</strong><br/>
+                                    <span class="fs-5 text-danger"><t t-esc="state.vacancyMetrics.refused"/></span>
+                                </div>
+                                <!-- Motivo frecuente -->
+                                <div>
+                                    <strong>Motivo Frecuente:</strong><br/>
+                                    <em class="text-secondary">
+                                    <t t-esc="state.vacancyMetrics.topRefuseReason || '—'"/>
+                                    </em>
+                                </div>
                                 </div>
                             </div>
-                            </div>
-                        </div>                     
+                            </div>                  
                         <div class="col-lg-6 m-0 p-0">
                             <div class="shadow-sm border m-2 p-4 bg-white">
                                 <div class="d-flex align-items-center justify-content-center">
