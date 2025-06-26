@@ -219,7 +219,7 @@
                                 <!-- Motivo frecuente -->
                                 <div>
                                     <strong>Motivo Frecuente:</strong><br/>
-                                    <em class="text-secondary">
+                                    <em>
                                     <t t-esc="state.vacancyMetrics.topRefuseReason || '—'"/>
                                     </em>
                                 </div>
