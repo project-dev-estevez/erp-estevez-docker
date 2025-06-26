@@ -483,81 +483,73 @@ async openRequisitionList(stateCode) {
     }
 
     async getVacancyMetrics() {
-        // 1) Leer el puesto seleccionado
+        // 1) Leer el job seleccionado y parsear a número
         const rawJid = this.state.selectedVacancyId;
-        const jobId  = rawJid && rawJid !== 'false' 
-                     ? parseInt(rawJid, 10) 
-                     : null;
+        const jobId  = rawJid && rawJid !== 'false' ? parseInt(rawJid, 10) : null;
     
-        // 2) Recuperar la última requisición APROBADA para ese puesto
+        // 2) Obtener la última requisición aprobada para ese job
         let lastReq = null;
         if (jobId) {
             const reqs = await this.orm.searchRead(
                 'hr.requisition',
                 [
-                  ['workstation_job_id', '=', jobId],
-                  ['state', '=', 'approved'],
+                    ['workstation_job_id', '=', jobId],
+                    ['state', '=', 'approved'],
                 ],
                 ['publish_date','close_date'],
                 { order: 'publish_date desc', limit: 1 }
             );
             lastReq = reqs[0] || null;
         }
-        console.log('▶️ Última requisición aprobada:', lastReq);
     
-        // 3) Construir dominio de applicants: rango + job_id
-        const domain = this._addDateRangeToDomain([]);
+        // 3) Preparar dominio y contexto
+        const baseDomain = this._addDateRangeToDomain([]);
         if (jobId) {
-            domain.push(['job_id','=', jobId]);
+            baseDomain.push(['job_id','=', jobId]);
         }
-        console.log('📋 Dominio de applicants:', domain);
+        const rpcContext = { context: { active_test: false } };
     
-        // 4) Conteos
-        const totalApps = await this.orm.searchCount('hr.applicant', domain);
-        const hired     = await this.orm.searchCount('hr.applicant', [...domain, ['application_status','=', 'hired']]);
-        const refused   = await this.orm.searchCount('hr.applicant', [...domain, ['application_status','=', 'refused']]);
-        console.log('📊 Conteos:', { totalApps, hired, refused });
+        // 4) Declarar variables de métricas
+        let totalApps = 0, hired = 0, refused = 0;
+        let topReason = '';
+        let status    = 'Global';
+        let openDur   = '';
     
-        // 5) Motivo de rechazo más frecuente
-        console.log('📋 readGroup domain:', [...domain, ['application_status','=', 'refused']]);
+        // 5) Contar applicants
+        totalApps = await this.orm.searchCount('hr.applicant', baseDomain, rpcContext);
+        hired     = await this.orm.searchCount('hr.applicant', [...baseDomain, ['application_status','=', 'hired']], rpcContext);
+        refused   = await this.orm.searchCount('hr.applicant', [...baseDomain, ['application_status','=', 'refused']], rpcContext);
+    
+        // 6) Agrupar motivos de rechazo
         const rg = await this.orm.readGroup(
             'hr.applicant',
-            [...domain, ['application_status','=', 'refused']],
+            [...baseDomain, ['application_status','=', 'refused']],
             ['refuse_reason_id'],
-            ['refuse_reason_id']
+            ['refuse_reason_id'],
+            rpcContext
         );
-        console.log('📑 ReadGroup Reasons:', rg);
-        let topReason = '';
         if (rg.length) {
-            rg.sort((a,b) => b.refuse_reason_id_count - a.refuse_reason_id_count);
+            rg.sort((a, b) => b.refuse_reason_id_count - a.refuse_reason_id_count);
             topReason = rg[0].refuse_reason_id[1] || '';
         }
     
-        // 6) Calcular estado y duración a partir de lastReq
-        let status  = 'Global';
-        let openDur = '';
+        // 7) Estado y duración según la última requisición aprobada
         if (lastReq && lastReq.publish_date) {
             const pub = DateTime.fromISO(lastReq.publish_date);
-            const cls = lastReq.close_date
-                ? DateTime.fromISO(lastReq.close_date)
-                : null;
+            const cls = lastReq.close_date ? DateTime.fromISO(lastReq.close_date) : null;
             status = cls ? 'Cerrada' : 'Abierta';
-        
+    
             // Duración en días completos (+1 para incluir el día de publicación)
-            const end = cls || DateTime.now();
-            // Usar toObject() para asegurarnos de obtener .days
+            const end     = cls || DateTime.now();
             const diffObj = end.diff(pub, 'days').toObject();
             const rawDays = diffObj.days || 0;
             const diffDays = Math.floor(rawDays) + 1;
             openDur = `${diffDays} día${diffDays !== 1 ? 's' : ''}`;
         } else if (jobId) {
-            // Si no hay requisición aprobada aún
             status = 'Por Activar';
         }
     
-        console.log('⏱ Estado/Duración:', { status, openDur });
-    
-        // 7) Actualizar state
+        // 8) Actualizar el state
         this.state.vacancyMetrics = {
             status,
             openDuration:   openDur,
