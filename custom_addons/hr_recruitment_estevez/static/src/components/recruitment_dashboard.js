@@ -96,6 +96,16 @@ export class RecruitmentDashboard extends Component {
           });
     }
 
+    openRejectionDetails = (reason) => {
+    // Ejemplo: mostrar modal con detalles
+    this.setState({
+        showRejectionModal: true,
+        selectedReason: reason
+    });
+    
+    // O cargar datos relacionados:
+    // fetchCandidatesByReason(reason.id).then(data => {...})
+}
     async openRecruitmentList(userId, onlyHired) {
         // 1) Arranca con el filtro de fecha
         let domain = [
@@ -146,7 +156,7 @@ export class RecruitmentDashboard extends Component {
         });
     }
 
-    async openRequisitionList(stateCode) {
+async openRequisitionList(stateCode) {
         let domain = [];
         domain = this._addDateRangeToDomain(domain);
         if (stateCode === 'approved_open') {
@@ -759,12 +769,14 @@ export class RecruitmentDashboard extends Component {
         const companyRejections = [];
 
         for (const r of data) {
+            const id = r.refuse_reason_id && r.refuse_reason_id[0] || false;
             const label = (r.refuse_reason_id && r.refuse_reason_id[1]) || "Sin motivo";
             const count = r.refuse_reason_id_count;
+
             if (label.toLowerCase().includes("declino")) {
-                candidateDeclines.push({ label, count });
+                candidateDeclines.push({ id, label, count });
             } else {
-                companyRejections.push({ label, count });
+                companyRejections.push({ id, label, count });
             }
         }
 
@@ -784,8 +796,15 @@ export class RecruitmentDashboard extends Component {
                     data: candidateDeclines.map(x => x.count),
                     backgroundColor: pastelCandidate
                 }]
-            },
-            options: {
+            },  
+            meta: candidateDeclines,          
+            options: {              
+                onClick: (event, activeElements, chart) => {
+                    if (!activeElements.length) return;
+                    const { index } = activeElements[0];
+                    const reason = this.state.rejectionReasons.candidate.meta[index];
+                    this.openRejectionList(reason.id);
+                },  
                 plugins: {
                     tooltip: {
                         callbacks: {
@@ -798,7 +817,7 @@ export class RecruitmentDashboard extends Component {
                         }
                     }
                 }
-            }
+            } 
         };
 
         this.state.rejectionReasons.company = {
@@ -810,7 +829,14 @@ export class RecruitmentDashboard extends Component {
                     backgroundColor: pastelCompany
                 }]
             },
+            meta: companyRejections,
             options: {
+                onClick: (event, activeElements, chart) => {
+                    if (!activeElements.length) return;
+                    const { index } = activeElements[0];
+                    const reason = this.state.rejectionReasons.company.meta[index];
+                    this.openRejectionList(reason.id);
+                },
                 plugins: {
                     tooltip: {
                         callbacks: {
@@ -828,6 +854,37 @@ export class RecruitmentDashboard extends Component {
 
         // Forzar refresco
         this.state.rejectionReasons = { ...this.state.rejectionReasons };
+    }
+
+    openRejectionList(refuse_reason_id) {
+        let domain = [
+            ["application_status", "=", "refused"],            
+        ];
+
+        if (refuse_reason_id === false){
+            domain.push(["refuse_reason_id", "=", false]);
+        } else if (refuse_reason_id){
+            domain.push(["refuse_reason_id", "=", refuse_reason_id]);
+        }else {
+            domain.push("|", 
+                   ["refuse_reason_id", "=", false],
+                   ["refuse_reason_id", "=", null]);
+        }
+    
+        domain = this._addDateRangeToDomain(domain);
+
+        this.env.services.action.doAction({
+            type: 'ir.actions.act_window',
+            name: 'Solicitudes Rechazadas',
+            res_model: 'hr.applicant',
+            views: [[false, 'list'], [false, 'form']],
+            target: 'current',
+            domain: domain,
+            context: {
+                search_default_filter_refused: 1,
+                active_test: false
+            }
+        });
     }
 
     viewTotalApplicants() {
