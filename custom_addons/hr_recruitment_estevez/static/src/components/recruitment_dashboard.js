@@ -182,6 +182,7 @@ async openRequisitionList(stateCode) {
         }
         this.loadAllData();
         this.getVacancyMetrics();
+        this.getFunnelRecruitment();
     }
 
     async loadAllData() {        
@@ -213,8 +214,8 @@ async openRequisitionList(stateCode) {
     async getFunnelRecruitment() {
         // 1) Determinar jobId desde el select
         const rawJid = this.state.selectedVacancyId;
-        const jobId  = rawJid && rawJid !== 'false' 
-                     ? parseInt(rawJid, 10) 
+        const jobId  = rawJid && rawJid !== 'false'
+                     ? parseInt(rawJid, 10)
                      : null;
     
         // 2) Cargar todas las etapas en orden
@@ -250,38 +251,58 @@ async openRequisitionList(stateCode) {
         // 6) Generar arrays
         const labels = stages.map(s => s.name);
         const counts = stages.map(s => stageCountMap[s.id] || 0);
+    
+        // **Override** primer valor con total de postulantes para esta vacante
+        const totalApps = counts.reduce((a, b) => a + b, 0) || 1;
+        counts[0] = totalApps;
+    
         const colors = this.getPastelColors(labels.length);
     
-        // 7) Opciones para mostrar % sobre el total de esta vacante
-        const total = counts.reduce((a,b) => a+b, 0) || 1;
+        // 7) Opciones mejoradas
         const options = {
             plugins: {
                 legend: { display: false },
                 tooltip: {
                     callbacks: {
                         label: ctx => {
-                            const n = counts[ctx.dataIndex];
-                            const pct = ((n/total)*100).toFixed(1);
-                            return `${labels[ctx.dataIndex]}: ${n} candidatos (${pct}%)`;
+                            const n   = counts[ctx.dataIndex];
+                            const pct = ((n / totalApps) * 100).toFixed(1);
+                            return `${labels[ctx.dataIndex]}: ${n} (${pct}%)`;
                         }
                     }
                 },
                 datalabels: {
                     anchor: 'center',
                     align: 'center',
+                    color: '#fff',
+                    font: {
+                        weight: 'bold',
+                        size: 12
+                    },
+                    backgroundColor: 'rgba(0,0,0,0.6)',
+                    padding: { top: 4, bottom: 4, left: 6, right: 6 },
                     formatter: val => {
-                        const pct = ((val/total)*100).toFixed(0);
+                        const pct = ((val / totalApps) * 100).toFixed(0);
                         return `${val}\n${pct}%`;
                     }
                 }
             }
         };
     
-        // 8) Actualizar el state
+        // 8) Actualizar el state y forzar re-render
         this.state.funnelRecruitment = {
-            data: { labels, datasets: [{ label: "Candidatos", data: counts, backgroundColor: colors }] },
+            data: {
+                labels,
+                datasets: [{
+                    label: "Candidatos",
+                    data: counts,
+                    backgroundColor: colors
+                }]
+            },
             options
         };
+        // Forzamos el update reactivo
+        this.state.funnelRecruitment = { ...this.state.funnelRecruitment };
     }
 
     async getTopRecruitments() {
@@ -580,6 +601,16 @@ async openRequisitionList(stateCode) {
             refused,
             topRefuseReason: topReason,
         };
+    }
+
+    async onVacancyChange(ev) {
+        // 1) Leer el valor recién seleccionado
+        const newVal = ev.target.value === 'false' ? false : parseInt(ev.target.value, 10);
+        this.state.selectedVacancyId = newVal;
+    
+        // 2) Ahora sí llamamos a los getters con el valor actualizado
+        await this.getVacancyMetrics();
+        await this.getFunnelRecruitment();
     }
 
     async getSourceRecruitment() {

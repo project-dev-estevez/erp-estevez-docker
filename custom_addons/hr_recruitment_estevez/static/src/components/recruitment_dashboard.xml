@@ -174,12 +174,17 @@
                                 <div class="mb-3">
                                 <label class="form-label">Vacante:</label>
                                 <select class="form-select"
-                                        t-model="state.selectedVacancyId"
-                                        t-on-change="getVacancyMetrics">
-                                    <option t-att-value="false">Todas las vacantes</option>
-                                    <t t-foreach="state.vacancyOptions" t-as="v" t-key="v.id">
-                                    <option t-att-value="v.id"><t t-esc="v.name"/></option>
-                                    </t>
+                                        t-on-change="onVacancyChange">
+                                <option t-att-value="false"
+                                        t-att-selected="state.selectedVacancyId === false">
+                                    Todas las vacantes
+                                </option>
+                                <t t-foreach="state.vacancyOptions" t-as="v" t-key="v.id">
+                                    <option t-att-value="v.id"
+                                            t-att-selected="state.selectedVacancyId === v.id">
+                                    <t t-esc="v.name"/>
+                                    </option>
+                                </t>
                                 </select>
                                 </div>
                                 <!-- Métricas en vertical -->
