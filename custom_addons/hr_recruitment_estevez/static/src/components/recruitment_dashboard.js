@@ -107,7 +107,6 @@ export class RecruitmentDashboard extends Component {
     // fetchCandidatesByReason(reason.id).then(data => {...})
 }
     async openRecruitmentList(userId, onlyHired) {
-        // 1) Arranca con el filtro de fecha
         let domain = [
             "|",
             ["active", "=", true],
@@ -115,15 +114,12 @@ export class RecruitmentDashboard extends Component {
           ];
         domain = this._addDateRangeToDomain(domain);
     
-        // 2) Filtra por reclutador y registro activo
         domain.push(["user_id", "=", userId]);
     
-        // 3) Si venías del dataset de “Contratados”, añade también ese filtro
         if (onlyHired) {
           domain.push(["application_status", "=", "hired"]);
         }
     
-        // 4) Lanza la acción con la lista de vistas
         await this.actionService.doAction({
             type: 'ir.actions.act_window',
             name: onlyHired ? 'Contratados' : 'Postulaciones',
@@ -212,98 +208,75 @@ async openRequisitionList(stateCode) {
     }
 
     async getFunnelRecruitment() {
-        // 1) Determinar jobId desde el select
-        const rawJid = this.state.selectedVacancyId;
-        const jobId  = rawJid && rawJid !== 'false'
-                     ? parseInt(rawJid, 10)
-                     : null;
+        // 1) Leer jobId del state
+        const jobId = this.state.selectedVacancyId;
     
-        // 2) Cargar todas las etapas en orden
-        const stages = await this.orm.searchRead(
-            "hr.recruitment.stage",
-            [],
-            ["id", "name", "sequence"]
-        );
-        stages.sort((a, b) => a.sequence - b.sequence);
-    
-        // 3) Construir dominio: rango de fechas + job_id (si hay)
-        let domain = this._addDateRangeToDomain([]);
+        // 2) Dominio base: rango + job_id (solo si no es false)
+        let baseDomain = this._addDateRangeToDomain([]);
         if (jobId) {
-            domain.push(['job_id', '=', jobId]);
+            baseDomain.push(['job_id', '=', jobId]);
         }
     
-        // 4) Leer grupo por etapa
-        const data = await this.orm.readGroup(
-            "hr.applicant",
-            domain,
-            ["stage_id"],
-            ["stage_id"]
+        // 3) Total de postulantes
+        const totalApps = await this.orm.searchCount('hr.applicant', baseDomain) || 1;
+    
+        // 4) Cargar y ordenar etapas
+        const stages = await this.orm.searchRead(
+            "hr.recruitment.stage", [], ["id","name","sequence"]
         );
+        stages.sort((a,b)=>a.sequence-b.sequence);
     
-        // 5) Mapa etapa → conteo
-        const stageCountMap = {};
-        for (const r of data) {
-            if (r.stage_id && r.stage_id[0]) {
-                stageCountMap[r.stage_id[0]] = r.stage_id_count;
-            }
+        // 5) Para cada etapa, contar cuántos han llegado
+        const counts = [];
+        for (const stage of stages) {
+            const cnt = await this.orm.searchCount(
+                'hr.applicant',
+                [...baseDomain, ['stage_id.sequence','>=', stage.sequence]]
+            );
+            counts.push(cnt);
         }
-    
-        // 6) Generar arrays
-        const labels = stages.map(s => s.name);
-        const counts = stages.map(s => stageCountMap[s.id] || 0);
-    
-        // **Override** primer valor con total de postulantes para esta vacante
-        const totalApps = counts.reduce((a, b) => a + b, 0) || 1;
+        // 6) Asegurar primer bloque = totalApps
         counts[0] = totalApps;
     
+        // 7) Labels, colores, opciones
+        const labels = stages.map(s => s.name);
         const colors = this.getPastelColors(labels.length);
-    
-        // 7) Opciones mejoradas
         const options = {
+            responsive: true,
+            maintainAspectRatio: false,
+            aspectRatio: 1.2,
             plugins: {
                 legend: { display: false },
-                tooltip: {
-                    callbacks: {
-                        label: ctx => {
-                            const n   = counts[ctx.dataIndex];
-                            const pct = ((n / totalApps) * 100).toFixed(1);
-                            return `${labels[ctx.dataIndex]}: ${n} (${pct}%)`;
-                        }
+                tooltip: { callbacks: {
+                    label: ctx => {
+                        const n   = counts[ctx.dataIndex];
+                        const pct = ((n/totalApps)*100).toFixed(1);
+                        return `${labels[ctx.dataIndex]}: ${n} (${pct}%)`;
                     }
-                },
+                }},
                 datalabels: {
-                    anchor: 'center',
-                    align: 'center',
-                    color: '#fff',
-                    font: {
-                        weight: 'bold',
-                        size: 12
-                    },
+                    anchor: 'center', align: 'center',
+                    color: '#fff', font: { weight:'bold', size:12 },
                     backgroundColor: 'rgba(0,0,0,0.6)',
-                    padding: { top: 4, bottom: 4, left: 6, right: 6 },
+                    padding: {top:4,bottom:4,left:6,right:6},
                     formatter: val => {
-                        const pct = ((val / totalApps) * 100).toFixed(0);
+                        const pct = ((val/totalApps)*100).toFixed(0);
                         return `${val}\n${pct}%`;
                     }
                 }
             }
         };
     
-        // 8) Actualizar el state y forzar re-render
+        // 8) Volcar al state y forzar update
         this.state.funnelRecruitment = {
-            data: {
-                labels,
-                datasets: [{
-                    label: "Candidatos",
-                    data: counts,
-                    backgroundColor: colors
-                }]
-            },
+            data: { labels, datasets:[{ data: counts, backgroundColor: colors }] },
             options
         };
-        // Forzamos el update reactivo
         this.state.funnelRecruitment = { ...this.state.funnelRecruitment };
     }
+    
+    
+    
 
     async getTopRecruitments() {
         let domain = [
@@ -604,14 +577,18 @@ async openRequisitionList(stateCode) {
     }
 
     async onVacancyChange(ev) {
-        // 1) Leer el valor recién seleccionado
-        const newVal = ev.target.value === 'false' ? false : parseInt(ev.target.value, 10);
-        this.state.selectedVacancyId = newVal;
+        // 1) Leer y fijar el nuevo valor
+        const raw = ev.target.value;
+        this.state.selectedVacancyId = raw === 'false' ? false : parseInt(raw, 10);
     
-        // 2) Ahora sí llamamos a los getters con el valor actualizado
-        await this.getVacancyMetrics();
-        await this.getFunnelRecruitment();
+        // 2) Dejar que OWL aplique el estado y luego recargar
+        Promise.resolve().then(async () => {
+            await this.getVacancyMetrics();
+            await this.getFunnelRecruitment();
+        });
     }
+    
+    
 
     async getSourceRecruitment() {
         let domain = [
@@ -620,7 +597,7 @@ async openRequisitionList(stateCode) {
             ["application_status", "=", "refused"]
         ];
         domain = this._addDateRangeToDomain(domain);
-    
+     
         const data = await this.orm.readGroup(
             "hr.applicant",
             domain,
