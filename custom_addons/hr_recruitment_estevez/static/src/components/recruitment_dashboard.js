@@ -19,6 +19,16 @@ export class RecruitmentDashboard extends Component {
         return domain;
     }
 
+    _getHiredDateRangeDomain(domain = []) {
+        if (this.state.startDate) {
+            domain.push(["date_closed", ">=", this.state.startDate]);
+        }
+        if (this.state.endDate) {
+            domain.push(["date_closed", "<=", this.state.endDate]);
+        }
+        return domain;
+    }
+
     setup() {
         const now = DateTime.now();
         const startOfMonth = now.startOf('month').toISODate();
@@ -740,7 +750,7 @@ async openRequisitionList(stateCode) {
 
     async getHiredApplicants() {
         let domain = [["application_status", "=", "hired"]];
-        domain = this._addDateRangeToDomain(domain);
+        domain = this._getHiredDateRangeDomain(domain);
 
         const data = await this.orm.searchCount("hr.applicant", domain);
         this.state.hiredApplicants.value = data;
@@ -970,7 +980,7 @@ async openRequisitionList(stateCode) {
 
     viewHiredApplicants() {
         let domain = [["application_status", "=", "hired"]];
-        domain = this._addDateRangeToDomain(domain);
+        domain = this._getHiredDateRangeDomain(domain);
 
         this.actionService.doAction({
             type: "ir.actions.act_window",
