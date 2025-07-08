@@ -60,46 +60,38 @@ class CalendarEvent(models.Model):
     def action_force_create_meet(self):
         self.ensure_one()
 
-        # 1) Si falta google_id, sincronizamos primero
         if not self.google_id:
-            # lee directamente el primer ID de la tabla google_service
-            self.env.cr.execute("SELECT id FROM google_service LIMIT 1")
+            # Obtener la tabla real del modelo
+            table = self.env['google.service']._table
+
+            # Ejecutar SQL para obtener el ID del primer registro (configuración de Google)
+            self.env.cr.execute(f"SELECT id FROM {table} LIMIT 1")
             row = self.env.cr.fetchone()
+
             if not row:
-                raise UserError(_("No hay ninguna configuración de Google Calendar (google.service)."))
+                raise UserError(_("No hay ninguna configuración activa para Google Calendar."))
+
+            # Obtener el registro de configuración
             config = self.env['google.service'].sudo().browse(row[0])
 
+            # Sincronizar el evento con Google Calendar
             try:
-                super(CalendarEvent, self)._sync_odoo2google(config.google_service())
-                self.invalidate_cache(['google_id'])
+                super(type(self), self)._sync_odoo2google(config.google_service())
             except Exception as e:
-                _logger.exception("Error sincronizando con Google: %s", e)
-                raise UserError(_(
-                    "No se pudo sincronizar con Google Calendar.\n"
-                    "Revisa la configuración y los logs."
-                ))
-            if not self.google_id:
-                raise UserError(_(
-                    "Tras sincronizar, el evento aún no tiene ID en Google."
-                ))
-            try:
-                super(CalendarEvent, self)._sync_odoo2google(
-                    config.google_service())
-                self.invalidate_cache(['google_id'])
-            except Exception as e:
-                _logger.exception("Error sincronizando con Google: %s", e)
-                raise UserError(_(
-                    "No se pudo sincronizar con Google Calendar.\n"
-                    "Revisa la configuración y los logs."
-                ))
-            if not self.google_id:
-                raise UserError(_(
-                    "Tras sincronizar, el evento aún no tiene ID en Google."
-                ))
+                raise UserError(_("Error al sincronizar con Google Calendar: %s") % str(e))
 
-        # 2) Crear el enlace de Google Meet
-        url = self._create_google_meet()
-        if not url:
+        # Mostrar el mensaje con el enlace Meet
+        if not self.google_meet_url:
             raise UserError(_("No se pudo generar el enlace de Google Meet."))
-        # 3) Recargar la vista para que aparezca el enlace
-        return {'type': 'ir.actions.client', 'tag': 'reload'}
+
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': _("Google Meet generado"),
+                'message': _("Enlace: <a href='%s' target='_blank'>%s</a>") % (
+                    self.google_meet_url, self.google_meet_url),
+                'type': 'success',
+                'sticky': False,
+            }
+        }
