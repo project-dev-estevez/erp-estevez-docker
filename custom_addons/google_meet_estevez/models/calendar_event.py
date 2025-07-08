@@ -60,23 +60,28 @@ class CalendarEvent(models.Model):
     def action_force_create_meet(self):
         self.ensure_one()
 
-        # 1) Sincronización si falta google_id
+        # 1) Si falta google_id, sincronizamos antes
         if not self.google_id:
-            # Busca la configuración **con sudo()** para evitar el AccessError
-            config = self.env['google.service'].sudo().search([], limit=1)
+            config = self.env['google.calendar.service'].sudo().search([], limit=1)
             if not config:
-                raise UserError(_("No hay configuración de Google Calendar."))
-            # Llama al método base de sincronización
-            super(CalendarEvent, self)._sync_odoo2google(config.google_service())
-            # Fuerza recarga de campo
-            self.invalidate_cache(['google_id'])
+                raise UserError(_("No hay ningún 'Google Calendar Service' configurado."))
+            try:
+                super(CalendarEvent, self)._sync_odoo2google(config.google_service())
+                self.invalidate_cache(['google_id'])
+            except Exception as e:
+                _logger.exception("Error sincronizando con Google: %s", e)
+                raise UserError(_(
+                    "No se pudo sincronizar el evento con Google Calendar.\n"
+                    "Revisa configuración y logs."
+                ))
             if not self.google_id:
                 raise UserError(_(
                     "Tras sincronizar, el evento aún no tiene ID en Google."
                 ))
 
-        # 2) Creación de Meet
+        # 2) Ahora creamos el Meet
         url = self._create_google_meet()
         if not url:
             raise UserError(_("No se pudo generar el enlace de Google Meet."))
+        # 3) Recarga el formulario
         return {'type': 'ir.actions.client', 'tag': 'reload'}
