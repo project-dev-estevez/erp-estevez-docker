@@ -4,6 +4,7 @@ import uuid
 import logging
 import time
 from odoo.addons.google_calendar.utils.google_calendar import GoogleCalendarService
+from odoo.addons.google_calendar.models.google_calendar import GoogleCalendarSynchronization
 
 _logger = logging.getLogger(__name__)
 
@@ -35,11 +36,13 @@ class CalendarEvent(models.Model):
     
     # Método mejorado para crear Google Meet
     def _create_google_meet(self):
-        if not self.is_google_meet or self.videocall_location or not self.google_id:
+        self.ensure_one()
+        if not self.is_google_meet or self.videocall_location:
             return False
-            
-        service = GoogleCalendarService(self.env['google.service'])
-        event_data = {
+        # Servicio bien inicializado
+        service_account = self.env['google.service'].search([], limit=1)
+        service = GoogleCalendarService(service_account)
+        body = {
             'conferenceData': {
                 'createRequest': {
                     'conferenceSolutionKey': {'type': 'hangoutsMeet'},
@@ -47,68 +50,43 @@ class CalendarEvent(models.Model):
                 }
             }
         }
-        
-        try:
-            result = service.patch(
-                calendar_id='primary',
-                event_id=self.google_id,
-                body=event_data,
-                params={'conferenceDataVersion': 1}
-            )
-            meet_url = result.get('hangoutLink')
-            if meet_url:
-                self.write({'videocall_location': meet_url})
-                _logger.info("Google Meet creado: %s", meet_url)
-                return meet_url
-        except Exception as e:
-            _logger.exception("Error creando Google Meet: %s", str(e))
+        result = service.patch(
+            calendar_id='primary',
+            event_id=self.google_id,
+            body=body,
+            params={'conferenceDataVersion': 1}
+        )
+        link = result.get('conferenceData', {}).get('entryPoints', [])
+        # Google devuelve entryPoints; busca el tipo 'video'
+        for ep in link:
+            if ep.get('entryPointType') == 'video':
+                url = ep.get('uri')
+                self.videocall_location = url
+                return url
         return False
-    
+
     # Método mejorado para forzar sincronización
     def _force_sync_to_google(self):
-        """Forzar sincronización inmediata con Google Calendar"""
-        try:
-            # Sincronizar usando el método interno de Google Calendar
-            service = self.env['google.calendar.service'].google_service()
-            GoogleCalendarSynchronization.sync_events(self.env, self)
-            
-            # Esperar y recargar
-            self.env.cr.commit()
-            time.sleep(5)
-            self.env.invalidate_all()
-            return self.search([('id', '=', self.id)])
-        except Exception as e:
-            _logger.error("Error sincronizando evento: %s", str(e))
-            return self
+        """ Forzar sincronización inmediatamente """
+        for event in self:
+            GoogleCalendarSynchronization(service_account).sync_events(self.env, self)
+        # No necesitas sleep/commit; el ORM lo refresca en la vista
+        return True
     
     # Método manual mejorado
     def force_create_meet(self):
         for event in self:
-            # Si no tiene google_id, forzar sincronización primero
             if not event.google_id:
-                event = event._force_sync_to_google()
-                
-                # Si después de sincronizar sigue sin google_id
-                if not event.google_id:
-                    raise UserError(_(
-                        "No se pudo sincronizar con Google Calendar. "
-                        "Verifica: \n"
-                        "1. Que el calendario esté configurado para sincronizar\n"
-                        "2. Que tengas conexión a internet\n"
-                        "3. Que la integración con Google esté activa"
-                    ))
-            
-            # Crear Meet
+                # Sincroniza primero
+                if not event._force_sync_to_google():
+                    raise UserError(_("No se pudo sincronizar con Google Calendar."))
+            # Crea Meet
             meet_url = event._create_google_meet()
-            if meet_url:
-                # Recargar la vista
-                return {
-                    'type': 'ir.actions.client',
-                    'tag': 'reload',
-                }
-            else:
-                raise UserError(_("Error generando Google Meet. Ver logs para más detalles."))
-    
+            if not meet_url:
+                raise UserError(_("Error generando Google Meet. Revisa los logs."))
+        # Después de procesar todos, recarga el form
+        return {'type': 'ir.actions.client', 'tag': 'reload'}
+        
     # Sincronización automática mejorada
     def _sync_odoo2google(self, google_service):
         res = super()._sync_odoo2google(google_service)
