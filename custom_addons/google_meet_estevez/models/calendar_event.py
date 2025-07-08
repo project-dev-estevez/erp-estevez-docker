@@ -61,26 +61,12 @@ class CalendarEvent(models.Model):
         self.ensure_one()
 
         if not self.google_id:
-            # Obtener la tabla real del modelo
-            table = self.env['google.service']._table
-
-            # Ejecutar SQL para obtener el ID del primer registro (configuración de Google)
-            self.env.cr.execute(f"SELECT id FROM {table} LIMIT 1")
-            row = self.env.cr.fetchone()
-
-            if not row:
-                raise UserError(_("No hay ninguna configuración activa para Google Calendar."))
-
-            # Obtener el registro de configuración
-            config = self.env['google.service'].sudo().browse(row[0])
-
-            # Sincronizar el evento con Google Calendar
             try:
-                super(type(self), self)._sync_odoo2google(config.google_service())
+                # Este método ya se encarga de sincronizar con Google y asignar google_meet_url
+                self._generate_google_event()
             except Exception as e:
                 raise UserError(_("Error al sincronizar con Google Calendar: %s") % str(e))
 
-        # Mostrar el mensaje con el enlace Meet
         if not self.google_meet_url:
             raise UserError(_("No se pudo generar el enlace de Google Meet."))
 
