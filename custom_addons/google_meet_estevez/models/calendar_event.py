@@ -62,10 +62,26 @@ class CalendarEvent(models.Model):
 
         # 1) Si falta google_id, sincronizamos primero
         if not self.google_id:
-            config = self.env['google.service'].sudo().search(
-                [], limit=1, order='name asc')
-            if not config:
-                raise UserError(_("Falta configurar Google Calendar (google.service)."))
+            # lee directamente el primer ID de la tabla google_service
+            self.env.cr.execute("SELECT id FROM google_service LIMIT 1")
+            row = self.env.cr.fetchone()
+            if not row:
+                raise UserError(_("No hay ninguna configuración de Google Calendar (google.service)."))
+            config = self.env['google.service'].sudo().browse(row[0])
+
+            try:
+                super(CalendarEvent, self)._sync_odoo2google(config.google_service())
+                self.invalidate_cache(['google_id'])
+            except Exception as e:
+                _logger.exception("Error sincronizando con Google: %s", e)
+                raise UserError(_(
+                    "No se pudo sincronizar con Google Calendar.\n"
+                    "Revisa la configuración y los logs."
+                ))
+            if not self.google_id:
+                raise UserError(_(
+                    "Tras sincronizar, el evento aún no tiene ID en Google."
+                ))
             try:
                 super(CalendarEvent, self)._sync_odoo2google(
                     config.google_service())
