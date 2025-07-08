@@ -58,15 +58,37 @@ class CalendarEvent(models.Model):
         return False
 
     def action_force_create_meet(self):
-        """Botón: crea el Meet si ya existe google_id, sino informa error."""
-        for event in self:
-            if not event.google_id:
+        self.ensure_one()
+
+        # 1) Si no hay google_id, forzamos sync con Google
+        if not self.google_id:
+            # Recupera la configuración OAuth
+            config = self.env['google.service'].search([], limit=1)
+            if not config:
+                raise UserError(_("No hay configuración de Google Calendar."))
+            # Invoca la sincronización del evento
+            try:
+                # El base model define _sync_odoo2google(self, google_service)
+                # config.google_service() devuelve la instancia https://  
+                super(CalendarEvent, self)._sync_odoo2google(config.google_service())
+                # refrescamos en BD
+                self.invalidate_cache(['google_id'])
+            except Exception as e:
+                _logger.exception("Error sincronizando con Google: %s", e)
                 raise UserError(_(
-                    "El evento aún no se ha sincronizado con Google Calendar.\n"
-                    "Guarda primero el evento y haz clic en 'Sincronizar calendario' "
-                    "antes de generar el enlace."
+                    "No se pudo sincronizar el evento con Google Calendar.\n"
+                    "Revisa la configuración y los logs."
                 ))
-            link = event._create_google_meet()
-            if not link:
-                raise UserError(_("No se pudo generar el enlace de Google Meet."))
+            if not self.google_id:
+                # seguimos sin google_id tras sync
+                raise UserError(_(
+                    "Tras sincronizar, el evento aún no tiene ID en Google.\n"
+                    "Asegúrate de que el calendario está vinculado y vuelve a intentarlo."
+                ))
+
+        # 2) Ya tenemos google_id: creamos el Meet
+        url = self._create_google_meet()
+        if not url:
+            raise UserError(_("No se pudo generar el enlace de Google Meet."))
+        # 3) Recarga el formulario para ver el enlace
         return {'type': 'ir.actions.client', 'tag': 'reload'}
