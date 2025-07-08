@@ -20,6 +20,13 @@
                     class="btn-primary"
                     invisible="show_meet_button == False"/>
                 <field name="videocall_location" widget="url" string="Enlace Meet" readonly="1"/>
+
+
+
+
+
+
+
             </xpath>
             
         </field>

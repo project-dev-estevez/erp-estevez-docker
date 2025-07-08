@@ -3,27 +3,27 @@ from odoo.exceptions import UserError
 import uuid
 import logging
 import time
-from odoo.addons.google_calendar.services.google_service import GoogleCalendarService
+from odoo.addons.google_calendar.utils.google_calendar import GoogleCalendarService
 
 
 _logger = logging.getLogger(__name__)
 
 class CalendarEvent(models.Model):
     _inherit = 'calendar.event'
-    
+
     # Mantener campos existentes
     is_google_meet = fields.Boolean(
         string="Usar Google Meet",
         default=True
     )
-    
+
     # Campo computado para control de visibilidad
     show_meet_button = fields.Boolean(
         string="Mostrar botón Meet",
         compute="_compute_show_meet_button",
         store=True
     )
-    
+
     @api.depends('is_google_meet', 'videocall_location', 'google_id')
     def _compute_show_meet_button(self):
         for event in self:
@@ -32,16 +32,17 @@ class CalendarEvent(models.Model):
                 not event.videocall_location and
                 bool(event.google_id)
             )
-    
-    
+
+
     # Método mejorado para crear Google Meet
     def _create_google_meet(self):
         if not self.is_google_meet or self.videocall_location or not self.google_id:
+
             return False
             
-        service_account = self.env['google.service'].search([], limit=1)
-        service = GoogleCalendarService(service_account)
+        service = GoogleCalendarService(self.env['google.service'])
         event_data = {
+
             'conferenceData': {
                 'createRequest': {
                     'conferenceSolutionKey': {'type': 'hangoutsMeet'},
@@ -82,7 +83,7 @@ class CalendarEvent(models.Model):
         except Exception as e:
             _logger.error("Error sincronizando evento: %s", str(e))
             return self
-    
+
     # Método manual mejorado
     def force_create_meet(self):
         for event in self:
@@ -118,7 +119,7 @@ class CalendarEvent(models.Model):
             # Intentar crear Meet después de sincronizar
             self._create_google_meet()
         return res
-    
+
     def _compute_show_meet_button(self):
         for event in self:
             event.show_meet_button = (
@@ -126,8 +127,4 @@ class CalendarEvent(models.Model):
                 not event.videocall_location and
                 event.google_id
             )
-    
-    show_meet_button = fields.Boolean(
-        compute="_compute_show_meet_button",
-        string="Mostrar botón Meet"
-    )
+
