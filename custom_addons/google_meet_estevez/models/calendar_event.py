@@ -18,7 +18,7 @@ class CalendarEvent(models.Model):
         compute="_compute_show_meet_button",
         store=True,
     )
-
+  
     @api.depends('is_google_meet', 'videocall_location', 'google_id')
     def _compute_show_meet_button(self):
         for event in self:
@@ -29,10 +29,7 @@ class CalendarEvent(models.Model):
             )
 
     def _create_google_meet(self):
-        """Parchea el evento en Google Calendar para crear Meet,
-           guarda el enlace en videocall_location."""
-        if not self.is_google_meet or self.videocall_location or not self.google_id:
-            return False
+        """Crea una reunión de Google Meet"""
         service = GoogleCalendarService(self.env['google.service'])
         try:
             res = service.patch(
@@ -48,35 +45,42 @@ class CalendarEvent(models.Model):
                 },
                 params={'conferenceDataVersion': 1},
             )
-            link = res.get('hangoutLink')
-            if link:
-                self.write({'videocall_location': link})
-                _logger.info("Google Meet creado: %s", link)
-                return link
+            return res.get('hangoutLink')
         except Exception as e:
-            _logger.exception("Error creando Google Meet: %s", e)
-        return False
+            _logger.error("Error creando Google Meet: %s", e)
+            return False
 
     def action_force_create_meet(self):
         self.ensure_one()
 
+        if not self.env.user.google_calendar_token:
+            raise UserError(_("Primero debes configurar tu conexión con Google Calendar"))
+
+        # Si no tiene ID de Google, sincronizar primero
         if not self.google_id:
             try:
-                # Este método ya se encarga de sincronizar con Google y asignar google_meet_url
-                self._generate_google_event()
+                self.with_context(no_mail_to_attendees=True)._sync_odoo2google(self.env.user)
+                self.refresh()
+                
+                if not self.google_id:
+                    raise UserError(_("No se pudo sincronizar el evento con Google Calendar"))
             except Exception as e:
-                raise UserError(_("Error al sincronizar con Google Calendar: %s") % str(e))
+                raise UserError(_("Error al sincronizar con Google: %s") % str(e))
 
-        if not self.google_meet_url:
-            raise UserError(_("No se pudo generar el enlace de Google Meet."))
+        # Crear Meet si no existe
+        if not self.videocall_location:
+            meet_link = self._create_google_meet()
+            if not meet_link:
+                raise UserError(_("No se pudo generar el enlace de Google Meet"))
+            
+            self.videocall_location = meet_link
 
         return {
             'type': 'ir.actions.client',
             'tag': 'display_notification',
             'params': {
                 'title': _("Google Meet generado"),
-                'message': _("Enlace: <a href='%s' target='_blank'>%s</a>") % (
-                    self.google_meet_url, self.google_meet_url),
+                'message': _("Enlace creado: %s") % self.videocall_location,
                 'type': 'success',
                 'sticky': False,
             }
