@@ -18,7 +18,7 @@ class CalendarEvent(models.Model):
         compute="_compute_show_meet_button",
         store=True,
     )
-  
+
     @api.depends('is_google_meet', 'videocall_location', 'google_id')
     def _compute_show_meet_button(self):
         for event in self:
@@ -53,17 +53,25 @@ class CalendarEvent(models.Model):
     def action_force_create_meet(self):
         self.ensure_one()
 
+        # Verificar conexión con Google
         if not self.env.user.google_calendar_token:
             raise UserError(_("Primero debes configurar tu conexión con Google Calendar"))
 
         # Si no tiene ID de Google, sincronizar primero
         if not self.google_id:
             try:
-                self.with_context(no_mail_to_attendees=True)._sync_odoo2google(self.env.user)
-                self.refresh()
+                # Forzar sincronización
+                self.need_sync = True
+                
+                # Ejecutar la sincronización para este evento
+                self.env['calendar.event']._sync_odoo2google(self.env.user)
+                
+                # Recargar datos manualmente
+                self.env.cache.invalidate()
+                self = self.search([('id', '=', self.id)], limit=1)
                 
                 if not self.google_id:
-                    raise UserError(_("No se pudo sincronizar el evento con Google Calendar"))
+                    raise UserError(_("No se pudo sincronizar el evento con Google Calendar. Por favor, guarda el evento e inténtalo de nuevo."))
             except Exception as e:
                 raise UserError(_("Error al sincronizar con Google: %s") % str(e))
 
@@ -83,5 +91,12 @@ class CalendarEvent(models.Model):
                 'message': _("Enlace creado: %s") % self.videocall_location,
                 'type': 'success',
                 'sticky': False,
+                'next': {
+                    'type': 'ir.actions.act_window',
+                    'res_model': 'calendar.event',
+                    'res_id': self.id,
+                    'views': [(False, 'form')],
+                    'target': 'current',
+                }
             }
         }
