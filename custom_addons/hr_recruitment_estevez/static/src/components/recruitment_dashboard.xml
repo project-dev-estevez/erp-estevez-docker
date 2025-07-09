@@ -299,7 +299,7 @@
                                 </div>
                                 <ChartRenderer type="'bar'" title="'Requisiciones por Estado'" config="state.requisitionStats"/>
                             </div>
-                        </div>
+                        </div>                        
                     </div>
 
                 </div>

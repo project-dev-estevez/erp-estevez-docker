@@ -90,7 +90,7 @@ export class RecruitmentDashboard extends Component {
             },
 
             startDate: startOfMonth,
-            endDate: endOfMonth,
+            endDate: endOfMonth,            
         })
 
         this.orm = useService("orm");
@@ -553,7 +553,7 @@ export class RecruitmentDashboard extends Component {
         };
         // fuerza el update
         this.state.requisitionStats = { ...this.state.requisitionStats };
-    }
+    }    
 
     async getVacancyMetrics() {
         // Leer el job seleccionado y parsear a número
