@@ -223,49 +223,52 @@
                                             style="min-width:220px;">
                                             <div class="mb-3">
                                                 <div class="fw-bold text-muted small mb-1">Estado de la vacante</div>
-                                                <span
-                                                        t-attf-style="background:#{state.vacancyMetrics.status === 'Abierta' ? '#28a745' : state.vacancyMetrics.status === 'Cerrada' ? '#dc3545' : '#ffc107'};width:12px;height:12px;display:inline-block;border-radius:50%;vertical-align:middle; margin-right:8px;"
-                                                    >
-                                                        &#160;
-                                                    </span>
+                                                <span t-attf-style="background:#{state.vacancyMetrics.status === 'Abierta' ? '#28a745' : state.vacancyMetrics.status === 'Cerrada' ? '#dc3545' : '#ffc107'};width:12px;height:12px;display:inline-block;border-radius:50%;vertical-align:middle; margin-right:8px;">
+                                                    &#160;
+                                                </span>
                                                 <span class="fw-semibold fs-5"
                                                     t-esc="state.vacancyMetrics.status" />
                                             </div>
-                                            <div class="mb-2 border-top pt-2 d-flex justify-content-between align-items-center">
-                                                <div class="text-muted small">Tiempo abierta</div>
-                                                <div class="fw-semibold fs-5">
-                                                    <t t-esc="state.vacancyMetrics.openDuration || '—'" />
+
+                                            <t t-if="state.vacancyMetrics.openDuration">
+                                                <div class="mb-2 border-top pt-2 d-flex justify-content-between align-items-center">
+                                                    <div class="text-muted small">Tiempo abierta</div>
+                                                    <div class="fw-semibold fs-5">
+                                                        <t t-esc="state.vacancyMetrics.openDuration || '—'" />
+                                                    </div>
                                                 </div>
-                                            </div>
-                                            <div
-                                                class="mb-2 border-top pt-2 d-flex justify-content-between align-items-center">
+                                            </t>
+                                            
+                                            <div class="mb-2 border-top pt-2 d-flex justify-content-between align-items-center">
                                                 <span class="text-muted small">Postulaciones</span>
                                                 <span class="fw-semibold fs-5">
                                                     <t t-esc="state.vacancyMetrics.applicants" />
                                                 </span>
                                             </div>
-                                            <div
-                                                class="mb-2 d-flex justify-content-between align-items-center">
+                                            <div class="mb-2 border-top pt-2 d-flex justify-content-between align-items-center">
                                                 <span class="text-muted small">Contrataciones</span>
                                                 <span class="fw-semibold fs-5 text-success">
                                                     <t t-esc="state.vacancyMetrics.hired" />
                                                 </span>
                                             </div>
-                                            <div
-                                                class="mb-2 d-flex justify-content-between align-items-center">
+                                            <div class="mb-2 border-top pt-2 d-flex justify-content-between align-items-center">
                                                 <span class="text-muted small">Rechazos</span>
                                                 <span class="fw-semibold fs-5 text-danger">
                                                     <t t-esc="state.vacancyMetrics.refused" />
                                                 </span>
                                             </div>
-                                            <div class="border-top pt-2 mt-2">
-                                                <div class="text-muted small">Motivo de rechazo
-                                                    más frecuente</div>
-                                                <div class="fw-semibold">
-                                                    <t
-                                                        t-esc="state.vacancyMetrics.topRefuseReason || '—'" />
+
+                                            <t t-if="state.vacancyMetrics.topRefuseReason">
+                                                <div class="border-top pt-2 mt-2">
+                                                    <div class="text-muted small">
+                                                        Motivo de rechazo más frecuente
+                                                    </div>
+                                                    <div class="fw-semibold">
+                                                        <t t-esc="state.vacancyMetrics.topRefuseReason || '—'" />
+                                                    </div>
                                                 </div>
-                                            </div>
+                                            </t>
+                                            
                                         </div>
                                     </t>
                                 </div>
