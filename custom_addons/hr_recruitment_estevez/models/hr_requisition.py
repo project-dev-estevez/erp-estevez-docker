@@ -32,7 +32,7 @@ class HrRequisition(models.Model):
 
     requisition_number = fields.Char(string='Formato de Solicitud', readonly=True, default='DA-F0-TH-006')
     # Información del solicitante
-    requestor_id = fields.Many2one('res.users', string="Solicitante", default=lambda self: self.env.user, required=True, readonly=True)
+    requestor_id = fields.Many2one('res.users', string="Solicitante", default=lambda self: self.env.user, readonly=True)
     company_id = fields.Many2one('res.company', string="Empresa", related='requestor_id.company_id', readonly=True, store=False)
     direction_id = fields.Many2one('hr.direction', string="Dirección", related='requestor_id.employee_id.direction_id', readonly=True, store=False)
     department_id = fields.Many2one('hr.department', string="Departamento", related='requestor_id.employee_id.department_id', readonly=True, store=False)
@@ -43,7 +43,7 @@ class HrRequisition(models.Model):
         ('new_creation', 'Puesto de nueva creación'),
         ('replacement', 'Reposición de personal'),
         ('new_vacancy', 'Nueva vacante')
-    ], string="Tipo de Requisición", required=True, help="Tipo de solicitud")
+    ], string="Tipo de Requisición", help="Tipo de solicitud")
     employee_id = fields.Many2one('hr.employee', string="Empleado a Reemplazar")
     vacancy_reason = fields.Selection([
         ('voluntary_retirement', 'Retiro Voluntario'),
@@ -53,29 +53,28 @@ class HrRequisition(models.Model):
         ('promotion', 'Promoción'),
         ('retirement', 'Jubilación'),
         ('other', 'Otro'),
-    ], string="Motivo de Vacante", required=True)
+    ], string="Motivo de Vacante")
     other_reason_description = fields.Text(string="Descripción de Otro Motivo")
     
     # Información del puesto
     job_type = fields.Selection([
         ('administrative', 'Administrativo'),
         ('operational', 'Operativo'),
-    ], string="Tipo de Puesto")
-    workstation_direction_id = fields.Many2one('hr.direction', string="Dirección del Puesto")
-    workstation_department_id = fields.Many2one('hr.department', string="Departamento del Puesto", domain="[('direction_id', '=', workstation_direction_id)]")
-    workstation_area_id = fields.Many2one('hr.area', string="Área del Puesto", domain="[('department_id', '=', workstation_department_id)]")
-    workstation_job_id = fields.Many2one('hr.job', string="Puesto Solicitado", domain="[('department_id', '=', workstation_department_id)]")
-    project_id = fields.Many2one('project.project', string="Proyecto")
-    number_of_vacancies = fields.Integer(string="Número de Vacantes")
-    work_schedule = fields.Many2one('resource.calendar', string="Horario de Jornada Laboral")
+    ], string="Tipo de Puesto", help="Selecciona el tipo de funciones que desempeñará el puesto. Administrativo: (Oficina, planificación o soporte interno). Operativo: (Tareas técnicas o de campo).")
+    workstation_direction_id = fields.Many2one('hr.direction', string="Dirección del Puesto", help="Selecciona la dirección a la que pertenece el puesto dentro de la empresa.")
+    workstation_department_id = fields.Many2one('hr.department', string="Departamento del Puesto", domain="[('direction_id', '=', workstation_direction_id)]", help="Indica el departamento específico al que está adscrito el puesto.")
+    workstation_area_id = fields.Many2one('hr.area', string="Área del Puesto", domain="[('department_id', '=', workstation_department_id)]", help="Especifica el área interna donde el puesto realiza sus funciones.")
+    workstation_job_id = fields.Many2one('hr.job', string="Puesto Solicitado", domain="[('department_id', '=', workstation_department_id)]", help="Nombre del puesto que se solicita cubrir.")
+    project_id = fields.Many2one('project.project', string="Proyecto", help="Especifica el proyecto al que estará asignado el puesto.")
+    number_of_vacancies = fields.Integer(string="Número de Vacantes", help="Número total de puestos disponibles que se desean cubrir.")
+    work_schedule = fields.Many2one('resource.calendar', string="Horario de Jornada Laboral", help="Selecciona el tipo de jornada laboral correspondiente.")
     gender = fields.Selection([
         ('male', 'Masculino'),
         ('female', 'Femenino'),
         ('indistinct', 'Indistinto'),
         ('other', 'Otro')
-    ], string="Género")
-
-    # Versión mejorada usando comprensión de listas
+    ], string="Género", help="Selecciona el género requerido para el puesto.")
+    
     age_range_min = fields.Selection(
         selection=[(str(i), str(i)) for i in range(18, 61)],  # 18 a 60
         string="Edad Mínima",
@@ -90,20 +89,29 @@ class HrRequisition(models.Model):
         
     #age_range_min = fields.Integer(string="Edad Mínima", default=18)
     # age_range_max = fields.Integer(string="Edad Máxima", default=60)
-    years_of_experience = fields.Integer(string="Años de Experiencia", required=True)
-    general_functions = fields.Text(string="Funciones Generales del Puesto")
-    academic_degree_id = fields.Many2one('hr.recruitment.degree', string="Escolaridad o Grado Académico")
-    software_ids = fields.Many2many('hr.requisition.software', string="Software que se utilizará por el empleado")
+    #years_of_experience = fields.Integer(string="Años de Experiencia", required=True, help="Indica los años mínimos de experiencia que debe tener el candidato.")
+    year_of_experience = fields.Selection([
+        ('seis_meses', '6 meses'),
+        ('uno_anio', '1 año'),
+        ('dos_anios', '2 años'),
+        ('tres_anios', '3 años'),
+        ('cuatro_anios', '4 años'),
+        ('cinco_anios', '5 años'),
+        ('seis_anios', '6 años en adelante')
+    ], string="Años de Experiencia", help="Indica los años mínimos de experiencia que debe tener el candidato.")
+    general_functions = fields.Text(string="Funciones Generales del Puesto", help="Especifica las tareas generales del puesto.")
+    academic_degree_id = fields.Many2one('hr.recruitment.degree', string="Escolaridad o Grado Académico", help="Selecciona el nivel educativo requerido.")
+    software_ids = fields.Many2many('hr.requisition.software', string="Software que se utilizará por el empleado", help="Menciona los programas que el empleado debe utilizar.")
 
     # Equipo requerido
-    computer_equipment_required = fields.Boolean(string="¿Requiere Equipo de Cómputo?", default=False)
-    cellular_equipment_required = fields.Boolean(string="¿Requiere Equipo Celular?", default=False)
-    uniform_ids = fields.Many2many('hr.requisition.uniform', string="Uniformes")
-    epp_ids = fields.Many2many('hr.requisition.epp', string="Equipo de Protección Personal")
+    computer_equipment_required = fields.Boolean(string="¿Requiere Equipo de Cómputo?", default=False, help="Indica si requiere que se le asigne algún equipo.")
+    cellular_equipment_required = fields.Boolean(string="¿Requiere Equipo Celular?", default=False, help="Indica si se requiere que se le asigne algun celular.")
+    uniform_ids = fields.Many2many('hr.requisition.uniform', string="Uniformes", help="Indica si requiere que se le asigne algun uniforme.")
+    epp_ids = fields.Many2many('hr.requisition.epp', string="Equipo de Protección Personal", help="Indica si requiere que se le asigne equipo de protección personal.")
 
     # Tags de la requisición
     tag_ids = fields.Many2many('hr.requisition.tag', string="Etiquetas")
-    observations = fields.Text(string="Observaciones de la Vacante")
+    observations = fields.Text(string="Observaciones de la Vacante", help="Espacio para incluir comentarios adicionales o detalles relevantes sobre la vacante.")
 
     is_published = fields.Boolean(
         string='Vacante Publicada',
@@ -129,7 +137,9 @@ class HrRequisition(models.Model):
         string='Estado Publicación',
         compute='_compute_publication_status',
         store=False
-    )
+    )    
+
+    @api.constrains('wizard_step', 'job_type', '')
 
     @api.depends('workstation_job_id')
     def _compute_name(self):
