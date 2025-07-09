@@ -396,14 +396,18 @@ class HrRequisition(models.Model):
             self.wizard_step = step
         return True
     
-    def action_publish_vacancy(self):
+    def action_publish_vacancy(self, from_job=False):
         self.ensure_one()
         
         if self.state != 'approved':
-            raise UserError("Solo puedes publicar vacantes aprobadas")
+            if not from_job:  # Solo mostrar error si no viene del puesto
+                raise UserError("Solo puedes publicar vacantes aprobadas")
+            return
         
         if self.is_published:
-            raise UserError("La vacante ya está publicada")
+            if not from_job:  # Solo mostrar error si no viene del puesto
+                raise UserError("La vacante ya está publicada")
+            return
         
         # Actualizar la requisición
         self.write({
@@ -412,37 +416,39 @@ class HrRequisition(models.Model):
             'close_date': False
         })
         
-        # Actualizar el puesto de trabajo asociado
-        if self.workstation_job_id:
-            self.workstation_job_id.write({
-                'is_published': True,
-            
+        # Actualizar el puesto SOLO si no viene del puesto
+        if not from_job and self.workstation_job_id:
+            self.workstation_job_id.with_context(skip_requisition_update=True).write({
+                'is_published': True
             })
         
-        # Notificación con recarga automática
-        return {
-            'type': 'ir.actions.client',
-            'tag': 'display_notification',
-            'params': {
-                'title': 'Vacante Publicada',
-                'message': 'La vacante ha sido aperturada correctamente',
-                'sticky': False,
-                'type': 'success',
-                'next': {
-                    'type': 'ir.actions.act_window',
-                    'res_model': self._name,
-                    'res_id': self.id,
-                    'views': [(False, 'form')],
-                    'target': 'current',
+        # Mostrar notificación solo si es acción manual
+        if not from_job:
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'title': 'Vacante Publicada',
+                    'message': 'La vacante ha sido aperturada correctamente',
+                    'sticky': False,
+                    'type': 'success',
+                    'next': {
+                        'type': 'ir.actions.act_window',
+                        'res_model': self._name,
+                        'res_id': self.id,
+                        'views': [(False, 'form')],
+                        'target': 'current',
+                    }
                 }
             }
-        }
 
-    def action_close_vacancy(self):
+    def action_close_vacancy(self, from_job=False):
         self.ensure_one()
         
         if not self.is_published:
-            raise UserError("La vacante no está publicada")
+            if not from_job:  # Solo mostrar error si no viene del puesto
+                raise UserError("La vacante no está publicada")
+            return
         
         # Actualizar la requisición
         self.write({
@@ -450,28 +456,28 @@ class HrRequisition(models.Model):
             'close_date': fields.Datetime.now()
         })
         
-        # Actualizar el puesto de trabajo asociado
-        if self.workstation_job_id:
-            self.workstation_job_id.write({
-                'is_published': False,
-                
+        # Actualizar el puesto SOLO si no viene del puesto
+        if not from_job and self.workstation_job_id:
+            self.workstation_job_id.with_context(skip_requisition_update=True).write({
+                'is_published': False
             })
         
-        # Notificación con recarga automática
-        return {
-            'type': 'ir.actions.client',
-            'tag': 'display_notification',
-            'params': {
-                'title': 'Vacante Cerrada',
-                'message': 'La vacante ha sido cerrada correctamente',
-                'sticky': False,
-                'type': 'warning',
-                'next': {
-                    'type': 'ir.actions.act_window',
-                    'res_model': self._name,
-                    'res_id': self.id,
-                    'views': [(False, 'form')],
-                    'target': 'current',
+        # Mostrar notificación solo si es acción manual
+        if not from_job:
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'title': 'Vacante Cerrada',
+                    'message': 'La vacante ha sido cerrada correctamente',
+                    'sticky': False,
+                    'type': 'warning',
+                    'next': {
+                        'type': 'ir.actions.act_window',
+                        'res_model': self._name,
+                        'res_id': self.id,
+                        'views': [(False, 'form')],
+                        'target': 'current',
+                    }
                 }
             }
-        }
