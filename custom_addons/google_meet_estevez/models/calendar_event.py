@@ -22,10 +22,11 @@ class CalendarEvent(models.Model):
     @api.depends('is_google_meet', 'videocall_location', 'google_id')
     def _compute_show_meet_button(self):
         for event in self:
+            # Condición simplificada para mejor rendimiento
             event.show_meet_button = (
-                event.is_google_meet
-                and not event.videocall_location
-                and bool(event.google_id)
+                event.is_google_meet and 
+                not event.videocall_location and 
+                bool(event.google_id)
             )
 
     def _create_google_meet(self):

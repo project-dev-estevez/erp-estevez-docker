@@ -5,20 +5,21 @@
     <field name="model">calendar.event</field>
     <field name="inherit_id" ref="calendar.view_calendar_event_form"/>
     <field name="arch" type="xml">
-      <!-- Checkbox antes de la ubicación -->
       <xpath expr="//field[@name='location']" position="before">
         <field name="is_google_meet"/>
       </xpath>
-
-      <!-- Botón "Generar Meet ahora" y campo de enlace -->
+      
       <xpath expr="//field[@name='location']" position="after">
+        <!-- Botón visible cuando se cumplen todas las condiciones -->
         <button
           name="action_force_create_meet"
           string="Generar Meet ahora"
           type="object"
           class="btn-primary"
-          invisible="not show_meet_button"
+          invisible="not is_google_meet or videocall_location or not google_id"
         />
+        
+        <!-- Campo de enlace -->
         <field
           name="videocall_location"
           widget="url"
