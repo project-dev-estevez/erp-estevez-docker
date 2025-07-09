@@ -10,22 +10,22 @@
         <field name="is_google_meet"/>
       </xpath>
 
-      <!-- Botón y enlace -->
+      <!-- Botón "Generar Meet ahora" y campo de enlace -->
       <xpath expr="//field[@name='location']" position="after">
         <button
           name="action_force_create_meet"
           string="Generar Meet ahora"
           type="object"
           class="btn-primary"
-          attrs="{'invisible': [('show_meet_button', '=', False)]}"
+          invisible="not show_meet_button"
         />
         <field
-            name="videocall_location"
-            widget="url"
-            string="Enlace Meet"
-            readonly="1"
-            attrs="{'invisible': [('videocall_location', '=', False]}"
-            />
+          name="videocall_location"
+          widget="url"
+          string="Enlace Meet"
+          readonly="1"
+          invisible="not videocall_location"
+        />
       </xpath>
     </field>
   </record>
