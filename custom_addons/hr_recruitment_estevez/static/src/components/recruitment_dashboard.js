@@ -556,7 +556,6 @@ export class RecruitmentDashboard extends Component {
     }    
 
     async getVacancyMetrics() {
-        console.log("Obteniendo métricas para la vacante:", this.state.selectedVacancy);
         // Leer el job seleccionado y parsear a número
         const rawJid = this.state.selectedVacancy;
         const jobId  = rawJid && rawJid !== 'false' ? parseInt(rawJid, 10) : null;
@@ -640,7 +639,7 @@ export class RecruitmentDashboard extends Component {
             }
         } else if (jobId) {
             status  = 'Por Activar';
-            openDur = '—';
+            openDur = '';
         }
     
         // Actualizar el state
