@@ -77,7 +77,7 @@ export class RecruitmentDashboard extends Component {
             },
 
             startDate: startOfMonth,
-            endDate: endOfMonth,
+            endDate: endOfMonth,            
         })
 
         this.orm = useService("orm");
@@ -92,7 +92,7 @@ export class RecruitmentDashboard extends Component {
             }));
             // 2) resto de carga
             await this.loadAllData();
-            this.getVacancyMetrics();
+            this.getVacancyMetrics();                     
           });
     }
 
@@ -503,7 +503,7 @@ async openRequisitionList(stateCode) {
         };
         // fuerza el update
         this.state.requisitionStats = { ...this.state.requisitionStats };
-    }
+    }    
 
     async getVacancyMetrics() {
         // Leer el job seleccionado y parsear a número
