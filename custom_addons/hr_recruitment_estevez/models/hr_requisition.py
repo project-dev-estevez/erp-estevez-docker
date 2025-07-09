@@ -90,7 +90,7 @@ class HrRequisition(models.Model):
     #age_range_min = fields.Integer(string="Edad Mínima", default=18)
     # age_range_max = fields.Integer(string="Edad Máxima", default=60)
     #years_of_experience = fields.Integer(string="Años de Experiencia", required=True, help="Indica los años mínimos de experiencia que debe tener el candidato.")
-    years_of_experience = fields.Selection([
+    year_of_experience = fields.Selection([
         ('seis_meses', '6 meses'),
         ('uno_anio', '1 año'),
         ('dos_anios', '2 años'),
