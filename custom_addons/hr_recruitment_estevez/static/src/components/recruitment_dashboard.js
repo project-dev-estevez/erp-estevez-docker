@@ -75,8 +75,11 @@ export class RecruitmentDashboard extends Component {
             funnelRecruitment: {},
 
             //Vacante
+            isVacancyDropdownOpen: false,
             vacancyOptions: [],
-            selectedVacancyId: false,
+            selectedVacancy: false,
+            vacancySearchText: "Todas Las Vacantes",
+            filteredVacancyOptions: [],
             vacancyMetrics: {
                 status: '',
                 openDuration: '',
@@ -94,28 +97,21 @@ export class RecruitmentDashboard extends Component {
         this.actionService = useService("action");
 
         onWillStart(async () => {
-            // 1) cargar puestos
-            const jobs = await this.orm.searchRead('hr.job', [], ['id','name']);
-            this.state.vacancyOptions = jobs.map(j => ({
-              id: j.id,
-              name: j.name,
-            }));
-            // 2) resto de carga
             await this.loadAllData();
-            this.getVacancyMetrics();
-          });
+        });
     }
 
     openRejectionDetails = (reason) => {
-    // Ejemplo: mostrar modal con detalles
-    this.setState({
-        showRejectionModal: true,
-        selectedReason: reason
-    });
-    
-    // O cargar datos relacionados:
-    // fetchCandidatesByReason(reason.id).then(data => {...})
-}
+        // Ejemplo: mostrar modal con detalles
+        this.setState({
+            showRejectionModal: true,
+            selectedReason: reason
+        });
+        
+        // O cargar datos relacionados:
+        // fetchCandidatesByReason(reason.id).then(data => {...})
+    }
+
     async openRecruitmentList(userId, onlyHired) {
         let domain = [
             "|",
@@ -162,7 +158,7 @@ export class RecruitmentDashboard extends Component {
         });
     }
 
-async openRequisitionList(stateCode) {
+    async openRequisitionList(stateCode) {
         let domain = [];
         domain = this._addDateRangeToDomain(domain);
         if (stateCode === 'approved_open') {
@@ -181,18 +177,68 @@ async openRequisitionList(stateCode) {
         });
     }
 
+    onVacancyInputFocus() {
+        this.state.isVacancyDropdownOpen = true;
+    }
+
+    onVacancyInputBlur() {
+        setTimeout(() => {
+            this.state.isVacancyDropdownOpen = false;
+            // Si el input quedó vacío, selecciona "Todas Las Vacantes"
+            // Solo selecciona "Todas Las Vacantes" si el input está vacío Y no hay opciones filtradas
+            if (!this.state.vacancySearchText && (!this.state.filteredVacancyOptions || !this.state.filteredVacancyOptions.length)) {
+                this.selectVacancy(false);
+            }
+        }, 300);
+    }
+
+    selectVacancy = async (vacancy) => {
+        console.log("Vacancy selected:", vacancy);
+        if (!vacancy) {
+            this.state.selectedVacancy = false;
+            this.state.vacancySearchText = "Todas Las Vacantes";
+        } else {
+            this.state.selectedVacancy = vacancy.id;
+            this.state.vacancySearchText = vacancy.name;
+        }
+        this.state.isVacancyDropdownOpen = false;
+
+        // Esperar a que OWL actualice el estado antes de cargar datos
+        await new Promise(resolve => setTimeout(resolve, 50));
+        
+        // Recargar datos
+        await Promise.all([
+            this.getVacancyMetrics(),
+            this.getFunnelRecruitment()
+        ]);
+    }
+
+    clearVacancySearch() {
+        this.state.vacancySearchText = "";
+        this.state.filteredVacancyOptions = this.state.vacancyOptions;
+        this.state.isVacancyDropdownOpen = true;
+    }
+
+    onVacancySearchInput(ev) {
+        const value = ev.target.value.toLowerCase();
+        this.state.vacancySearchText = ev.target.value;
+        this.state.filteredVacancyOptions = this.state.vacancyOptions.filter(
+            v => v.name.toLowerCase().includes(value)
+        );
+        this.state.isVacancyDropdownOpen = true;
+    }
+
     onDateRangeChange() {
         if (this.state.startDate && this.state.endDate && this.state.endDate < this.state.startDate) {
             // Corrige automáticamente o muestra un mensaje
             this.state.endDate = this.state.startDate;
         }
         this.loadAllData();
-        this.getVacancyMetrics();
-        this.getFunnelRecruitment();
     }
 
     async loadAllData() {        
         await Promise.all([
+            this.getAllVacancies(),
             this.getTopRecruitments(),
             this.getSourceRecruitment(),
             this.getIndicatorsSourceRecruitment(),
@@ -203,9 +249,20 @@ async openRequisitionList(stateCode) {
             this.getHiredApplicants(),
             this.getAverageHiringTime(),
             this.getRejectionReasons(),
+            this.getVacancyMetrics(),
             this.getFunnelRecruitment(),
             this.getRequisitionStats()
         ]);
+    }
+
+    async getAllVacancies() {
+        const jobs = await this.orm.searchRead('hr.job', [], ['id','name']);
+        this.state.vacancyOptions = jobs.map(j => ({
+            id: j.id,
+            name: j.name,
+        }));
+
+        this.state.filteredVacancyOptions = this.state.vacancyOptions;
     }
 
     getPastelColors(count) {
@@ -218,8 +275,9 @@ async openRequisitionList(stateCode) {
     }
 
     async getFunnelRecruitment() {
+        console.log("Calculando embudo de reclutamiento: ", this.state.selectedVacancy);
         // 1) Leer jobId del state
-        const jobId = this.state.selectedVacancyId;
+        const jobId = this.state.selectedVacancy;
     
         // 2) Dominio base: rango + job_id (solo si no es false)
         let baseDomain = this._addDateRangeToDomain([]);
@@ -228,7 +286,7 @@ async openRequisitionList(stateCode) {
         }
     
         // 3) Total de postulantes
-        const totalApps = await this.orm.searchCount('hr.applicant', baseDomain) || 1;
+        const totalApps = await this.orm.searchCount('hr.applicant', baseDomain) || 0;
     
         // 4) Cargar y ordenar etapas
         const stages = await this.orm.searchRead(
@@ -498,8 +556,9 @@ async openRequisitionList(stateCode) {
     }
 
     async getVacancyMetrics() {
+        console.log("Obteniendo métricas para la vacante:", this.state.selectedVacancy);
         // Leer el job seleccionado y parsear a número
-        const rawJid = this.state.selectedVacancyId;
+        const rawJid = this.state.selectedVacancy;
         const jobId  = rawJid && rawJid !== 'false' ? parseInt(rawJid, 10) : null;
     
         // Obtener la última requisición aprobada para ese job
@@ -593,21 +652,19 @@ async openRequisitionList(stateCode) {
             refused,
             topRefuseReason: topReason,
         };
-    }
+    }   
 
-    async onVacancyChange(ev) {
-        // 1) Leer y fijar el nuevo valor
-        const raw = ev.target.value;
-        this.state.selectedVacancyId = raw === 'false' ? false : parseInt(raw, 10);
+    // async onVacancyChange(ev) {
+    //     // 1) Leer y fijar el nuevo valor
+    //     const raw = ev.target.value;
+    //     this.state.selectedVacancy = raw === 'false' ? false : parseInt(raw, 10);
     
-        // 2) Dejar que OWL aplique el estado y luego recargar
-        Promise.resolve().then(async () => {
-            await this.getVacancyMetrics();
-            await this.getFunnelRecruitment();
-        });
-    }
-    
-    
+    //     // 2) Dejar que OWL aplique el estado y luego recargar
+    //     Promise.resolve().then(async () => {
+    //         await this.getVacancyMetrics();
+    //         await this.getFunnelRecruitment();
+    //     });
+    // }
 
     async getSourceRecruitment() {
         // 1. Total postulaciones por fuente (por create_date)
