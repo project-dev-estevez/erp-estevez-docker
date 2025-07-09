@@ -3,7 +3,6 @@ from odoo.exceptions import UserError
 import uuid
 import logging
 from odoo.addons.google_calendar.utils.google_calendar import GoogleCalendarService
-from odoo.addons.google_calendar.models.google_sync import GoogleSync
 
 _logger = logging.getLogger(__name__)
 
@@ -51,15 +50,6 @@ class CalendarEvent(models.Model):
             _logger.error("Error creando Google Meet: %s", e)
             return False
 
-    def _ensure_event_is_syncable(self):
-        """Verifica que el evento tenga los datos mínimos para sincronizar"""
-        if not self.start or not self.stop:
-            raise UserError(_("El evento debe tener fecha de inicio y fin"))
-        if not self.name:
-            raise UserError(_("El evento debe tener un título"))
-        if not self.user_id or not self.user_id.email:
-            raise UserError(_("El organizador debe tener un email válido"))
-
     def action_force_create_meet(self):
         self.ensure_one()
 
@@ -67,44 +57,22 @@ class CalendarEvent(models.Model):
         if not self.env.user.google_calendar_token:
             raise UserError(_("Primero debes configurar tu conexión con Google Calendar"))
 
-        # Verificar que el evento sea sincronizable
-        self._ensure_event_is_syncable()
-
         # Si no tiene ID de Google, sincronizar primero
         if not self.google_id:
             try:
                 # Forzar sincronización
-                self.write({'need_sync': True})
+                self.need_sync = True
                 
-                # Crear un diccionario con los datos del evento
-                event_data = {
-                    'start': self.start,
-                    'stop': self.stop,
-                    'name': self.name,
-                    'description': self.description,
-                    'location': self.location,
-                    'partner_ids': [(6, 0, self.partner_ids.ids)],
-                    'user_id': self.user_id.id,
-                    'allday': self.allday,
-                    'show_as': self.show_as,
-                    'privacy': self.privacy,
-                    'need_sync': True,
-                }
+                # Ejecutar la sincronización para este evento
+                self.env['calendar.event']._sync_odoo2google(self.env.user)
                 
-                # Crear un evento temporal para sincronizar
-                temp_event = self.env['calendar.event'].create(event_data)
-                temp_event.with_context(no_mail_to_attendees=True)._sync_google_calendar()
+                # Recargar datos manualmente
+                self.env.cache.invalidate()
+                self = self.search([('id', '=', self.id)], limit=1)
                 
-                # Si se creó correctamente, copiar el google_id
-                if temp_event.google_id:
-                    self.google_id = temp_event.google_id
-                    # Eliminar el evento temporal
-                    temp_event.unlink()
-                else:
-                    raise UserError(_("No se pudo sincronizar el evento con Google Calendar"))
-                
+                if not self.google_id:
+                    raise UserError(_("No se pudo sincronizar el evento con Google Calendar. Por favor, guarda el evento e inténtalo de nuevo."))
             except Exception as e:
-                _logger.exception("Error sincronizando evento: %s", str(e))
                 raise UserError(_("Error al sincronizar con Google: %s") % str(e))
 
         # Crear Meet si no existe
