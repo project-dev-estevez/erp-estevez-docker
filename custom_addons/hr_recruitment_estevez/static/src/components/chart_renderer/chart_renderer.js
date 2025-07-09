@@ -23,8 +23,12 @@ export class ChartRenderer extends Component {
         }
         // Destruye la instancia previa si existe
         if (this.chartInstance) {
+            console.log("Destroying previous chart instance");
             this.chartInstance.destroy();
+            this.chartInstance = null;
         }
+        if (!this.props.config?.data) return; // No renderizar si no hay datos
+        
         const config = this.props.config || {};
         const data = config.data || {};
         const defaultOptions = {
