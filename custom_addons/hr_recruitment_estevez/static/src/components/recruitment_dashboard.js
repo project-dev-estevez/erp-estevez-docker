@@ -796,19 +796,7 @@ export class RecruitmentDashboard extends Component {
             refused,
             topRefuseReason: topReason,
         };
-    }   
-
-    // async onVacancyChange(ev) {
-    //     // 1) Leer y fijar el nuevo valor
-    //     const raw = ev.target.value;
-    //     this.state.selectedVacancy = raw === 'false' ? false : parseInt(raw, 10);
-    
-    //     // 2) Dejar que OWL aplique el estado y luego recargar
-    //     Promise.resolve().then(async () => {
-    //         await this.getVacancyMetrics();
-    //         await this.getFunnelRecruitment();
-    //     });
-    // }
+    }
 
     async getSourceRecruitment() {
         // 1. Total postulaciones por fuente (por create_date)
