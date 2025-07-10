@@ -16,7 +16,7 @@
                 <field name="requisition_type" optional="hide"/>
                 <field name="project_id" string="Proyecto" optional="show"/>
                 <field name="tag_ids" widget="many2many_tags" string="Etiquetas" optional="show"/>
-                <field name="publication_status" string="Estado Requisición" 
+                <field name="publication_status" string="Estado" 
                        widget="badge"
                        decoration-success="publication_status == 'Abierta'"
                        decoration-danger="publication_status == 'Cerrada'"
