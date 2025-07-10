@@ -11,13 +11,13 @@
       
       <xpath expr="//field[@name='location']" position="after">
         <!-- Botón visible cuando se cumplen todas las condiciones -->
-        <!--<button
+        <button
             name="action_force_create_meet"
             string="Generar Meet ahora"
             type="object"
             class="btn-primary"
             invisible="is_google_meet and not videocall_location and google_id"
-        />-->
+        />
         
         <!-- Campo de enlace -->
         <field
