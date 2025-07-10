@@ -89,13 +89,13 @@ export class RecruitmentDashboard extends Component {
                 topRefuseReason: '',
             },
 
-            // Eficiencia
-            efficiencyDonutChart: {
+            // Tiempo Promedio por Etapa
+            averageTimePerStageChart: {
                 data: {
-                    labels: ["A", "B", "C"],
+                    labels: ["Primera Entrevista", "Examen Técnico", "Examen Médico"],
                     datasets: [{
-                        data: [30, 50, 20],
-                        backgroundColor: ["#007bff", "#28a745", "#ffc107"],
+                        data: [3.5, 7.2, 1.8],
+                        backgroundColor: ["#4ECDC4", "#45B7D1", "#96CEB4"],
                     }]
                 },
                 options: {
@@ -105,7 +105,7 @@ export class RecruitmentDashboard extends Component {
                     }
                 }
             },
-            efficiencyDonutChartCenterValue: 0,
+            averageTimePerStageCenterValue: 42,
 
             startDate: startOfMonth,
             endDate: endOfMonth,            
