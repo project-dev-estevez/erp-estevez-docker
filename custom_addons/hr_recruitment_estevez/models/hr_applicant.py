@@ -175,7 +175,15 @@ class HrApplicant(models.Model):
         index=True,
         string='Candidato',  # Cambiar el string que se muestra
         help='Candidato asociado a esta solicitud'
-    )    
+    )
+
+    # === NUEVO CAMPO PARA HISTORIAL ===
+    stage_history_ids = fields.One2many(
+        'hr.applicant.stage.history', 
+        'applicant_id', 
+        string='Historial de Etapas',
+        help='Historial completo de etapas por las que ha pasado el candidato'
+    )
 
 
     @api.depends('create_date', 'date_closed')
@@ -202,7 +210,66 @@ class HrApplicant(models.Model):
     def create(self, vals):
         if 'user_id' not in vals or not vals['user_id']:
             vals['user_id'] = self.env.user.id  # Asigna el usuario logueado por defecto
-        return super(HrApplicant, self).create(vals)
+        
+        # Crear el applicant
+        applicant = super(HrApplicant, self).create(vals)
+        
+        # === NUEVO: Crear historial inicial ===
+        if applicant.stage_id:
+            self.env['hr.applicant.stage.history'].create({
+                'applicant_id': applicant.id,
+                'stage_id': applicant.stage_id.id,
+                'enter_date': fields.Datetime.now(),
+            })
+        
+        return applicant
+    
+    def write(self, vals):
+        # Validar si el postulante está bloqueado
+        if 'stage_id' in vals and any(applicant.kanban_state == 'blocked' for applicant in self):
+            raise UserError(_("El postulante está bloqueado y no puede avanzar en el proceso hasta que el bloqueo sea resuelto o eliminado manualmente por un usuario autorizado."))
+
+        # === NUEVO: Manejar cambios de etapa para historial ===
+        if 'stage_id' in vals and vals['stage_id']:
+            for applicant in self:
+                old_stage_id = applicant.stage_id.id if applicant.stage_id else False
+                new_stage_id = vals['stage_id']
+                
+                # Solo procesar si realmente cambió la etapa
+                if old_stage_id != new_stage_id:
+                    now = fields.Datetime.now()
+                    
+                    # 1. Si no tiene historial previo, crear registro para la etapa actual (antes del cambio)
+                    if not applicant.stage_history_ids and old_stage_id:
+                        self.env['hr.applicant.stage.history'].create({
+                            'applicant_id': applicant.id,
+                            'stage_id': old_stage_id,
+                            'enter_date': applicant.date_last_stage_update or applicant.create_date,
+                            'leave_date': now,
+                        })
+                    
+                    # 2. Cerrar la etapa anterior (si existe y tiene historial)
+                    elif old_stage_id:
+                        current_history = applicant.stage_history_ids.filtered(
+                            lambda h: h.stage_id.id == old_stage_id and not h.leave_date
+                        )
+                        if current_history:
+                            current_history.write({'leave_date': now})
+                    
+                    # 3. Crear nueva entrada de historial
+                    self.env['hr.applicant.stage.history'].create({
+                        'applicant_id': applicant.id,
+                        'stage_id': new_stage_id,
+                        'enter_date': now,
+                    })
+
+        # Preservar el reclutador (user_id) si no está en los valores
+        if 'user_id' not in vals:
+            for record in self:
+                if record.user_id:
+                    vals['user_id'] = record.user_id.id
+
+        return super(HrApplicant, self).write(vals)
     
     # Computed fields
     @api.depends('weight', 'height')
@@ -350,19 +417,6 @@ class HrApplicant(models.Model):
                 subtype_id=self.env.ref('mail.mt_comment').id
             )
             _logger.info(f"Applicant {applicant.id} blocked and notified")
-
-    def write(self, vals):
-        # Validar si el postulante está bloqueado
-        if 'stage_id' in vals and any(applicant.kanban_state == 'blocked' for applicant in self):
-            raise UserError(_("El postulante está bloqueado y no puede avanzar en el proceso hasta que el bloqueo sea resuelto o eliminado manualmente por un usuario autorizado."))
-
-        # Preservar el reclutador (user_id) si no está en los valores
-        if 'user_id' not in vals:
-            for record in self:
-                if record.user_id:
-                    vals['user_id'] = record.user_id.id
-
-        return super(HrApplicant, self).write(vals)
 
     @api.depends('stage_id.name')
     def _compute_is_examen_medico(self):

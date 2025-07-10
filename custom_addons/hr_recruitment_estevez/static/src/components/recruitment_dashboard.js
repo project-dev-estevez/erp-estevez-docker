@@ -89,13 +89,13 @@ export class RecruitmentDashboard extends Component {
                 topRefuseReason: '',
             },
 
-            // Eficiencia
-            efficiencyDonutChart: {
+            // Tiempo Promedio por Etapa
+            averageTimePerStageChart: {
                 data: {
-                    labels: ["A", "B", "C"],
+                    labels: ["Primera Entrevista", "Examen Técnico", "Examen Médico"],
                     datasets: [{
-                        data: [30, 50, 20],
-                        backgroundColor: ["#007bff", "#28a745", "#ffc107"],
+                        data: [3.5, 7.2, 1.8],
+                        backgroundColor: ["#4ECDC4", "#45B7D1", "#96CEB4"],
                     }]
                 },
                 options: {
@@ -105,7 +105,7 @@ export class RecruitmentDashboard extends Component {
                     }
                 }
             },
-            efficiencyDonutChartCenterValue: 0,
+            averageTimePerStageCenterValue: 42,
 
             startDate: startOfMonth,
             endDate: endOfMonth,            
@@ -269,6 +269,7 @@ export class RecruitmentDashboard extends Component {
             this.getRejectionReasons(),
             this.getVacancyMetrics(),
             this.getFunnelRecruitment(),
+            this.getFunnelRecruitment(),
             this.getRequisitionStats()
         ]);
     }
@@ -284,82 +285,208 @@ export class RecruitmentDashboard extends Component {
     }
 
     getPastelColors(count) {
-        const colors = [];
-        for (let i = 0; i < count; i++) {
-            const hue = Math.floor((360 / count) * i + Math.random() * 30);
-            colors.push(`hsl(${hue}, 70%, 85%)`);
+        // Paleta de colores premium más vivos (12 colores base)
+        const premiumColors = [
+            '#4ECDC4', // Turquesa elegante
+            '#45B7D1', // Azul cielo premium
+            '#96CEB4', // Verde menta sofisticado
+            '#FFEAA7', // Amarillo dorado suave
+            '#DDA0DD', // Lavanda premium
+            '#FFB347', // Naranja mandarina
+            '#98D8C8', // Verde agua cristalina
+            '#F7DC6F', // Oro pálido
+            '#BB8FCE', // Púrpura elegante
+            '#85C1E9', // Azul cielo claro
+            '#F8C471', // Melocotón dorado
+            '#FF6B6B', // Rojo coral vibrante
+        ];
+
+        // Si necesitas 12 o menos colores, usa la paleta predefinida
+        if (count <= premiumColors.length) {
+            return premiumColors.slice(0, count);
         }
+
+        // Para más de 12 colores, combina la paleta base + colores generados dinámicamente
+        const colors = [...premiumColors];
+        
+        // Genera colores adicionales con valores más vivos y distribuidos
+        for (let i = premiumColors.length; i < count; i++) {
+            // Distribuye los matices uniformemente en el círculo cromático
+            const hue = Math.floor((360 / (count - premiumColors.length)) * (i - premiumColors.length));
+            
+            // Saturación alta para colores vivos (65-85%)
+            const saturation = 65 + Math.random() * 20;
+            
+            // Luminosidad premium (55-75%)
+            const lightness = 55 + Math.random() * 20;
+            
+            colors.push(`hsl(${hue}, ${saturation}%, ${lightness}%)`);
+        }
+        
         return colors;
     }
 
     async getFunnelRecruitment() {
-        console.log("Calculando embudo de reclutamiento: ", this.state.selectedVacancy);
         // 1) Leer jobId del state
         const jobId = this.state.selectedVacancy;
-    
+
         // 2) Dominio base: rango + job_id (solo si no es false)
         let baseDomain = this._addDateRangeToDomain([]);
         if (jobId) {
             baseDomain.push(['job_id', '=', jobId]);
         }
-    
-        // 3) Total de postulantes
-        const totalApps = await this.orm.searchCount('hr.applicant', baseDomain) || 0;
-    
-        // 4) Cargar y ordenar etapas
+
+        // 3) Cargar y ordenar etapas
         const stages = await this.orm.searchRead(
-            "hr.recruitment.stage", [], ["id","name","sequence"]
+            "hr.recruitment.stage", [], ["id", "name", "sequence"]
         );
-        stages.sort((a,b)=>a.sequence-b.sequence);
-    
-        // 5) Para cada etapa, contar cuántos han llegado
+        stages.sort((a, b) => a.sequence - b.sequence);
+
+        console.log("Etapas de reclutamiento:", stages);
+
+        // 4) **FUNCIÓN PARA NORMALIZAR STRINGS (solo mayúsculas/minúsculas)**
+        const normalizeString = (str) => {
+            return str.toLowerCase().trim();
+        };
+
+        // 5) **MAPEO DE ETAPAS A GRUPOS (ya en minúsculas)**
+        const stageGroups = [
+            {
+                label: "Aplicaciones",
+                stageNames: ["nuevo", "calificacion inicial", "primer contacto"],
+                minSequence: null,
+                maxSequence: null
+            },
+            {
+                label: "Pruebas Psicométricas", 
+                stageNames: ["pruebas psicométricas"],
+                minSequence: null,
+                maxSequence: null
+            },
+            {
+                label: "Primera Entrevista",
+                stageNames: ["primera entrevista"],
+                minSequence: null,
+                maxSequence: null
+            },
+            {
+                label: "Examen Técnico",
+                stageNames: [
+                    "examen técnico / conocimiento", 
+                    "primera entrevista / técnica", 
+                    "segunda entrevista / técnica", 
+                    "tercera entrevista / técnica"
+                ],
+                minSequence: null,
+                maxSequence: null
+            },
+            {
+                label: "Entrevista Técnica",
+                stageNames: [
+                    "primera entrevista / técnica", 
+                    "segunda entrevista / técnica", 
+                    "tercera entrevista / técnica"
+                ],
+                minSequence: null,
+                maxSequence: null
+            },
+            {
+                label: "Examen Médico",
+                stageNames: ["examen médico"],
+                minSequence: null,
+                maxSequence: null
+            },
+            {
+                label: "Contrataciones",
+                stageNames: ["contrato firmado"],
+                minSequence: null,
+                maxSequence: null
+            }
+        ];
+
+        // 6) **Calcular min/max sequence para cada grupo usando normalización**
+        for (const group of stageGroups) {
+            const groupStages = stages.filter(stage => 
+                group.stageNames.includes(normalizeString(stage.name))
+            );
+            if (groupStages.length > 0) {
+                group.minSequence = Math.min(...groupStages.map(s => s.sequence));
+                group.maxSequence = Math.max(...groupStages.map(s => s.sequence));
+            }
+        }
+
+        // 7) Filtrar grupos válidos y ordenar por sequence
+        const validGroups = stageGroups.filter(g => g.minSequence !== null);
+        validGroups.sort((a, b) => a.minSequence - b.minSequence);
+
+        console.log("Grupos de etapas válidos:", validGroups);
+
+        // 8) Contar applicants para cada grupo
         const counts = [];
-        for (const stage of stages) {
+        for (const group of validGroups) {
             const cnt = await this.orm.searchCount(
                 'hr.applicant',
-                [...baseDomain, ['stage_id.sequence','>=', stage.sequence]]
+                [...baseDomain, ['stage_id.sequence', '>=', group.minSequence]]
             );
             counts.push(cnt);
         }
-        // 6) Asegurar primer bloque = totalApps
-        counts[0] = totalApps;
-    
-        // 7) Labels, colores, opciones
-        const labels = stages.map(s => s.name);
+
+        // 9) **ESTO ES CLAVE: Asegurar que el primer bloque tenga el total**
+        if (counts.length > 0) {
+            const totalApps = await this.orm.searchCount('hr.applicant', baseDomain) || 0;
+            counts[0] = totalApps;
+        }
+
+        // 10) Labels, colores, opciones
+        const labels = validGroups.map(g => g.label);
         const colors = this.getPastelColors(labels.length);
+        
         const options = {
             responsive: true,
             maintainAspectRatio: false,
             aspectRatio: 1.2,
             plugins: {
                 legend: { display: false },
-                tooltip: { callbacks: {
-                    label: ctx => {
-                        const n   = counts[ctx.dataIndex];
-                        const pct = ((n/totalApps)*100).toFixed(1);
-                        return `${labels[ctx.dataIndex]}: ${n} (${pct}%)`;
+                tooltip: { 
+                    callbacks: {
+                        label: ctx => {
+                            const n = counts[ctx.dataIndex];
+                            const total = counts[0] || 1;
+                            const pct = ((n / total) * 100).toFixed(1);
+                            return `${labels[ctx.dataIndex]}: ${n} (${pct}%)`;
+                        }
                     }
-                }},
+                },
                 datalabels: {
-                    anchor: 'center', align: 'center',
-                    color: '#fff', font: { weight:'bold', size:12 },
+                    anchor: 'center', 
+                    align: 'center',
+                    color: '#fff', 
+                    font: { weight: 'bold', size: 12 },
                     backgroundColor: 'rgba(0,0,0,0.6)',
-                    padding: {top:4,bottom:4,left:6,right:6},
-                    formatter: val => {
-                        const pct = ((val/totalApps)*100).toFixed(0);
-                        return `${val}\n${pct}%`;
+                    padding: { top: 4, bottom: 4, left: 6, right: 6 },
+                    formatter: (val, ctx) => {
+                        const n = counts[ctx.dataIndex];
+                        const total = counts[0] || 1;
+                        const pct = ((n / total) * 100).toFixed(0);
+                        return `${labels[ctx.dataIndex]}\n${n}\n${pct}%`;
                     }
                 }
             }
         };
-    
-        // 8) Volcar al state y forzar update
+
+        // 11) Actualizar estado
         this.state.funnelRecruitment = {
-            data: { labels, datasets:[{ data: counts, backgroundColor: colors }] },
+            data: { 
+                labels, 
+                datasets: [{ 
+                    data: counts, 
+                    backgroundColor: colors 
+                }] 
+            },
             options
         };
-        this.state.funnelRecruitment = { ...this.state.funnelRecruitment };
-    }    
+
+    }
 
     async getTopRecruitments() {
         // 1. Total postulaciones por reclutador (por create_date)
@@ -429,8 +556,8 @@ export class RecruitmentDashboard extends Component {
         
         this.state.topRecruitments = {
             data: { labels, datasets: [
-                { label: "Total Postulaciones", data: totalCounts, backgroundColor: "hsl(210,70%,85%)" },
-                { label: "Contratados",          data: hiredCounts, backgroundColor: "hsl(140,70%,85%)" }
+                { label: "Total Postulaciones", data: totalCounts, backgroundColor: '#F7DC6F' },
+                { label: "Contratados",          data: hiredCounts, backgroundColor: '#4ECDC4' }
             ]},
             meta: recruiterStats,
             options: {
@@ -669,19 +796,7 @@ export class RecruitmentDashboard extends Component {
             refused,
             topRefuseReason: topReason,
         };
-    }   
-
-    // async onVacancyChange(ev) {
-    //     // 1) Leer y fijar el nuevo valor
-    //     const raw = ev.target.value;
-    //     this.state.selectedVacancy = raw === 'false' ? false : parseInt(raw, 10);
-    
-    //     // 2) Dejar que OWL aplique el estado y luego recargar
-    //     Promise.resolve().then(async () => {
-    //         await this.getVacancyMetrics();
-    //         await this.getFunnelRecruitment();
-    //     });
-    // }
+    }
 
     async getSourceRecruitment() {
         // 1. Total postulaciones por fuente (por create_date)

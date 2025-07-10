@@ -328,11 +328,11 @@
                                     style="height: 300px;">
                                     <ChartRenderer
                                         type="'doughnut'"
-                                        config="state.efficiencyDonutChart" />
+                                        config="state.averageTimePerStageChart" />
                                     <div
-                                        class="position-absolute top-60 start-50 translate-middle w-100 text-center">
+                                        class="position-absolute top-65 start-50 translate-middle w-100 text-center">
                                         <span class="fw-bolder text-primary display-3 lh-1">
-                                            <t t-esc="state.efficiencyDonutChartCenterValue || '0'" />
+                                            <t t-esc="state.averageTimePerStageCenterValue || '0'" />
                                         </span>
                                     </div>
                                 </div>
