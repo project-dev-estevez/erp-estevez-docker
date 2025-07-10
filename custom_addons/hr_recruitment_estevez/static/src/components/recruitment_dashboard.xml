@@ -324,8 +324,17 @@
                                         <span class="fa fa-arrow-right text-white"/>
                                     </div>
                                 </div>
-                                <div>
-                                    aqui lo que sea mijo
+                                <div class="d-flex flex-column align-items-center justify-content-center position-relative"
+                                    style="height: 300px;">
+                                    <ChartRenderer
+                                        type="'doughnut'"
+                                        config="state.efficiencyDonutChart" />
+                                    <div
+                                        class="position-absolute top-60 start-50 translate-middle w-100 text-center">
+                                        <span class="fw-bolder text-primary display-3 lh-1">
+                                            <t t-esc="state.efficiencyDonutChartCenterValue || '0'" />
+                                        </span>
+                                    </div>
                                 </div>
                             </div>
                         </div>

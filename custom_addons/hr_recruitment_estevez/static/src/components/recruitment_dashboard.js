@@ -89,6 +89,24 @@ export class RecruitmentDashboard extends Component {
                 topRefuseReason: '',
             },
 
+            // Eficiencia
+            efficiencyDonutChart: {
+                data: {
+                    labels: ["A", "B", "C"],
+                    datasets: [{
+                        data: [30, 50, 20],
+                        backgroundColor: ["#007bff", "#28a745", "#ffc107"],
+                    }]
+                },
+                options: {
+                    cutout: "70%", // Donut
+                    plugins: {
+                        legend: { display: true, position: "bottom" }
+                    }
+                }
+            },
+            efficiencyDonutChartCenterValue: 0,
+
             startDate: startOfMonth,
             endDate: endOfMonth,            
         })
