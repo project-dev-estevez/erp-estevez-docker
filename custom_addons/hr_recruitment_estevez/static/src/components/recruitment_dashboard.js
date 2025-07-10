@@ -287,7 +287,6 @@ export class RecruitmentDashboard extends Component {
     getPastelColors(count) {
         // Paleta de colores premium más vivos (12 colores base)
         const premiumColors = [
-            '#FF6B6B', // Rojo coral vibrante
             '#4ECDC4', // Turquesa elegante
             '#45B7D1', // Azul cielo premium
             '#96CEB4', // Verde menta sofisticado
@@ -299,6 +298,7 @@ export class RecruitmentDashboard extends Component {
             '#BB8FCE', // Púrpura elegante
             '#85C1E9', // Azul cielo claro
             '#F8C471', // Melocotón dorado
+            '#FF6B6B', // Rojo coral vibrante
         ];
 
         // Si necesitas 12 o menos colores, usa la paleta predefinida
@@ -556,8 +556,8 @@ export class RecruitmentDashboard extends Component {
         
         this.state.topRecruitments = {
             data: { labels, datasets: [
-                { label: "Total Postulaciones", data: totalCounts, backgroundColor: "hsl(210,70%,85%)" },
-                { label: "Contratados",          data: hiredCounts, backgroundColor: "hsl(140,70%,85%)" }
+                { label: "Total Postulaciones", data: totalCounts, backgroundColor: '#F7DC6F' },
+                { label: "Contratados",          data: hiredCounts, backgroundColor: '#4ECDC4' }
             ]},
             meta: recruiterStats,
             options: {
