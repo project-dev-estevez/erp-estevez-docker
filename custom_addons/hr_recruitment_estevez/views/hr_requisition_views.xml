@@ -6,22 +6,22 @@
         <field name="model">hr.requisition</field>
         <field name="arch" type="xml">
             <list>
-                <field name="create_date" string="Fecha y Hora"/>
+                <field name="create_date" string="Fecha de Solicitud"/>
                 <field name="workstation_job_id"/>
+                <field name="tag_ids" widget="many2many_tags" string="Etiquetas" optional="show"/>
                 <field name="workstation_area_id" string="Área" optional="show"/>
                 <field name="workstation_department_id" string="Departamento" optional="show"/>
-                <field name="number_of_vacancies" string="Vacantes" optional="show"/>
+                <field name="number_of_vacancies" string="N° Vacantes" optional="show"/>
                 <field name="requestor_id" optional="show"/>
                 <field name="company_id" optional="hide"/>
                 <field name="requisition_type" optional="hide"/>
                 <field name="project_id" string="Proyecto" optional="show"/>
-                <field name="tag_ids" widget="many2many_tags" string="Etiquetas" optional="show"/>
-                <field name="publication_status" string="Estado" 
+                <field name="publication_status" string="Estado Vacante" 
                        widget="badge"
                        decoration-success="publication_status == 'Abierta'"
                        decoration-danger="publication_status == 'Cerrada'"
                        decoration-warning="publication_status == 'Por Activar'"/>
-                <field name="state" 
+                <field name="state" string="Estado Requisición"
                        optional="show"
                        widget="badge" 
                        decoration-muted="state == 'to_approve'" 
@@ -36,6 +36,7 @@
         </field>
     </record>
 
+    <!-- Vista de formulario para requisiciones -->
     <record id="view_hr_requisition_form" model="ir.ui.view">
         <field name="name">hr.requisition.form</field>
         <field name="model">hr.requisition</field>
@@ -324,8 +325,6 @@
             </form>
         </field>
     </record>
-
- 
 
     <!-- Vista de search para requisiciones -->
     <record id="view_hr_requisition_search" model="ir.ui.view">
