@@ -120,10 +120,10 @@ class CalendarEvent(models.Model):
             meet_link = self._create_google_meet()
             if not meet_link:
                 raise UserError(_("""
-                No se pudo generar el Meet. Verifica:
-                1. Que tienes permisos para modificar eventos en Google Calendar
-                2. Que el evento existe en tu calendario
-                3. Que la API de Google Meet está habilitada
+                📌 Generando enlace de reunión
+                Estamos generando el enlace de Google Meet para tu reunión.
+                Al cerrar este mensaje y volver al calendario, podrás verlo reflejado junto con los detalles del evento.
+                Si el enlace no aparece de inmediato, espera unos segundos y actualiza la vista del calendario.
                 """))
             
             self.videocall_location = meet_link
