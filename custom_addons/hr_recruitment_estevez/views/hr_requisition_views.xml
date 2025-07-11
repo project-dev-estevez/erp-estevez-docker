@@ -6,22 +6,22 @@
         <field name="model">hr.requisition</field>
         <field name="arch" type="xml">
             <list>
-                <field name="create_date" string="Fecha de Solicitud"/>
-                <field name="workstation_job_id"/>
-                <field name="tag_ids" widget="many2many_tags" string="Etiquetas" optional="show"/>
-                <field name="workstation_area_id" string="Área" optional="show"/>
-                <field name="workstation_department_id" string="Departamento" optional="show"/>
-                <field name="number_of_vacancies" string="N° Vacantes" optional="show"/>
-                <field name="requestor_id" optional="show"/>
-                <field name="company_id" optional="hide"/>
+                <field name="create_date" string="Fecha de Solicitud" width="180"/>
+                <field name="workstation_job_id" width="180"/>
+                <field name="tag_ids" widget="many2many_tags" string="Etiquetas" optional="show" width="180"/>
+                <field name="workstation_area_id" string="Área" optional="show" width="180"/>
+                <field name="workstation_department_id" string="Departamento" optional="show" width="180"/>
+                <field name="number_of_vacancies" string="N° Vacantes" optional="show" width="180"/>
+                <field name="requestor_id" optional="show" width="180"/>
+                <field name="company_id" optional="hide" width="180"/>
                 <field name="requisition_type" optional="hide"/>
-                <field name="project_id" string="Proyecto" optional="show"/>
-                <field name="publication_status" string="Estado Vacante" 
+                <field name="project_id" string="Proyecto" optional="show" width="180"/>
+                <field name="publication_status" string="Estado Vacante" width="180"
                        widget="badge"
                        decoration-success="publication_status == 'Abierta'"
                        decoration-danger="publication_status == 'Cerrada'"
                        decoration-warning="publication_status == 'Por Activar'"/>
-                <field name="state" string="Estado Requisición"
+                <field name="state" string="Estado Requisición" width="180"
                        optional="show"
                        widget="badge" 
                        decoration-muted="state == 'to_approve'" 
@@ -338,7 +338,7 @@
                 <field name="requisition_type"/>
                 <field name="state"/>
                 <separator/>
-                <filter name="filter_to_approve" string="Esperándome" domain="[('state', 'in', ['to_approve', 'first_approval'])]" />     
+                <filter name="filter_to_approve" string="Por aprobar" domain="[('state', 'in', ['to_approve', 'first_approval'])]" />     
                  <!-- Por Área -->            
                 <filter name="filter_area_operaciones" string="Área Operaciones" domain="[('workstation_area_id.name', '=', 'Operaciones')]"/>
 
