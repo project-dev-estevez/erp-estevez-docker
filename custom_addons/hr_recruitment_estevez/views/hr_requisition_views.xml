@@ -363,7 +363,7 @@
                 <separator string="Estado de Vacante"/>
                 <filter name="vacant_open" string="Vacante Abierta" domain="[('publication_status', '=', 'Abierta')]"/>
                 <filter name="vacant_closed" string="Vacante Cerrada" domain="[('publication_status', '=', 'Cerrada')]"/>
-                <filter name="vacant_pending" string="Vacante por Activar" domain="[('publication_status', '=', 'Por Aprobar')]"/>
+                <filter name="vacant_pending" string="Vacante por Activar" domain="[('publication_status', '=', 'Por Activar')]"/>
             </search>
         </field>
     </record>
