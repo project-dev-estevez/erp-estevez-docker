@@ -360,13 +360,13 @@
                 <filter name="state_approved" string="Aprobadas" domain="[('state', '=', 'approved')]"/>
                 <filter name="state_rejected" string="Rechazadas" domain="[('state', '=', 'rejected')]"/>      
 
-                <separator string="Estado de Vacante"/>
+                <!--separator string="Estado de Vacante"/>
                 <filter name="filter_vacancy_open" string="Abierta" 
                     domain="[('publication_status','=','Abierta')]"/>
                 <filter name="filter_vacancy_closed" string="Cerrada" 
                     domain="[('publication_status','=','Cerrada')]"/>
                 <filter name="filter_vacancy_to_activate" string="Por Activar" 
-                    domain="[('publication_status','=','Por Activar')]"/>
+                    domain="[('publication_status','=','Por Activar')]"/-->
             </search>
         </field>
     </record>
