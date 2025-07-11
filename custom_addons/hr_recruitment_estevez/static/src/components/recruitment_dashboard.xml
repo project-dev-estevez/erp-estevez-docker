@@ -331,7 +331,7 @@
                                         config="state.averageTimePerStageChart" />
                                     <div
                                         class="position-absolute top-65 start-50 translate-middle w-100 text-center">
-                                        <span class="fw-bolder text-primary display-3 lh-1">
+                                        <span class="fw-bolder text-primary h2 lh-1">
                                             <t t-esc="state.averageTimePerStageCenterValue || '0'" />
                                         </span>
                                     </div>
