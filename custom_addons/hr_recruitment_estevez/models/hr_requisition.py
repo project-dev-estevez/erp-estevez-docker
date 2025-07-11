@@ -28,7 +28,7 @@ class HrRequisition(models.Model):
         ('first_approval', 'En Curso'),
         ('rejected', 'Rechazado'),
         ('approved', 'Aprobado'),
-    ], string="Estado", default='to_approve', track_visibility='onchange')
+    ], default='to_approve', track_visibility='onchange')
 
     requisition_number = fields.Char(string='Formato de Solicitud', readonly=True, default='DA-F0-TH-006')
     # Información del solicitante
@@ -133,8 +133,7 @@ class HrRequisition(models.Model):
     ]
 
     # Nuevo campo computado
-    publication_status = fields.Char(
-        string='Estado Publicación',
+    publication_status = fields.Char(        
         compute='_compute_publication_status',
         store=False
     )    
