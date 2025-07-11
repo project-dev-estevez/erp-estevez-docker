@@ -221,7 +221,7 @@
                                     class="btn-primary" 
                                     invisible="wizard_step == 'equipo'"/>
                                     
-                            <button name="action_save" type="object" string="Guardar"
+                            <button name="action_save" type="object" string="Guardar y Finalizar"
                                 class="btn-primary" 
                                 invisible="wizard_step != 'equipo'"
                                 confirm="¿Estás seguro de que deseas guardar la requisición?"
@@ -338,7 +338,27 @@
                 <field name="requisition_type"/>
                 <field name="state"/>
                 <separator/>
-                <filter name="filter_to_approve" string="Esperándome" domain="[('state', 'in', ['to_approve', 'first_approval'])]" />
+                <filter name="filter_to_approve" string="Esperándome" domain="[('state', 'in', ['to_approve', 'first_approval'])]" />     
+                 <!-- Por Área -->            
+                <filter name="filter_area_operaciones" string="Área Operaciones" domain="[('workstation_area_id.name', '=', 'Operaciones')]"/>
+
+                <!-- Por Departamento -->
+                <filter name="filter_dep_rh" string="Departamento Compras" domain="[('workstation_department_id.name', '=', 'Compras')]"/>            
+
+                <!-- Por Proyecto -->
+                <filter name="filter_proj_sinproyecto" string="Sin Proyecto" domain="[('project_id', '=', False)]"/>                
+
+                <!-- Por Tipo de Requisición -->
+                <filter name="filter_type_new" string="Nueva Vacante" domain="[('requisition_type','=','new_vacancy')]"/>                
+
+                <!-- Estado de la Requisición -->
+                <separator string="Estado de Requisición"/>
+                <filter name="state_to_approve" string="Por Aprobar" domain="[('state', '=', 'to_approve')]"/>
+                <filter name="state_first_approval" string="Primera Aprobación" domain="[('state', '=', 'first_approval')]"/>
+                <filter name="state_second_approval" string="Segunda Aprobación" domain="[('state', '=', 'second_approval')]"/>
+                <filter name="state_approved" string="Aprobadas" domain="[('state', '=', 'approved')]"/>
+                <filter name="state_rejected" string="Rechazadas" domain="[('state', '=', 'rejected')]"/>      
+                
             </search>
         </field>
     </record>

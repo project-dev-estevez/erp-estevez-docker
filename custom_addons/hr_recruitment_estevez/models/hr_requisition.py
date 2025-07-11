@@ -382,21 +382,24 @@ class HrRequisition(models.Model):
             'datos_puesto': "Faltan datos importantes en 'Datos del puesto'"
         }
         
-        # Aquí puedes agregar validaciones específicas por paso
-        # Por ejemplo, si en el paso 'especificaciones' hay un campo obligatorio:
-        if self.wizard_step == 'especificaciones':
-            if not self.requisition_type:  # Reemplaza con tu campo real
-                raise UserError(error_messages['especificaciones'])
-        elif self.wizard_step == 'datos_puesto':
-            if not self.job_type:  # Reemplaza con tu campo real
-                raise UserError(error_messages['datos_puesto'])
-        
         steps = {
-            'especificaciones': 'datos_puesto',
+           'especificaciones': 'datos_puesto',
             'datos_puesto': 'equipo'
         }
+
         for record in self:
+        
+            # Validación por paso
+            if record.wizard_step == 'especificaciones':
+                if not record.requisition_type:
+                    raise UserError(error_messages['especificaciones'])
+            elif record.wizard_step == 'datos_puesto':
+                if not record.job_type:
+                    raise UserError(error_messages['datos_puesto'])
+
+            # Cambio al siguiente paso
             record.wizard_step = steps.get(record.wizard_step, 'equipo')
+                
         return False
     
     def set_wizard_step(self, step):
