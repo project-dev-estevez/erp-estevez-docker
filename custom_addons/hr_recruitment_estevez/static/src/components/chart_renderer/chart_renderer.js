@@ -18,9 +18,9 @@ export class ChartRenderer extends Component {
     }
 
     renderChart() {
-        if (window.Chart && window.Chart.register && window.ChartDataLabels) {
-            window.Chart.register(window.ChartDataLabels);
-        }
+        // if (window.Chart && window.Chart.register && window.ChartDataLabels) {
+        //     window.Chart.register(window.ChartDataLabels);
+        // }
         // Destruye la instancia previa si existe
         if (this.chartInstance) {
             console.log("Destroying previous chart instance");
@@ -59,10 +59,21 @@ export class ChartRenderer extends Component {
                 }
             }
         };
+
+        // ✅ NUEVO: Solo agregar datalabels si se especifica
+        const plugins = [];
+        
+        // Verificar si esta gráfica específica quiere datalabels
+        if (config.enableDataLabels && window.ChartDataLabels) {
+            plugins.push(window.ChartDataLabels);
+            console.log("📊 DataLabels habilitado para esta gráfica");
+        }
+
         this.chartInstance = new Chart(this.chartRef.el, {
             type: this.props.type,
             data: data,
             options: options,
+            plugins: plugins,
         });
     }
 }

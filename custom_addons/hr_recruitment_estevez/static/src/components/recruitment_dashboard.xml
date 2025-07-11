@@ -90,7 +90,7 @@
                         <div class="col-lg-6 m-0 p-0">
                             <div class="shadow-sm border m-2 p-4 bg-white">
                                 <div class="d-flex align-items-center justify-content-between">
-                                    <h3 class="text-primary fw-bold">Postulaciones por Reclutador</h3>
+                                    <h3 class="text-primary fw-bold">Eficiencia de contratación por reclutador</h3>
                                     <div class="px-3 py-1 bg-primary cursor-pointer">
                                         <span class="fa fa-arrow-right text-white"/>
                                     </div>
@@ -101,7 +101,7 @@
                         <div class="col-lg-6 m-0 p-0">
                             <div class="shadow-sm border m-2 p-4 bg-white">
                                 <div class="d-flex align-items-center justify-content-between">
-                                    <h3 class="text-primary fw-bold">Fuentes</h3>
+                                    <h3 class="text-primary fw-bold">Efectividad de las Fuentes de Reclutamiento</h3>
                                     <div class="px-3 py-1 bg-primary cursor-pointer">
                                         <span class="fa fa-arrow-right text-white"/>
                                     </div>
@@ -112,7 +112,7 @@
                                         <ChartRenderer type="'pie'" title="'Fuentes de Reclutamiento'" config="state.sourceRecruitment"/>
                                     </div>
                                     <div class="col-12 col-md-6">
-                                        <h3 class="text-primary fw-bold">Inidicadores de Reclutamiento</h3>
+                                        <!-- <h3 class="text-primary fw-bold">Inidicadores de Reclutamiento</h3> -->
                                         <div class="table-responsive">
                                             <table class="table table-borderless align-middle">
                                                 <thead>
@@ -146,7 +146,7 @@
                         <div class="col-12 m-0 p-0">
                             <div class="shadow-sm border m-2 p-4 bg-white">
                                 <div class="d-flex align-items-center justify-content-center">
-                                    <h3 class="text-primary text-center fw-bold">Motivos de Rechazo</h3>
+                                    <h3 class="text-primary text-center fw-bold">Rechazos y Declinaciones en el Reclutamiento</h3>
                                 </div>
                                 <div class="row mt-2">
                                     <div class="col">
@@ -171,7 +171,7 @@
                         <div class="col-12 m-0 p-0">
                             <div class="shadow-sm border m-2 p-4 bg-white">
                                 <div class="d-flex align-items-center justify-content-center mt-4">
-                                    <h3 class="text-primary text-center fw-bold">Embudo de Etapas</h3>
+                                    <h3 class="text-primary text-center fw-bold">Embudo de reclutamiento por vacante</h3>
                                 </div>
                                 <div class="row">
                                     <div class="col-4">
@@ -331,7 +331,7 @@
                                         config="state.averageTimePerStageChart" />
                                     <div
                                         class="position-absolute top-65 start-50 translate-middle w-100 text-center">
-                                        <span class="fw-bolder text-primary display-3 lh-1">
+                                        <span class="fw-bolder text-primary h2 lh-1">
                                             <t t-esc="state.averageTimePerStageCenterValue || '0'" />
                                         </span>
                                     </div>
