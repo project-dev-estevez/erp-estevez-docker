@@ -470,7 +470,8 @@ export class RecruitmentDashboard extends Component {
                     backgroundColor: colors 
                 }] 
             },
-            options
+            options,
+            enableDataLabels: true
         };
 
     }
