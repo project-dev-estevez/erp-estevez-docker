@@ -358,10 +358,7 @@
                 <filter name="state_second_approval" string="Segunda Aprobación" domain="[('state', '=', 'second_approval')]"/>
                 <filter name="state_approved" string="Aprobadas" domain="[('state', '=', 'approved')]"/>
                 <filter name="state_rejected" string="Rechazadas" domain="[('state', '=', 'rejected')]"/>      
-
-                <!-- Estado de la Vacante -->
-                <separator string="Estado de Vacante"/>
-                <filter name="vacant_open" string="Vacante Abierta" domain="[('publication_status', '=', 'Abierta')]"/>                
+                
             </search>
         </field>
     </record>
