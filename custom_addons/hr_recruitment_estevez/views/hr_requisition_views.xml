@@ -350,16 +350,7 @@
                 <filter name="filter_proj_sinproyecto" string="Sin Proyecto" domain="[('project_id', '=', False)]"/>                
 
                 <!-- Por Tipo de Requisición -->
-                <filter name="filter_type_new" string="Nueva Vacante" domain="[('requisition_type','=','new_vacancy')]"/>                
-
-                <!-- Filtro para Estado Vacante -->
-            <separator string="Estado de Vacante"/>
-            <filter name="filter_vacancy_open" string="Abierta" 
-                    domain="[('publication_status','=','Abierta')]"/>
-            <filter name="filter_vacancy_closed" string="Cerrada" 
-                    domain="[('publication_status','=','Cerrada')]"/>
-            <filter name="filter_vacancy_to_activate" string="Por Activar" 
-                    domain="[('publication_status','=','Por Activar')]"/>
+                <filter name="filter_type_new" string="Nueva Vacante" domain="[('requisition_type','=','new_vacancy')]"/>                              
 
                 <!-- Estado de la Requisición -->
                 <separator string="Estado de Requisición"/>
@@ -369,13 +360,13 @@
                 <filter name="state_approved" string="Aprobadas" domain="[('state', '=', 'approved')]"/>
                 <filter name="state_rejected" string="Rechazadas" domain="[('state', '=', 'rejected')]"/>      
 
-                <!--separator string="Estado de Vacante"/>
+                <separator string="Estado de Vacante"/>
                 <filter name="filter_vacancy_open" string="Abierta" 
                     domain="[('publication_status','=','Abierta')]"/>
                 <filter name="filter_vacancy_closed" string="Cerrada" 
                     domain="[('publication_status','=','Cerrada')]"/>
                 <filter name="filter_vacancy_to_activate" string="Por Activar" 
-                    domain="[('publication_status','=','Por Activar')]"/-->
+                    domain="[('publication_status','=','Por Activar')]"/>
             </search>
         </field>
     </record>
