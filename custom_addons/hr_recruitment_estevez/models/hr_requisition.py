@@ -148,10 +148,12 @@ class HrRequisition(models.Model):
     @api.depends('state', 'is_published')
     def _compute_publication_status(self):
         for record in self:
-            if record.state != 'approved':
-                record.publication_status = 'Por Activar'
+            if record.state == 'first_approval':
+                record.publication_status = 'Por Abrir'
+            elif record.state == 'approved':
+                 record.publication_status = 'Abierta' if record.is_published else 'Cerrada'
             else:
-                record.publication_status = 'Abierta' if record.is_published else 'Cerrada'
+                record.publication_status = 'Por Activar'
 
     # Acciones de estado
     def action_approve(self):
