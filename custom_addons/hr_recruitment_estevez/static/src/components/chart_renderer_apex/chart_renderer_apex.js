@@ -38,7 +38,9 @@ export class ChartRendererApex extends Component {
                 type: chartType,
                 height: this.props.height || 350,
                 width: '100%',
+                cursor: 'pointer',
                 toolbar: {
+                    show: true,
                     // ...configuración del toolbar sin cambios...
                 },
                 events: {
@@ -48,6 +50,21 @@ export class ChartRendererApex extends Component {
                     enabled: true,
                     easing: 'easeinout',
                     speed: 800
+                }
+            },
+            states: {
+                hover: {
+                    filter: {
+                        type: 'lighten',
+                        value: 0.15  // Ilumina un 15% al hacer hover
+                    }
+                },
+                active: {
+                    allowMultipleDataPointsSelection: false,
+                    filter: {
+                        type: 'darken',
+                        value: 0.35  // Oscurece al hacer click
+                    }
                 }
             },
             plotOptions: {
