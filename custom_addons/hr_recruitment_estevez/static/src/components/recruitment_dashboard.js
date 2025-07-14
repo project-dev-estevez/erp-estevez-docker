@@ -580,9 +580,9 @@ export class RecruitmentDashboard extends Component {
                         borderRadius: 4
                     }
                 },
-                dataLabels: {
-                    enabled: false  // Sin labels en las barras
-                },
+                // dataLabels: {
+                //     enabled: false  // Sin labels en las barras
+                // },
                 stroke: {
                     width: 1,
                     colors: ['#fff']

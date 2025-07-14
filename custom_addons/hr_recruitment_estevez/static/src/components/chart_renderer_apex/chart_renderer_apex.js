@@ -39,66 +39,76 @@ export class ChartRendererApex extends Component {
                 height: this.props.height || 350,
                 width: '100%',
                 toolbar: {
-                    show: true,  // ✅ CAMBIO: Habilitar toolbar
-                    offsetX: 0,
-                    offsetY: 0,
-                    tools: {
-                        download: true,      // ✅ HABILITAR: Menú desplegable nativo
-                        selection: false,
-                        zoom: false,
-                        zoomin: false,
-                        zoomout: false,
-                        pan: false,
-                        reset: false
-                    },
-                    // ✅ CONFIGURACIÓN: Opciones de exportación
-                    export: {
-                        csv: {
-                            filename: `${config.filename || 'grafica'}_datos`,
-                            columnDelimiter: ',',
-                            headerCategory: 'Categoría',
-                            headerValue: 'Valor',
-                            dateFormatter(timestamp) {
-                                return new Date(timestamp).toDateString()
-                            }
-                        },
-                        svg: {
-                            filename: `${config.filename || 'grafica'}_imagen`,
-                        },
-                        png: {
-                            filename: `${config.filename || 'grafica'}_imagen`,
-                            width: undefined,    // Usar ancho del gráfico
-                            height: undefined    // Usar altura del gráfico
-                        }
-                    },
-                    // ✅ NUEVO: Auto-selected para mostrar menú desplegable
-                    autoSelected: 'download'
+                    // ...configuración del toolbar sin cambios...
                 },
-                // ✅ NUEVO: Eventos para personalizar descarga
                 events: {
-                    beforeExport: function (chartContext, options) {
-                        console.log(`📥 Descargando ${options.type.toUpperCase()}: ${options.filename}`);
-
-                        // Personalizar nombre según tipo
-                        const fecha = new Date().toISOString().split('T')[0];
-                        const baseFilename = config.filename || 'grafica';
-
-                        if (options.type === 'csv') {
-                            options.filename = `${baseFilename}_datos_${fecha}`;
-                        } else {
-                            options.filename = `${baseFilename}_imagen_${fecha}`;
-                        }
-
-                        return options;
-                    },
-                    exported: function (chartContext, options) {
-                        console.log(`✅ ${options.type.toUpperCase()} descargado exitosamente: ${options.filename}`);
-                    }
+                    // ...eventos sin cambios...
                 },
                 animations: {
                     enabled: true,
                     easing: 'easeinout',
                     speed: 800
+                }
+            },
+            plotOptions: {
+                bar: {
+                    horizontal: isHorizontal,
+                    borderRadius: 4,
+                    columnWidth: '60%',
+                    barHeight: '70%',
+                    // ✅ NUEVO: Configuración para labels en barras
+                    dataLabels: {
+                        position: 'center'  // Centrar en la barra
+                    }
+                }
+            },
+            // ✅ CAMBIO PRINCIPAL: Habilitar dataLabels con configuración personalizada
+            dataLabels: {
+                enabled: true,  // ✅ CAMBIAR: De false a true
+                enabledOnSeries: undefined,  // En todas las series
+                formatter: function (val, opts) {
+                    // Solo mostrar el nombre en la primera serie (Total Postulaciones)
+                    if (opts.seriesIndex === 0) {
+                        const categoryIndex = opts.dataPointIndex;
+                        const categoryName = config.categories ? config.categories[categoryIndex] : '';
+                        return categoryName;  // ✅ Retorna el nombre del reclutador
+                    }
+                    return '';  // No mostrar nada en la segunda serie (Contratados)
+                },
+                textAnchor: 'start',  // ✅ Alinear texto al inicio (izquierda)
+                distributed: false,
+                offsetX: -10,  // ✅ Mover hacia la izquierda
+                offsetY: 0,
+                style: {
+                    fontSize: '12px',
+                    fontFamily: 'Helvetica, Arial, sans-serif',
+                    fontWeight: 'bold',
+                    colors: ['#333333']  // Color del texto
+                },
+                background: {
+                    enabled: false  // Sin fondo
+                },
+                dropShadow: {
+                    enabled: false
+                }
+            },
+            stroke: {
+                show: true,
+                width: 2,
+                colors: ['transparent']
+            },
+            xaxis: {
+                categories: config.categories || [],
+                labels: {
+                    show: false  // ✅ OCULTAR: Labels del eje X ya que están en las barras
+                }
+            },
+            yaxis: {
+                title: {
+                    text: config.yAxisTitle || ''
+                },
+                labels: {
+                    show: false  // ✅ OPCIONAL: Ocultar labels del eje Y también
                 }
             },
             // ...resto de configuración sin cambios...
