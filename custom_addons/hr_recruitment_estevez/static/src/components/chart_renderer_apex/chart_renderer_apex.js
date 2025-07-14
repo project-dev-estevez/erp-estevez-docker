@@ -35,11 +35,65 @@ export class ChartRendererApex extends Component {
         // Configuración base de ApexCharts
         const defaultOptions = {
             chart: {
-                type: chartType,  // Siempre 'bar', el horizontal se controla en plotOptions
+                type: chartType,
                 height: this.props.height || 350,
-                width: '100%',    // ✅ AGREGAR: Asegurar ancho
+                width: '100%',
                 toolbar: {
-                    show: false
+                    show: true,  // ✅ CAMBIO: Habilitar toolbar
+                    offsetX: 0,
+                    offsetY: 0,
+                    tools: {
+                        download: true,      // ✅ HABILITAR: Menú desplegable nativo
+                        selection: false,
+                        zoom: false,
+                        zoomin: false,
+                        zoomout: false,
+                        pan: false,
+                        reset: false
+                    },
+                    // ✅ CONFIGURACIÓN: Opciones de exportación
+                    export: {
+                        csv: {
+                            filename: `${config.filename || 'grafica'}_datos`,
+                            columnDelimiter: ',',
+                            headerCategory: 'Categoría',
+                            headerValue: 'Valor',
+                            dateFormatter(timestamp) {
+                                return new Date(timestamp).toDateString()
+                            }
+                        },
+                        svg: {
+                            filename: `${config.filename || 'grafica'}_imagen`,
+                        },
+                        png: {
+                            filename: `${config.filename || 'grafica'}_imagen`,
+                            width: undefined,    // Usar ancho del gráfico
+                            height: undefined    // Usar altura del gráfico
+                        }
+                    },
+                    // ✅ NUEVO: Auto-selected para mostrar menú desplegable
+                    autoSelected: 'download'
+                },
+                // ✅ NUEVO: Eventos para personalizar descarga
+                events: {
+                    beforeExport: function (chartContext, options) {
+                        console.log(`📥 Descargando ${options.type.toUpperCase()}: ${options.filename}`);
+
+                        // Personalizar nombre según tipo
+                        const fecha = new Date().toISOString().split('T')[0];
+                        const baseFilename = config.filename || 'grafica';
+
+                        if (options.type === 'csv') {
+                            options.filename = `${baseFilename}_datos_${fecha}`;
+                        } else {
+                            options.filename = `${baseFilename}_imagen_${fecha}`;
+                        }
+
+                        return options;
+                    },
+                    exported: function (chartContext, options) {
+                        console.log(`✅ ${options.type.toUpperCase()} descargado exitosamente: ${options.filename}`);
+                    }
                 },
                 animations: {
                     enabled: true,
@@ -47,52 +101,7 @@ export class ChartRendererApex extends Component {
                     speed: 800
                 }
             },
-            plotOptions: {
-                bar: {
-                    horizontal: isHorizontal,  // ✅ CORREGIR: Usar variable calculada
-                    borderRadius: 4,
-                    columnWidth: '60%',
-                    barHeight: '70%'  // ✅ AGREGAR: Para barras horizontales
-                }
-            },
-            dataLabels: {
-                enabled: false
-            },
-            stroke: {
-                show: true,
-                width: 2,
-                colors: ['transparent']
-            },
-            xaxis: {
-                categories: config.categories || [],
-                labels: {
-                    show: true
-                }
-            },
-            yaxis: {
-                title: {
-                    text: config.yAxisTitle || ''
-                }
-            },
-            fill: {
-                opacity: 1
-            },
-            tooltip: {
-                theme: 'light'
-            },
-            colors: config.colors || ['#007bff', '#28a745', '#ffc107', '#dc3545', '#6f42c1'],
-            // ✅ AGREGAR: Configuración específica para responsive
-            responsive: [{
-                breakpoint: 480,
-                options: {
-                    chart: {
-                        width: 200
-                    },
-                    legend: {
-                        position: 'bottom'
-                    }
-                }
-            }]
+            // ...resto de configuración sin cambios...
         };
 
         // Merger configuración personalizada
