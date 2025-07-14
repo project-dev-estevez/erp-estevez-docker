@@ -85,17 +85,16 @@
                                      showPercentage="false"/>
                         </div>
                     </div>
+
                     <!-- Postulaciones por reclutador y fuentes de reclutamiento -->
                     <div class="row">
                         <div class="col-lg-6 m-0 p-0">
                             <div class="shadow-sm border m-2 p-4 bg-white">
-                                <div class="d-flex align-items-center justify-content-between">
-                                    <h3 class="text-primary fw-bold">Eficiencia de contratación por reclutador</h3>
-                                    <div class="px-3 py-1 bg-primary cursor-pointer">
-                                        <span class="fa fa-arrow-right text-white"/>
-                                    </div>
-                                </div>
-                                <ChartRenderer type="'bar'" title="'Postulaciones por Reclutador'" config="state.topRecruitments"/>
+                                <ChartRendererApex
+                                    type="'bar-horizontal'"
+                                    height="350"
+                                    config="state.topRecruitments" />
+                                <!-- <ChartRenderer type="'bar'" title="'Postulaciones por Reclutador'" config="state.topRecruitments"/> -->
                             </div>
                         </div>
                         <div class="col-lg-6 m-0 p-0">
@@ -237,8 +236,7 @@
                                                     <t t-if="state.vacancyMetrics.openDuration">
                                                         <div
                                                             class="mb-2 border-top pt-2 d-flex justify-content-between align-items-center">
-                                                            <div class="text-muted small">Tiempo
-                                                                abierta</div>
+                                                            <div class="text-muted small">Tiempo abierta</div>
                                                             <div class="fw-semibold fs-5">
                                                                 <t
                                                                     t-esc="state.vacancyMetrics.openDuration || '—'" />

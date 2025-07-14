@@ -1,0 +1,5 @@
+<templates xml:space="preserve">
+    <t t-name="owl.ChartRendererApex" owl="1">
+        <div t-ref="apexChart" class="apex-chart-container" style="min-height: 350px; width: 100%;"/>
+    </t>
+</templates>
