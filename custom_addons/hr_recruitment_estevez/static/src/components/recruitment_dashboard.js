@@ -5,6 +5,7 @@ import { KpiCard } from "./kpi_card/kpi_card";
 import { ChartRenderer } from "./chart_renderer/chart_renderer";
 import { useService } from "@web/core/utils/hooks";
 import { Component, onWillStart, useState } from "@odoo/owl";
+import { ChartRendererApex } from "./chart_renderer_apex/chart_renderer_apex";
 const { DateTime } = luxon;
 
 export class RecruitmentDashboard extends Component {
@@ -537,43 +538,92 @@ export class RecruitmentDashboard extends Component {
             return { ...r, percentage };
         });
 
-        // 5. Preparar datos para la gráfica
+        // 5. Preparar datos únicamente para ApexCharts
         const labels = recruiterStats.map(r => r.name);
         const totalCounts = recruiterStats.map(r => r.total);
         const hiredCounts = recruiterStats.map(r => r.hired);
-        
+
+        // ✅ SOLO ApexCharts - Barras agrupadas elegantes
         this.state.topRecruitments = {
-            data: { labels, datasets: [
-                { label: "Total Postulaciones", data: totalCounts, backgroundColor: '#F7DC6F' },
-                { label: "Contratados",          data: hiredCounts, backgroundColor: '#4ECDC4' }
-            ]},
-            meta: recruiterStats,
-            options: {
-                indexAxis: 'y',
-                onClick: (event, activeElements, chart) => {
-                    if (!activeElements.length) {
-                        return;
-                    }
-                    const { datasetIndex, index } = activeElements[0];
-                    const stat = this.state.topRecruitments.meta[index];
-                    const onlyHired = datasetIndex === 1;
-                    this.openRecruitmentList(stat.id, onlyHired);
+            series: [
+                {
+                    name: 'Total Postulaciones',
+                    data: totalCounts
                 },
-                plugins: {
-                    tooltip: {
-                        callbacks: {
-                            afterBody: ctx => {
-                                const stat = recruiterStats[ctx[0].dataIndex];
-                                return `Porcentaje de contratación: ${stat.percentage}%`;
-                            }
+                {
+                    name: 'Contratados',
+                    data: hiredCounts
+                }
+            ],
+            categories: labels,  // Nombres de los reclutadores
+            colors: ['#F7DC6F', '#4ECDC4'],  // Colores amarillo y turquesa
+            meta: recruiterStats,  // Para los clicks
+            options: {
+                chart: {
+                    type: 'bar',
+                    stacked: false,  // Barras agrupadas, no apiladas
+                    events: {
+                        dataPointSelection: (event, chartContext, config) => {
+                            // Manejar clicks en las barras
+                            const seriesIndex = config.seriesIndex;  // 0 = Total, 1 = Contratados
+                            const dataPointIndex = config.dataPointIndex;  // Índice del reclutador
+                            const stat = recruiterStats[dataPointIndex];
+                            const onlyHired = seriesIndex === 1;
+                            this.openRecruitmentList(stat.id, onlyHired);
                         }
+                    }
+                },
+                plotOptions: {
+                    bar: {
+                        horizontal: true,  // Barras horizontales
+                        columnWidth: '75%',
+                        borderRadius: 4
+                    }
+                },
+                dataLabels: {
+                    enabled: false  // Sin labels en las barras
+                },
+                stroke: {
+                    width: 1,
+                    colors: ['#fff']
+                },
+                title: {
+                    text: 'Eficiencia de Contratación por Reclutador',
+                    align: 'center',
+                    style: {
+                        fontSize: '16px',
+                        fontWeight: 'bold'
+                    }
+                },
+                legend: {
+                    position: 'top',
+                    horizontalAlign: 'center'
+                },
+                tooltip: {
+                    shared: true,  // Muestra ambas series en el tooltip
+                    intersect: false,
+                    custom: function ({ series, seriesIndex, dataPointIndex, w }) {
+                        const stat = recruiterStats[dataPointIndex];
+                        const totalValue = series[0][dataPointIndex];
+                        const hiredValue = series[1][dataPointIndex];
+
+                        return `
+                        <div class="px-3 py-2">
+                            <div class="fw-bold">${stat.name}</div>
+                            <div>Total Postulaciones: <span class="fw-bold">${totalValue}</span></div>
+                            <div>Contratados: <span class="fw-bold text-success">${hiredValue}</span></div>
+                            <div class="text-muted">Porcentaje: ${stat.percentage}%</div>
+                        </div>
+                    `;
                     }
                 }
             }
         };
 
-        // Forzar refresco
+        // Forzar refresco del estado
         this.state.topRecruitments = { ...this.state.topRecruitments };
+
+        console.log("📊 Datos ApexCharts - Top Reclutamientos:", this.state.topRecruitments);
     }
 
     async getRequisitionStats() {
@@ -1397,7 +1447,7 @@ export class RecruitmentDashboard extends Component {
 }
 
 RecruitmentDashboard.template = "recruitment.dashboard";
-RecruitmentDashboard.components = { KpiCard, ChartRenderer };
+RecruitmentDashboard.components = { KpiCard, ChartRenderer, ChartRendererApex };
 
 // Registrar el dashboard OWL
 registry.category("actions").add("recruitment.dashboard", RecruitmentDashboard);
