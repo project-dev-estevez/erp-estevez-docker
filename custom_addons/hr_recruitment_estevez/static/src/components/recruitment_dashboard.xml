@@ -6,35 +6,12 @@
             <div class="row m-3">
                 <div class="col-lg-12">
                     <!-- Titulo y filtro -->
-                    <div class="row">
-                        <div class="col m-0 p-0">
-                            <div class="shadow-sm border m-2 p-4 bg-white">
-                                <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-md-between">
-                                    <h1 class="text-primary fw-bold mb-3 mb-md-0 text-center text-md-start">Dashboard Reclutamiento</h1>
-                                    <div class="d-flex gap-2 w-100 w-md-auto justify-content-center">
-                                        <div>
-                                            <label class="form-label mb-0 me-2">Desde:</label>
-                                            <input type="date" 
-                                                t-model="state.startDate" 
-                                                class="form-control" 
-                                                style="min-width: 170px;" 
-                                                t-on-change="onDateRangeChange"/>
-                                        </div>
-                                        <div>
-                                            <label class="form-label mb-0 me-2">Hasta:</label>
-                                            <input type="date" 
-                                                t-model="state.endDate" 
-                                                class="form-control" 
-                                                style="min-width: 170px;" 
-                                                t-on-change="onDateRangeChange"
-                                                t-att-min="state.startDate"/>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
+                    <DashboardHeader
+                        title="'Dashboard Reclutamiento'"
+                        startDate="state.startDate"
+                        endDate="state.endDate"
+                        onDateChange.bind="onDateRangeChange" />
+
                     <!-- KPIs principales -->
                     <div class="row">
                         <div class="col">

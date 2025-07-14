@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    
+    <t t-name="hr_recruitment_estevez.DashboardHeader" owl="1">
+        <div class="row">
+            <div class="col m-0 p-0">
+                <div class="shadow-sm border m-2 p-4 bg-white">
+                    <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-md-between">
+                        
+                        <!-- ✅ Título dinámico -->
+                        <h1 class="text-primary fw-bold mb-3 mb-md-0 text-center text-md-start">
+                            <t t-esc="props.title"/>
+                        </h1>
+                        
+                        <!-- ✅ Filtros de fecha -->
+                        <div class="d-flex gap-2 w-100 w-md-auto justify-content-center">
+                            <div>
+                                <label class="form-label mb-0 me-2">Desde:</label>
+                                <input type="date" 
+                                    t-att-value="props.startDate"
+                                    class="form-control" 
+                                    style="min-width: 170px;" 
+                                    t-on-change="onStartDateChange"/>
+                            </div>
+                            <div>
+                                <label class="form-label mb-0 me-2">Hasta:</label>
+                                <input type="date" 
+                                    t-att-value="props.endDate"
+                                    class="form-control" 
+                                    style="min-width: 170px;" 
+                                    t-on-change="onEndDateChange"
+                                    t-att-min="props.startDate"/>
+                            </div>
+                        </div>
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+    </t>
+
+</templates>

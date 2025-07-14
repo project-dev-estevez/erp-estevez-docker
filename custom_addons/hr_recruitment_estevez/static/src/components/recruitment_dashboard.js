@@ -1,6 +1,9 @@
 /** @odoo-module **/
 
 import { registry } from "@web/core/registry";
+
+import { DashboardHeader } from "./dashboard_header/dashboard_header";
+
 import { KpiCard } from "./kpi_card/kpi_card";
 import { ChartRenderer } from "./chart_renderer/chart_renderer";
 import { useService } from "@web/core/utils/hooks";
@@ -243,12 +246,14 @@ export class RecruitmentDashboard extends Component {
         this.state.isVacancyDropdownOpen = true;
     }
 
-    onDateRangeChange() {
-        if (this.state.startDate && this.state.endDate && this.state.endDate < this.state.startDate) {
-            // Corrige automáticamente o muestra un mensaje
-            this.state.endDate = this.state.startDate;
-        }
-        this.loadAllData();
+    async onDateRangeChange(startDate, endDate) {
+        console.log("📅 Cambio de fechas:", { startDate, endDate });
+        
+        this.state.startDate = startDate;
+        this.state.endDate = endDate;
+        
+        // Recargar todos los datos
+        await this.loadAllData();
     }
 
     async loadAllData() {        
@@ -1512,7 +1517,10 @@ export class RecruitmentDashboard extends Component {
 }
 
 RecruitmentDashboard.template = "recruitment.dashboard";
-RecruitmentDashboard.components = { KpiCard, ChartRenderer, ChartRendererApex };
+RecruitmentDashboard.components = {
+    DashboardHeader, KpiCard, 
+    ChartRenderer, ChartRendererApex
+};
 
 // Registrar el dashboard OWL
 registry.category("actions").add("recruitment.dashboard", RecruitmentDashboard);
