@@ -6,30 +6,47 @@
             <div class="col m-0 p-0">
                 <div class="shadow-sm border m-2 p-4 bg-white">
                     <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-md-between">
-                        
-                        <!-- ✅ Título dinámico -->
-                        <h1 class="text-primary fw-bold mb-3 mb-md-0 text-center text-md-start">
-                            <t t-esc="props.title"/>
-                        </h1>
-                        
-                        <!-- ✅ Filtros de fecha -->
-                        <div class="d-flex gap-2 w-100 w-md-auto justify-content-center">
+
+                        <!-- ✅ Título minimalista elegante -->
+                        <div class="d-flex align-items-center mb-3 mb-md-0">
+                            <!-- ✨ Icono contenido -->
+                            <div class="me-2 p-2 bg-primary bg-opacity-10 rounded-2 border border-primary border-opacity-20">
+                                <i class="fa fa-chart-line text-primary fs-4"></i>
+                            </div>
+                            <!-- ✨ Información del dashboard -->
                             <div>
-                                <label class="form-label mb-0 me-2">Desde:</label>
-                                <input type="date" 
-                                    t-att-value="props.startDate"
-                                    class="form-control" 
-                                    style="min-width: 170px;" 
-                                    t-on-change="onStartDateChange"/>
+                                <h1 class="mb-1 fw-bold text-primary fs-2">
+                                    <t t-esc="props.title"/>
+                                </h1>
+                                <small class="text-muted fw-medium text-uppercase opacity-75">
+                                    Panel de Control Ejecutivo
+                                </small>
+                            </div>
+                        </div>
+
+                        <!-- ✅ Selectores de fecha COMPLETAMENTE clickeables -->
+                        <div class="d-flex gap-3 align-items-center">
+                            <div class="cursor-pointer">
+                                <label class="form-label mb-1 fw-medium text-muted small">Desde:</label>
+                                <div class="position-relative cursor-pointer" t-on-click="onDateContainerClick">
+                                    <input type="date" 
+                                        t-att-value="props.startDate"
+                                        class="form-control border-2 rounded-3 text-center fw-medium cursor-pointer"
+                                        t-on-change="onStartDateChange"/>
+                                </div>
+                            </div>
+                            <div class="text-muted">
+                                <i class="fa fa-arrow-right"></i>
                             </div>
                             <div>
-                                <label class="form-label mb-0 me-2">Hasta:</label>
-                                <input type="date" 
-                                    t-att-value="props.endDate"
-                                    class="form-control" 
-                                    style="min-width: 170px;" 
-                                    t-on-change="onEndDateChange"
-                                    t-att-min="props.startDate"/>
+                                <label class="form-label mb-1 fw-medium text-muted small">Hasta:</label>
+                                <div class="position-relative cursor-pointer" t-on-click="onDateContainerClick">
+                                    <input type="date" 
+                                        t-att-value="props.endDate"
+                                        class="form-control border-2 rounded-3 text-center fw-medium cursor-pointer"
+                                        t-on-change="onEndDateChange"
+                                        t-att-min="props.startDate"/>
+                                </div>
                             </div>
                         </div>
                         
