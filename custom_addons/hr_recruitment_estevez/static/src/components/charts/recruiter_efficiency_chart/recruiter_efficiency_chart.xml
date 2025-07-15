@@ -15,7 +15,7 @@
                 type="'bar'"
                 title="props.title || 'Eficiencia por Reclutador'"
                 config="state.chartData"
-                height="props.height || 350"/>
+                height="props.height || 400"/>
         </div>
     </t>
 
