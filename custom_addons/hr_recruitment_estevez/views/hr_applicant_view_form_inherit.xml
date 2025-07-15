@@ -21,120 +21,142 @@
                         <field name="aptitude_state" widget="statusbar" options="{'clickable': '1'}" nolabel="1"/>
                     </group>
 
-                    <group string="Ficha de Identificación">
-                        <field name="interrogation_type"/>
-                        <field name="patient_name"/>
-                        <field name="gender"/>
-                        <field name="birth_date"/>
-                        <field name="age"/>
-                        <field name="job_position"/>
-                        <field name="degree_id"/>
-                        <field name="address"/>
-                        <field name="phone"/>
+                    <group>
+                        <group string="Ficha de Identificación">
+                            <field name="interrogation_type"/>
+                            <field name="patient_name"/>
+                            <field name="gender"/>
+                            <field name="birth_date"/>
+                            <field name="age"/>
+                            <field name="job_position"/>
+                            <field name="degree_id"/>
+                            <field name="address"/>
+                            <field name="phone"/>
+                        </group>
+
+                        <group string="Antecedentes Heredo Familiares">
+                            <field name="family_medical_history" nolabel="1"/>
+                        </group>
                     </group>
-                    <group string="Antecedentes Heredo Familiares">
-                        <field name="family_medical_history" nolabel="1"/>
-                    </group>
+
                     <group string="Antecedentes Personales No Patológicos">
-                        <field name="place_of_origin"/>
-                        <field name="place_of_residence"/>
-                        <field name="marital_status"/>
-                        <field name="occupations"/>
-                        <field name="religion"/>
-                        <field name="housing_type"/>
-                        <field name="construction_material"/>
-                        <field name="housing_services"/>
-                        <field name="weekly_clothing_change"/>
-                        <field name="daily_teeth_brushing"/>
-                        <field name="zoonosis"/>
-                        <field name="overcrowding"/>
-                        <field name="tattoos_piercings"/>
-                        <field name="blood_type"/>
-                        <field name="donor"/>
-                    </group>
-                    <group string="Antecedentes Personales Patológicos">
-                        <field name="complete_schedule"/>
-                        <field name="comments"/>
-                        <field name="no_vaccination_card"/>
-                        <field name="last_vaccine"/>
-                        <field name="previous_surgeries"/>
-                        <field name="traumas"/>
-                        <field name="transfusions"/>
-                        <field name="allergies"/>
-                        <field name="chronic_diseases"/>
-                        <field name="childhood_diseases"/>
-                        <field name="smoking"/>
-                        <field name="alcoholism"/>
-                        <field name="drug_addiction"/>
-                    </group>
-                    <group string="Antecedentes Gineco-Obstétricos">
-                        <field name="menarche"/>
-                        <field name="thelarche"/>
-                        <field name="rhythm"/>
-                        <field name="gpca"/>
-                        <field name="breastfeeding_history"/>
-                        <field name="ivsa"/>
-                        <field name="nps"/>
-                        <field name="mpf"/>
-                    </group>
-                    <group string="Padecimiento Actual">
-                        <field name="current_condition" nolabel="1"/>
-                    </group>
-                    <group string="Interrogatorio por Aparatos y Sistemas">
-                        <field name="cardiovascular" placeholder="disnea, taquicardia, bradicardia, cianosis, plétora yugular y lipotimia negados" />
-                        <field name="respiratory" placeholder="disnea, tiros intercostales, aleteo nasal, tos persistente y crónica, expectoración y hemoptisis"/>
-                        <field name="gastrointestinal" placeholder="disfagia, reflujo gastroesofágico, pirosis, plenitud postprandial, constipación, flatulencia, nausea, vómito y diarrea negados, evacuaciones normales"/>
-                        <field name="genitourinary" placeholder="disuria, poliuria, tenesmo vesical, piuria, hematuria, incontinencia urinaria, disminución del chorro de orina, negados, diuresis normal"/>
-                        <field name="endocrine" placeholder="interrogados y negados"/>
-                        <field name="nervous" placeholder="epilepsia, cefalea, miopía, astigmatismo, negados"/>
-                        <field name="musculoskeletal" placeholder="mialgias, artralgias, debilidad muscular, negados"/>
-                        <field name="skin_mucous" placeholder="nevos, condilomas, xerosis, negados"/>
+                        <group>
+                            <field name="place_of_origin"/>
+                            <field name="place_of_residence"/>
+                            <field name="marital_status"/>
+                            <field name="occupations"/>
+                            <field name="religion"/>
+                            <field name="housing_type"/>
+                            <field name="construction_material"/>
+                            <field name="housing_services"/>
+                        </group>
+                        <group>
+                            <field name="weekly_clothing_change"/>
+                            <field name="daily_teeth_brushing"/>
+                            <field name="zoonosis"/>
+                            <field name="overcrowding"/>
+                            <field name="tattoos_piercings"/>
+                            <field name="blood_type"/>
+                            <field name="donor"/>
+                        </group>
                     </group>
 
-                    <group string="Signos Vitales">
-                        <field name="heart_rate"/>
-                        <field name="respiratory_rate"/>
-                        <field name="temperature"/>
-                        <field name="blood_pressure"/>
-                        <field name="oxygen_saturation"/>
-                        <field name="weight"/>
-                        <field name="height"/>
-                        <field name="bmi"/>
+                    <group>
+                        <group string="Antecedentes Personales Patológicos">
+                            <field name="complete_schedule"/>
+                            <field name="comments"/>
+                            <field name="no_vaccination_card"/>
+                            <field name="last_vaccine"/>
+                            <field name="previous_surgeries"/>
+                            <field name="traumas"/>
+                            <field name="transfusions"/>
+                            <field name="allergies"/>
+                            <field name="chronic_diseases"/>
+                            <field name="childhood_diseases"/>
+                            <field name="smoking"/>
+                            <field name="alcoholism"/>
+                            <field name="drug_addiction"/>
+                        </group>
+                        <group string="Antecedentes Gineco-Obstétricos">
+                            <field name="menarche"/>
+                            <field name="thelarche"/>
+                            <field name="rhythm"/>
+                            <field name="gpca"/>
+                            <field name="breastfeeding_history"/>
+                            <field name="ivsa"/>
+                            <field name="nps"/>
+                            <field name="mpf"/>
+                        </group>
                     </group>
 
-                    <group string="Exploración Física">
-                        <field name="head_neck"/>
-                        <field name="chest"/>
-                        <field name="abdomen"/>
-                        <field name="extremities"/>
-                        <field name="neurological"/>
-                        <field name="skin"/>
+                    <group>
+                        <group string="Padecimiento Actual">
+                            <field name="current_condition" nolabel="1"/>
+                        </group>
+                        <group string="Interrogatorio por Aparatos y Sistemas">
+                            <field name="cardiovascular" placeholder="disnea, taquicardia, bradicardia, cianosis, plétora yugular y lipotimia negados" />
+                            <field name="respiratory" placeholder="disnea, tiros intercostales, aleteo nasal, tos persistente y crónica, expectoración y hemoptisis"/>
+                            <field name="gastrointestinal" placeholder="disfagia, reflujo gastroesofágico, pirosis, plenitud postprandial, constipación, flatulencia, nausea, vómito y diarrea negados, evacuaciones normales"/>
+                            <field name="genitourinary" placeholder="disuria, poliuria, tenesmo vesical, piuria, hematuria, incontinencia urinaria, disminución del chorro de orina, negados, diuresis normal"/>
+                            <field name="endocrine" placeholder="interrogados y negados"/>
+                            <field name="nervous" placeholder="epilepsia, cefalea, miopía, astigmatismo, negados"/>
+                            <field name="musculoskeletal" placeholder="mialgias, artralgias, debilidad muscular, negados"/>
+                            <field name="skin_mucous" placeholder="nevos, condilomas, xerosis, negados"/>
+                        </group>
                     </group>
 
-                    <group string="Resultados Previos y Actuales de Laboratorio, Gabinete y Otros">
-                        <field name="laboratory_results" nolabel="1"/>
-                    </group>
+                    <group>
+                        <group string="Signos Vitales">
+                            <field name="heart_rate"/>
+                            <field name="respiratory_rate"/>
+                            <field name="temperature"/>
+                            <field name="blood_pressure"/>
+                            <field name="oxygen_saturation"/>
+                            <field name="weight"/>
+                            <field name="height"/>
+                            <field name="bmi"/>
+                        </group>
 
-                    <group string="Diagnóstico o Problemas Clínicos">
-                        <field name="diagnosis" nolabel="1"/>
+                        <group string="Exploración Física">
+                            <field name="head_neck"/>
+                            <field name="chest"/>
+                            <field name="abdomen"/>
+                            <field name="extremities"/>
+                            <field name="neurological"/>
+                            <field name="skin"/>
+                        </group>
                     </group>
+                    
+                    <group>
+                        <group string="Resultados Previos y Actuales de Laboratorio, Gabinete y Otros">
+                            <field name="laboratory_results" nolabel="1"/>
+                        </group>
 
-                    <group string="Terapéutica Empleada y Resultados Previos">
-                        <field name="previous_treatment" nolabel="1"/>
+                        <group string="Diagnóstico o Problemas Clínicos">
+                            <field name="diagnosis" nolabel="1"/>
+                        </group>
                     </group>
+                    
+                    <group>
+                        <group string="Terapéutica Empleada y Resultados Previos">
+                            <field name="previous_treatment" nolabel="1"/>
+                        </group>
 
-                    <group string="Tratamiento e Indicaciones">
-                        <field name="treatment_recommendations" nolabel="1" readonly="1"/>
+                        <group string="Tratamiento e Indicaciones">
+                            <field name="treatment_recommendations" nolabel="1" readonly="1"/>
+                        </group>
                     </group>
+                    
+                    <group>
+                        <group string="Próxima Cita">
+                            <field name="next_appointment" nolabel="1"/>
+                        </group>
 
-                    <group string="Próxima Cita">
-                        <field name="next_appointment" nolabel="1"/>
+                        <group string="Pronóstico">
+                            <field name="prognosis" nolabel="1"/>
+                        </group>
                     </group>
-
-                    <group string="Pronóstico">
-                        <field name="prognosis" nolabel="1"/>
-                    </group>
-
+                    
                     <div class="text-center">
                         <button name="%(action_report_hr_applicant_document)d" string="Guardar" type="action" class="btn btn-primary btn-lg mt-4"/>
                         <!-- <button name="%(action_report_hr_applicant_document)d" string="Generar PDF" type="action" class="btn btn-secondary btn-lg mt-4"/> -->
