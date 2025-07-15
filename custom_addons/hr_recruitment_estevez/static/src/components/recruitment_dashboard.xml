@@ -16,9 +16,9 @@
                     <!-- KPIs principales -->
                     <div class="row">
                         <KpisGrid 
-                            kpisData="state"
                             startDate="state.startDate"
-                            endDate="state.endDate"/>
+                            endDate="state.endDate"
+                            onMounted.bind="onKpisGridMounted"/>
                     </div>
 
                     <!-- Postulaciones por reclutador y fuentes de reclutamiento -->

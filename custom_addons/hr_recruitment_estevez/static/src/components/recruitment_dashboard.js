@@ -35,79 +35,55 @@ export class RecruitmentDashboard extends Component {
     }
 
     setup() {
-        const now = DateTime.now();
-        const startOfMonth = now.startOf('month').toISODate();
-        const endOfMonth = now.endOf('month').toISODate();
+        this.orm = useService("orm");
+        this.actionService = useService("action");
+        
+        // ✅ Variable para guardar la referencia al KpisGrid
+        this.kpisGridComponent = null;
 
+        // ✅ Estado del dashboard - YA NO incluye KPIs
         this.state = useState({
-            // Postulaciones Totales
-            totalApplicants: {
-                value: 0,
-            },
-            // Postulaciones En Progreso
-            inProgressApplicants: {
-                value: 0,
-            },
-            // Candidatos Preseleccionados
-            preselectedApplicants: {
-                value: 0,
-            },
-            // Postulaciones Rechazadas
-            rejectedApplicants: {
-                value: 0,
-            },
-            // Contrataciones Realizadas
-            hiredApplicants: {
-                value: 0,
-            },
-            // Tiempo promedio de contratación
-            averageHiringTime: {
-                value: 0,
-            },
-            // Postulaciones por Reclutador
-            topRecruitments: {},
-            // Fuentes de Reclutamiento
-            sourceRecruitment: {},
-            indicatorsSourceRecruitment: {
-                sources: []
-            },
-            // Motivos de Rechazo
-            rejectionReasons: {
-                candidate: {},
-                company: {},
-            },
-            // Embudo de Etaoas
-            funnelRecruitment: {},
-
-            //Vacante
-            isVacancyDropdownOpen: false,
-            vacancyOptions: [],
+            // Filtros
+            startDate: "",
+            endDate: "",
             selectedVacancy: false,
-            vacancySearchText: "Todas Las Vacantes",
-            filteredVacancyOptions: [],
+            availableVacancies: [],
+
+            // ✅ Solo datos de gráficos - NO MÁS KPIs aquí
+            topRecruitments: {},
+            sourceRecruitment: {},
+            indicatorsSourceRecruitment: { sources: [] },
+            rejectionReasons: { candidate: {}, company: {} },
+            funnelRecruitment: {},
+            requisitionStats: {},
+            averageTimePerStageChart: {},
+            averageTimePerStageCenterValue: "0 min",
             vacancyMetrics: {
-                status: '',
+                status: 'Global',
                 openDuration: '',
                 applicants: 0,
                 hired: 0,
                 refused: 0,
-                topRefuseReason: '',
-            },
+                topRefuseReason: ''
+            }
+        });
 
-            // Tiempo Promedio por Etapa
-            averageTimePerStageChart: {},
-            averageTimePerStageCenterValue: "",
-
-            startDate: startOfMonth,
-            endDate: endOfMonth,            
-        })
-
-        this.orm = useService("orm");
-        this.actionService = useService("action");
-
+        // ✅ Cargar datos al inicializar
         onWillStart(async () => {
+            // Inicializar fechas por defecto
+            const today = new Date();
+            const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+            this.state.startDate = firstDayOfMonth.toISOString().split('T')[0];
+            this.state.endDate = today.toISOString().split('T')[0];
+
+            // Cargar datos del dashboard (sin KPIs)
             await this.loadAllData();
         });
+    }
+
+    onKpisGridMounted(kpisGridComponent) {
+        console.log("📊 Dashboard: KpisGrid montado", kpisGridComponent);
+        this.kpisGridComponent = kpisGridComponent;
     }
 
     openRejectionDetails = (reason) => {
@@ -248,34 +224,38 @@ export class RecruitmentDashboard extends Component {
     }
 
     async onDateRangeChange(startDate, endDate) {
-        console.log("📅 Cambio de fechas:", { startDate, endDate });
+        console.log("📅 Dashboard: Cambio de fechas:", { startDate, endDate });
         
         this.state.startDate = startDate;
         this.state.endDate = endDate;
         
-        // Recargar todos los datos
+        // ✅ Notificar al KpisGrid del cambio usando la referencia guardada
+        if (this.kpisGridComponent) {
+            console.log("🔄 Dashboard: Recargando KPIs...");
+            await this.kpisGridComponent.loadKpisData();
+        }
+        
+        // Recargar datos de gráficos
         await this.loadAllData();
     }
 
-    async loadAllData() {        
-        await Promise.all([
-            this.getAllVacancies(),
-            this.getTopRecruitments(),
-            this.getSourceRecruitment(),
-            this.getIndicatorsSourceRecruitment(),
-            this.getTotalApplicants(),
-            this.getInProgressApplicants(),
-            this.getPreselectedApplicants(),
-            this.getRejectedApplicants(),
-            this.getHiredApplicants(),
-            this.getAverageHiringTime(),
-            this.getRejectionReasons(),
-            this.getVacancyMetrics(),
-            this.getFunnelRecruitment(),
-            this.getFunnelRecruitment(),
-            this.getRequisitionStats(),
-            this.getAverageTimePerStage(),
-        ]);
+    async loadAllData() {
+        try {
+            await Promise.all([
+                this.getAllVacancies(),
+                this.getTopRecruitments(),
+                this.getSourceRecruitment(),
+                this.getIndicatorsSourceRecruitment(),
+                this.getRejectionReasons(),
+                this.getVacancyMetrics(),
+                this.getFunnelRecruitment(),
+                this.getRequisitionStats(),
+                this.getAverageTimePerStage(),
+            ]);
+            console.log("✅ Dashboard: Todos los datos cargados");
+        } catch (error) {
+            console.error("❌ Dashboard: Error cargando datos:", error);
+        }
     }
 
     async getAllVacancies() {
@@ -1072,78 +1052,6 @@ export class RecruitmentDashboard extends Component {
 
         // 5. Guarda en el estado
         this.state.indicatorsSourceRecruitment.sources = indicators;
-    }
-
-    async getTotalApplicants() {
-        const context = { context: { active_test: false } };
-        let domain = [];
-        domain = this._addDateRangeToDomain(domain);
-
-        const data = await this.orm.searchCount("hr.applicant", domain, context);
-        this.state.totalApplicants.value = data;
-    }
-
-    async getInProgressApplicants() {
-        let domain = [["application_status", "=", "ongoing"]];
-        domain = this._addDateRangeToDomain(domain);
-
-        const data = await this.orm.searchCount("hr.applicant", domain);
-        this.state.inProgressApplicants.value = data;
-    }
-
-    async getPreselectedApplicants() {
-        // Buscar applicants cuya etapa (stage_id.sequence) sea mayor a 4
-        let domain = [
-            ["stage_id.sequence", ">", 4],
-            ["application_status", "!=", "hired"]
-        ];
-        domain = this._addDateRangeToDomain(domain);
-
-        const data = await this.orm.searchCount("hr.applicant", domain);
-        this.state.preselectedApplicants.value = data;
-    }
-
-    async getRejectedApplicants() {
-        const context = { context: { active_test: false } };
-        let domain = [["application_status", "=", "refused"]];
-        domain = this._addDateRangeToDomain(domain);
-
-        const data = await this.orm.searchCount("hr.applicant", domain, context);
-        this.state.rejectedApplicants.value = data;
-    }
-
-    async getHiredApplicants() {
-        let domain = [["application_status", "=", "hired"]];
-        domain = this._getHiredDateRangeDomain(domain);
-
-        const data = await this.orm.searchCount("hr.applicant", domain);
-        this.state.hiredApplicants.value = data;
-    }
-
-    async getAverageHiringTime() {
-        let domain = [["application_status", "=", "hired"]];
-        domain = this._addDateRangeToDomain(domain);
-
-        const applicants = await this.orm.searchRead('hr.applicant', domain, ["create_date", "date_closed"]);
-        if (!applicants.length) {
-            return 0;
-        }
-
-        let totalDays = 0;
-        let count = 0;
-        for (const applicant of applicants) {
-            if (applicant.create_date && applicant.date_closed) {
-                const created = new Date(applicant.create_date);
-                const closed = new Date(applicant.date_closed);
-                const diffTime = closed - created;
-                const diffDays = diffTime / (1000 * 60 * 60 * 24);
-                totalDays += diffDays;
-                count += 1;
-            }
-        }
-
-        const averageDays = count ? (totalDays / count) : 0;
-        this.state.averageHiringTime.value = averageDays.toFixed(2);
     }
 
     async getRejectionReasons() {
