@@ -888,6 +888,120 @@ export class RecruitmentDashboard extends Component {
             context
         );
 
+        // ✅ FUNCIÓN AVANZADA: Normalizar texto (sin mayúsculas, minúsculas ni tildes)
+        const normalizeText = (text) => {
+            if (!text) return '';
+            
+            return text
+                .toLowerCase()                    // Convertir a minúsculas
+                .trim()                          // Quitar espacios al inicio/final
+                .normalize('NFD')                // Descomponer caracteres con tildes
+                .replace(/[\u0300-\u036f]/g, '') // Eliminar diacríticos (tildes, acentos)
+                .replace(/[^\w\s]/g, ' ')        // Reemplazar caracteres especiales con espacios
+                .replace(/\s+/g, ' ')            // Normalizar espacios múltiples a uno solo
+                .trim();                         // Quitar espacios finales después de normalizar
+        };
+
+        // ✅ FUNCIÓN MEJORADA: Detectar si es declinación del candidato
+        const isCandidateDecline = (reasonLabel) => {
+            if (!reasonLabel) return false;
+            
+            const normalizedLabel = normalizeText(reasonLabel);
+            
+            // ✅ MOTIVOS NORMALIZADOS (sin tildes ni mayúsculas)
+            const candidateDeclinePatterns = [
+                // Declinaciones explícitas
+                'declino',
+                'candidato declino',
+                'declina',
+                'candidato declina',
+                
+                // No se presentó (múltiples variaciones)
+                'no se presento',
+                'no se presenta',
+                'no asistio',
+                'no asiste',
+                'ausente',
+                'falta',
+                'inasistencia',
+                
+                // Solo se presenta a inducción
+                'solo se presenta a induccion',
+                'solo induccion',
+                'unicamente induccion',
+                'nada mas induccion',
+                
+                // No respondió/responde
+                'no respondio',
+                'no responde',
+                'no contesta',
+                'no contesto',
+                'sin respuesta',
+                'no hay respuesta',
+                
+                // Abandono del proceso
+                'abandono',
+                'abandona',
+                'se retira',
+                'se retiro',
+                'retiro',
+                'desiste',
+                'desistio',
+                
+                // Cambio de opinión
+                'cambio de opinion',
+                'cambio opinion',
+                'ya no le interesa',
+                'perdio interes',
+                'perdio el interes',
+                'sin interes',
+                
+                // Aceptó otra oferta
+                'acepto otra oferta',
+                'acepta otra oferta',
+                'otra oferta',
+                'mejor oferta',
+                'oferta mejor',
+                'consiguio otro trabajo',
+                'otro trabajo',
+                'otra empresa',
+                
+                // Problemas personales del candidato
+                'no esta interesado',
+                'no le interesa',
+                'no disponible',
+                'no puede',
+                'imposibilitado',
+                'problemas personales',
+                'situacion personal',
+                
+                // Problemas con condiciones
+                'no cumple horario',
+                'horario no le conviene',
+                'salario insuficiente',
+                'salario bajo',
+                'sueldo bajo',
+                'poco salario',
+                'distancia',
+                'muy lejos',
+                'ubicacion',
+                'transporte',
+                
+                // Otros motivos del candidato
+                'no acepta condiciones',
+                'condiciones no favorables',
+                'expectativas diferentes',
+                'no es lo que busca',
+                'cambio de planes'
+            ];
+            
+            // ✅ VERIFICAR si algún patrón coincide EXACTAMENTE o está CONTENIDO
+            return candidateDeclinePatterns.some(pattern => {
+                // Buscar coincidencia exacta O que el patrón esté contenido en el label
+                return normalizedLabel === pattern || normalizedLabel.includes(pattern);
+            });
+        };
+
         // Separa en declinaciones de candidatos y rechazos de empresa
         const candidateDeclines = [];
         const companyRejections = [];
@@ -897,14 +1011,30 @@ export class RecruitmentDashboard extends Component {
             const label = (r.refuse_reason_id && r.refuse_reason_id[1]) || "Sin motivo";
             const count = r.refuse_reason_id_count;
 
-            if (label.toLowerCase().includes("declino")) {
+            // ✅ USAR LA FUNCIÓN MEJORADA DE CLASIFICACIÓN
+            if (isCandidateDecline(label)) {
                 candidateDeclines.push({ id, label, count });
+                console.log(`👤 CANDIDATO: "${label}" → normalizado: "${normalizeText(label)}"`);
             } else {
                 companyRejections.push({ id, label, count });
+                console.log(`🏢 EMPRESA: "${label}" → normalizado: "${normalizeText(label)}"`);
             }
         }
 
-        // Datos para ChartRenderer
+        // ✅ LOGS DETALLADOS para debugging
+        console.log("📊 Resumen de clasificación de rechazos:");
+        console.log(`👤 Declinaciones de candidatos: ${candidateDeclines.length} tipos, ${candidateDeclines.reduce((sum, x) => sum + x.count, 0)} total`);
+        console.log(`🏢 Rechazos de empresa: ${companyRejections.length} tipos, ${companyRejections.reduce((sum, x) => sum + x.count, 0)} total`);
+        
+        // ✅ MOSTRAR todos los motivos de candidatos detectados
+        if (candidateDeclines.length > 0) {
+            console.log("👤 Motivos de candidatos detectados:");
+            candidateDeclines.forEach(decline => {
+                console.log(`   • "${decline.label}" (${decline.count} casos)`);
+            });
+        }
+
+        // Datos para ChartRenderer (resto del código sin cambios)
         const pastelCandidate = this.getPastelColors(candidateDeclines.length);
         const pastelCompany = this.getPastelColors(companyRejections.length);
 
@@ -936,11 +1066,11 @@ export class RecruitmentDashboard extends Component {
                                 const idx = context[0].dataIndex;
                                 const count = candidateDeclines[idx].count;
                                 const percent = totalCandidate > 0 ? ((count / totalCandidate) * 100).toFixed(2) : "0.00";
-                                return `Porcentaje de rechazo: ${percent}%`;
+                                return `Porcentaje de declinación: ${percent}%`;
                             }
                         }
                     }
-                }
+                } 
             } 
         };
 
