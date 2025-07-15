@@ -40,14 +40,21 @@
         "views/hr_applicant_view_search_inherit.xml",        
         #"views/hr_candidate_custom_views.xml"
         "views/hr_candidate_view_form.xml",
-        "views/hr_job_views.xml"
+        "views/hr_job_views.xml",
+        'views/hr_applicant_tree_custom.xml',
+        'views/hr_job_view_list.xml',
+        'views/hr_candidate_view_list.xml',
+
     ],
     'assets': {
         'web.assets_backend': [
             'static/src/js/tabs_navigation.js',
+            #'hr_recruitment_estevez/static/src/js/validation_modal.js',
+            #'hr_recruitment_estevez/static/src/css/validation_modal.css',
+            #'hr_recruitment_estevez/static/src/xml/validation_modal.xml',
             'hr_recruitment_estevez/static/src/components/**/*.js',
             'hr_recruitment_estevez/static/src/components/**/*.xml',
-            'hr_recruitment_estevez/static/src/components/**/*.scss',
+            'hr_recruitment_estevez/static/src/components/**/*.scss',          
         ],
     },
     "installable": True,

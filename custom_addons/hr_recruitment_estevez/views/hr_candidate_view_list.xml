@@ -1,0 +1,48 @@
+<odoo>
+  <record id="hr_candidate_view_list_widths" model="ir.ui.view">
+    <field name="name">hr.candidate.view.list.widths</field>
+    <field name="model">hr.candidate</field>
+    <field name="inherit_id" ref="hr_recruitment.hr_candidate_view_tree"/>
+    <field name="arch" type="xml">
+      <xpath expr="//field[@name='partner_name']" position="attributes">
+        <attribute name="width">180</attribute>
+      </xpath>   
+      <xpath expr="//field[@name='email_from']" position="attributes">
+        <attribute name="width">190</attribute>
+      </xpath>  
+      <xpath expr="//field[@name='partner_phone']" position="attributes">
+        <attribute name="width">180</attribute>
+      </xpath>       
+      <xpath expr="//field[@name='user_id']" position="attributes">
+        <attribute name="width">180</attribute>
+      </xpath>        
+      <xpath expr="//field[@name='priority']" position="attributes">
+        <attribute name="width">180</attribute>
+      </xpath>       
+      <xpath expr="//field[@name='availability']" position="attributes">
+        <attribute name="width">180</attribute>
+      </xpath>  
+      <xpath expr="//field[@name='type_id']" position="attributes">
+        <attribute name="width">180</attribute>
+      </xpath>  
+      <xpath expr="//field[@name='linkedin_profile']" position="attributes">
+        <attribute name="width">180</attribute>
+      </xpath>  
+      <xpath expr="//field[@name='applications_count']" position="attributes">
+        <attribute name="width">180</attribute>
+      </xpath>  
+      <xpath expr="//field[@name='refused_applications_count']" position="attributes">
+        <attribute name="width">180</attribute>
+      </xpath>  
+      <xpath expr="//field[@name='accepted_applications_count']" position="attributes">
+        <attribute name="width">180</attribute>
+      </xpath>  
+      <xpath expr="//field[@name='partner_id']" position="attributes">
+        <attribute name="width">180</attribute>
+      </xpath>  
+      <xpath expr="//field[@name='company_id']" position="attributes">
+        <attribute name="width">180</attribute>
+      </xpath>  
+    </field>
+  </record>
+</odoo>
