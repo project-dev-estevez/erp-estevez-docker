@@ -148,54 +148,77 @@ export class RecruiterEfficiencyChart extends Component {
             return { ...r, percentage };
         });
 
-        // 6. Preparar datos para ApexCharts
+        // 6. ✅ SIMPLE: Preparar datos SIN duplicar categorías
         const labels = recruiterStats.map(r => r.name);
         const ongoingCounts = recruiterStats.map(r => r.ongoing);
         const hiredCounts = recruiterStats.map(r => r.hired);
+        const totalCounts = recruiterStats.map(r => r.total);  // ✅ NUEVA serie
 
-        // 7. Configurar el gráfico
+        console.log("📊 Labels:", labels);
+        console.log("📊 OngoingCounts:", ongoingCounts);
+        console.log("📊 HiredCounts:", hiredCounts);
+        console.log("📊 TotalCounts:", totalCounts);
+
+        // 7. ✅ CONFIGURAR: Tres series con Total separado
         this.state.chartData = {
             series: [
                 {
-                    name: 'En Proceso',
-                    data: ongoingCounts
+                    name: 'Total Postulaciones',
+                    data: totalCounts,
+                    stack: 'total'   // ✅ CAMBIAR: Darle su propio stack
                 },
                 {
-                    name: 'Contratados', 
-                    data: hiredCounts
+                    name: 'En Proceso',
+                    data: ongoingCounts,
+                    stack: 'detalle'
+                },
+                {
+                    name: 'Contratados',
+                    data: hiredCounts,
+                    stack: 'detalle'
                 }
             ],
             categories: labels,
-            colors: ['#80c7fd', '#00E396'],
+            colors: ['#FFD700', '#00E396', '#3f51b5'],  // ✅ Tres colores
             meta: recruiterStats,
             filename: 'eficiencia_reclutadores',
             options: {
                 chart: {
                     type: 'bar',
-                    stacked: true,
-                    height: this.props.height || 350,
+                    stacked: true,  // ✅ Mantener apilado solo para las que tienen stack
+                    height: this.props.height || 400,
                     events: {
                         dataPointSelection: (event, chartContext, config) => {
                             const seriesIndex = config.seriesIndex;
                             const dataPointIndex = config.dataPointIndex;
                             const stat = recruiterStats[dataPointIndex];
 
-                            // Determinar filtro según serie
+                            // ✅ CORREGIR: Índices según el nuevo orden
                             let onlyHired = false;
                             let onlyOngoing = false;
-                            if (seriesIndex === 1) {
-                                onlyHired = true;
-                            } else if (seriesIndex === 0) {
+                            let showAll = false;
+
+                            if (seriesIndex === 0) {         // ✅ Total (ahora es índice 0)
+                                showAll = true;
+                            } else if (seriesIndex === 1) {  // ✅ En Proceso (ahora es índice 1)
                                 onlyOngoing = true;
+                            } else if (seriesIndex === 2) {  // ✅ Contratados (ahora es índice 2)
+                                onlyHired = true;
                             }
 
-                            this.openRecruitmentList(stat.id, onlyHired, onlyOngoing);
+                            this.openRecruitmentList(stat.id, onlyHired, onlyOngoing, showAll);
                         }
                     }
                 },
                 plotOptions: {
                     bar: {
-                        horizontal: true
+                        horizontal: true,
+                        barHeight: '50%',  // ✅ Reducir altura para que se vean bien las 3 barras
+                        distributed: false,
+                        // ✅ IMPORTANTE: Configurar spacing entre grupos
+                        dataLabels: {
+                            position: 'center'
+                        }
                     }
                 },
                 dataLabels: {
@@ -205,7 +228,7 @@ export class RecruiterEfficiencyChart extends Component {
                     },
                     style: {
                         colors: ['#fff'],
-                        fontSize: '12px',
+                        fontSize: '11px',
                         fontWeight: 'bold'
                     }
                 },
@@ -229,34 +252,83 @@ export class RecruiterEfficiencyChart extends Component {
                 },
                 yaxis: {
                     labels: {
-                        show: true
+                        show: true  // ✅ MANTENER: Mostrar nombres de reclutadores
                     }
                 },
                 legend: {
                     position: 'top',
-                    horizontalAlign: 'left'
+                    horizontalAlign: 'left',
+                    // ✅ OPCIONAL: Personalizar leyenda para distinguir mejor
+                    markers: {
+                        width: 12,
+                        height: 12,
+                        strokeWidth: 0,
+                        strokeColor: '#fff',
+                        fillColors: undefined,
+                        radius: 12,
+                        customHTML: undefined,
+                        onClick: undefined,
+                        offsetX: 0,
+                        offsetY: 0
+                    }
                 },
                 fill: {
-                    opacity: 1
+                    opacity: [0.9, 1, 1]  // ✅ CORREGIR: Total menos opaco, otros sólidos
+                },
+                // ✅ NUEVA CONFIGURACIÓN: Para separar las barras visualmente
+                grid: {
+                    show: true,
+                    borderColor: '#f1f1f1',
+                    strokeDashArray: 0,
+                    position: 'back',
+                    xaxis: {
+                        lines: {
+                            show: true
+                        }
+                    },
+                    yaxis: {
+                        lines: {
+                            show: false  // No mostrar líneas horizontales para mejor claridad
+                        }
+                    }
                 },
                 tooltip: {
-                    shared: true,
-                    intersect: false,
+                    shared: false,  // ✅ CAMBIAR: Tooltip individual por serie
+                    intersect: true,
                     custom: function ({ series, seriesIndex, dataPointIndex, w }) {
                         const stat = recruiterStats[dataPointIndex];
-                        const ongoingValue = series[0][dataPointIndex];
-                        const hiredValue = series[1][dataPointIndex];
-                        const totalValue = ongoingValue + hiredValue;
+                        const value = series[seriesIndex][dataPointIndex];
 
-                        return `
-                        <div class="px-3 py-2">
-                            <div class="fw-bold">${stat.name}</div>
-                            <div>En Proceso: <span class="fw-bold text-primary">${ongoingValue}</span></div>
-                            <div>Contratados: <span class="fw-bold text-success">${hiredValue}</span></div>
-                            <div>Total: <span class="fw-bold">${totalValue}</span></div>
-                            <div class="text-muted">Tasa de conversión: ${stat.percentage}%</div>
-                        </div>
-                    `;
+                        let content = '';
+                        if (seriesIndex === 0) {
+                            // ✅ Total - AZUL (ahora es índice 0)
+                            content = `
+                    <div class="px-3 py-2">
+                        <div class="fw-bold">${stat.name}</div>
+                        <div>Total Postulaciones: <span class="fw-bold text-primary">${value}</span></div>
+                        <div class="text-muted">Total de candidatos gestionados</div>
+                        <hr class="my-1">
+                        <div class="small">En Proceso: ${stat.ongoing} | Contratados: ${stat.hired}</div>
+                    </div>`;
+                        } else if (seriesIndex === 1) {
+                            // ✅ En Proceso - AMARILLO (ahora es índice 1)
+                            content = `
+                    <div class="px-3 py-2">
+                        <div class="fw-bold">${stat.name}</div>
+                        <div>En Proceso: <span class="fw-bold text-success">${value}</span></div>
+                        <div class="text-muted">Candidatos actualmente en evaluación</div>
+                    </div>`;
+                        } else if (seriesIndex === 2) {
+                            // ✅ Contratados - VERDE (ahora es índice 2)
+                            content = `
+                    <div class="px-3 py-2">
+                        <div class="fw-bold">${stat.name}</div>
+                        <div>Contratados: <span class="fw-bold text-warning">${value}</span></div>
+                        <div class="text-muted">Tasa de conversión: ${stat.percentage}%</div>
+                    </div>`;
+                        }
+
+                        return content;
                     }
                 }
             }
@@ -264,7 +336,6 @@ export class RecruiterEfficiencyChart extends Component {
 
         // Forzar actualización
         this.state.chartData = { ...this.state.chartData };
-        console.log("📊 RecruiterEfficiencyChart: Datos actualizados", this.state.chartData);
     }
 
     // ✅ Métodos de filtrado por fechas - USAN this.props
@@ -289,7 +360,7 @@ export class RecruiterEfficiencyChart extends Component {
     }
 
     // ✅ Navegación a lista de postulaciones
-    async openRecruitmentList(userId, onlyHired = false, onlyOngoing = false) {
+    async openRecruitmentList(userId, onlyHired = false, onlyOngoing = false, showAll = false) {
         let domain = [
             "|",
             ["active", "=", true],
@@ -298,14 +369,17 @@ export class RecruiterEfficiencyChart extends Component {
         domain = this._addDateRangeToDomain(domain);
         domain.push(["user_id", "=", userId]);
 
-        // Filtrar por tipo de aplicación
-        if (onlyHired) {
-            domain.push(["application_status", "=", "hired"]);
-        } else if (onlyOngoing) {
-            domain.push(["application_status", "=", "ongoing"]);
+        // ✅ Filtrar por tipo de aplicación
+        if (!showAll) {
+            if (onlyHired) {
+                domain.push(["application_status", "=", "hired"]);
+            } else if (onlyOngoing) {
+                domain.push(["application_status", "=", "ongoing"]);
+            }
         }
 
-        let actionName = 'Postulaciones';
+        // ✅ Determinar nombre de la acción
+        let actionName = 'Todas las Postulaciones';
         if (onlyHired) {
             actionName = 'Contratados';
         } else if (onlyOngoing) {
