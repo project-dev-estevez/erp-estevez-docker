@@ -20,7 +20,7 @@
                        widget="badge"
                        decoration-success="publication_status == 'Abierta'"
                        decoration-danger="publication_status == 'Cerrada'"
-                       decoration-warning="publication_status == 'Por Activar'"/>
+                       decoration-warning="publication_status == 'Por Abrir'"/>
                 <field name="state" string="Estado Requisición" width="180"
                        optional="show"
                        widget="badge" 

@@ -148,12 +148,10 @@ class HrRequisition(models.Model):
     @api.depends('state', 'is_published')
     def _compute_publication_status(self):
         for record in self:
-            if record.state == 'first_approval':
-                record.publication_status = 'Por Abrir'
-            elif record.state == 'approved':
-                 record.publication_status = 'Abierta' if record.is_published else 'Cerrada'
+            if record.state != 'approved':
+                record.publication_status = 'Por Abrir'            
             else:
-                record.publication_status = 'Por Activar'
+                record.publication_status = 'Abierta' if record.is_published else 'Por Abrir'
 
     # Acciones de estado
     def action_approve(self):
@@ -377,29 +375,38 @@ class HrRequisition(models.Model):
         return False
     
     def action_next(self):
-        # Validación de paso actual
         error_messages = {
             'especificaciones': "Debe completar todos los campos obligatorios en 'Especificaciones'",
             'datos_puesto': "Faltan datos importantes en 'Datos del puesto'"
         }
-        
+    
         steps = {
-           'especificaciones': 'datos_puesto',
+            'especificaciones': 'datos_puesto',
             'datos_puesto': 'equipo'
         }
 
         for record in self:
+            error_msg = False
         
-            # Validación por paso
-            if record.wizard_step == 'especificaciones':
-                if not record.requisition_type:
-                    raise UserError(error_messages['especificaciones'])
-            elif record.wizard_step == 'datos_puesto':
-                if not record.job_type:
-                    raise UserError(error_messages['datos_puesto'])
-
-            # Cambio al siguiente paso
-            record.wizard_step = steps.get(record.wizard_step, 'equipo')
+            if record.wizard_step == 'especificaciones' and not record.requisition_type:
+                error_msg = error_messages['especificaciones']
+            elif record.wizard_step == 'datos_puesto' and not record.job_type:
+                error_msg = error_messages['datos_puesto']
+        
+            if error_msg:
+                # Devolver acción para mostrar modal personalizado
+                return {
+                    'type': 'ir.actions.client',
+                    'tag': 'display_notification',
+                    'params': {
+                        'title': 'Validación requerida',
+                        'message': error_msg,
+                        'sticky': True,
+                        'type': 'danger',
+                    }
+                }
+            else:
+                record.wizard_step = steps.get(record.wizard_step, 'equipo')
                 
         return False
     
