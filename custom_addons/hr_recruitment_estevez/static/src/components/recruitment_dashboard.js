@@ -1,11 +1,17 @@
 /** @odoo-module **/
 
 import { registry } from "@web/core/registry";
-import { KpiCard } from "./kpi_card/kpi_card";
+
+import { DashboardHeader } from "./dashboard_header/dashboard_header";
+import { KpisGrid } from "./kpis/kpis_grid";
+
+import { RecruiterEfficiencyChart } from "./charts/recruiter_efficiency_chart/recruiter_efficiency_chart";
+import { ProcessEfficiencyChart } from "./charts/process_efficiency_chart/process_efficiency_chart";
+
+
 import { ChartRenderer } from "./chart_renderer/chart_renderer";
 import { useService } from "@web/core/utils/hooks";
 import { Component, onWillStart, useState } from "@odoo/owl";
-import { ChartRendererApex } from "./chart_renderer_apex/chart_renderer_apex";
 const { DateTime } = luxon;
 
 export class RecruitmentDashboard extends Component {
@@ -31,79 +37,66 @@ export class RecruitmentDashboard extends Component {
     }
 
     setup() {
-        const now = DateTime.now();
-        const startOfMonth = now.startOf('month').toISODate();
-        const endOfMonth = now.endOf('month').toISODate();
+        this.orm = useService("orm");
+        this.actionService = useService("action");
+        
+        // ✅ Variables para referencias de componentes
+        this.kpisGridComponent = null;
+        this.recruiterEfficiencyComponent = null;
+        this.processEfficiencyComponent = null;
 
         this.state = useState({
-            // Postulaciones Totales
-            totalApplicants: {
-                value: 0,
-            },
-            // Postulaciones En Progreso
-            inProgressApplicants: {
-                value: 0,
-            },
-            // Candidatos Preseleccionados
-            preselectedApplicants: {
-                value: 0,
-            },
-            // Postulaciones Rechazadas
-            rejectedApplicants: {
-                value: 0,
-            },
-            // Contrataciones Realizadas
-            hiredApplicants: {
-                value: 0,
-            },
-            // Tiempo promedio de contratación
-            averageHiringTime: {
-                value: 0,
-            },
-            // Postulaciones por Reclutador
-            topRecruitments: {},
-            // Fuentes de Reclutamiento
-            sourceRecruitment: {},
-            indicatorsSourceRecruitment: {
-                sources: []
-            },
-            // Motivos de Rechazo
-            rejectionReasons: {
-                candidate: {},
-                company: {},
-            },
-            // Embudo de Etaoas
-            funnelRecruitment: {},
-
-            //Vacante
-            isVacancyDropdownOpen: false,
-            vacancyOptions: [],
+            // Filtros
+            startDate: "",
+            endDate: "",
             selectedVacancy: false,
-            vacancySearchText: "Todas Las Vacantes",
+            availableVacancies: [],
+            sourceRecruitment: {},
+            indicatorsSourceRecruitment: { sources: [] },
+            rejectionReasons: { candidate: {}, company: {} },
+            funnelRecruitment: {},
+            requisitionStats: {},
+            vacancyOptions: [],
             filteredVacancyOptions: [],
+            vacancySearchText: "Todas Las Vacantes",
+            isVacancyDropdownOpen: false,
             vacancyMetrics: {
-                status: '',
+                status: 'Global',
                 openDuration: '',
                 applicants: 0,
                 hired: 0,
                 refused: 0,
-                topRefuseReason: '',
-            },
+                topRefuseReason: ''
+            }
+        });
 
-            // Tiempo Promedio por Etapa
-            averageTimePerStageChart: {},
-            averageTimePerStageCenterValue: "",
-
-            startDate: startOfMonth,
-            endDate: endOfMonth,            
-        })
-
-        this.orm = useService("orm");
-        this.actionService = useService("action");
-
+        // ✅ Cargar datos al inicializar
         onWillStart(async () => {
+            // Inicializar fechas por defecto
+            const today = new Date();
+            const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+            this.state.startDate = firstDayOfMonth.toISOString().split('T')[0];
+            this.state.endDate = today.toISOString().split('T')[0];
+
+            // Cargar datos del dashboard (sin KPIs)
             await this.loadAllData();
         });
+    }
+
+    onKpisGridMounted(kpisGridComponent) {
+        console.log("📊 Dashboard: KpisGrid montado", kpisGridComponent);
+        this.kpisGridComponent = kpisGridComponent;
+    }
+
+    // ✅ NUEVO: Callback para RecruiterEfficiencyChart
+    onRecruiterEfficiencyMounted(recruiterEfficiencyComponent) {
+        console.log("📊 Dashboard: RecruiterEfficiencyChart montado", recruiterEfficiencyComponent);
+        this.recruiterEfficiencyComponent = recruiterEfficiencyComponent;
+    }
+
+    onProcessEfficiencyMounted(processEfficiencyComponent) {
+        console.log("📊 Dashboard: ProcessEfficiencyChart montado", processEfficiencyComponent);
+        this.processEfficiencyComponent = processEfficiencyComponent;
     }
 
     openRejectionDetails = (reason) => {
@@ -243,43 +236,122 @@ export class RecruitmentDashboard extends Component {
         this.state.isVacancyDropdownOpen = true;
     }
 
-    onDateRangeChange() {
-        if (this.state.startDate && this.state.endDate && this.state.endDate < this.state.startDate) {
-            // Corrige automáticamente o muestra un mensaje
-            this.state.endDate = this.state.startDate;
+    async onDateRangeChange(startDate, endDate) {
+        console.log("📅 Dashboard: Cambio de fechas:", { startDate, endDate });
+        
+        this.state.startDate = startDate;
+        this.state.endDate = endDate;
+        
+        // ✅ CREAR array para promises de recarga
+        const reloadPromises = [];
+        
+        if (this.kpisGridComponent) {
+            console.log("🔄 Dashboard: Recargando KPIs...");
+            reloadPromises.push(this.kpisGridComponent.loadKpisData());
         }
-        this.loadAllData();
+
+        if (this.recruiterEfficiencyComponent) {
+            console.log("🔄 Dashboard: Recargando gráfico de eficiencia...");
+            reloadPromises.push(this.recruiterEfficiencyComponent.loadChartData());
+        }
+
+        if (this.processEfficiencyComponent) {
+            console.log("🔄 Dashboard: Recargando gráfico de proceso...");
+            reloadPromises.push(this.processEfficiencyComponent.refresh());
+        }
+        
+        // ✅ ESPERAR todas las recargas en paralelo
+        await Promise.all(reloadPromises);
+        
+        // Recargar datos de gráficos del dashboard
+        await this.loadAllData();
     }
 
-    async loadAllData() {        
-        await Promise.all([
-            this.getAllVacancies(),
-            this.getTopRecruitments(),
-            this.getSourceRecruitment(),
-            this.getIndicatorsSourceRecruitment(),
-            this.getTotalApplicants(),
-            this.getInProgressApplicants(),
-            this.getPreselectedApplicants(),
-            this.getRejectedApplicants(),
-            this.getHiredApplicants(),
-            this.getAverageHiringTime(),
-            this.getRejectionReasons(),
-            this.getVacancyMetrics(),
-            this.getFunnelRecruitment(),
-            this.getFunnelRecruitment(),
-            this.getRequisitionStats(),
-            this.getAverageTimePerStage(),
-        ]);
+    async loadAllData() {
+        try {
+            await Promise.all([
+                this.getAllVacancies(),
+                this.getSourceRecruitment(),
+                this.getIndicatorsSourceRecruitment(),
+                this.getRejectionReasons(),
+                this.getVacancyMetrics(),
+                this.getFunnelRecruitment(),
+                this.getRequisitionStats(),
+                // this.getAverageTimePerStage(),
+            ]);
+            console.log("✅ Dashboard: Todos los datos cargados");
+        } catch (error) {
+            console.error("❌ Dashboard: Error cargando datos:", error);
+        }
     }
 
     async getAllVacancies() {
-        const jobs = await this.orm.searchRead('hr.job', [], ['id','name']);
-        this.state.vacancyOptions = jobs.map(j => ({
-            id: j.id,
-            name: j.name,
-        }));
-
-        this.state.filteredVacancyOptions = this.state.vacancyOptions;
+        console.log("📋 Cargando vacantes con requisiciones aprobadas...");
+        
+        try {
+            // 1) Primero obtener todas las requisiciones aprobadas
+            const approvedRequisitions = await this.orm.searchRead(
+                'hr.requisition',
+                [['state', '=', 'approved']],  // ✅ Solo requisiciones aprobadas
+                ['workstation_job_id', 'is_published', 'publish_date', 'close_date']
+            );
+            
+            console.log("✅ Requisiciones aprobadas encontradas:", approvedRequisitions.length);
+            
+            if (approvedRequisitions.length === 0) {
+                console.log("⚠️ No hay requisiciones aprobadas, lista de vacantes vacía");
+                this.state.vacancyOptions = [];
+                this.state.filteredVacancyOptions = [];
+                this.state.vacancySearchText = "Sin vacantes disponibles";
+                return;
+            }
+            
+            // 2) Extraer los IDs únicos de workstation_job_id (eliminar duplicados)
+            const approvedJobIds = [...new Set(
+                approvedRequisitions
+                    .filter(req => req.workstation_job_id)  // Solo los que tienen job
+                    .map(req => req.workstation_job_id[0])   // Extraer el ID
+            )];
+            
+            console.log("🎯 IDs de trabajos con requisiciones aprobadas:", approvedJobIds);
+            
+            if (approvedJobIds.length === 0) {
+                console.log("⚠️ No hay trabajos asociados a requisiciones aprobadas");
+                this.state.vacancyOptions = [];
+                this.state.filteredVacancyOptions = [];
+                this.state.vacancySearchText = "Sin vacantes disponibles";
+                return;
+            }
+            
+            // 3) Obtener los datos de los trabajos (hr.job) que tienen requisiciones aprobadas
+            const approvedJobs = await this.orm.searchRead(
+                'hr.job',
+                [['id', 'in', approvedJobIds]],  // ✅ Solo jobs con requisiciones aprobadas
+                ['id', 'name']
+            );
+            
+            console.log("✅ Vacantes con requisiciones aprobadas:", approvedJobs.length);
+            
+            // 4) Actualizar el estado
+            this.state.vacancyOptions = approvedJobs.map(j => ({
+                id: j.id,
+                name: j.name,
+            }));
+            this.state.filteredVacancyOptions = this.state.vacancyOptions;
+            
+            // 5) Inicializar el texto del selector
+            if (!this.state.vacancySearchText || this.state.vacancySearchText === "Sin vacantes disponibles") {
+                this.state.vacancySearchText = "Todas Las Vacantes";
+            }
+            
+            console.log("✅ Vacantes cargadas:", this.state.vacancyOptions.length);
+            
+        } catch (error) {
+            console.error("❌ Error cargando vacantes con requisiciones aprobadas:", error);
+            this.state.vacancyOptions = [];
+            this.state.filteredVacancyOptions = [];
+            this.state.vacancySearchText = "Error cargando vacantes";
+        }
     }
 
     getPastelColors(count) {
@@ -435,7 +507,47 @@ export class RecruitmentDashboard extends Component {
             counts[0] = totalApps;
         }
 
-        // 10) Labels, colores, opciones
+        // ✅ **10) NUEVO: Calcular porcentajes de conversión entre etapas consecutivas**
+        const conversionRates = [];
+        for (let i = 0; i < counts.length; i++) {
+            if (i === 0) {
+                // Primera etapa: 100% (es el total)
+                conversionRates.push(100);
+            } else {
+                // Etapas siguientes: porcentaje respecto a la etapa anterior
+                const currentCount = counts[i];
+                const previousCount = counts[i - 1];
+                const conversionRate = previousCount > 0 ? ((currentCount / previousCount) * 100) : 0;
+                conversionRates.push(conversionRate);
+            }
+        }
+
+        // ✅ **11) Crear datos detallados para debugging y tooltips**
+        const stageDetails = validGroups.map((group, index) => {
+            const currentCount = counts[index];
+            const conversionRate = conversionRates[index];
+            const previousCount = index > 0 ? counts[index - 1] : currentCount;
+            
+            return {
+                label: group.label,
+                count: currentCount,
+                conversionRate: conversionRate,
+                previousCount: previousCount,
+                isFirst: index === 0
+            };
+        });
+
+        // ✅ **12) Log detallado para debugging**
+        console.log("📊 Análisis de conversión por etapas:");
+        stageDetails.forEach((stage, index) => {
+            if (stage.isFirst) {
+                console.log(`${index + 1}. ${stage.label}: ${stage.count} candidatos (100% - Total inicial)`);
+            } else {
+                console.log(`${index + 1}. ${stage.label}: ${stage.count} candidatos (${stage.conversionRate.toFixed(1)}% de ${stage.previousCount})`);
+            }
+        });
+
+        // 13) Labels, colores, opciones
         const labels = validGroups.map(g => g.label);
         const colors = this.getPastelColors(labels.length);
         
@@ -448,10 +560,29 @@ export class RecruitmentDashboard extends Component {
                 tooltip: { 
                     callbacks: {
                         label: ctx => {
-                            const n = counts[ctx.dataIndex];
-                            const total = counts[0] || 1;
-                            const pct = ((n / total) * 100).toFixed(1);
-                            return `${labels[ctx.dataIndex]}: ${n} (${pct}%)`;
+                            const index = ctx.dataIndex;
+                            const stage = stageDetails[index];
+                            
+                            if (stage.isFirst) {
+                                return `${stage.label}: ${stage.count} candidatos (Total inicial)`;
+                            } else {
+                                return `${stage.label}: ${stage.count} candidatos (${stage.conversionRate.toFixed(1)}% de ${stage.previousCount})`;
+                            }
+                        },
+                        // ✅ NUEVO: Información adicional en el tooltip
+                        afterBody: (context) => {
+                            const index = context[0].dataIndex;
+                            const stage = stageDetails[index];
+                            
+                            if (!stage.isFirst) {
+                                const lost = stage.previousCount - stage.count;
+                                const lossRate = ((lost / stage.previousCount) * 100).toFixed(1);
+                                return [
+                                    `Perdidos en esta etapa: ${lost} candidatos (${lossRate}%)`,
+                                    `Venían de: ${stage.previousCount} candidatos`
+                                ];
+                            }
+                            return [];
                         }
                     }
                 },
@@ -463,16 +594,21 @@ export class RecruitmentDashboard extends Component {
                     backgroundColor: 'rgba(0,0,0,0.6)',
                     padding: { top: 4, bottom: 4, left: 6, right: 6 },
                     formatter: (val, ctx) => {
-                        const n = counts[ctx.dataIndex];
-                        const total = counts[0] || 1;
-                        const pct = ((n / total) * 100).toFixed(0);
-                        return `${labels[ctx.dataIndex]}\n${n}\n${pct}%`;
+                        const index = ctx.dataIndex;
+                        const stage = stageDetails[index];
+                        
+                        // ✅ NUEVO: Mostrar nombre, cantidad y porcentaje de conversión
+                        if (stage.isFirst) {
+                            return `${stage.label}\n${stage.count}\n100%`;
+                        } else {
+                            return `${stage.label}\n${stage.count}\n${stage.conversionRate.toFixed(0)}%`;
+                        }
                     }
                 }
             }
         };
 
-        // 11) Actualizar estado
+        // 14) Actualizar estado
         this.state.funnelRecruitment = {
             data: { 
                 labels, 
@@ -482,213 +618,16 @@ export class RecruitmentDashboard extends Component {
                 }] 
             },
             options,
-            enableDataLabels: true
+            enableDataLabels: true,
+            // ✅ NUEVO: Guardar datos detallados para uso posterior
+            stageDetails: stageDetails
         };
 
-    }
-
-    async getTopRecruitments() {
-        // 1. Total postulaciones por reclutador (por create_date)
-        let domain = [
-            "|",
-            ["active", "=", true],
-            ["application_status", "=", "refused"]
-        ];
-
-        domain = this._addDateRangeToDomain(domain);
-
-        const totalData = await this.orm.readGroup(
-            "hr.applicant",
-            domain,
-            ["user_id"],
-            ["user_id"]
-        );
-
-        // 2. Contratados por reclutador (por date_closed)
-        let hiredDomain = [
-            ["application_status", "=", "hired"]
-        ];
-        hiredDomain = this._getHiredDateRangeDomain(hiredDomain);
-
-        const hiredData = await this.orm.readGroup(
-            "hr.applicant",
-            hiredDomain,
-            ["user_id"],
-            ["user_id"]
-        );
-
-        // 3. En proceso por reclutador (ongoing)
-        let ongoingDomain = [
-            ["application_status", "=", "ongoing"]
-        ];
-        ongoingDomain = this._addDateRangeToDomain(ongoingDomain);
-
-        const ongoingData = await this.orm.readGroup(
-            "hr.applicant",
-            ongoingDomain,
-            ["user_id"],
-            ["user_id"]
-        );
-
-        // 4. Unir todos los conjuntos de usuarios
-        const recruiterMap = {};
-
-        // Total postulaciones
-        for (const r of totalData) {
-            const id = (r.user_id && r.user_id[0]) || false;
-            const name = (r.user_id && r.user_id[1]) || "Desconocido";
-            recruiterMap[id] = {
-                id,
-                name,
-                total: r.user_id_count,
-                hired: 0,
-                ongoing: 0
-            };
-        }
-
-        // Contratados
-        for (const r of hiredData) {
-            const id = (r.user_id && r.user_id[0]) || false;
-            const name = (r.user_id && r.user_id[1]) || "Desconocido";
-            if (!recruiterMap[id]) {
-                recruiterMap[id] = { id, name, total: 0, hired: 0, ongoing: 0 };
-            }
-            recruiterMap[id].hired = r.user_id_count;
-        }
-
-        // En proceso
-        for (const r of ongoingData) {
-            const id = (r.user_id && r.user_id[0]) || false;
-            const name = (r.user_id && r.user_id[1]) || "Desconocido";
-            if (!recruiterMap[id]) {
-                recruiterMap[id] = { id, name, total: 0, hired: 0, ongoing: 0 };
-            }
-            recruiterMap[id].ongoing = r.user_id_count;
-        }
-
-        // 5. Construir el array final
-        const recruiterStats = Object.values(recruiterMap).map(r => {
-            const percentage = r.total > 0 ? ((r.hired / r.total) * 100).toFixed(2) : "0.00";
-            return { ...r, percentage };
-        });
-
-        // 6. Preparar datos para ApexCharts - Barras apiladas
-        const labels = recruiterStats.map(r => r.name);
-        const ongoingCounts = recruiterStats.map(r => r.ongoing);
-        const hiredCounts = recruiterStats.map(r => r.hired);
-
-        // ✅ BARRAS APILADAS como el ejemplo
-        this.state.topRecruitments = {
-            series: [
-                {
-                    name: 'En Proceso',
-                    data: ongoingCounts
-                },
-                {
-                    name: 'Contratados',
-                    data: hiredCounts
-                }
-            ],
-            categories: labels,  // Nombres de los reclutadores
-            colors: ['#80c7fd', '#00E396'],  // Azul claro y verde como el ejemplo
-            meta: recruiterStats,  // Para los clicks
-            filename: 'eficiencia_reclutadores',  // Para descargas
-            options: {
-                chart: {
-                    type: 'bar',
-                    stacked: true,
-                    events: {
-                        dataPointSelection: (event, chartContext, config) => {
-                            const seriesIndex = config.seriesIndex;  // 0 = En Proceso, 1 = Contratados
-                            const dataPointIndex = config.dataPointIndex;  // Índice del reclutador
-                            const stat = recruiterStats[dataPointIndex];
-
-                            // Determinar filtro según serie
-                            let onlyHired = false;
-                            let onlyOngoing = false;
-                            if (seriesIndex === 1) {
-                                onlyHired = true;
-                            } else if (seriesIndex === 0) {
-                                onlyOngoing = true;
-                            }
-
-                            this.openRecruitmentList(stat.id, onlyHired, onlyOngoing);
-                        }
-                    }
-                },
-                plotOptions: {
-                    bar: {
-                        horizontal: true  // ✅ Barras horizontales como el ejemplo
-                    }
-                },
-                dataLabels: {
-                    enabled: true,  // ✅ Habilitar labels dentro de las barras
-                    formatter: function (val) {
-                        return val > 0 ? val : '';  // Solo mostrar si hay valor
-                    },
-                    style: {
-                        colors: ['#fff'],  // Texto blanco para contraste
-                        fontSize: '12px',
-                        fontWeight: 'bold'
-                    }
-                },
-                stroke: {
-                    width: 1,
-                    colors: ['#fff']
-                },
-                title: {
-                    text: 'Eficiencia de Contratación por Reclutador',
-                    align: 'center',
-                    style: {
-                        fontSize: '16px',
-                        fontWeight: 'bold'
-                    }
-                },
-                xaxis: {
-                    categories: labels,
-                    labels: {
-                        show: false  // ✅ Ocultar labels del eje X (los nombres irán en dataLabels)
-                    }
-                },
-                yaxis: {
-                    labels: {
-                        show: true  // ✅ Mostrar nombres de reclutadores en el eje Y
-                    }
-                },
-                legend: {
-                    position: 'top',  // Como el ejemplo
-                    horizontalAlign: 'left'  // Como el ejemplo
-                },
-                fill: {
-                    opacity: 1
-                },
-                tooltip: {
-                    shared: true,  // Muestra ambas series en el tooltip
-                    intersect: false,
-                    custom: function ({ series, seriesIndex, dataPointIndex, w }) {
-                        const stat = recruiterStats[dataPointIndex];
-                        const ongoingValue = series[0][dataPointIndex];
-                        const hiredValue = series[1][dataPointIndex];
-                        const totalValue = ongoingValue + hiredValue;
-
-                        return `
-                        <div class="px-3 py-2">
-                            <div class="fw-bold">${stat.name}</div>
-                            <div>En Proceso: <span class="fw-bold text-primary">${ongoingValue}</span></div>
-                            <div>Contratados: <span class="fw-bold text-success">${hiredValue}</span></div>
-                            <div>Total: <span class="fw-bold">${totalValue}</span></div>
-                            <div class="text-muted">Tasa de conversión: ${stat.percentage}%</div>
-                        </div>
-                    `;
-                    }
-                }
-            }
-        };
-
-        // Forzar refresco del estado
-        this.state.topRecruitments = { ...this.state.topRecruitments };
-
-        console.log("📊 Datos ApexCharts - Barras Apiladas:", this.state.topRecruitments);
+        // ✅ **15) Log final con resumen**
+        console.log("✅ Embudo de conversión actualizado:");
+        console.log(`   Total inicial: ${counts[0]} candidatos`);
+        console.log(`   Conversión promedio: ${(conversionRates.slice(1).reduce((sum, rate) => sum + rate, 0) / (conversionRates.length - 1)).toFixed(1)}%`);
+        console.log(`   Candidatos finales: ${counts[counts.length - 1]} (${((counts[counts.length - 1] / counts[0]) * 100).toFixed(1)}% del total)`);
     }
 
     async getRequisitionStats() {
@@ -1068,78 +1007,6 @@ export class RecruitmentDashboard extends Component {
         this.state.indicatorsSourceRecruitment.sources = indicators;
     }
 
-    async getTotalApplicants() {
-        const context = { context: { active_test: false } };
-        let domain = [];
-        domain = this._addDateRangeToDomain(domain);
-
-        const data = await this.orm.searchCount("hr.applicant", domain, context);
-        this.state.totalApplicants.value = data;
-    }
-
-    async getInProgressApplicants() {
-        let domain = [["application_status", "=", "ongoing"]];
-        domain = this._addDateRangeToDomain(domain);
-
-        const data = await this.orm.searchCount("hr.applicant", domain);
-        this.state.inProgressApplicants.value = data;
-    }
-
-    async getPreselectedApplicants() {
-        // Buscar applicants cuya etapa (stage_id.sequence) sea mayor a 4
-        let domain = [
-            ["stage_id.sequence", ">", 4],
-            ["application_status", "!=", "hired"]
-        ];
-        domain = this._addDateRangeToDomain(domain);
-
-        const data = await this.orm.searchCount("hr.applicant", domain);
-        this.state.preselectedApplicants.value = data;
-    }
-
-    async getRejectedApplicants() {
-        const context = { context: { active_test: false } };
-        let domain = [["application_status", "=", "refused"]];
-        domain = this._addDateRangeToDomain(domain);
-
-        const data = await this.orm.searchCount("hr.applicant", domain, context);
-        this.state.rejectedApplicants.value = data;
-    }
-
-    async getHiredApplicants() {
-        let domain = [["application_status", "=", "hired"]];
-        domain = this._getHiredDateRangeDomain(domain);
-
-        const data = await this.orm.searchCount("hr.applicant", domain);
-        this.state.hiredApplicants.value = data;
-    }
-
-    async getAverageHiringTime() {
-        let domain = [["application_status", "=", "hired"]];
-        domain = this._addDateRangeToDomain(domain);
-
-        const applicants = await this.orm.searchRead('hr.applicant', domain, ["create_date", "date_closed"]);
-        if (!applicants.length) {
-            return 0;
-        }
-
-        let totalDays = 0;
-        let count = 0;
-        for (const applicant of applicants) {
-            if (applicant.create_date && applicant.date_closed) {
-                const created = new Date(applicant.create_date);
-                const closed = new Date(applicant.date_closed);
-                const diffTime = closed - created;
-                const diffDays = diffTime / (1000 * 60 * 60 * 24);
-                totalDays += diffDays;
-                count += 1;
-            }
-        }
-
-        const averageDays = count ? (totalDays / count) : 0;
-        this.state.averageHiringTime.value = averageDays.toFixed(2);
-    }
-
     async getRejectionReasons() {
         const context = { context: { active_test: false } };
         let domain = [["application_status", "=", "refused"]];
@@ -1154,6 +1021,120 @@ export class RecruitmentDashboard extends Component {
             context
         );
 
+        // ✅ FUNCIÓN AVANZADA: Normalizar texto (sin mayúsculas, minúsculas ni tildes)
+        const normalizeText = (text) => {
+            if (!text) return '';
+            
+            return text
+                .toLowerCase()                    // Convertir a minúsculas
+                .trim()                          // Quitar espacios al inicio/final
+                .normalize('NFD')                // Descomponer caracteres con tildes
+                .replace(/[\u0300-\u036f]/g, '') // Eliminar diacríticos (tildes, acentos)
+                .replace(/[^\w\s]/g, ' ')        // Reemplazar caracteres especiales con espacios
+                .replace(/\s+/g, ' ')            // Normalizar espacios múltiples a uno solo
+                .trim();                         // Quitar espacios finales después de normalizar
+        };
+
+        // ✅ FUNCIÓN MEJORADA: Detectar si es declinación del candidato
+        const isCandidateDecline = (reasonLabel) => {
+            if (!reasonLabel) return false;
+            
+            const normalizedLabel = normalizeText(reasonLabel);
+            
+            // ✅ MOTIVOS NORMALIZADOS (sin tildes ni mayúsculas)
+            const candidateDeclinePatterns = [
+                // Declinaciones explícitas
+                'declino',
+                'candidato declino',
+                'declina',
+                'candidato declina',
+                
+                // No se presentó (múltiples variaciones)
+                'no se presento',
+                'no se presenta',
+                'no asistio',
+                'no asiste',
+                'ausente',
+                'falta',
+                'inasistencia',
+                
+                // Solo se presenta a inducción
+                'solo se presenta a induccion',
+                'solo induccion',
+                'unicamente induccion',
+                'nada mas induccion',
+                
+                // No respondió/responde
+                'no respondio',
+                'no responde',
+                'no contesta',
+                'no contesto',
+                'sin respuesta',
+                'no hay respuesta',
+                
+                // Abandono del proceso
+                'abandono',
+                'abandona',
+                'se retira',
+                'se retiro',
+                'retiro',
+                'desiste',
+                'desistio',
+                
+                // Cambio de opinión
+                'cambio de opinion',
+                'cambio opinion',
+                'ya no le interesa',
+                'perdio interes',
+                'perdio el interes',
+                'sin interes',
+                
+                // Aceptó otra oferta
+                'acepto otra oferta',
+                'acepta otra oferta',
+                'otra oferta',
+                'mejor oferta',
+                'oferta mejor',
+                'consiguio otro trabajo',
+                'otro trabajo',
+                'otra empresa',
+                
+                // Problemas personales del candidato
+                'no esta interesado',
+                'no le interesa',
+                'no disponible',
+                'no puede',
+                'imposibilitado',
+                'problemas personales',
+                'situacion personal',
+                
+                // Problemas con condiciones
+                'no cumple horario',
+                'horario no le conviene',
+                'salario insuficiente',
+                'salario bajo',
+                'sueldo bajo',
+                'poco salario',
+                'distancia',
+                'muy lejos',
+                'ubicacion',
+                'transporte',
+                
+                // Otros motivos del candidato
+                'no acepta condiciones',
+                'condiciones no favorables',
+                'expectativas diferentes',
+                'no es lo que busca',
+                'cambio de planes'
+            ];
+            
+            // ✅ VERIFICAR si algún patrón coincide EXACTAMENTE o está CONTENIDO
+            return candidateDeclinePatterns.some(pattern => {
+                // Buscar coincidencia exacta O que el patrón esté contenido en el label
+                return normalizedLabel === pattern || normalizedLabel.includes(pattern);
+            });
+        };
+
         // Separa en declinaciones de candidatos y rechazos de empresa
         const candidateDeclines = [];
         const companyRejections = [];
@@ -1163,14 +1144,30 @@ export class RecruitmentDashboard extends Component {
             const label = (r.refuse_reason_id && r.refuse_reason_id[1]) || "Sin motivo";
             const count = r.refuse_reason_id_count;
 
-            if (label.toLowerCase().includes("declino")) {
+            // ✅ USAR LA FUNCIÓN MEJORADA DE CLASIFICACIÓN
+            if (isCandidateDecline(label)) {
                 candidateDeclines.push({ id, label, count });
+                console.log(`👤 CANDIDATO: "${label}" → normalizado: "${normalizeText(label)}"`);
             } else {
                 companyRejections.push({ id, label, count });
+                console.log(`🏢 EMPRESA: "${label}" → normalizado: "${normalizeText(label)}"`);
             }
         }
 
-        // Datos para ChartRenderer
+        // ✅ LOGS DETALLADOS para debugging
+        console.log("📊 Resumen de clasificación de rechazos:");
+        console.log(`👤 Declinaciones de candidatos: ${candidateDeclines.length} tipos, ${candidateDeclines.reduce((sum, x) => sum + x.count, 0)} total`);
+        console.log(`🏢 Rechazos de empresa: ${companyRejections.length} tipos, ${companyRejections.reduce((sum, x) => sum + x.count, 0)} total`);
+        
+        // ✅ MOSTRAR todos los motivos de candidatos detectados
+        if (candidateDeclines.length > 0) {
+            console.log("👤 Motivos de candidatos detectados:");
+            candidateDeclines.forEach(decline => {
+                console.log(`   • "${decline.label}" (${decline.count} casos)`);
+            });
+        }
+
+        // Datos para ChartRenderer (resto del código sin cambios)
         const pastelCandidate = this.getPastelColors(candidateDeclines.length);
         const pastelCompany = this.getPastelColors(companyRejections.length);
 
@@ -1202,11 +1199,11 @@ export class RecruitmentDashboard extends Component {
                                 const idx = context[0].dataIndex;
                                 const count = candidateDeclines[idx].count;
                                 const percent = totalCandidate > 0 ? ((count / totalCandidate) * 100).toFixed(2) : "0.00";
-                                return `Porcentaje de rechazo: ${percent}%`;
+                                return `Porcentaje de declinación: ${percent}%`;
                             }
                         }
                     }
-                }
+                } 
             } 
         };
 
@@ -1246,161 +1243,6 @@ export class RecruitmentDashboard extends Component {
         this.state.rejectionReasons = { ...this.state.rejectionReasons };
     }
 
-    async getAverageTimePerStage() {
-        console.log("📊 Calculando tiempo promedio por etapa (solo contratados)...");
-        
-        // 1) Obtener applicants contratados en el rango de fechas
-        let hiredDomain = [["application_status", "=", "hired"]];
-        hiredDomain = this._getHiredDateRangeDomain(hiredDomain);
-        
-        const hiredApplicants = await this.orm.searchRead(
-            "hr.applicant",
-            hiredDomain,
-            ["id"]
-        );
-        
-        console.log("👥 Applicants contratados encontrados:", hiredApplicants.length);
-        
-        if (hiredApplicants.length === 0) {
-            console.log("⚠️ No hay contratados en este rango, manteniendo valores por defecto");
-            return;
-        }
-        
-        // 2) Obtener IDs de los applicants contratados
-        const hiredIds = hiredApplicants.map(a => a.id);
-        
-        // 3) Consultar historial con duración en horas también
-        const historyRecords = await this.orm.searchRead(
-            "hr.applicant.stage.history",
-            [
-                ['applicant_id', 'in', hiredIds],
-                ['leave_date', '!=', false],
-                ['duration_hours', '>', 0]
-            ],
-            ['stage_id', 'duration_days', 'duration_hours', 'applicant_id']
-        );
-        
-        console.log("📈 Registros de historial de contratados:", historyRecords.length);
-        console.log("📊 Detalle de registros:", historyRecords);
-        
-        // 4) Agrupar por etapa
-        const stageTimeMap = {};
-        
-        for (const record of historyRecords) {
-            const stageId = record.stage_id[0];
-            const stageName = record.stage_id[1];
-            
-            if (!stageTimeMap[stageId]) {
-                stageTimeMap[stageId] = {
-                    name: stageName,
-                    durations: []
-                };
-            }
-            
-            stageTimeMap[stageId].durations.push({
-                days: record.duration_days,
-                hours: record.duration_hours
-            });
-        }
-        
-        // 5) Calcular promedios
-        const labels = [];
-        const data = [];
-        let totalHours = 0;
-        let totalCount = 0;
-        
-        for (const stageId in stageTimeMap) {
-            const stage = stageTimeMap[stageId];
-            const durations = stage.durations;
-            
-            if (durations.length > 0) {
-                const avgHours = durations.reduce((sum, d) => sum + d.hours, 0) / durations.length;
-                const avgDays = avgHours / 24;
-                
-                labels.push(stage.name);
-                data.push(Number(avgDays.toFixed(2)));
-                
-                totalHours += avgHours * durations.length;
-                totalCount += durations.length;
-                
-                console.log(`📋 ${stage.name}: ${avgDays.toFixed(2)} días promedio (${durations.length} muestras)`);
-            }
-        }
-        
-        // 6) Si no hay datos válidos, usar datos de prueba
-        if (labels.length === 0) {
-            console.log("⚠️ No hay datos válidos, usando datos de prueba");
-            labels.push("Primera Entrevista", "Examen Técnico", "Examen Médico");
-            data.push(0.1, 0.2, 0.05);
-            totalHours = 4.8;
-            totalCount = 3;
-        }
-        
-        // 7) Formatear el promedio global
-        const globalAverageHours = totalCount > 0 ? (totalHours / totalCount) : 0;
-        let centerText = "0 min";
-        
-        if (globalAverageHours >= 24) {
-            const days = (globalAverageHours / 24).toFixed(1);
-            centerText = `${days} día${days != 1 ? 's' : ''}`;
-        } else if (globalAverageHours >= 1) {
-            const hours = globalAverageHours.toFixed(1);
-            centerText = `${hours} hora${hours != 1 ? 's' : ''}`;
-        } else if (globalAverageHours > 0) {
-            const minutes = Math.round(globalAverageHours * 60);
-            centerText = `${minutes} min`;
-        }
-        
-        // 8) ¡CLAVE! Crear un NUEVO objeto para forzar reactivity en OWL
-        this.state.averageTimePerStageChart = {
-            data: {
-                labels,
-                datasets: [{
-                    data,
-                    backgroundColor: this.getPastelColors(labels.length),
-                }]
-            },
-            options: {
-                cutout: "70%",
-                plugins: {
-                    legend: { display: true, position: "bottom" },
-                    tooltip: {
-                        callbacks: {
-                            label: ctx => {
-                                const days = ctx.parsed;
-                                const hours = (days * 24);
-                                
-                                let timeText = "";
-                                if (days >= 1) {
-                                    timeText = `${days.toFixed(1)} días`;
-                                } else if (hours >= 1) {
-                                    timeText = `${hours.toFixed(1)} horas`;
-                                } else {
-                                    const minutes = Math.round(hours * 60);
-                                    timeText = `${minutes} minutos`;
-                                }
-                                
-                                return [
-                                    `${ctx.label}: ${timeText}`,
-                                    `(Solo candidatos contratados)`
-                                ];
-                            }
-                        }
-                    }
-                }
-            }
-        };
-        
-        this.state.averageTimePerStageCenterValue = centerText;
-        
-        // 9) ¡SÚPER IMPORTANTE! Forzar actualización completa del estado
-        this.state.averageTimePerStageChart = { ...this.state.averageTimePerStageChart };
-        
-        console.log("✅ Gráfica actualizada - Promedio global:", centerText);
-        console.log("🎯 Basado en", hiredApplicants.length, "candidatos contratados");
-        console.log("📊 Chart data:", this.state.averageTimePerStageChart);
-    }
-
     openRejectionList(refuse_reason_id) {
         let domain = [
             ["application_status", "=", "refused"],            
@@ -1432,87 +1274,14 @@ export class RecruitmentDashboard extends Component {
         });
     }
 
-    viewTotalApplicants() {
-        const context = { active_test: false };
-        let domain = [];
-        domain = this._addDateRangeToDomain(domain);
-
-        this.actionService.doAction({
-            type: "ir.actions.act_window",
-            name: "Postulaciones",
-            res_model: "hr.applicant",
-            domain: domain,
-            views: [[false, "list"], [false, "form"]],
-            context: context,
-        });
-    }
-
-    viewInProgressApplicants() {
-        let domain = [["application_status", "=", "ongoing"]];
-        domain = this._addDateRangeToDomain(domain);
-
-        this.actionService.doAction({
-            type: "ir.actions.act_window",
-            name: "Postulaciones en Progreso",
-            res_model: "hr.applicant",
-            domain: domain,
-            views: [[false, "list"], [false, "form"]],
-        });
-    }
-
-    viewPreselectedApplicants() {
-        let domain = [
-            ["stage_id.sequence", ">", 4],
-            ["application_status", "!=", "hired"]
-        ];
-        domain = this._addDateRangeToDomain(domain);
-
-        this.actionService.doAction({
-            type: "ir.actions.act_window",
-            name: "Postulaciones Preseleccionadas",
-            res_model: "hr.applicant",
-            domain: domain,
-            views: [[false, "list"], [false, "form"]],
-        });
-    }
-
-    viewRejectedApplicants() {
-        const context = { active_test: false };
-        let domain = [["application_status", "=", "refused"]];
-        domain = this._addDateRangeToDomain(domain);
-
-        this.actionService.doAction({
-            type: "ir.actions.act_window",
-            name: "Postulaciones Rechazadas",
-            res_model: "hr.applicant",
-            domain: domain,
-            views: [[false, "list"], [false, "form"]],
-            context: context
-        });
-    }
-
-    viewHiredApplicants() {
-        let domain = [["application_status", "=", "hired"]];
-        domain = this._getHiredDateRangeDomain(domain);
-
-        this.actionService.doAction({
-            type: "ir.actions.act_window",
-            name: "Postulaciones Contratadas",
-            res_model: "hr.applicant",
-            domain: domain,
-            views: [[false, "list"], [false, "form"]]
-        });
-    }
-
-    viewAverageHiringTime() {
-        // No-op to avoid errors
-        return;
-    }
-
 }
 
 RecruitmentDashboard.template = "recruitment.dashboard";
-RecruitmentDashboard.components = { KpiCard, ChartRenderer, ChartRendererApex };
+RecruitmentDashboard.components = {
+    DashboardHeader, KpisGrid, 
+    ChartRenderer, RecruiterEfficiencyChart,
+    ProcessEfficiencyChart
+};
 
 // Registrar el dashboard OWL
 registry.category("actions").add("recruitment.dashboard", RecruitmentDashboard);

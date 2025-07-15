@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    
+    <t t-name="hr_recruitment_estevez.RecruiterEfficiencyChart" owl="1">
+        <!-- ✅ Gráfico o Loading -->
+        <div t-if="state.isLoading" class="text-center py-5">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Cargando...</span>
+            </div>
+            <div class="mt-2 text-muted">Cargando datos de eficiencia...</div>
+        </div>
+
+        <div t-else="">
+            <ChartRendererApex 
+                type="'bar'"
+                title="props.title || 'Eficiencia por Reclutador'"
+                config="state.chartData"
+                height="props.height || 400"/>
+        </div>
+    </t>
+
+</templates>
