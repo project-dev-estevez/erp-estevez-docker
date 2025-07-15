@@ -45,7 +45,6 @@ export class RecruitmentDashboard extends Component {
         this.recruiterEfficiencyComponent = null;
         this.processEfficiencyComponent = null;
 
-        // ✅ Estado del dashboard - YA NO incluye KPIs
         this.state = useState({
             // Filtros
             startDate: "",
@@ -57,6 +56,10 @@ export class RecruitmentDashboard extends Component {
             rejectionReasons: { candidate: {}, company: {} },
             funnelRecruitment: {},
             requisitionStats: {},
+            vacancyOptions: [],
+            filteredVacancyOptions: [],
+            vacancySearchText: "Todas Las Vacantes",
+            isVacancyDropdownOpen: false,
             vacancyMetrics: {
                 status: 'Global',
                 openDuration: '',
@@ -283,13 +286,72 @@ export class RecruitmentDashboard extends Component {
     }
 
     async getAllVacancies() {
-        const jobs = await this.orm.searchRead('hr.job', [], ['id','name']);
-        this.state.vacancyOptions = jobs.map(j => ({
-            id: j.id,
-            name: j.name,
-        }));
-
-        this.state.filteredVacancyOptions = this.state.vacancyOptions;
+        console.log("📋 Cargando vacantes con requisiciones aprobadas...");
+        
+        try {
+            // 1) Primero obtener todas las requisiciones aprobadas
+            const approvedRequisitions = await this.orm.searchRead(
+                'hr.requisition',
+                [['state', '=', 'approved']],  // ✅ Solo requisiciones aprobadas
+                ['workstation_job_id', 'is_published', 'publish_date', 'close_date']
+            );
+            
+            console.log("✅ Requisiciones aprobadas encontradas:", approvedRequisitions.length);
+            
+            if (approvedRequisitions.length === 0) {
+                console.log("⚠️ No hay requisiciones aprobadas, lista de vacantes vacía");
+                this.state.vacancyOptions = [];
+                this.state.filteredVacancyOptions = [];
+                this.state.vacancySearchText = "Sin vacantes disponibles";
+                return;
+            }
+            
+            // 2) Extraer los IDs únicos de workstation_job_id (eliminar duplicados)
+            const approvedJobIds = [...new Set(
+                approvedRequisitions
+                    .filter(req => req.workstation_job_id)  // Solo los que tienen job
+                    .map(req => req.workstation_job_id[0])   // Extraer el ID
+            )];
+            
+            console.log("🎯 IDs de trabajos con requisiciones aprobadas:", approvedJobIds);
+            
+            if (approvedJobIds.length === 0) {
+                console.log("⚠️ No hay trabajos asociados a requisiciones aprobadas");
+                this.state.vacancyOptions = [];
+                this.state.filteredVacancyOptions = [];
+                this.state.vacancySearchText = "Sin vacantes disponibles";
+                return;
+            }
+            
+            // 3) Obtener los datos de los trabajos (hr.job) que tienen requisiciones aprobadas
+            const approvedJobs = await this.orm.searchRead(
+                'hr.job',
+                [['id', 'in', approvedJobIds]],  // ✅ Solo jobs con requisiciones aprobadas
+                ['id', 'name']
+            );
+            
+            console.log("✅ Vacantes con requisiciones aprobadas:", approvedJobs.length);
+            
+            // 4) Actualizar el estado
+            this.state.vacancyOptions = approvedJobs.map(j => ({
+                id: j.id,
+                name: j.name,
+            }));
+            this.state.filteredVacancyOptions = this.state.vacancyOptions;
+            
+            // 5) Inicializar el texto del selector
+            if (!this.state.vacancySearchText || this.state.vacancySearchText === "Sin vacantes disponibles") {
+                this.state.vacancySearchText = "Todas Las Vacantes";
+            }
+            
+            console.log("✅ Vacantes cargadas:", this.state.vacancyOptions.length);
+            
+        } catch (error) {
+            console.error("❌ Error cargando vacantes con requisiciones aprobadas:", error);
+            this.state.vacancyOptions = [];
+            this.state.filteredVacancyOptions = [];
+            this.state.vacancySearchText = "Error cargando vacantes";
+        }
     }
 
     getPastelColors(count) {
@@ -445,7 +507,47 @@ export class RecruitmentDashboard extends Component {
             counts[0] = totalApps;
         }
 
-        // 10) Labels, colores, opciones
+        // ✅ **10) NUEVO: Calcular porcentajes de conversión entre etapas consecutivas**
+        const conversionRates = [];
+        for (let i = 0; i < counts.length; i++) {
+            if (i === 0) {
+                // Primera etapa: 100% (es el total)
+                conversionRates.push(100);
+            } else {
+                // Etapas siguientes: porcentaje respecto a la etapa anterior
+                const currentCount = counts[i];
+                const previousCount = counts[i - 1];
+                const conversionRate = previousCount > 0 ? ((currentCount / previousCount) * 100) : 0;
+                conversionRates.push(conversionRate);
+            }
+        }
+
+        // ✅ **11) Crear datos detallados para debugging y tooltips**
+        const stageDetails = validGroups.map((group, index) => {
+            const currentCount = counts[index];
+            const conversionRate = conversionRates[index];
+            const previousCount = index > 0 ? counts[index - 1] : currentCount;
+            
+            return {
+                label: group.label,
+                count: currentCount,
+                conversionRate: conversionRate,
+                previousCount: previousCount,
+                isFirst: index === 0
+            };
+        });
+
+        // ✅ **12) Log detallado para debugging**
+        console.log("📊 Análisis de conversión por etapas:");
+        stageDetails.forEach((stage, index) => {
+            if (stage.isFirst) {
+                console.log(`${index + 1}. ${stage.label}: ${stage.count} candidatos (100% - Total inicial)`);
+            } else {
+                console.log(`${index + 1}. ${stage.label}: ${stage.count} candidatos (${stage.conversionRate.toFixed(1)}% de ${stage.previousCount})`);
+            }
+        });
+
+        // 13) Labels, colores, opciones
         const labels = validGroups.map(g => g.label);
         const colors = this.getPastelColors(labels.length);
         
@@ -458,10 +560,29 @@ export class RecruitmentDashboard extends Component {
                 tooltip: { 
                     callbacks: {
                         label: ctx => {
-                            const n = counts[ctx.dataIndex];
-                            const total = counts[0] || 1;
-                            const pct = ((n / total) * 100).toFixed(1);
-                            return `${labels[ctx.dataIndex]}: ${n} (${pct}%)`;
+                            const index = ctx.dataIndex;
+                            const stage = stageDetails[index];
+                            
+                            if (stage.isFirst) {
+                                return `${stage.label}: ${stage.count} candidatos (Total inicial)`;
+                            } else {
+                                return `${stage.label}: ${stage.count} candidatos (${stage.conversionRate.toFixed(1)}% de ${stage.previousCount})`;
+                            }
+                        },
+                        // ✅ NUEVO: Información adicional en el tooltip
+                        afterBody: (context) => {
+                            const index = context[0].dataIndex;
+                            const stage = stageDetails[index];
+                            
+                            if (!stage.isFirst) {
+                                const lost = stage.previousCount - stage.count;
+                                const lossRate = ((lost / stage.previousCount) * 100).toFixed(1);
+                                return [
+                                    `Perdidos en esta etapa: ${lost} candidatos (${lossRate}%)`,
+                                    `Venían de: ${stage.previousCount} candidatos`
+                                ];
+                            }
+                            return [];
                         }
                     }
                 },
@@ -473,16 +594,21 @@ export class RecruitmentDashboard extends Component {
                     backgroundColor: 'rgba(0,0,0,0.6)',
                     padding: { top: 4, bottom: 4, left: 6, right: 6 },
                     formatter: (val, ctx) => {
-                        const n = counts[ctx.dataIndex];
-                        const total = counts[0] || 1;
-                        const pct = ((n / total) * 100).toFixed(0);
-                        return `${labels[ctx.dataIndex]}\n${n}\n${pct}%`;
+                        const index = ctx.dataIndex;
+                        const stage = stageDetails[index];
+                        
+                        // ✅ NUEVO: Mostrar nombre, cantidad y porcentaje de conversión
+                        if (stage.isFirst) {
+                            return `${stage.label}\n${stage.count}\n100%`;
+                        } else {
+                            return `${stage.label}\n${stage.count}\n${stage.conversionRate.toFixed(0)}%`;
+                        }
                     }
                 }
             }
         };
 
-        // 11) Actualizar estado
+        // 14) Actualizar estado
         this.state.funnelRecruitment = {
             data: { 
                 labels, 
@@ -492,9 +618,16 @@ export class RecruitmentDashboard extends Component {
                 }] 
             },
             options,
-            enableDataLabels: true
+            enableDataLabels: true,
+            // ✅ NUEVO: Guardar datos detallados para uso posterior
+            stageDetails: stageDetails
         };
 
+        // ✅ **15) Log final con resumen**
+        console.log("✅ Embudo de conversión actualizado:");
+        console.log(`   Total inicial: ${counts[0]} candidatos`);
+        console.log(`   Conversión promedio: ${(conversionRates.slice(1).reduce((sum, rate) => sum + rate, 0) / (conversionRates.length - 1)).toFixed(1)}%`);
+        console.log(`   Candidatos finales: ${counts[counts.length - 1]} (${((counts[counts.length - 1] / counts[0]) * 100).toFixed(1)}% del total)`);
     }
 
     async getRequisitionStats() {
