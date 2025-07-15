@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    
+    <t t-name="hr_recruitment_estevez.KpiCard" owl="1">
+        <div class="h-100">
+            <!-- ✅ 100% Bootstrap utilities -->
+            <div class="card h-100 border-0 shadow-sm bg-white text-center position-relative rounded-3"
+                t-att-class="props.onClick ? 'cursor-pointer' : ''"
+                t-on-click="onCardClick"
+                onmouseover="this.classList.replace('shadow-sm', 'shadow-lg'); this.style.transform='translateY(-0.5rem) scale(1.02)'"
+                onmouseout="this.classList.replace('shadow-lg', 'shadow-sm'); this.style.transform='translateY(0) scale(1)'"
+                style="transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);">
+                
+                <div class="card-body d-flex flex-column justify-content-center p-4">
+                    <!-- ✅ Valor grande con Bootstrap display -->
+                    <div class="display-3 fw-bold text-primary mb-2 lh-1">
+                        <t t-esc="formattedValue"/>
+                    </div>
+                    
+                    <!-- ✅ Badge premium para porcentaje -->
+                    <div t-if="props.showPercentage and formattedPercentage" class="mb-3">
+                        <span class="badge fs-6 px-3 py-2 rounded-pill"
+                            t-att-class="parseFloat(props.percentage) >= 0 ? 'bg-success bg-opacity-15 text-success' : 'bg-danger bg-opacity-15 text-danger'">
+                            <i t-att-class="parseFloat(props.percentage) >= 0 ? 'bi bi-arrow-up' : 'bi bi-arrow-down'"></i>
+                            <t t-esc="formattedPercentage"/>
+                        </span>
+                    </div>
+                    
+                    <!-- ✅ Título con spacing Bootstrap -->
+                    <h6 class="text-muted fw-medium text-uppercase ls-1 mb-0 opacity-75">
+                        <t t-esc="props.name"/>
+                    </h6>
+                </div>
+            </div>
+        </div>
+    </t>
+
+</templates>

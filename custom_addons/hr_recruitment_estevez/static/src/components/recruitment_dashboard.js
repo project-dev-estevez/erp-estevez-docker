@@ -3,8 +3,8 @@
 import { registry } from "@web/core/registry";
 
 import { DashboardHeader } from "./dashboard_header/dashboard_header";
+import { KpisGrid } from "./kpis/kpis_grid";
 
-import { KpiCard } from "./kpi_card/kpi_card";
 import { ChartRenderer } from "./chart_renderer/chart_renderer";
 import { useService } from "@web/core/utils/hooks";
 import { Component, onWillStart, useState } from "@odoo/owl";
@@ -1514,11 +1514,17 @@ export class RecruitmentDashboard extends Component {
         return;
     }
 
+    handleKpiClick(action) {
+        console.log(`📊 Navegando a: ${action}`);
+        // Aquí puedes agregar la lógica de navegación específica
+        // Por ejemplo: this.env.services.action.doAction(...)
+    }
+
 }
 
 RecruitmentDashboard.template = "recruitment.dashboard";
 RecruitmentDashboard.components = {
-    DashboardHeader, KpiCard, 
+    DashboardHeader, KpisGrid, 
     ChartRenderer, ChartRendererApex
 };
 

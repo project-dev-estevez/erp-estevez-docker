@@ -14,53 +14,9 @@
 
                     <!-- KPIs principales -->
                     <div class="row">
-                        <div class="col">
-                            <KpiCard onClick.bind="viewTotalApplicants"
-                                     name="'Postulaciones'" 
-                                     value="state.totalApplicants.value" 
-                                     percentage="state.totalApplicants.percentage"
-                                     showPercentage="false"/>
-                        </div>
-
-                        <div class="col">
-                            <KpiCard onClick.bind="viewInProgressApplicants"
-                                     name="'En Progreso'" 
-                                     value="state.inProgressApplicants.value" 
-                                     percentage="state.inProgressApplicants.percentage"
-                                     showPercentage="false"/>
-                        </div>
-
-                        <div class="col">
-                            <KpiCard onClick.bind="viewPreselectedApplicants"
-                                     name="'Preseleccionados'" 
-                                     value="state.preselectedApplicants.value" 
-                                     percentage="state.preselectedApplicants.percentage"
-                                     showPercentage="false"/>
-                        </div>
-
-                        <div class="col">
-                            <KpiCard onClick.bind="viewRejectedApplicants"
-                                     name="'Rechazados'" 
-                                     value="state.rejectedApplicants.value" 
-                                     percentage="state.rejectedApplicants.percentage"
-                                     showPercentage="false"/>
-                        </div>
-
-                        <div class="col">
-                            <KpiCard onClick.bind="viewHiredApplicants"
-                                     name="'Contratados'" 
-                                     value="state.hiredApplicants.value" 
-                                     percentage="state.hiredApplicants.percentage"
-                                     showPercentage="false"/>
-                        </div>
-
-                        <div class="col">
-                            <KpiCard onClick.bind="viewAverageHiringTime"
-                                     name="'Tiempo Promedio'" 
-                                     value="state.averageHiringTime.value" 
-                                     percentage="state.averageHiringTime.previousValue"
-                                     showPercentage="false"/>
-                        </div>
+                        <KpisGrid 
+                            kpisData="state" 
+                            onKpiClick.bind="handleKpiClick"/>
                     </div>
 
                     <!-- Postulaciones por reclutador y fuentes de reclutamiento -->

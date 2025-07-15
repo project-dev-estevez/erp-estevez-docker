@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    
+    <t t-name="hr_recruitment_estevez.KpisGrid" owl="1">
+        <!-- ✅ Container sin margin para alinear con dashboard -->
+        <div class="container-fluid p-0 mb-4">
+            <div class="row g-3">
+                <t t-foreach="kpis" t-as="kpi" t-key="kpi.name">
+                    <!-- ✅ Columnas responsivas Bootstrap -->
+                    <div class="col-12 col-sm-6 col-md-4 col-lg-2">
+                        <KpiCard 
+                            name="kpi.name"
+                            value="kpi.value"
+                            percentage="kpi.percentage"
+                            showPercentage="kpi.showPercentage"
+                            onClick="kpi.onClick"/>
+                    </div>
+                </t>
+            </div>
+        </div>
+    </t>
+
+</templates>
