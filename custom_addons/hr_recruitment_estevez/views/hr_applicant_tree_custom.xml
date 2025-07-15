@@ -24,10 +24,7 @@
       </xpath>   
       <xpath expr="//field[@name='refuse_reason_id']" position="attributes">
         <attribute name="width">180</attribute>
-      </xpath> 
-      <xpath expr="//field[@name='activity_date_deadline']" position="attributes">
-        <attribute name="width">180</attribute>
-      </xpath> 
+      </xpath>        
       <xpath expr="//field[@name='priority']" position="attributes">
         <attribute name="width">180</attribute>
       </xpath>  
