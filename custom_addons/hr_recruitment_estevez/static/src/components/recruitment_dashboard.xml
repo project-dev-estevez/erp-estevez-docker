@@ -5,6 +5,7 @@
         <div class="vh-100 overflow-auto bg-muted mb-5 pb-5">
             <div class="row m-3">
                 <div class="col-lg-12">
+                    
                     <!-- Titulo y filtro -->
                     <DashboardHeader
                         title="'Dashboard Reclutamiento'"
