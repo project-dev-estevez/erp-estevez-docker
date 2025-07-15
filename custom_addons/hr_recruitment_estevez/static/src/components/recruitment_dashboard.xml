@@ -5,7 +5,7 @@
         <div class="vh-100 overflow-auto bg-muted mb-5 pb-5">
             <div class="row m-3">
                 <div class="col-lg-12">
-                    
+
                     <!-- Titulo y filtro -->
                     <DashboardHeader
                         title="'Dashboard Reclutamiento'"
@@ -25,10 +25,12 @@
                     <div class="row">
                         <div class="col-lg-6 m-0 p-0">
                             <div class="shadow-sm border m-2 p-4 bg-white">
-                                <ChartRendererApex
-                                    type="'bar-horizontal'"
-                                    height="350"
-                                    config="state.topRecruitments" />
+                                <RecruiterEfficiencyChart
+                                    chartData="state.topRecruitments"
+                                    startDate="state.startDate"
+                                    endDate="state.endDate"
+                                    title="'Postulaciones por Reclutador'"
+                                    height="350"/>
                                 <!-- <ChartRenderer type="'bar'" title="'Postulaciones por Reclutador'" config="state.topRecruitments"/> -->
                             </div>
                         </div>

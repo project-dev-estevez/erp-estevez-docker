@@ -5,10 +5,11 @@ import { registry } from "@web/core/registry";
 import { DashboardHeader } from "./dashboard_header/dashboard_header";
 import { KpisGrid } from "./kpis/kpis_grid";
 
+import { RecruiterEfficiencyChart } from "./charts/recruiter_efficiency_chart/recruiter_efficiency_chart";
+
 import { ChartRenderer } from "./chart_renderer/chart_renderer";
 import { useService } from "@web/core/utils/hooks";
 import { Component, onWillStart, useState } from "@odoo/owl";
-import { ChartRendererApex } from "./chart_renderer_apex/chart_renderer_apex";
 const { DateTime } = luxon;
 
 export class RecruitmentDashboard extends Component {
@@ -1442,7 +1443,7 @@ export class RecruitmentDashboard extends Component {
 RecruitmentDashboard.template = "recruitment.dashboard";
 RecruitmentDashboard.components = {
     DashboardHeader, KpisGrid, 
-    ChartRenderer, ChartRendererApex
+    ChartRenderer, RecruiterEfficiencyChart
 };
 
 // Registrar el dashboard OWL

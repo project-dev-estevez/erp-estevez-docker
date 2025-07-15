@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    
+    <t t-name="hr_recruitment_estevez.RecruiterEfficiencyChart" owl="1">
+        <ChartRendererApex
+                        type="'bar-horizontal'"
+                        height="chartHeight"  
+                        config="props.chartData" />
+    </t>
+
+</templates>
