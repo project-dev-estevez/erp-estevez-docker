@@ -2,10 +2,21 @@
 <templates xml:space="preserve">
     
     <t t-name="hr_recruitment_estevez.RecruiterEfficiencyChart" owl="1">
-        <ChartRendererApex
-                        type="'bar-horizontal'"
-                        height="chartHeight"  
-                        config="props.chartData" />
+        <!-- ✅ Gráfico o Loading -->
+        <div t-if="state.isLoading" class="text-center py-5">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Cargando...</span>
+            </div>
+            <div class="mt-2 text-muted">Cargando datos de eficiencia...</div>
+        </div>
+
+        <div t-else="">
+            <ChartRendererApex 
+                type="'bar'"
+                title="props.title || 'Eficiencia por Reclutador'"
+                config="state.chartData"
+                height="props.height || 350"/>
+        </div>
     </t>
 
 </templates>

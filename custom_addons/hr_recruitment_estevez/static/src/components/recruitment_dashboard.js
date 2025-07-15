@@ -38,8 +38,9 @@ export class RecruitmentDashboard extends Component {
         this.orm = useService("orm");
         this.actionService = useService("action");
         
-        // ✅ Variable para guardar la referencia al KpisGrid
+        // ✅ Variables para referencias de componentes
         this.kpisGridComponent = null;
+        this.recruiterEfficiencyComponent = null;
 
         // ✅ Estado del dashboard - YA NO incluye KPIs
         this.state = useState({
@@ -48,9 +49,6 @@ export class RecruitmentDashboard extends Component {
             endDate: "",
             selectedVacancy: false,
             availableVacancies: [],
-
-            // ✅ Solo datos de gráficos - NO MÁS KPIs aquí
-            topRecruitments: {},
             sourceRecruitment: {},
             indicatorsSourceRecruitment: { sources: [] },
             rejectionReasons: { candidate: {}, company: {} },
@@ -84,6 +82,12 @@ export class RecruitmentDashboard extends Component {
     onKpisGridMounted(kpisGridComponent) {
         console.log("📊 Dashboard: KpisGrid montado", kpisGridComponent);
         this.kpisGridComponent = kpisGridComponent;
+    }
+
+    // ✅ NUEVO: Callback para RecruiterEfficiencyChart
+    onRecruiterEfficiencyMounted(recruiterEfficiencyComponent) {
+        console.log("📊 Dashboard: RecruiterEfficiencyChart montado", recruiterEfficiencyComponent);
+        this.recruiterEfficiencyComponent = recruiterEfficiencyComponent;
     }
 
     openRejectionDetails = (reason) => {
@@ -234,6 +238,12 @@ export class RecruitmentDashboard extends Component {
             console.log("🔄 Dashboard: Recargando KPIs...");
             await this.kpisGridComponent.loadKpisData();
         }
+
+        // ✅ NUEVO: Notificar al RecruiterEfficiencyChart
+        if (this.recruiterEfficiencyComponent) {
+            console.log("🔄 Dashboard: Recargando gráfico de eficiencia...");
+            await this.recruiterEfficiencyComponent.loadChartData();
+        }
         
         // Recargar datos de gráficos
         await this.loadAllData();
@@ -243,7 +253,7 @@ export class RecruitmentDashboard extends Component {
         try {
             await Promise.all([
                 this.getAllVacancies(),
-                this.getTopRecruitments(),
+                // this.getTopRecruitments(),
                 this.getSourceRecruitment(),
                 this.getIndicatorsSourceRecruitment(),
                 this.getRejectionReasons(),
