@@ -6,6 +6,8 @@ import { DashboardHeader } from "./dashboard_header/dashboard_header";
 import { KpisGrid } from "./kpis/kpis_grid";
 
 import { RecruiterEfficiencyChart } from "./charts/recruiter_efficiency_chart/recruiter_efficiency_chart";
+import { ProcessEfficiencyChart } from "./charts/process_efficiency_chart/process_efficiency_chart";
+
 
 import { ChartRenderer } from "./chart_renderer/chart_renderer";
 import { useService } from "@web/core/utils/hooks";
@@ -41,6 +43,7 @@ export class RecruitmentDashboard extends Component {
         // ✅ Variables para referencias de componentes
         this.kpisGridComponent = null;
         this.recruiterEfficiencyComponent = null;
+        this.processEfficiencyComponent = null;
 
         // ✅ Estado del dashboard - YA NO incluye KPIs
         this.state = useState({
@@ -54,8 +57,8 @@ export class RecruitmentDashboard extends Component {
             rejectionReasons: { candidate: {}, company: {} },
             funnelRecruitment: {},
             requisitionStats: {},
-            averageTimePerStageChart: {},
-            averageTimePerStageCenterValue: "0 min",
+            // averageTimePerStageChart: {},
+            // averageTimePerStageCenterValue: "0 min",
             vacancyMetrics: {
                 status: 'Global',
                 openDuration: '',
@@ -88,6 +91,11 @@ export class RecruitmentDashboard extends Component {
     onRecruiterEfficiencyMounted(recruiterEfficiencyComponent) {
         console.log("📊 Dashboard: RecruiterEfficiencyChart montado", recruiterEfficiencyComponent);
         this.recruiterEfficiencyComponent = recruiterEfficiencyComponent;
+    }
+
+    onProcessEfficiencyMounted(processEfficiencyComponent) {
+        console.log("📊 Dashboard: ProcessEfficiencyChart montado", processEfficiencyComponent);
+        this.processEfficiencyComponent = processEfficiencyComponent;
     }
 
     openRejectionDetails = (reason) => {
@@ -233,19 +241,28 @@ export class RecruitmentDashboard extends Component {
         this.state.startDate = startDate;
         this.state.endDate = endDate;
         
-        // ✅ Notificar al KpisGrid del cambio usando la referencia guardada
+        // ✅ CREAR array para promises de recarga
+        const reloadPromises = [];
+        
         if (this.kpisGridComponent) {
             console.log("🔄 Dashboard: Recargando KPIs...");
-            await this.kpisGridComponent.loadKpisData();
+            reloadPromises.push(this.kpisGridComponent.loadKpisData());
         }
 
-        // ✅ NUEVO: Notificar al RecruiterEfficiencyChart
         if (this.recruiterEfficiencyComponent) {
             console.log("🔄 Dashboard: Recargando gráfico de eficiencia...");
-            await this.recruiterEfficiencyComponent.loadChartData();
+            reloadPromises.push(this.recruiterEfficiencyComponent.loadChartData());
+        }
+
+        if (this.processEfficiencyComponent) {
+            console.log("🔄 Dashboard: Recargando gráfico de proceso...");
+            reloadPromises.push(this.processEfficiencyComponent.refresh());
         }
         
-        // Recargar datos de gráficos
+        // ✅ ESPERAR todas las recargas en paralelo
+        await Promise.all(reloadPromises);
+        
+        // Recargar datos de gráficos del dashboard
         await this.loadAllData();
     }
 
@@ -259,7 +276,7 @@ export class RecruitmentDashboard extends Component {
                 this.getVacancyMetrics(),
                 this.getFunnelRecruitment(),
                 this.getRequisitionStats(),
-                this.getAverageTimePerStage(),
+                // this.getAverageTimePerStage(),
             ]);
             console.log("✅ Dashboard: Todos los datos cargados");
         } catch (error) {
@@ -965,160 +982,160 @@ export class RecruitmentDashboard extends Component {
         this.state.rejectionReasons = { ...this.state.rejectionReasons };
     }
 
-    async getAverageTimePerStage() {
-        console.log("📊 Calculando tiempo promedio por etapa (solo contratados)...");
+    // async getAverageTimePerStage() {
+    //     console.log("📊 Calculando tiempo promedio por etapa (solo contratados)...");
         
-        // 1) Obtener applicants contratados en el rango de fechas
-        let hiredDomain = [["application_status", "=", "hired"]];
-        hiredDomain = this._getHiredDateRangeDomain(hiredDomain);
+    //     // 1) Obtener applicants contratados en el rango de fechas
+    //     let hiredDomain = [["application_status", "=", "hired"]];
+    //     hiredDomain = this._getHiredDateRangeDomain(hiredDomain);
         
-        const hiredApplicants = await this.orm.searchRead(
-            "hr.applicant",
-            hiredDomain,
-            ["id"]
-        );
+    //     const hiredApplicants = await this.orm.searchRead(
+    //         "hr.applicant",
+    //         hiredDomain,
+    //         ["id"]
+    //     );
         
-        console.log("👥 Applicants contratados encontrados:", hiredApplicants.length);
+    //     console.log("👥 Applicants contratados encontrados:", hiredApplicants.length);
         
-        if (hiredApplicants.length === 0) {
-            console.log("⚠️ No hay contratados en este rango, manteniendo valores por defecto");
-            return;
-        }
+    //     if (hiredApplicants.length === 0) {
+    //         console.log("⚠️ No hay contratados en este rango, manteniendo valores por defecto");
+    //         return;
+    //     }
         
-        // 2) Obtener IDs de los applicants contratados
-        const hiredIds = hiredApplicants.map(a => a.id);
+    //     // 2) Obtener IDs de los applicants contratados
+    //     const hiredIds = hiredApplicants.map(a => a.id);
         
-        // 3) Consultar historial con duración en horas también
-        const historyRecords = await this.orm.searchRead(
-            "hr.applicant.stage.history",
-            [
-                ['applicant_id', 'in', hiredIds],
-                ['leave_date', '!=', false],
-                ['duration_hours', '>', 0]
-            ],
-            ['stage_id', 'duration_days', 'duration_hours', 'applicant_id']
-        );
+    //     // 3) Consultar historial con duración en horas también
+    //     const historyRecords = await this.orm.searchRead(
+    //         "hr.applicant.stage.history",
+    //         [
+    //             ['applicant_id', 'in', hiredIds],
+    //             ['leave_date', '!=', false],
+    //             ['duration_hours', '>', 0]
+    //         ],
+    //         ['stage_id', 'duration_days', 'duration_hours', 'applicant_id']
+    //     );
         
-        console.log("📈 Registros de historial de contratados:", historyRecords.length);
-        console.log("📊 Detalle de registros:", historyRecords);
+    //     console.log("📈 Registros de historial de contratados:", historyRecords.length);
+    //     console.log("📊 Detalle de registros:", historyRecords);
         
-        // 4) Agrupar por etapa
-        const stageTimeMap = {};
+    //     // 4) Agrupar por etapa
+    //     const stageTimeMap = {};
         
-        for (const record of historyRecords) {
-            const stageId = record.stage_id[0];
-            const stageName = record.stage_id[1];
+    //     for (const record of historyRecords) {
+    //         const stageId = record.stage_id[0];
+    //         const stageName = record.stage_id[1];
             
-            if (!stageTimeMap[stageId]) {
-                stageTimeMap[stageId] = {
-                    name: stageName,
-                    durations: []
-                };
-            }
+    //         if (!stageTimeMap[stageId]) {
+    //             stageTimeMap[stageId] = {
+    //                 name: stageName,
+    //                 durations: []
+    //             };
+    //         }
             
-            stageTimeMap[stageId].durations.push({
-                days: record.duration_days,
-                hours: record.duration_hours
-            });
-        }
+    //         stageTimeMap[stageId].durations.push({
+    //             days: record.duration_days,
+    //             hours: record.duration_hours
+    //         });
+    //     }
         
-        // 5) Calcular promedios
-        const labels = [];
-        const data = [];
-        let totalHours = 0;
-        let totalCount = 0;
+    //     // 5) Calcular promedios
+    //     const labels = [];
+    //     const data = [];
+    //     let totalHours = 0;
+    //     let totalCount = 0;
         
-        for (const stageId in stageTimeMap) {
-            const stage = stageTimeMap[stageId];
-            const durations = stage.durations;
+    //     for (const stageId in stageTimeMap) {
+    //         const stage = stageTimeMap[stageId];
+    //         const durations = stage.durations;
             
-            if (durations.length > 0) {
-                const avgHours = durations.reduce((sum, d) => sum + d.hours, 0) / durations.length;
-                const avgDays = avgHours / 24;
+    //         if (durations.length > 0) {
+    //             const avgHours = durations.reduce((sum, d) => sum + d.hours, 0) / durations.length;
+    //             const avgDays = avgHours / 24;
                 
-                labels.push(stage.name);
-                data.push(Number(avgDays.toFixed(2)));
+    //             labels.push(stage.name);
+    //             data.push(Number(avgDays.toFixed(2)));
                 
-                totalHours += avgHours * durations.length;
-                totalCount += durations.length;
+    //             totalHours += avgHours * durations.length;
+    //             totalCount += durations.length;
                 
-                console.log(`📋 ${stage.name}: ${avgDays.toFixed(2)} días promedio (${durations.length} muestras)`);
-            }
-        }
+    //             console.log(`📋 ${stage.name}: ${avgDays.toFixed(2)} días promedio (${durations.length} muestras)`);
+    //         }
+    //     }
         
-        // 6) Si no hay datos válidos, usar datos de prueba
-        if (labels.length === 0) {
-            console.log("⚠️ No hay datos válidos, usando datos de prueba");
-            labels.push("Primera Entrevista", "Examen Técnico", "Examen Médico");
-            data.push(0.1, 0.2, 0.05);
-            totalHours = 4.8;
-            totalCount = 3;
-        }
+    //     // 6) Si no hay datos válidos, usar datos de prueba
+    //     if (labels.length === 0) {
+    //         console.log("⚠️ No hay datos válidos, usando datos de prueba");
+    //         labels.push("Primera Entrevista", "Examen Técnico", "Examen Médico");
+    //         data.push(0.1, 0.2, 0.05);
+    //         totalHours = 4.8;
+    //         totalCount = 3;
+    //     }
         
-        // 7) Formatear el promedio global
-        const globalAverageHours = totalCount > 0 ? (totalHours / totalCount) : 0;
-        let centerText = "0 min";
+    //     // 7) Formatear el promedio global
+    //     const globalAverageHours = totalCount > 0 ? (totalHours / totalCount) : 0;
+    //     let centerText = "0 min";
         
-        if (globalAverageHours >= 24) {
-            const days = (globalAverageHours / 24).toFixed(1);
-            centerText = `${days} día${days != 1 ? 's' : ''}`;
-        } else if (globalAverageHours >= 1) {
-            const hours = globalAverageHours.toFixed(1);
-            centerText = `${hours} hora${hours != 1 ? 's' : ''}`;
-        } else if (globalAverageHours > 0) {
-            const minutes = Math.round(globalAverageHours * 60);
-            centerText = `${minutes} min`;
-        }
+    //     if (globalAverageHours >= 24) {
+    //         const days = (globalAverageHours / 24).toFixed(1);
+    //         centerText = `${days} día${days != 1 ? 's' : ''}`;
+    //     } else if (globalAverageHours >= 1) {
+    //         const hours = globalAverageHours.toFixed(1);
+    //         centerText = `${hours} hora${hours != 1 ? 's' : ''}`;
+    //     } else if (globalAverageHours > 0) {
+    //         const minutes = Math.round(globalAverageHours * 60);
+    //         centerText = `${minutes} min`;
+    //     }
         
-        // 8) ¡CLAVE! Crear un NUEVO objeto para forzar reactivity en OWL
-        this.state.averageTimePerStageChart = {
-            data: {
-                labels,
-                datasets: [{
-                    data,
-                    backgroundColor: this.getPastelColors(labels.length),
-                }]
-            },
-            options: {
-                cutout: "70%",
-                plugins: {
-                    legend: { display: true, position: "bottom" },
-                    tooltip: {
-                        callbacks: {
-                            label: ctx => {
-                                const days = ctx.parsed;
-                                const hours = (days * 24);
+    //     // 8) ¡CLAVE! Crear un NUEVO objeto para forzar reactivity en OWL
+    //     this.state.averageTimePerStageChart = {
+    //         data: {
+    //             labels,
+    //             datasets: [{
+    //                 data,
+    //                 backgroundColor: this.getPastelColors(labels.length),
+    //             }]
+    //         },
+    //         options: {
+    //             cutout: "70%",
+    //             plugins: {
+    //                 legend: { display: true, position: "bottom" },
+    //                 tooltip: {
+    //                     callbacks: {
+    //                         label: ctx => {
+    //                             const days = ctx.parsed;
+    //                             const hours = (days * 24);
                                 
-                                let timeText = "";
-                                if (days >= 1) {
-                                    timeText = `${days.toFixed(1)} días`;
-                                } else if (hours >= 1) {
-                                    timeText = `${hours.toFixed(1)} horas`;
-                                } else {
-                                    const minutes = Math.round(hours * 60);
-                                    timeText = `${minutes} minutos`;
-                                }
+    //                             let timeText = "";
+    //                             if (days >= 1) {
+    //                                 timeText = `${days.toFixed(1)} días`;
+    //                             } else if (hours >= 1) {
+    //                                 timeText = `${hours.toFixed(1)} horas`;
+    //                             } else {
+    //                                 const minutes = Math.round(hours * 60);
+    //                                 timeText = `${minutes} minutos`;
+    //                             }
                                 
-                                return [
-                                    `${ctx.label}: ${timeText}`,
-                                    `(Solo candidatos contratados)`
-                                ];
-                            }
-                        }
-                    }
-                }
-            }
-        };
+    //                             return [
+    //                                 `${ctx.label}: ${timeText}`,
+    //                                 `(Solo candidatos contratados)`
+    //                             ];
+    //                         }
+    //                     }
+    //                 }
+    //             }
+    //         }
+    //     };
         
-        this.state.averageTimePerStageCenterValue = centerText;
+    //     this.state.averageTimePerStageCenterValue = centerText;
         
-        // 9) ¡SÚPER IMPORTANTE! Forzar actualización completa del estado
-        this.state.averageTimePerStageChart = { ...this.state.averageTimePerStageChart };
+    //     // 9) ¡SÚPER IMPORTANTE! Forzar actualización completa del estado
+    //     this.state.averageTimePerStageChart = { ...this.state.averageTimePerStageChart };
         
-        console.log("✅ Gráfica actualizada - Promedio global:", centerText);
-        console.log("🎯 Basado en", hiredApplicants.length, "candidatos contratados");
-        console.log("📊 Chart data:", this.state.averageTimePerStageChart);
-    }
+    //     console.log("✅ Gráfica actualizada - Promedio global:", centerText);
+    //     console.log("🎯 Basado en", hiredApplicants.length, "candidatos contratados");
+    //     console.log("📊 Chart data:", this.state.averageTimePerStageChart);
+    // }
 
     openRejectionList(refuse_reason_id) {
         let domain = [
@@ -1156,7 +1173,8 @@ export class RecruitmentDashboard extends Component {
 RecruitmentDashboard.template = "recruitment.dashboard";
 RecruitmentDashboard.components = {
     DashboardHeader, KpisGrid, 
-    ChartRenderer, RecruiterEfficiencyChart
+    ChartRenderer, RecruiterEfficiencyChart,
+    ProcessEfficiencyChart
 };
 
 // Registrar el dashboard OWL
