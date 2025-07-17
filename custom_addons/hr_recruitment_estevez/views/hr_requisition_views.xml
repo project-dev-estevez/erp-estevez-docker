@@ -337,7 +337,7 @@
     </record>
 
     <!-- Vista de search para requisiciones -->
-    <record id="view_hr_requisition_search" model="ir.ui.view">
+    <record id="hr_requisition_search" model="ir.ui.view">
         <field name="name">hr.requisition.search</field>
         <field name="model">hr.requisition</field>
         <field name="arch" type="xml">
