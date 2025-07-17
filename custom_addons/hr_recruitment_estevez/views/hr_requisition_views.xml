@@ -395,9 +395,9 @@
                     <field name="project_id" string="Proyecto"/>                         
 
                 <!--Por solicitante -->
-                <separator string="solicitante"/>   
+                <!--separator string="solicitante"/>   
                 <filter name="filter_soli" string="👤SOLICITANTE" domain="[]"/>
-                    <filter string="Solicitante" name="filter_solicitante" context="{'group_by': 'requestor_id'}"/>
+                    <filter string="Solicitante" name="filter_solicitante" context="{'group_by': 'requestor_id'}"/-->
 
 
                 <!-- Ultimo mes -->
