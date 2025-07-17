@@ -348,9 +348,9 @@
                 <field name="requisition_type"/>
                 <field name="state"/>
                 <field name="publication_status"/>
-                <separator/>
+                <separator string="🚦ESTADO REQUISICION"/>
                  <!-- Estado de la Requisición -->
-                <filter string="🚦ESTADO REQUISICION"/>
+                <!--filter string="🚦ESTADO REQUISICION"/-->
                 <filter name="state_to_approve" string="Por Aprobar" domain="[('state', '=', 'to_approve')]"/>
                 <filter name="state_first_approval" string="Primera Aprobación" domain="[('state', '=', 'first_approval')]"/>
                 <filter name="state_second_approval" string="Segunda Aprobación" domain="[('state', '=', 'second_approval')]"/>
@@ -359,8 +359,8 @@
 
                  <!-- Por Área -->         
                 <separator/>               
-                <filter string="🏗️AREAS"/>
-                    <filter name="filter_operaciones" string="Capacitación y DO" domain="[('workstation_area_id.name', '=', 'Capacitación y DO')]"/>
+                <!--filter string="🏗️AREAS"/-->
+                    <filter name="filter_capacitacion" string="Capacitación y DO" domain="[('workstation_area_id.name', '=', 'Capacitación y DO')]"/>
                     <filter name="filter_almacen_foraneo" string="Almacén Foráneo" domain="[('workstation_area_id.name', '=', 'Almacén Foráneo')]"/>
                     <filter name="filter_taller" string="Taller" domain="[('workstation_area_id.name', '=', 'Taller')]"/>
                     <filter name="filter_obra_civil" string="Obra Civil" domain="[('workstation_area_id.name', '=', 'Obra Civil')]"/>
@@ -371,7 +371,7 @@
 
                 <!-- Por Departamento -->       
                 <separator/>             
-                <filter string="🏢DEPARTAMENTO"/>
+                <!--filter string="🏢DEPARTAMENTO"/-->
                     <filter name="filter_talento_humano" string="Talento Humano" domain="[('workstation_department_id.name', '=', 'Talento Humano')]"/>
                     <filter name="filter_operaciones" string="Operaciones" domain="[('workstation_department_id.name', '=', 'Operaciones')]"/>
                     <filter name="filter_obra_civil" string="Obra Civil" domain="[('workstation_department_id.name', '=', 'Obra Civil')]"/>
@@ -383,26 +383,26 @@
                
                <!--Estado de la Vacante-->
                <separator/>   
-                <filter string="🚦ESTADO VACANTE"/>
+                <!--filter string="🚦ESTADO VACANTE"/-->
                     <filter name="filter_vacancy_open" string="Abierta" domain="[('publication_status','=','Abierta')]"/>
                     <filter name="filter_vacancy_closed" string="Cerrada" domain="[('publication_status','=','Cerrada')]"/>
                     <filter name="filter_vacancy_to_activate" string="Por Activar" domain="[('publication_status','=','Por Activar')]"/>
 
                 <!-- Por Proyecto -->
                 <separator/>   
-                <filter string="🛠️PROYECTO"/>
+                <!--filter string="🛠️PROYECTO"/-->
                     <filter name="filter_proj_sinproyecto" string="Sin Proyecto" domain="[('project_id', '=', False)]"/>       
                     <field name="project_id" string="Proyecto"/>                         
 
                 <!--Por solicitante -->
                 <separator/>   
-                <filter string="👤SOLICITANTE"/>
+                <!--filter string="👤SOLICITANTE"/-->
                     <filter string="Solicitante" name="filter_solicitante" context="{'group_by': 'requestor_id'}"/>
 
 
                 <!-- Ultimo mes -->
                 <separator/>   
-                <filter string="📅FECHA"/>
+                <!--filter string="📅FECHA"/-->
                     <filter name="last_month" string="Último mes" domain="[('create_date','>=', (context_today() - relativedelta(days=30)).strftime('%%Y-%%m-%%d'))]"/>                                                                                                   
 
                 <!--Agrupaciones-->
