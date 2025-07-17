@@ -397,7 +397,7 @@
                 <!--Por solicitante -->
                 <separator/>   
                 <filter string="👤SOLICITANTE"/>
-                    <filter string="Solicitante" name="filter_solicitante" context="{'group_by': 'solicitante_id'}"/>
+                    <filter string="Solicitante" name="filter_solicitante" context="{'group_by': 'requestor_id'}"/>
 
 
                 <!-- Ultimo mes -->
@@ -410,7 +410,7 @@
                     <filter string="🏢 Departamento" context="{'group_by': 'workstation_department_id'}"/>
                     <filter string="🛠️ Proyecto" context="{'group_by': 'project_id'}"/>      
                     <filter string="🏗️ Areas" context="{'group_by': 'workstation_area_id'}"/>
-                    <filter string="👤 Solicitante" context="{'group_by': 'solicitante_id'}"/>     
+                    <filter string="👤 Solicitante" context="{'group_by': 'requestor_id'}"/>     
                     <filter string="🚦 Estatus Requisicion" context="{'group_by': 'state'}"/> 
                     <filter string="🚦 Estatus Vacante" context="{'group_by': 'publication_status'}"/>                                        
 
