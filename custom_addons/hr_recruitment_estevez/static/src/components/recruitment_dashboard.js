@@ -1,17 +1,16 @@
 /** @odoo-module **/
 
 import { registry } from "@web/core/registry";
-
+import { Component, onWillStart, useState } from "@odoo/owl";
+import { useService } from "@web/core/utils/hooks";
 import { DashboardHeader } from "./dashboard_header/dashboard_header";
 import { KpisGrid } from "./kpis/kpis_grid";
-
 import { RecruiterEfficiencyChart } from "./charts/recruiter_efficiency_chart/recruiter_efficiency_chart";
 import { ProcessEfficiencyChart } from "./charts/process_efficiency_chart/process_efficiency_chart";
+import { RecruitmentSourcesChart } from "./charts/recruitment_sources_chart/recruitment_sources_chart";
 
 
 import { ChartRenderer } from "./chart_renderer/chart_renderer";
-import { useService } from "@web/core/utils/hooks";
-import { Component, onWillStart, useState } from "@odoo/owl";
 const { DateTime } = luxon;
 
 export class RecruitmentDashboard extends Component {
@@ -44,6 +43,7 @@ export class RecruitmentDashboard extends Component {
         this.kpisGridComponent = null;
         this.recruiterEfficiencyComponent = null;
         this.processEfficiencyComponent = null;
+        this.recruitmentSourcesComponent = null;
 
         this.state = useState({
             // Filtros
@@ -88,7 +88,6 @@ export class RecruitmentDashboard extends Component {
         this.kpisGridComponent = kpisGridComponent;
     }
 
-    // ✅ NUEVO: Callback para RecruiterEfficiencyChart
     onRecruiterEfficiencyMounted(recruiterEfficiencyComponent) {
         console.log("📊 Dashboard: RecruiterEfficiencyChart montado", recruiterEfficiencyComponent);
         this.recruiterEfficiencyComponent = recruiterEfficiencyComponent;
@@ -97,6 +96,11 @@ export class RecruitmentDashboard extends Component {
     onProcessEfficiencyMounted(processEfficiencyComponent) {
         console.log("📊 Dashboard: ProcessEfficiencyChart montado", processEfficiencyComponent);
         this.processEfficiencyComponent = processEfficiencyComponent;
+    }
+
+    onRecruitmentSourcesMounted(recruitmentSourcesComponent) {
+        console.log("📊 Dashboard: RecruitmentSourcesChart montado", recruitmentSourcesComponent);
+        this.recruitmentSourcesComponent = recruitmentSourcesComponent;
     }
 
     openRejectionDetails = (reason) => {
@@ -237,7 +241,6 @@ export class RecruitmentDashboard extends Component {
     }
 
     async onDateRangeChange(startDate, endDate) {
-        console.log("📅 Dashboard: Cambio de fechas:", { startDate, endDate });
         
         this.state.startDate = startDate;
         this.state.endDate = endDate;
@@ -246,18 +249,20 @@ export class RecruitmentDashboard extends Component {
         const reloadPromises = [];
         
         if (this.kpisGridComponent) {
-            console.log("🔄 Dashboard: Recargando KPIs...");
             reloadPromises.push(this.kpisGridComponent.loadKpisData());
         }
 
         if (this.recruiterEfficiencyComponent) {
-            console.log("🔄 Dashboard: Recargando gráfico de eficiencia...");
             reloadPromises.push(this.recruiterEfficiencyComponent.loadChartData());
         }
 
         if (this.processEfficiencyComponent) {
-            console.log("🔄 Dashboard: Recargando gráfico de proceso...");
             reloadPromises.push(this.processEfficiencyComponent.refresh());
+        }
+
+        if (this.recruitmentSourcesComponent) {
+            console.log("🔄 Dashboard: Recargando fuentes de reclutamiento...");
+            reloadPromises.push(this.recruitmentSourcesComponent.refresh());
         }
         
         // ✅ ESPERAR todas las recargas en paralelo
@@ -1280,7 +1285,7 @@ RecruitmentDashboard.template = "recruitment.dashboard";
 RecruitmentDashboard.components = {
     DashboardHeader, KpisGrid, 
     ChartRenderer, RecruiterEfficiencyChart,
-    ProcessEfficiencyChart
+    ProcessEfficiencyChart, RecruitmentSourcesChart
 };
 
 // Registrar el dashboard OWL

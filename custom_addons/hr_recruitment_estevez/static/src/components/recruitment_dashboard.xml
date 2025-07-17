@@ -30,11 +30,17 @@
                                         title="'Eficiencia de Contratación por Reclutador'"
                                         height="400"
                                         onMounted.bind="onRecruiterEfficiencyMounted"/>
-                                <!-- <ChartRenderer type="'bar'" title="'Postulaciones por Reclutador'" config="state.topRecruitments"/> -->
                             </div>
                         </div>
                         <div class="col-lg-6 m-0 p-0">
                             <div class="shadow-sm border m-2 p-4 bg-white">
+                                <RecruitmentSourcesChart startDate="state.startDate"
+                                                        endDate="state.endDate"
+                                                        title="'Efectividad de las Fuentes de Reclutamiento'"
+                                                        height="400"
+                                                        onMounted.bind="onRecruitmentSourcesMounted"/>
+                            </div>
+                            <!-- <div class="shadow-sm border m-2 p-4 bg-white">
                                 <div class="d-flex align-items-center justify-content-between">
                                     <h3 class="text-primary fw-bold">Efectividad de las Fuentes de Reclutamiento</h3>
                                     <div class="px-3 py-1 bg-primary cursor-pointer">
@@ -47,13 +53,11 @@
                                         <ChartRenderer type="'pie'" title="'Fuentes de Reclutamiento'" config="state.sourceRecruitment"/>
                                     </div>
                                     <div class="col-12 col-md-6">
-                                        <!-- <h3 class="text-primary fw-bold">Inidicadores de Reclutamiento</h3> -->
                                         <div class="table-responsive">
                                             <table class="table table-borderless align-middle">
                                                 <thead>
                                                     <tr>
                                                         <th>Fuente</th>
-                                                        <!-- <th class="text-end"># Candidatos</th> -->
                                                         <th class="text-end"># Contratados</th>
                                                         <th class="text-end">% Contratación</th>
                                                     </tr>
@@ -62,7 +66,6 @@
                                                     <t t-foreach="state.indicatorsSourceRecruitment.sources" t-as="item" t-key="item.label">
                                                         <tr>
                                                             <td><span t-esc="item.label"/></td>
-                                                            <!-- <td class="text-end"><span t-esc="item.total"/></td> -->
                                                             <td class="text-end"><span t-esc="item.hired"/></td>
                                                             <td class="text-end"><span t-esc="item.percentage"/>%</td>
                                                         </tr>
@@ -72,7 +75,7 @@
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            </div> -->
                         </div>
                     </div>
 
