@@ -348,7 +348,7 @@
                 <field name="requisition_type"/>
                 <field name="state"/>
                 <field name="publication_status"/>
-                <separator string="🚦ESTADO REQUISICION"/>
+                <separator string="ESTADO REQUISICION"/>
                  <!-- Estado de la Requisición -->
                 <!--filter string="🚦ESTADO REQUISICION"/-->
                 <filter name="state_to_approve" string="Por Aprobar" domain="[('state', '=', 'to_approve')]"/>
