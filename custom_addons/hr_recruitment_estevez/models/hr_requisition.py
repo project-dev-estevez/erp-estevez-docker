@@ -135,7 +135,8 @@ class HrRequisition(models.Model):
     # Nuevo campo computado
     publication_status = fields.Char(        
         compute='_compute_publication_status',
-        store=False
+        store=False,
+        search=True
     )    
 
     @api.constrains('wizard_step', 'job_type', '')

@@ -319,6 +319,16 @@
                         padding-top: 20px;
                     }
 
+                    .o_searchview .o_searchview_facet .o_facet_values:empty {
+                        display: block !important;
+                        font-weight: bold !important;
+                        color: #7c7bad !important;
+                        padding: 4px 0 !important;
+                        background: transparent !important;
+                        border: none !important;
+                        margin-top: 8px;
+                    }
+
                  
                 </style>
                 
@@ -339,34 +349,73 @@
                 <field name="state"/>
                 <field name="publication_status"/>
                 <separator/>
-                <filter name="filter_to_approve" string="Por aprobar" domain="[('state', 'in', ['to_approve', 'first_approval'])]" />     
-                 <!-- Por Área -->            
-                <filter name="filter_area_operaciones" string="Área Operaciones" domain="[('workstation_area_id.name', '=', 'Operaciones')]"/>
-
-                <!-- Por Departamento -->
-                <filter name="filter_dep_rh" string="Departamento Compras" domain="[('workstation_department_id.name', '=', 'Compras')]"/>            
-
-                <!-- Por Proyecto -->
-                <filter name="filter_proj_sinproyecto" string="Sin Proyecto" domain="[('project_id', '=', False)]"/>                
-
-                <!-- Por Tipo de Requisición -->
-                <filter name="filter_type_new" string="Nueva Vacante" domain="[('requisition_type','=','new_vacancy')]"/>                              
-
-                <!-- Estado de la Requisición -->
-                <separator string="Estado de Requisición"/>
+                 <!-- Estado de la Requisición -->
+                <filter string="🚦ESTADO REQUISICION"/>
                 <filter name="state_to_approve" string="Por Aprobar" domain="[('state', '=', 'to_approve')]"/>
                 <filter name="state_first_approval" string="Primera Aprobación" domain="[('state', '=', 'first_approval')]"/>
                 <filter name="state_second_approval" string="Segunda Aprobación" domain="[('state', '=', 'second_approval')]"/>
                 <filter name="state_approved" string="Aprobadas" domain="[('state', '=', 'approved')]"/>
-                <filter name="state_rejected" string="Rechazadas" domain="[('state', '=', 'rejected')]"/>      
+                <filter name="state_rejected" string="Rechazadas" domain="[('state', '=', 'rejected')]"/>  
 
-                <!--separator string="Estado de Vacante"/>
-                <filter name="filter_vacancy_open" string="Abierta" 
-                    domain="[('publication_status','=','Abierta')]"/>
-                <filter name="filter_vacancy_closed" string="Cerrada" 
-                    domain="[('publication_status','=','Cerrada')]"/>
-                <filter name="filter_vacancy_to_activate" string="Por Activar" 
-                    domain="[('publication_status','=','Por Activar')]"/-->
+                 <!-- Por Área -->         
+                <separator/>               
+                <filter string="🏗️AREAS"/>
+                    <filter name="filter_operaciones" string="Capacitación y DO" domain="[('workstation_area_id.name', '=', 'Capacitación y DO')]"/>
+                    <filter name="filter_almacen_foraneo" string="Almacén Foráneo" domain="[('workstation_area_id.name', '=', 'Almacén Foráneo')]"/>
+                    <filter name="filter_taller" string="Taller" domain="[('workstation_area_id.name', '=', 'Taller')]"/>
+                    <filter name="filter_obra_civil" string="Obra Civil" domain="[('workstation_area_id.name', '=', 'Obra Civil')]"/>
+                    <filter name="filter_ehs" string="EHS" domain="[('workstation_area_id.name', '=', 'EHS')]"/>
+                    <filter name="filter_empalmes" string="Empalmes" domain="[('workstation_area_id.name', '=', 'Empalmes')]"/>
+                    <filter name="filter_atraccion_talento" string="Atracción de Talento" domain="[('workstation_area_id.name', '=', 'Atracción de Talento')]"/>                
+                    <filter name="filter_construccion" string="Construcción" domain="[('workstation_area_id.name', '=', 'Construcción')]"/>                                                        
+
+                <!-- Por Departamento -->       
+                <separator/>             
+                <filter string="🏢DEPARTAMENTO"/>
+                    <filter name="filter_talento_humano" string="Talento Humano" domain="[('workstation_department_id.name', '=', 'Talento Humano')]"/>
+                    <filter name="filter_operaciones" string="Operaciones" domain="[('workstation_department_id.name', '=', 'Operaciones')]"/>
+                    <filter name="filter_obra_civil" string="Obra Civil" domain="[('workstation_department_id.name', '=', 'Obra Civil')]"/>
+                    <filter name="filter_juridico" string="Jurídico" domain="[('workstation_department_id.name', '=', 'Jurídico')]"/>
+                    <filter name="filter_calidad" string="Calidad" domain="[('workstation_department_id.name', '=', 'Calidad')]"/>
+                    <filter name="filter_almacen" string="Almacén" domain="[('workstation_department_id.name', '=', 'Almacén')]"/>
+                    <filter name="filter_admon_obra" string="Administración de Obra" domain="[('workstation_department_id.name', '=', 'Administración de Obra')]"/>
+                    <filter name="filter_control_vehicular" string="Control Vehicular" domain="[('workstation_department_id.name', '=', 'Control Vehicular')]"/>                                
+               
+               <!--Estado de la Vacante-->
+               <separator/>   
+                <filter string="🚦ESTADO VACANTE"/>
+                    <filter name="filter_vacancy_open" string="Abierta" domain="[('publication_status','=','Abierta')]"/>
+                    <filter name="filter_vacancy_closed" string="Cerrada" domain="[('publication_status','=','Cerrada')]"/>
+                    <filter name="filter_vacancy_to_activate" string="Por Activar" domain="[('publication_status','=','Por Activar')]"/>
+
+                <!-- Por Proyecto -->
+                <separator/>   
+                <filter string="🛠️PROYECTO"/>
+                    <filter name="filter_proj_sinproyecto" string="Sin Proyecto" domain="[('project_id', '=', False)]"/>       
+                    <field name="project_id" string="Proyecto"/>                         
+
+                <!--Por solicitante -->
+                <separator/>   
+                <filter string="👤SOLICITANTE"/>
+                    <filter string="Solicitante" name="filter_solicitante" context="{'group_by': 'solicitante_id'}"/>
+
+
+                <!-- Ultimo mes -->
+                <separator/>   
+                <filter string="📅FECHA"/>
+                    <filter name="last_month" string="Último mes" domain="[('create_date','>=', (context_today() - relativedelta(days=30)).strftime('%%Y-%%m-%%d'))]"/>                                                                                                   
+
+                <!--Agrupaciones-->
+                <group>
+                    <filter string="🏢 Departamento" context="{'group_by': 'workstation_department_id'}"/>
+                    <filter string="🛠️ Proyecto" context="{'group_by': 'project_id'}"/>      
+                    <filter string="🏗️ Areas" context="{'group_by': 'workstation_area_id'}"/>
+                    <filter string="👤 Solicitante" context="{'group_by': 'solicitante_id'}"/>     
+                    <filter string="🚦 Estatus Requisicion" context="{'group_by': 'state'}"/> 
+                    <filter string="🚦 Estatus Vacante" context="{'group_by': 'publication_status'}"/>                                        
+
+                </group>
+
             </search>
         </field>
     </record>
