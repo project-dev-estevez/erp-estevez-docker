@@ -51,8 +51,6 @@ export class RecruitmentDashboard extends Component {
             endDate: "",
             selectedVacancy: false,
             availableVacancies: [],
-            sourceRecruitment: {},
-            indicatorsSourceRecruitment: { sources: [] },
             rejectionReasons: { candidate: {}, company: {} },
             funnelRecruitment: {},
             requisitionStats: {},
@@ -141,28 +139,6 @@ export class RecruitmentDashboard extends Component {
         await this.actionService.doAction({
             type: 'ir.actions.act_window',
             name: actionName,
-            res_model: 'hr.applicant',
-            views: [[false, 'list'], [false, 'form']],
-            domain: domain,
-            context: { active_test: false },
-        });
-    }
-
-    async openSourceRecruitmentList(sourceId) {
-        let domain = [];
-        domain = this._addDateRangeToDomain(domain);
-    
-        // Filtra por source_id
-        if (sourceId) {
-            domain.push(["source_id", "=", sourceId]);
-        } else {
-            // opcional: mostrar también los sin fuente
-            domain.push(["source_id", "=", false]);
-        }
-    
-        await this.actionService.doAction({
-            type: 'ir.actions.act_window',
-            name: 'Postulaciones por Fuente',
             res_model: 'hr.applicant',
             views: [[false, 'list'], [false, 'form']],
             domain: domain,
@@ -276,8 +252,6 @@ export class RecruitmentDashboard extends Component {
         try {
             await Promise.all([
                 this.getAllVacancies(),
-                this.getSourceRecruitment(),
-                this.getIndicatorsSourceRecruitment(),
                 this.getRejectionReasons(),
                 this.getVacancyMetrics(),
                 this.getFunnelRecruitment(),
@@ -843,173 +817,6 @@ export class RecruitmentDashboard extends Component {
             refused,
             topRefuseReason: topReason,
         };
-    }
-
-    async getSourceRecruitment() {
-        // 1. Total postulaciones por fuente (por create_date)
-        let domain = [
-            "|",
-            ["active", "=", true],
-            ["application_status", "=", "refused"]
-        ];
-        domain = this._addDateRangeToDomain(domain);
-
-        const totalData = await this.orm.readGroup(
-            "hr.applicant",
-            domain,
-            ["source_id"],
-            ["source_id"]
-        );
-
-        // 2. Contratados por fuente (por date_closed)
-        let hiredDomain = [
-            ["application_status", "=", "hired"]
-        ];
-        hiredDomain = this._getHiredDateRangeDomain(hiredDomain);
-
-        const hiredData = await this.orm.readGroup(
-            "hr.applicant",
-            hiredDomain,
-            ["source_id"],
-            ["source_id"]
-        );
-
-        // 3. Unir ambos conjuntos de fuentes
-        const sourceMap = {};
-
-        // Total postulaciones
-        for (const r of totalData) {
-            const id = (r.source_id && r.source_id[0]) || false;
-            const label = (r.source_id && r.source_id[1]) || "Sin fuente";
-            sourceMap[id] = {
-                sourceId: id,
-                label,
-                total: r.source_id_count,
-                hired: 0 // se llenará después
-            };
-        }
-
-        // Contratados
-        for (const r of hiredData) {
-            const id = (r.source_id && r.source_id[0]) || false;
-            const label = (r.source_id && r.source_id[1]) || "Sin fuente";
-            if (!sourceMap[id]) {
-                sourceMap[id] = { sourceId: id, label, total: 0, hired: 0 };
-            }
-            sourceMap[id].hired = r.source_id_count;
-        }
-
-        // 4. Construir arrays para la gráfica
-        const sourcesData = Object.values(sourceMap);
-        const labels = sourcesData.map(s => s.label);
-        const totalCounts = sourcesData.map(s => s.total);
-        const hiredCounts = sourcesData.map(s => s.hired);
-        const colors = this.getPastelColors(labels.length);
-
-        this.state.sourceRecruitment = {
-            data: {
-                labels,
-                datasets: [
-                    {
-                        label: "Total Postulaciones",
-                        data: totalCounts,
-                        backgroundColor: colors,
-                    },
-                    {
-                        label: "Contratados",
-                        data: hiredCounts,
-                        backgroundColor: "hsl(140,70%,85%)"
-                    }
-                ]
-            },
-            meta: sourcesData,
-            options: {
-                onClick: (event, activeElements) => {
-                    if (!activeElements.length) return;
-                    const { index } = activeElements[0];
-                    const src = this.state.sourceRecruitment.meta[index];
-                    this.openSourceRecruitmentList(src.sourceId);
-                },
-                plugins: {
-                    tooltip: {
-                        callbacks: {
-                            label: ctx => {
-                                const src = sourcesData[ctx.dataIndex];
-                                const datasetLabel = ctx.dataset.label;
-                                const value = ctx.dataset.data[ctx.dataIndex];
-                                return `${datasetLabel} - ${src.label}: ${value}`;
-                            }
-                        }
-                    }
-                }
-            }
-        };
-        // Forzar refresco
-        this.state.sourceRecruitment = { ...this.state.sourceRecruitment };
-    }
-
-    async getIndicatorsSourceRecruitment() {
-        // 1. Total postulaciones por fuente (por create_date)
-        let domain = [
-            "|",
-            ["active", "=", true],
-            ["application_status", "=", "refused"]
-        ];
-        domain = this._addDateRangeToDomain(domain);
-
-        const totalData = await this.orm.readGroup(
-            "hr.applicant",
-            domain,
-            ["source_id"],
-            ["source_id"]
-        );
-
-        // 2. Contratados por fuente (por date_closed)
-        let hiredDomain = [
-            ["application_status", "=", "hired"]
-        ];
-        hiredDomain = this._getHiredDateRangeDomain(hiredDomain);
-
-        const hiredData = await this.orm.readGroup(
-            "hr.applicant",
-            hiredDomain,
-            ["source_id"],
-            ["source_id"]
-        );
-
-        // 3. Unir ambos conjuntos de fuentes
-        const sourceMap = {};
-
-        // Total postulaciones
-        for (const r of totalData) {
-            const id = (r.source_id && r.source_id[0]) || false;
-            const label = (r.source_id && r.source_id[1]) || "Sin fuente";
-            sourceMap[id] = {
-                id,
-                label,
-                total: r.source_id_count,
-                hired: 0 // se llenará después
-            };
-        }
-
-        // Contratados
-        for (const r of hiredData) {
-            const id = (r.source_id && r.source_id[0]) || false;
-            const label = (r.source_id && r.source_id[1]) || "Sin fuente";
-            if (!sourceMap[id]) {
-                sourceMap[id] = { id, label, total: 0, hired: 0 };
-            }
-            sourceMap[id].hired = r.source_id_count;
-        }
-
-        // 4. Construir el array de indicadores
-        const indicators = Object.values(sourceMap).map(r => {
-            const percentage = r.total > 0 ? ((r.hired / r.total) * 100).toFixed(2) : "0.00";
-            return { ...r, percentage };
-        });
-
-        // 5. Guarda en el estado
-        this.state.indicatorsSourceRecruitment.sources = indicators;
     }
 
     async getRejectionReasons() {
