@@ -1,0 +1,42 @@
+<odoo>
+  <record id="hr_applicant_tree_custom_widths" model="ir.ui.view">
+    <field name="name">hr.applicant.tree.custom.widths</field>
+    <field name="model">hr.applicant</field>
+    <field name="inherit_id" ref="hr_recruitment.crm_case_tree_view_job"/>
+    <field name="arch" type="xml">
+      <xpath expr="//field[@name='partner_name']" position="attributes">
+        <attribute name="width">180</attribute>
+      </xpath> 
+      <xpath expr="//field[@name='create_date']" position="attributes">
+        <attribute name="width">180</attribute>
+      </xpath>
+      <xpath expr="//field[@name='job_id']" position="attributes">
+        <attribute name="width">200</attribute>
+      </xpath>   
+      <xpath expr="//field[@name='stage_id']" position="attributes">
+        <attribute name="width">180</attribute>
+      </xpath>     
+      <xpath expr="//field[@name='candidate_id']" position="attributes">
+        <attribute name="width">180</attribute>
+      </xpath>    
+      <xpath expr="//field[@name='application_status']" position="attributes">
+        <attribute name="width">180</attribute>
+      </xpath>   
+      <xpath expr="//field[@name='refuse_reason_id']" position="attributes">
+        <attribute name="width">180</attribute>
+      </xpath>        
+      <xpath expr="//field[@name='priority']" position="attributes">
+        <attribute name="width">180</attribute>
+      </xpath>  
+      <xpath expr="//field[@name='email_from']" position="attributes">
+        <attribute name="width">180</attribute>
+      </xpath>   
+      <xpath expr="//field[@name='categ_ids']" position="attributes">
+        <attribute name="width">180</attribute>
+      </xpath> 
+      <xpath expr="//field[@name='user_id']" position="attributes">
+        <attribute name="width">180</attribute>
+      </xpath>   
+    </field>
+  </record>
+</odoo>

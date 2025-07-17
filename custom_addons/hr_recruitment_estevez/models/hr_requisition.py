@@ -379,36 +379,21 @@ class HrRequisition(models.Model):
             'especificaciones': "Debe completar todos los campos obligatorios en 'Especificaciones'",
             'datos_puesto': "Faltan datos importantes en 'Datos del puesto'"
         }
-    
+
         steps = {
             'especificaciones': 'datos_puesto',
             'datos_puesto': 'equipo'
         }
 
         for record in self:
-            error_msg = False
-        
             if record.wizard_step == 'especificaciones' and not record.requisition_type:
-                error_msg = error_messages['especificaciones']
+                raise ValidationError(error_messages['especificaciones'])
             elif record.wizard_step == 'datos_puesto' and not record.job_type:
-                error_msg = error_messages['datos_puesto']
-        
-            if error_msg:
-                # Devolver acción para mostrar modal personalizado
-                return {
-                    'type': 'ir.actions.client',
-                    'tag': 'display_notification',
-                    'params': {
-                        'title': 'Validación requerida',
-                        'message': error_msg,
-                        'sticky': True,
-                        'type': 'danger',
-                    }
-                }
-            else:
-                record.wizard_step = steps.get(record.wizard_step, 'equipo')
-                
-        return False
+                raise ValidationError(error_messages['datos_puesto'])
+
+            record.wizard_step = steps.get(record.wizard_step, 'equipo')
+
+        return True
     
     def set_wizard_step(self, step):
         self.ensure_one()
