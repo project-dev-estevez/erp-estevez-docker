@@ -382,26 +382,26 @@
                     <filter name="filter_control_vehicular" string="Control Vehicular" domain="[('workstation_department_id.name', '=', 'Control Vehicular')]"/>                                
                
                <!--Estado de la Vacante-->
-               <separator string=""/>   
+               <separator string="Vacante"/>   
                 <filter name="filter_vacante" string="🚦ESTADO VACANTE" domain="[]"/>
                     <filter name="filter_vacancy_open" string="Abierta" domain="[('publication_status','=','Abierta')]"/>
                     <filter name="filter_vacancy_closed" string="Cerrada" domain="[('publication_status','=','Cerrada')]"/>
                     <filter name="filter_vacancy_to_activate" string="Por Activar" domain="[('publication_status','=','Por Activar')]"/>
 
                 <!-- Por Proyecto -->
-                <separator string=""/>   
+                <separator string="Proyecto"/>   
                 <filter name="filter_proyecto" string="🛠️PROYECTO" domain="[]"/>
                     <filter name="filter_proj_sinproyecto" string="Sin Proyecto" domain="[('project_id', '=', False)]"/>       
                     <field name="project_id" string="Proyecto"/>                         
 
                 <!--Por solicitante -->
-                <separator string=""/>   
+                <separator string="solicitante"/>   
                 <filter name="filter_soli" string="👤SOLICITANTE" domain="[]"/>
                     <filter string="Solicitante" name="filter_solicitante" context="{'group_by': 'requestor_id'}"/>
 
 
                 <!-- Ultimo mes -->
-                <separator string=""/>   
+                <separator string="Fecha"/>   
                 <filter name="filter_date" string="📅FECHA" domain="[]"/>
                     <filter name="last_month" string="Último mes" domain="[('create_date','>=', (context_today() - relativedelta(days=30)).strftime('%%Y-%%m-%%d'))]"/>                                                                                                   
 
