@@ -7,11 +7,10 @@
                 <div class="col-lg-12">
 
                     <!-- Titulo y filtro -->
-                    <DashboardHeader
-                        title="'Dashboard Reclutamiento'"
-                        startDate="state.startDate"
-                        endDate="state.endDate"
-                        onDateChange.bind="onDateRangeChange" />
+                    <DashboardHeader title="'Dashboard Reclutamiento'"
+                                    startDate="state.startDate"
+                                    endDate="state.endDate"
+                                    onDateChange.bind="onDateRangeChange" />
 
                     <!-- KPIs principales -->
                     <div class="row">
