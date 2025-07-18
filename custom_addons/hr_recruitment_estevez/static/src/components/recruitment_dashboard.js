@@ -33,7 +33,6 @@ export class RecruitmentDashboard extends Component {
             endDate: "",
             selectedVacancy: false,
             availableVacancies: [],
-            rejectionReasons: { candidate: {}, company: {} },
             funnelRecruitment: {},
             requisitionStats: {},
             vacancyOptions: [],
@@ -83,6 +82,7 @@ export class RecruitmentDashboard extends Component {
         return domain;
     }
 
+    // ✅ Callbacks de montaje de componentes
     onKpisGridMounted(kpisGridComponent) {
         console.log("📊 Dashboard: KpisGrid montado", kpisGridComponent);
         this.kpisGridComponent = kpisGridComponent;
@@ -264,11 +264,9 @@ export class RecruitmentDashboard extends Component {
         try {
             await Promise.all([
                 this.getAllVacancies(),
-                this.getRejectionReasons(),
                 this.getVacancyMetrics(),
                 this.getFunnelRecruitment(),
                 this.getRequisitionStats(),
-                // this.getAverageTimePerStage(),
             ]);
             console.log("✅ Dashboard: Todos los datos cargados");
         } catch (error) {
@@ -829,273 +827,6 @@ export class RecruitmentDashboard extends Component {
             refused,
             topRefuseReason: topReason,
         };
-    }
-
-    async getRejectionReasons() {
-        const context = { context: { active_test: false } };
-        let domain = [["application_status", "=", "refused"]];
-        domain = this._addDateRangeToDomain(domain);
-
-        // Agrupa por motivo de rechazo
-        const data = await this.orm.readGroup(
-            "hr.applicant",
-            domain,
-            ["refuse_reason_id"],
-            ["refuse_reason_id"],
-            context
-        );
-
-        // ✅ FUNCIÓN AVANZADA: Normalizar texto (sin mayúsculas, minúsculas ni tildes)
-        const normalizeText = (text) => {
-            if (!text) return '';
-            
-            return text
-                .toLowerCase()                    // Convertir a minúsculas
-                .trim()                          // Quitar espacios al inicio/final
-                .normalize('NFD')                // Descomponer caracteres con tildes
-                .replace(/[\u0300-\u036f]/g, '') // Eliminar diacríticos (tildes, acentos)
-                .replace(/[^\w\s]/g, ' ')        // Reemplazar caracteres especiales con espacios
-                .replace(/\s+/g, ' ')            // Normalizar espacios múltiples a uno solo
-                .trim();                         // Quitar espacios finales después de normalizar
-        };
-
-        // ✅ FUNCIÓN MEJORADA: Detectar si es declinación del candidato
-        const isCandidateDecline = (reasonLabel) => {
-            if (!reasonLabel) return false;
-            
-            const normalizedLabel = normalizeText(reasonLabel);
-            
-            // ✅ MOTIVOS NORMALIZADOS (sin tildes ni mayúsculas)
-            const candidateDeclinePatterns = [
-                // Declinaciones explícitas
-                'declino',
-                'candidato declino',
-                'declina',
-                'candidato declina',
-                
-                // No se presentó (múltiples variaciones)
-                'no se presento',
-                'no se presenta',
-                'no asistio',
-                'no asiste',
-                'ausente',
-                'falta',
-                'inasistencia',
-                
-                // Solo se presenta a inducción
-                'solo se presenta a induccion',
-                'solo induccion',
-                'unicamente induccion',
-                'nada mas induccion',
-                
-                // No respondió/responde
-                'no respondio',
-                'no responde',
-                'no contesta',
-                'no contesto',
-                'sin respuesta',
-                'no hay respuesta',
-                
-                // Abandono del proceso
-                'abandono',
-                'abandona',
-                'se retira',
-                'se retiro',
-                'retiro',
-                'desiste',
-                'desistio',
-                
-                // Cambio de opinión
-                'cambio de opinion',
-                'cambio opinion',
-                'ya no le interesa',
-                'perdio interes',
-                'perdio el interes',
-                'sin interes',
-                
-                // Aceptó otra oferta
-                'acepto otra oferta',
-                'acepta otra oferta',
-                'otra oferta',
-                'mejor oferta',
-                'oferta mejor',
-                'consiguio otro trabajo',
-                'otro trabajo',
-                'otra empresa',
-                
-                // Problemas personales del candidato
-                'no esta interesado',
-                'no le interesa',
-                'no disponible',
-                'no puede',
-                'imposibilitado',
-                'problemas personales',
-                'situacion personal',
-                
-                // Problemas con condiciones
-                'no cumple horario',
-                'horario no le conviene',
-                'salario insuficiente',
-                'salario bajo',
-                'sueldo bajo',
-                'poco salario',
-                'distancia',
-                'muy lejos',
-                'ubicacion',
-                'transporte',
-                
-                // Otros motivos del candidato
-                'no acepta condiciones',
-                'condiciones no favorables',
-                'expectativas diferentes',
-                'no es lo que busca',
-                'cambio de planes'
-            ];
-            
-            // ✅ VERIFICAR si algún patrón coincide EXACTAMENTE o está CONTENIDO
-            return candidateDeclinePatterns.some(pattern => {
-                // Buscar coincidencia exacta O que el patrón esté contenido en el label
-                return normalizedLabel === pattern || normalizedLabel.includes(pattern);
-            });
-        };
-
-        // Separa en declinaciones de candidatos y rechazos de empresa
-        const candidateDeclines = [];
-        const companyRejections = [];
-
-        for (const r of data) {
-            const id = r.refuse_reason_id && r.refuse_reason_id[0] || false;
-            const label = (r.refuse_reason_id && r.refuse_reason_id[1]) || "Sin motivo";
-            const count = r.refuse_reason_id_count;
-
-            // ✅ USAR LA FUNCIÓN MEJORADA DE CLASIFICACIÓN
-            if (isCandidateDecline(label)) {
-                candidateDeclines.push({ id, label, count });
-                console.log(`👤 CANDIDATO: "${label}" → normalizado: "${normalizeText(label)}"`);
-            } else {
-                companyRejections.push({ id, label, count });
-                console.log(`🏢 EMPRESA: "${label}" → normalizado: "${normalizeText(label)}"`);
-            }
-        }
-
-        // ✅ LOGS DETALLADOS para debugging
-        console.log("📊 Resumen de clasificación de rechazos:");
-        console.log(`👤 Declinaciones de candidatos: ${candidateDeclines.length} tipos, ${candidateDeclines.reduce((sum, x) => sum + x.count, 0)} total`);
-        console.log(`🏢 Rechazos de empresa: ${companyRejections.length} tipos, ${companyRejections.reduce((sum, x) => sum + x.count, 0)} total`);
-        
-        // ✅ MOSTRAR todos los motivos de candidatos detectados
-        if (candidateDeclines.length > 0) {
-            console.log("👤 Motivos de candidatos detectados:");
-            candidateDeclines.forEach(decline => {
-                console.log(`   • "${decline.label}" (${decline.count} casos)`);
-            });
-        }
-
-        // Datos para ChartRenderer (resto del código sin cambios)
-        const pastelCandidate = this.getPastelColors(candidateDeclines.length);
-        const pastelCompany = this.getPastelColors(companyRejections.length);
-
-        // Calcula el total de cada grupo para el porcentaje
-        const totalCandidate = candidateDeclines.reduce((sum, x) => sum + x.count, 0);
-        const totalCompany = companyRejections.reduce((sum, x) => sum + x.count, 0);
-
-        this.state.rejectionReasons.candidate = {
-            data: {
-                labels: candidateDeclines.map(x => x.label),
-                datasets: [{
-                    label: "Declinaciones Candidatos",
-                    data: candidateDeclines.map(x => x.count),
-                    backgroundColor: pastelCandidate
-                }]
-            },  
-            meta: candidateDeclines,          
-            options: {              
-                onClick: (event, activeElements, chart) => {
-                    if (!activeElements.length) return;
-                    const { index } = activeElements[0];
-                    const reason = this.state.rejectionReasons.candidate.meta[index];
-                    this.openRejectionList(reason.id);
-                },  
-                plugins: {
-                    tooltip: {
-                        callbacks: {
-                            afterBody: (context) => {
-                                const idx = context[0].dataIndex;
-                                const count = candidateDeclines[idx].count;
-                                const percent = totalCandidate > 0 ? ((count / totalCandidate) * 100).toFixed(2) : "0.00";
-                                return `Porcentaje de declinación: ${percent}%`;
-                            }
-                        }
-                    }
-                } 
-            } 
-        };
-
-        this.state.rejectionReasons.company = {
-            data: {
-                labels: companyRejections.map(x => x.label),
-                datasets: [{
-                    label: "Rechazos Empresa",
-                    data: companyRejections.map(x => x.count),
-                    backgroundColor: pastelCompany
-                }]
-            },
-            meta: companyRejections,
-            options: {
-                onClick: (event, activeElements, chart) => {
-                    if (!activeElements.length) return;
-                    const { index } = activeElements[0];
-                    const reason = this.state.rejectionReasons.company.meta[index];
-                    this.openRejectionList(reason.id);
-                },
-                plugins: {
-                    tooltip: {
-                        callbacks: {
-                            afterBody: (context) => {
-                                const idx = context[0].dataIndex;
-                                const count = companyRejections[idx].count;
-                                const percent = totalCompany > 0 ? ((count / totalCompany) * 100).toFixed(2) : "0.00";
-                                return `Porcentaje de rechazo: ${percent}%`;
-                            }
-                        }
-                    }
-                }
-            }
-        };
-
-        // Forzar refresco
-        this.state.rejectionReasons = { ...this.state.rejectionReasons };
-    }
-
-    openRejectionList(refuse_reason_id) {
-        let domain = [
-            ["application_status", "=", "refused"],            
-        ];
-
-        if (refuse_reason_id === false){
-            domain.push(["refuse_reason_id", "=", false]);
-        } else if (refuse_reason_id){
-            domain.push(["refuse_reason_id", "=", refuse_reason_id]);
-        }else {
-            domain.push("|", 
-                   ["refuse_reason_id", "=", false],
-                   ["refuse_reason_id", "=", null]);
-        }
-    
-        domain = this._addDateRangeToDomain(domain);
-
-        this.env.services.action.doAction({
-            type: 'ir.actions.act_window',
-            name: 'Solicitudes Rechazadas',
-            res_model: 'hr.applicant',
-            views: [[false, 'list'], [false, 'form']],
-            target: 'current',
-            domain: domain,
-            context: {
-                search_default_filter_refused: 1,
-                active_test: false
-            }
-        });
     }
 
 }
