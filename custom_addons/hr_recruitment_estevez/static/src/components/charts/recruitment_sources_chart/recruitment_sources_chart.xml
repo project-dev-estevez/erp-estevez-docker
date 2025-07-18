@@ -2,84 +2,92 @@
 <templates xml:space="preserve">
     <t t-name="hr_recruitment_estevez.RecruitmentSourcesChart" owl="1">
         <div class="recruitment-sources-chart">
-            <!-- Título y botón de acción -->
-            <div class="d-flex align-items-center justify-content-between mb-3">
-                <h3 class="text-primary fw-bold">
-                    <t t-esc="props.title || 'Efectividad de las Fuentes de Reclutamiento'" />
-                </h3>
-                <div class="px-3 py-1 bg-primary cursor-pointer rounded">
-                    <span class="fa fa-arrow-right text-white"/>
-                </div>
-            </div>
 
             <!-- Loading spinner -->
             <div t-if="state.isLoading" class="text-center py-5">
-                <div class="spinner-border text-primary" role="status">
+                <div class="spinner-border text-primary mb-3" role="status">
                     <span class="visually-hidden">Cargando...</span>
                 </div>
-                <p class="mt-2 text-muted">Cargando fuentes de reclutamiento...</p>
+                <p class="text-muted mb-0">Cargando fuentes de reclutamiento...</p>
             </div>
 
             <!-- Contenido principal -->
-            <div t-else="" class="row">
-                <!-- Gráfico de pie -->
-                <div class="col-12 col-md-6 mb-3">
-                    <div t-if="state.hasData">
-                        <ChartRenderer 
-                            type="'pie'" 
-                            title="'Fuentes de Reclutamiento'" 
-                            config="state.sourceRecruitment"
-                            style="`height: ${props.height || 400}px;`" />
-                    </div>
-                    <div t-else="" class="text-center py-5">
-                        <i class="fa fa-chart-pie fa-3x text-muted mb-3"></i>
-                        <p class="text-muted">No hay datos de fuentes de reclutamiento en el rango seleccionado</p>
+            <div t-else="" class="row g-3">
+                <!-- Gráfico Polar Area -->
+                <div class="col-12 col-lg-7">
+                    <div class="bg-white rounded shadow-sm p-3">
+                        <div t-if="state.hasData">
+                            <!-- ✅ USAR CHARTRENDERAPEX -->
+                            <ChartRendererApex 
+                                type="'polarArea'" 
+                                config="state.apexConfig"
+                                height="props.height || 400" 
+                                t-key="state.chartKey" />
+                        </div>
+                        <div t-else="" class="text-center py-5">
+                            <i class="fa fa-chart-pie fa-4x text-muted mb-3"></i>
+                            <h5 class="text-muted">Sin datos disponibles</h5>
+                            <p class="text-muted mb-0">No hay fuentes de reclutamiento en el rango seleccionado</p>
+                        </div>
                     </div>
                 </div>
 
                 <!-- Tabla de indicadores -->
-                <div class="col-12 col-md-6">
-                    <div class="table-responsive">
-                        <table class="table table-borderless align-middle">
-                            <thead>
-                                <tr>
-                                    <th>Fuente</th>
-                                    <th class="text-end"># Contratados</th>
-                                    <th class="text-end">% Efectividad</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <t t-if="state.indicatorsSourceRecruitment.sources.length > 0">
-                                    <t t-foreach="state.indicatorsSourceRecruitment.sources" t-as="item" t-key="item.label">
+                <div class="col-12 col-lg-5">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-hover mb-0">
+                                    <thead class="table-light">
                                         <tr>
-                                            <td>
-                                                <span t-esc="item.label"/>
-                                                <small class="text-muted d-block">
-                                                    <t t-esc="item.total"/> postulaciones
-                                                </small>
-                                            </td>
-                                            <td class="text-end">
-                                                <span class="fw-semibold text-success" t-esc="item.hired"/>
-                                            </td>
-                                            <td class="text-end">
-                                                <!-- ✅ ARREGLAR: Usar función helper en lugar de parseFloat -->
-                                                <span class="fw-semibold" 
-                                                      t-att-class="getPercentageClass(item.percentage)"
-                                                      t-esc="item.percentage"/>%
-                                            </td>
+                                            <th class="border-0 py-3">Fuente</th>
+                                            <th class="border-0 text-center py-3">Contratados</th>
+                                            <th class="border-0 text-center py-3">Efectividad</th>
                                         </tr>
-                                    </t>
-                                </t>
-                                <t t-else="">
-                                    <tr>
-                                        <td colspan="3" class="text-center text-muted py-4">
-                                            <i class="fa fa-info-circle me-2"></i>
-                                            No hay datos disponibles
-                                        </td>
-                                    </tr>
-                                </t>
-                            </tbody>
-                        </table>
+                                    </thead>
+                                    <tbody>
+                                        <t t-if="state.indicatorsSourceRecruitment.sources.length > 0">
+                                            <t t-foreach="state.indicatorsSourceRecruitment.sources" t-as="item" t-key="item.label">
+                                                <tr style="cursor: pointer;" 
+                                                    t-on-click="() => this.openSourceRecruitmentList(item.id)"
+                                                    class="border-bottom">
+                                                    <td class="py-3">
+                                                        <div class="d-flex align-items-center">
+                                                            <div class="flex-shrink-0 me-3">
+                                                                <div class="bg-secondary rounded-circle" 
+                                                                     style="width: 10px; height: 10px;"></div>
+                                                            </div>
+                                                            <div class="flex-grow-1">
+                                                                <div class="fw-semibold text-dark" t-esc="item.label"/>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <td class="text-center py-3">
+                                                        <span class="badge bg-success fs-6" t-esc="item.hired"/>
+                                                    </td>
+                                                    <td class="text-center py-3">
+                                                        <span class="fw-bold fs-6" 
+                                                              t-att-class="getPercentageClass(item.percentage)">
+                                                            <t t-esc="item.percentage"/>%
+                                                        </span>
+                                                    </td>
+                                                </tr>
+                                            </t>
+                                        </t>
+                                        <t t-else="">
+                                            <tr>
+                                                <td colspan="3" class="text-center text-muted py-5">
+                                                    <div>
+                                                        <i class="fa fa-info-circle fa-2x mb-2"></i>
+                                                        <div>No hay datos disponibles</div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </t>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
