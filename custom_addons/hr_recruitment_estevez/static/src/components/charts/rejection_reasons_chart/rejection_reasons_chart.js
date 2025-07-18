@@ -181,8 +181,11 @@ export class RejectionReasonsChart extends Component {
         this.state.candidateData = candidateDeclines;
         this.state.companyData = companyRejections;
 
-        // ✅ CONFIGURAR GRÁFICA DE CANDIDATOS (COMO TU EJEMPLO)
+        // ✅ CONFIGURAR GRÁFICA DE CANDIDATOS (CON ORDENAMIENTO)
         if (candidateDeclines.length > 0) {
+            // ✅ ORDENAR de mayor a menor
+            candidateDeclines.sort((a, b) => b.count - a.count);
+            
             const labelsCandidate = candidateDeclines.map(x => x.label);
             const seriesCandidate = candidateDeclines.map(x => x.count);
             const colorsCandidate = this.getBarColors(labelsCandidate.length, 'candidate');
@@ -192,7 +195,7 @@ export class RejectionReasonsChart extends Component {
             this.state.apexConfigCandidate = {
                 series: [{
                     name: 'Declinaciones',
-                    data: seriesCandidate // ✅ Solo los números como en tu ejemplo
+                    data: seriesCandidate
                 }],
                 options: {
                     title: {
@@ -219,12 +222,12 @@ export class RejectionReasonsChart extends Component {
                         bar: {
                             borderRadius: 4,
                             borderRadiusApplication: 'end',
-                            horizontal: true, // ✅ Como en tu ejemplo
+                            horizontal: true,
                         }
                     },
                     colors: colorsCandidate,
                     dataLabels: {
-                        enabled: true, // ✅ CAMBIÉ: Habilitado para mostrar números
+                        enabled: true,
                         formatter: function (val) {
                             return val;
                         },
@@ -235,14 +238,13 @@ export class RejectionReasonsChart extends Component {
                         }
                     },
                     xaxis: {
-                        categories: labelsCandidate, // ✅ EXACTO como en tu ejemplo
+                        categories: labelsCandidate,
                         labels: {
                             style: {
                                 fontSize: '10px'
                             }
                         }
                     },
-                    // ✅ QUITAR toda la configuración de yaxis.categories
                     yaxis: {
                         labels: {
                             style: {
@@ -278,8 +280,11 @@ export class RejectionReasonsChart extends Component {
             };
         }
 
-        // ✅ CONFIGURAR GRÁFICA DE EMPRESA (COMO TU EJEMPLO)
+        // ✅ CONFIGURAR GRÁFICA DE EMPRESA (CON ORDENAMIENTO)
         if (companyRejections.length > 0) {
+            // ✅ ORDENAR de mayor a menor
+            companyRejections.sort((a, b) => b.count - a.count);
+            
             const labelsCompany = companyRejections.map(x => x.label);
             const seriesCompany = companyRejections.map(x => x.count);
             const colorsCompany = this.getBarColors(labelsCompany.length, 'company');
@@ -289,7 +294,7 @@ export class RejectionReasonsChart extends Component {
             this.state.apexConfigCompany = {
                 series: [{
                     name: 'Rechazos',
-                    data: seriesCompany // ✅ Solo los números como en tu ejemplo
+                    data: seriesCompany
                 }],
                 options: {
                     title: {
@@ -316,12 +321,12 @@ export class RejectionReasonsChart extends Component {
                         bar: {
                             borderRadius: 4,
                             borderRadiusApplication: 'end',
-                            horizontal: true, // ✅ Como en tu ejemplo
+                            horizontal: true,
                         }
                     },
                     colors: colorsCompany,
                     dataLabels: {
-                        enabled: true, // ✅ CAMBIÉ: Habilitado para mostrar números
+                        enabled: true,
                         formatter: function (val) {
                             return val;
                         },
@@ -332,14 +337,13 @@ export class RejectionReasonsChart extends Component {
                         }
                     },
                     xaxis: {
-                        categories: labelsCompany, // ✅ EXACTO como en tu ejemplo
+                        categories: labelsCompany,
                         labels: {
                             style: {
                                 fontSize: '10px'
                             }
                         }
                     },
-                    // ✅ QUITAR toda la configuración de yaxis.categories
                     yaxis: {
                         labels: {
                             style: {
