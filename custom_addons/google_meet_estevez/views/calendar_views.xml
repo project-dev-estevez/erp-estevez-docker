@@ -16,8 +16,7 @@
             string="Generar Meet ahora"
             type="object"
             class="btn-primary"
-            invisible="is_google_meet and not videocall_location and google_id"
-        />
+            invisible="['|', ('is_google_meet','=',False), ('videocall_location','!=',False)]"/>
         
         <!-- Campo de enlace -->
         <field
