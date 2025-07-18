@@ -22,21 +22,9 @@ class CalendarEvent(models.Model):
 
     videocall_location = fields.Char(
         string="Enlace Meet",
-        compute='_compute_videocall_location',
+        compute="_compute_videocall_location",
         store=True,
     )
-
-    @api.depends('google_id', 'is_google_meet')
-    def _compute_videocall_location(self):
-        for ev in self:
-            # Si ya existe enlace o no está marcado para Meet, no hacemos nada
-            if ev.videocall_location or not ev.is_google_meet or not ev.google_id:
-                continue
-            try:
-                link = ev._create_google_meet()
-            except Exception:
-                link = False
-            ev.videocall_location = link or False
 
     @api.depends('is_google_meet', 'videocall_location', 'google_id')
     def _compute_show_meet_button(self):
@@ -119,18 +107,49 @@ class CalendarEvent(models.Model):
 
     def action_force_create_meet(self):
         self.ensure_one()
+
+        # Verificación de conexión
+        if not self.env.user.google_calendar_token:
+            raise UserError(_("Configura tu conexión con Google Calendar primero"))
+        
+        # Validación básica del evento
+        required_fields = ['start', 'stop', 'name', 'user_id.email']
+        if any(not getattr(self, field.split('.')[0]) for field in required_fields):
+            raise UserError(_("Faltan datos requeridos en el evento"))
+
+        # Sincronización con Google si es necesario
         if not self.google_id:
             self._sync_with_google()
-        # Forzamos re-computar el campo:
-        self._compute_videocall_location()
+        
+        # Crear Meet
+        if not self.videocall_location:
+            meet_link = self._create_google_meet()
+            if not meet_link:
+                raise UserError(_("""
+                📌 Generando enlace de reunión
+                Estamos generando el enlace de Google Meet para tu reunión.
+                Al cerrar este mensaje y volver al calendario, podrás verlo reflejado junto con los detalles del evento.
+                Si el enlace no aparece de inmediato, espera unos segundos y actualiza la vista del calendario.
+                """))
+            
+            self.videocall_location = meet_link
+
         return {
-            'type': 'ir.actions.act_window',
-            'res_model': 'calendar.event',
-            'res_id': self.id,
-            'view_mode': 'form',
-            'view_id': self.env.ref('calendar.view_calendar_event_form').id,
-            'target': 'current',
-            'flags': {'reload': True},
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': _("✅ Meet Generado"),
+                'message': _("Enlace: <a href='%s' target='_blank'>%s</a>") % (self.videocall_location, self.videocall_location),
+                'type': 'success',
+                'sticky': False,
+                'next': {
+                    'type': 'ir.actions.act_window',
+                    'res_model': 'calendar.event',
+                    'res_id': self.id,
+                    'views': [(False, 'form')],
+                    'target': 'current',
+                }
+            }
         }
 
     def _sync_with_google(self):
