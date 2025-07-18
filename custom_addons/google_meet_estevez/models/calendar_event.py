@@ -20,6 +20,24 @@ class CalendarEvent(models.Model):
         store=True,
     )
 
+    videocall_location = fields.Char(
+        string="Enlace Meet",
+        compute='_compute_videocall_location',
+        store=True,
+    )
+
+    @api.depends('google_id', 'is_google_meet')
+    def _compute_videocall_location(self):
+        for ev in self:
+            # Si ya existe enlace o no está marcado para Meet, no hacemos nada
+            if ev.videocall_location or not ev.is_google_meet or not ev.google_id:
+                continue
+            try:
+                link = ev._create_google_meet()
+            except Exception:
+                link = False
+            ev.videocall_location = link or False
+
     @api.depends('is_google_meet', 'videocall_location', 'google_id')
     def _compute_show_meet_button(self):
         for event in self:
@@ -101,27 +119,10 @@ class CalendarEvent(models.Model):
 
     def action_force_create_meet(self):
         self.ensure_one()
-
-        # Verificación de conexión
-        if not self.env.user.google_calendar_token:
-            raise UserError(_("Configura tu conexión con Google Calendar primero"))
-        
-        # Validación básica del evento
-        required_fields = ['start', 'stop', 'name', 'user_id.email']
-        if any(not getattr(self, field.split('.')[0]) for field in required_fields):
-            raise UserError(_("Faltan datos requeridos en el evento"))
-
-        # Sincronización con Google si es necesario
         if not self.google_id:
             self._sync_with_google()
-        
-        # Crear Meet
-        if not self.videocall_location:
-            meet_link = self._create_google_meet()
-            if not meet_link:
-                raise UserError(_("No se pudo generar el enlace Meet."))
-            self.write({'videocall_location': meet_link})
-
+        # Forzamos re-computar el campo:
+        self._compute_videocall_location()
         return {
             'type': 'ir.actions.act_window',
             'res_model': 'calendar.event',
