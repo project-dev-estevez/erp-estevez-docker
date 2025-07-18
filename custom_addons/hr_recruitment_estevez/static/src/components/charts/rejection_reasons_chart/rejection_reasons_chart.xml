@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="hr_recruitment_estevez.RejectionReasonsChart" owl="1">
+        <div class="rejection-reasons-chart">
+            <!-- Título -->
+            <div class="d-flex align-items-center justify-content-center mb-4">
+                <h3 class="text-primary text-center fw-bold">
+                    <i class="fa fa-chart-bar me-2"></i>
+                    <t t-esc="props.title || 'Rechazos y Declinaciones en el Reclutamiento'"/>
+                </h3>
+            </div>
+
+            <!-- Loading spinner -->
+            <div t-if="state.isLoading" class="text-center py-5">
+                <div class="spinner-border text-primary mb-3" role="status">
+                    <span class="visually-hidden">Cargando...</span>
+                </div>
+                <p class="text-muted mb-0">Cargando motivos de rechazo...</p>
+            </div>
+
+            <!-- Contenido principal -->
+            <div t-else="" class="row g-3">
+                <!-- Gráfica de Declinaciones de Candidatos -->
+                <div class="col-12 col-lg-6">
+                    <div class="bg-white rounded shadow-sm p-3">
+                        <div t-if="state.hasData and state.candidateData.length > 0">
+                            <ChartRendererApex 
+                                type="'bar'" 
+                                config="state.apexConfigCandidate"
+                                height="props.height || 350"
+                                t-key="state.chartKeyCand" />
+                        </div>
+                        <div t-else="" class="text-center py-5">
+                            <i class="fa fa-user-times fa-4x text-muted mb-3"></i>
+                            <h5 class="text-muted">Sin declinaciones de candidatos</h5>
+                            <p class="text-muted mb-0">No hay declinaciones de candidatos en el rango seleccionado</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Gráfica de Rechazos de Empresa -->
+                <div class="col-12 col-lg-6">
+                    <div class="bg-white rounded shadow-sm p-3">
+                        <div t-if="state.hasData and state.companyData.length > 0">
+                            <ChartRendererApex 
+                                type="'bar'" 
+                                config="state.apexConfigCompany"
+                                height="props.height || 350"
+                                t-key="state.chartKeyComp" />
+                        </div>
+                        <div t-else="" class="text-center py-5">
+                            <i class="fa fa-building fa-4x text-muted mb-3"></i>
+                            <h5 class="text-muted">Sin rechazos de empresa</h5>
+                            <p class="text-muted mb-0">No hay rechazos de empresa en el rango seleccionado</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sin datos en absoluto -->
+            <div t-if="!state.isLoading and !state.hasData" class="text-center py-5">
+                <i class="fa fa-chart-bar fa-4x text-muted mb-3"></i>
+                <h5 class="text-muted">Sin datos de rechazo</h5>
+                <p class="text-muted mb-0">No hay motivos de rechazo en el rango seleccionado</p>
+            </div>
+        </div>
+    </t>
+</templates>

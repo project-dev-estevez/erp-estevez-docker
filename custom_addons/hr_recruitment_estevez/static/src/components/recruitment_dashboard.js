@@ -11,29 +11,10 @@ import { RecruitmentSourcesChart } from "./charts/recruitment_sources_chart/recr
 
 
 import { ChartRenderer } from "./chart_renderer/chart_renderer";
+import { RejectionReasonsChart } from "./charts/rejection_reasons_chart/rejection_reasons_chart";
 const { DateTime } = luxon;
 
 export class RecruitmentDashboard extends Component {
-
-    _addDateRangeToDomain(domain = []) {
-        if (this.state.startDate) {
-            domain.push(["create_date", ">=", this.state.startDate]);
-        }
-        if (this.state.endDate) {
-            domain.push(["create_date", "<=", this.state.endDate]);
-        }
-        return domain;
-    }
-
-    _getHiredDateRangeDomain(domain = []) {
-        if (this.state.startDate) {
-            domain.push(["date_closed", ">=", this.state.startDate]);
-        }
-        if (this.state.endDate) {
-            domain.push(["date_closed", "<=", this.state.endDate]);
-        }
-        return domain;
-    }
 
     setup() {
         this.orm = useService("orm");
@@ -44,6 +25,7 @@ export class RecruitmentDashboard extends Component {
         this.recruiterEfficiencyComponent = null;
         this.processEfficiencyComponent = null;
         this.recruitmentSourcesComponent = null;
+        this.rejectionReasonsComponent = null;
 
         this.state = useState({
             // Filtros
@@ -81,6 +63,26 @@ export class RecruitmentDashboard extends Component {
         });
     }
 
+    _addDateRangeToDomain(domain = []) {
+        if (this.state.startDate) {
+            domain.push(["create_date", ">=", this.state.startDate]);
+        }
+        if (this.state.endDate) {
+            domain.push(["create_date", "<=", this.state.endDate]);
+        }
+        return domain;
+    }
+
+    _getHiredDateRangeDomain(domain = []) {
+        if (this.state.startDate) {
+            domain.push(["date_closed", ">=", this.state.startDate]);
+        }
+        if (this.state.endDate) {
+            domain.push(["date_closed", "<=", this.state.endDate]);
+        }
+        return domain;
+    }
+
     onKpisGridMounted(kpisGridComponent) {
         console.log("📊 Dashboard: KpisGrid montado", kpisGridComponent);
         this.kpisGridComponent = kpisGridComponent;
@@ -110,6 +112,11 @@ export class RecruitmentDashboard extends Component {
         
         // O cargar datos relacionados:
         // fetchCandidatesByReason(reason.id).then(data => {...})
+    }
+
+    onRejectionReasonsMounted(rejectionReasonsComponent) {
+        console.log("📊 Dashboard: RejectionReasonsChart montado", rejectionReasonsComponent);
+        this.rejectionReasonsComponent = rejectionReasonsComponent;
     }
 
     async openRecruitmentList(userId, onlyHired = false, onlyOngoing = false) {
@@ -239,6 +246,11 @@ export class RecruitmentDashboard extends Component {
         if (this.recruitmentSourcesComponent) {
             console.log("🔄 Dashboard: Recargando fuentes de reclutamiento...");
             reloadPromises.push(this.recruitmentSourcesComponent.refresh());
+        }
+
+        if (this.rejectionReasonsComponent) {
+            console.log("🔄 Dashboard: Recargando motivos de rechazo...");
+            reloadPromises.push(this.rejectionReasonsComponent.refresh());
         }
         
         // ✅ ESPERAR todas las recargas en paralelo
@@ -1092,7 +1104,8 @@ RecruitmentDashboard.template = "recruitment.dashboard";
 RecruitmentDashboard.components = {
     DashboardHeader, KpisGrid, 
     ChartRenderer, RecruiterEfficiencyChart,
-    ProcessEfficiencyChart, RecruitmentSourcesChart
+    ProcessEfficiencyChart, RecruitmentSourcesChart,
+    RejectionReasonsChart
 };
 
 // Registrar el dashboard OWL

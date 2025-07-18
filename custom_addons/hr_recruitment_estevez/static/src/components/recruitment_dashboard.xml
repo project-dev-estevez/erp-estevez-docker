@@ -45,17 +45,11 @@
                     <div class="row">
                         <div class="col-12 m-0 p-0">
                             <div class="shadow-sm border m-2 p-4 bg-white">
-                                <div class="d-flex align-items-center justify-content-center">
-                                    <h3 class="text-primary text-center fw-bold">Rechazos y Declinaciones en el Reclutamiento</h3>
-                                </div>
-                                <div class="row mt-2">
-                                    <div class="col">
-                                        <ChartRenderer type="'bar'" config="state.rejectionReasons.candidate"/>
-                                    </div>
-                                    <div class="col">
-                                        <ChartRenderer type="'bar'" config="state.rejectionReasons.company"/>
-                                    </div>
-                                </div>
+                                <RejectionReasonsChart startDate="state.startDate"
+                                                       endDate="state.endDate"
+                                                       title="'Rechazos y Declinaciones en el Reclutamiento'"
+                                                       height="350"
+                                                       onMounted.bind="onRejectionReasonsMounted"/>
                             </div>
                         </div>                        
                     </div>
