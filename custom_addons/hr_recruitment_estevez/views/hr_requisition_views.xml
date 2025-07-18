@@ -350,7 +350,7 @@
                 <field name="publication_status"/>
                 <separator string="ESTADO REQUISICION"/>
                  <!-- Estado de la Requisición -->
-                <!--filter name="filter_status" string="🚦ESTADO REQUISICION" domain="[]"/-->
+                <filter name="filter_status" string="🚦ESTADO REQUISICION" domain="[]"/>
                 <filter name="state_to_approve" string="Por Aprobar" domain="[('state', '=', 'to_approve')]"/>
                 <filter name="state_first_approval" string="Primera Aprobación" domain="[('state', '=', 'first_approval')]"/>
                 <filter name="state_second_approval" string="Segunda Aprobación" domain="[('state', '=', 'second_approval')]"/>
@@ -359,7 +359,7 @@
 
                  <!-- Por Área -->         
                 <separator string="AREAS"/>               
-                <!--filter name="filter_area" string="🏗️AREAS" domain="[]"/-->
+                <filter name="filter_area" string="🏗️AREAS" domain="[]"/>
                     <filter name="filter_capacitacion" string="Capacitación y DO" domain="[('workstation_area_id.name', '=', 'Capacitación y DO')]"/>
                     <filter name="filter_almacen_foraneo" string="Almacén Foráneo" domain="[('workstation_area_id.name', '=', 'Almacén Foráneo')]"/>
                     <filter name="filter_taller" string="Taller" domain="[('workstation_area_id.name', '=', 'Taller')]"/>
@@ -371,7 +371,7 @@
 
                 <!-- Por Departamento -->       
                 <separator string="DEPARTAMENTO"/>             
-                <!--filter name="filter_departments" string="🏢DEPARTAMENTO" domain="[]"/-->
+                <filter name="filter_departments" string="🏢DEPARTAMENTO" domain="[]"/>
                     <filter name="filter_talento_humano" string="Talento Humano" domain="[('workstation_department_id.name', '=', 'Talento Humano')]"/>
                     <filter name="filter_operaciones" string="Operaciones" domain="[('workstation_department_id.name', '=', 'Operaciones')]"/>
                     <filter name="filter_obra_civil" string="Obra Civil" domain="[('workstation_department_id.name', '=', 'Obra Civil')]"/>
@@ -383,41 +383,37 @@
                
                <!--Estado de la Vacante-->
                <separator string="Vacante"/>   
-                <!--filter name="filter_vacante" string="🚦ESTADO VACANTE" domain="[]"/-->
+                <filter name="filter_vacante" string="🚦ESTADO VACANTE" domain="[]"/>
                     <filter name="filter_vacancy_open" string="Abierta" domain="[('publication_status','=','Abierta')]"/>
                     <filter name="filter_vacancy_closed" string="Cerrada" domain="[('publication_status','=','Cerrada')]"/>
                     <filter name="filter_vacancy_to_activate" string="Por Activar" domain="[('publication_status','=','Por Activar')]"/>
 
                 <!-- Por Proyecto -->
                 <separator string="Proyecto"/>   
-                <!--filter name="filter_proyecto" string="🛠️PROYECTO" domain="[]"/-->
+                <filter name="filter_proyecto" string="🛠️PROYECTO" domain="[]"/>
                     <filter name="filter_proj_sinproyecto" string="Sin Proyecto" domain="[('project_id', '=', False)]"/>       
                     <field name="project_id" string="Proyecto"/>                         
 
                 <!--Por solicitante -->
-                <separator string="solicitante"/>   
-                <!--filter name="filter_soli" string="👤SOLICITANTE" domain="[]"/-->
-                    <filter string="Solicitante" name="filter_solicitante" context="{'group_by': 'requestor_id'}"/>
+                <!--separator string="solicitante"/>   
+                <filter name="filter_soli" string="👤SOLICITANTE" domain="[]"/>
+                    <filter string="Solicitante" name="filter_solicitante" context="{'group_by': 'requestor_id'}"/-->
 
 
                 <!-- Ultimo mes -->
                 <separator string="Fecha"/>   
-                <!--filter name="filter_date" string="📅FECHA" domain="[]"/-->
+                <filter name="filter_date" string="📅FECHA" domain="[]"/>
                     <filter name="last_month" string="Último mes" domain="[('create_date','>=', (context_today() - relativedelta(days=30)).strftime('%%Y-%%m-%%d'))]"/>                                                                                                   
 
                 <separator string="📊 AGRUPACIONES"/>
 
-                <!--Agrupaciones-->
-                <group>
-                    <filter string="🏢 Departamento" context="{'group_by': 'workstation_department_id'}"/>
-                    <filter string="🛠️ Proyecto" context="{'group_by': 'project_id'}"/>      
-                    <filter string="🏗️ Areas" context="{'group_by': 'workstation_area_id'}"/>
-                    <filter string="👤 Solicitante" context="{'group_by': 'requestor_id'}"/>     
-                    <filter string="🚦 Estatus Requisicion" context="{'group_by': 'state'}"/> 
-                    <filter string="🚦 Estatus Vacante" context="{'group_by': 'publication_status'}"/>                                        
-
-                </group>
-
+                <!--Agrupaciones-->                
+                    <filter name="departamento" string="🏢 Departamento" context="{'group_by': 'workstation_department_id'}"/>
+                    <filter name="proyecto" string="🛠️ Proyecto" context="{'group_by': 'project_id'}"/>      
+                    <filter name="area" string="🏗️ Areas" context="{'group_by': 'workstation_area_id'}"/>
+                    <filter name="solicitante" string="👤 Solicitante" context="{'group_by': 'requestor_id'}"/>     
+                    <filter name="requi" string="🚦 Estatus Requisicion" context="{'group_by': 'state'}"/> 
+                    <filter name="vacante" string="🚦 Estatus Vacante" context="{'group_by': 'publication_status'}"/>                                                        
             </search>
         </field>
     </record>

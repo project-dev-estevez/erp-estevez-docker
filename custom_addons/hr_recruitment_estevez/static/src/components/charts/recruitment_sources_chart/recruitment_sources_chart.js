@@ -1,12 +1,12 @@
 /** @odoo-module */
 
-import { Component, useState, onWillStart, onMounted } from "@odoo/owl";
+import { Component, useState, onWillStart, onMounted, onWillUpdateProps } from "@odoo/owl";
 import { useService } from "@web/core/utils/hooks";
-import { ChartRenderer } from "../../chart_renderer/chart_renderer";
+import { ChartRendererApex } from "../../chart_renderer_apex/chart_renderer_apex"; // ✅ CAMBIO: Usar ApexCharts
 
 export class RecruitmentSourcesChart extends Component {
     static template = "hr_recruitment_estevez.RecruitmentSourcesChart";
-    static components = { ChartRenderer };
+    static components = { ChartRendererApex }; // ✅ CAMBIO: ApexCharts renderer
     static props = {
         startDate: { type: String, optional: true },
         endDate: { type: String, optional: true },
@@ -20,14 +20,18 @@ export class RecruitmentSourcesChart extends Component {
         this.actionService = useService("action");
 
         this.state = useState({
-            sourceRecruitment: {
-                data: { labels: [], datasets: [] },
-                options: {},
-                meta: []
+            // ✅ NUEVO: Configuración para ApexCharts
+            apexConfig: {
+                series: [],
+                categories: [],
+                options: {}
             },
             indicatorsSourceRecruitment: { sources: [] },
             isLoading: true,
-            hasData: false
+            hasData: false,
+            // ✅ NUEVO: Datos internos para manejo
+            sourcesData: [],
+            chartKey: 'chart-' + Date.now()
         });
 
         onWillStart(async () => {
@@ -39,18 +43,39 @@ export class RecruitmentSourcesChart extends Component {
                 this.props.onMounted(this);
             }
         });
+
+        // ✅ NUEVO: Detectar cambios en props (fechas)
+        onWillUpdateProps(async (nextProps) => {
+            if (this.props.startDate !== nextProps.startDate || 
+                this.props.endDate !== nextProps.endDate) {
+                
+                console.log("📅 RecruitmentSourcesChart: Fechas cambiaron, recargando...");
+                
+                // Actualizar props temporalmente
+                this.tempProps = nextProps;
+                await this.loadChart();
+                this.tempProps = null;
+            }
+        });
+    }
+
+    // ✅ NUEVO: Método para obtener props actuales
+    getCurrentProps() {
+        return this.tempProps || this.props;
     }
 
     async loadChart() {
+        const currentProps = this.getCurrentProps();
+        
         console.log("📊 RecruitmentSourcesChart: Cargando datos...", {
-            startDate: this.props.startDate,
-            endDate: this.props.endDate
+            startDate: currentProps.startDate,
+            endDate: currentProps.endDate
         });
 
         this.state.isLoading = true;
 
         try {
-            // ✅ USAR LA LÓGICA ORIGINAL: Secuencial
+            // ✅ MANTENER: Lógica secuencial original
             await this.getSourceRecruitment();
             await this.getIndicatorsSourceRecruitment();
             
@@ -63,7 +88,7 @@ export class RecruitmentSourcesChart extends Component {
         }
     }
 
-    // ✅ MÉTODO PRINCIPAL: Lógica EXACTA del dashboard original
+    // ✅ REFINADO: Método principal optimizado para ApexCharts
     async getSourceRecruitment() {
         // 1. Total postulaciones por fuente (por create_date)
         let domain = [
@@ -104,7 +129,7 @@ export class RecruitmentSourcesChart extends Component {
                 sourceId: id,
                 label,
                 total: r.source_id_count,
-                hired: 0 // se llenará después
+                hired: 0
             };
         }
 
@@ -118,13 +143,9 @@ export class RecruitmentSourcesChart extends Component {
             sourceMap[id].hired = r.source_id_count;
         }
 
-        // 4. Construir arrays para la gráfica
+        // 4. Preparar datos
         const sourcesData = Object.values(sourceMap);
-        const labels = sourcesData.map(s => s.label);
-        const totalCounts = sourcesData.map(s => s.total);
-        const hiredCounts = sourcesData.map(s => s.hired);
-        const colors = this.getPastelColors(labels.length);
-
+        
         console.log("📈 RecruitmentSourcesChart: Fuentes procesadas:", sourcesData.length);
 
         if (sourcesData.length === 0) {
@@ -134,139 +155,154 @@ export class RecruitmentSourcesChart extends Component {
         }
 
         this.state.hasData = true;
+        this.state.sourcesData = sourcesData;
 
-        this.state.sourceRecruitment = {
-            data: {
-                labels,
-                datasets: [
-                    {
-                        label: "Total Postulaciones",
-                        data: totalCounts,
-                        backgroundColor: colors,
-                    },
-                    {
-                        label: "Contratados",
-                        data: hiredCounts,
-                        backgroundColor: "hsl(140,70%,85%)"
-                    }
-                ]
-            },
-            meta: sourcesData,
+        // ✅ PREPARAR datos para ApexCharts
+        const labels = sourcesData.map(s => s.label);
+        const series = sourcesData.map(s => s.total);
+        const colors = this.getPolarAreaColors(labels.length);
+        this.state.chartKey = 'chart-' + Date.now();
+
+        console.log("🏷️ RecruitmentSourcesChart: Labels generados:", labels);
+        console.log("📊 RecruitmentSourcesChart: Series generadas:", series);
+
+        // ✅ CONFIGURAR APEXCHARTS CON ACTUALIZACIÓN COMPLETA
+        this.state.apexConfig = {
+            series: series,
+            // ✅ IMPORTANTE: Asegurar que categories y labels estén sincronizados
+            categories: labels,
             options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                onClick: (event, activeElements) => {
-                    if (!activeElements.length) return;
-                    const { index } = activeElements[0];
-                    const src = this.state.sourceRecruitment.meta[index];
-                    this.openSourceRecruitmentList(src.sourceId);
+                title: {
+                    text: this.props.title || 'Efectividad de las Fuentes de Reclutamiento',
+                    align: 'center',
+                    style: {
+                        fontSize: '16px',
+                        fontWeight: 'bold'
+                    }
                 },
-                plugins: {
-                    legend: {
-                        position: 'bottom',
-                        labels: {
-                            padding: 20,
-                            usePointStyle: true,
-                            font: { size: 12 }
-                        }
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: ctx => {
-                                const src = sourcesData[ctx.dataIndex];
-                                const datasetLabel = ctx.dataset.label;
-                                const value = ctx.dataset.data[ctx.dataIndex];
-                                return `${datasetLabel} - ${src.label}: ${value}`;
-                            }
+                chart: {
+                    type: 'polarArea',
+                    height: this.props.height || 400,
+                    // ✅ AGREGAR: ID único para forzar recreación
+                    id: 'recruitment-sources-chart-' + Date.now(),
+                    events: {
+                        dataPointSelection: (event, chartContext, config) => {
+                            const sourceData = this.state.sourcesData[config.dataPointIndex];
+                            this.openSourceRecruitmentList(sourceData.sourceId);
                         }
                     }
-                }
+                },
+                // ✅ CRÍTICO: Labels debe estar aquí también
+                labels: labels,
+                colors: colors,
+                stroke: {
+                    colors: ['#fff'],
+                    width: 2
+                },
+                fill: {
+                    opacity: 0.8
+                },
+                plotOptions: {
+                    polarArea: {
+                        rings: {
+                            strokeWidth: 1,
+                            strokeColor: '#e8e8e8'
+                        },
+                        spokes: {
+                            strokeWidth: 1,
+                            connectorColors: '#e8e8e8'
+                        }
+                    }
+                },
+                dataLabels: {
+                    enabled: true,
+                    formatter: function(val) {
+                        return Math.round(val);
+                    },
+                    style: {
+                        fontSize: '12px',
+                        fontWeight: 'bold',
+                        colors: ['#fff']
+                    }
+                },
+                legend: {
+                    position: 'bottom',
+                    horizontalAlign: 'center',
+                    floating: false,
+                    fontSize: '12px',
+                    itemMargin: {
+                        horizontal: 10,
+                        vertical: 5
+                    }
+                },
+                tooltip: {
+                    y: {
+                        formatter: function (value) {
+                            return value + ' postulaciones';
+                        }
+                    }
+                },
+                responsive: [{
+                    breakpoint: 480,
+                    options: {
+                        chart: {
+                            height: 300
+                        },
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }]
             }
         };
-        
-        // Forzar refresco
-        this.state.sourceRecruitment = { ...this.state.sourceRecruitment };
 
-        console.log("✅ RecruitmentSourcesChart: Gráfico configurado");
+        console.log("✅ RecruitmentSourcesChart: Configuración ApexCharts preparada con labels:", labels);
     }
 
-    // ✅ MÉTODO SECUNDARIO: Lógica EXACTA del dashboard original
+    // ✅ OPTIMIZADO: Método de indicadores usando datos ya procesados
     async getIndicatorsSourceRecruitment() {
-        // 1. Total postulaciones por fuente (por create_date)
-        let domain = [
-            "|",
-            ["active", "=", true],
-            ["application_status", "=", "refused"]
-        ];
-        domain = this._addDateRangeToDomain(domain);
-
-        const totalData = await this.orm.readGroup(
-            "hr.applicant",
-            domain,
-            ["source_id"],
-            ["source_id"]
-        );
-
-        // 2. Contratados por fuente (por date_closed)
-        let hiredDomain = [
-            ["application_status", "=", "hired"]
-        ];
-        hiredDomain = this._getHiredDateRangeDomain(hiredDomain);
-
-        const hiredData = await this.orm.readGroup(
-            "hr.applicant",
-            hiredDomain,
-            ["source_id"],
-            ["source_id"]
-        );
-
-        // 3. Unir ambos conjuntos de fuentes
-        const sourceMap = {};
-
-        // Total postulaciones
-        for (const r of totalData) {
-            const id = (r.source_id && r.source_id[0]) || false;
-            const label = (r.source_id && r.source_id[1]) || "Sin fuente";
-            sourceMap[id] = {
-                id,
-                label,
-                total: r.source_id_count,
-                hired: 0 // se llenará después
-            };
+        // Usar los datos que ya calculamos en getSourceRecruitment
+        if (!this.state.sourcesData || this.state.sourcesData.length === 0) {
+            this.state.indicatorsSourceRecruitment = { sources: [] };
+            return;
         }
 
-        // Contratados
-        for (const r of hiredData) {
-            const id = (r.source_id && r.source_id[0]) || false;
-            const label = (r.source_id && r.source_id[1]) || "Sin fuente";
-            if (!sourceMap[id]) {
-                sourceMap[id] = { id, label, total: 0, hired: 0 };
-            }
-            sourceMap[id].hired = r.source_id_count;
-        }
-
-        // 4. Construir el array de indicadores
-        const indicators = Object.values(sourceMap).map(r => {
+        // Construir indicadores con porcentajes
+        const indicators = this.state.sourcesData.map(r => {
             const percentage = r.total > 0 ? ((r.hired / r.total) * 100).toFixed(2) : "0.00";
-            return { ...r, percentage };
+            return { 
+                id: r.sourceId,
+                label: r.label, 
+                total: r.total,
+                hired: r.hired,
+                percentage 
+            };
         });
 
-        // 5. Guarda en el estado
+        // Ordenar por efectividad (porcentaje de contratación)
+        indicators.sort((a, b) => parseFloat(b.percentage) - parseFloat(a.percentage));
+
         this.state.indicatorsSourceRecruitment.sources = indicators;
 
         console.log("✅ RecruitmentSourcesChart: Indicadores calculados:", indicators.length);
     }
 
-    // ✅ MÉTODO: Abrir lista de fuentes (igual que en dashboard)
+    // ✅ MANTENER: Método de navegación original
     async openSourceRecruitmentList(sourceId) {
+        const currentProps = this.getCurrentProps();
         let domain = [];
-        domain = this._addDateRangeToDomain(domain);
+        
+        if (currentProps.startDate) {
+            domain.push(["create_date", ">=", currentProps.startDate]);
+        }
+        if (currentProps.endDate) {
+            domain.push(["create_date", "<=", currentProps.endDate]);
+        }
     
         // Filtra por source_id
         if (sourceId) {
             domain.push(["source_id", "=", sourceId]);
         } else {
-            // opcional: mostrar también los sin fuente
             domain.push(["source_id", "=", false]);
         }
     
@@ -280,25 +316,27 @@ export class RecruitmentSourcesChart extends Component {
         });
     }
 
-    // ✅ MÉTODO: Mostrar gráfico vacío
+    // ✅ REFINADO: Gráfico vacío para ApexCharts (forzar limpieza)
     showEmptyChart() {
         this.state.hasData = false;
-        this.state.sourceRecruitment = {
-            data: { labels: [], datasets: [] },
+        this.state.chartKey = 'empty-' + Date.now();
+        // ✅ LIMPIAR completamente la configuración
+        this.state.apexConfig = {
+            series: [],
+            categories: [],
             options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { display: false },
-                    tooltip: { enabled: false }
+                labels: [],
+                chart: {
+                    // ✅ ID único para forzar recreación
+                    id: 'empty-chart-' + Date.now()
                 }
-            },
-            meta: []
+            }
         };
         this.state.indicatorsSourceRecruitment = { sources: [] };
+        this.state.sourcesData = [];
     }
 
-    // ✅ NUEVO: Función helper para clasificar porcentajes
+    // ✅ MANTENER: Helper para clasificar porcentajes
     getPercentageClass(percentage) {
         const perc = parseFloat(percentage);
         if (perc >= 20) return 'text-success';
@@ -306,74 +344,65 @@ export class RecruitmentSourcesChart extends Component {
         return 'text-danger';
     }
 
-    // ✅ MÉTODOS DE FILTRADO POR FECHAS
+    // ✅ MANTENER: Métodos de filtrado por fechas
     _addDateRangeToDomain(domain = []) {
-        if (this.props.startDate) {
-            domain.push(["create_date", ">=", this.props.startDate]);
+        const currentProps = this.getCurrentProps();
+        
+        if (currentProps.startDate) {
+            domain.push(["create_date", ">=", currentProps.startDate]);
         }
-        if (this.props.endDate) {
-            domain.push(["create_date", "<=", this.props.endDate]);
+        if (currentProps.endDate) {
+            domain.push(["create_date", "<=", currentProps.endDate]);
         }
         return domain;
     }
 
     _getHiredDateRangeDomain(domain = []) {
-        if (this.props.startDate) {
-            domain.push(["date_closed", ">=", this.props.startDate]);
+        const currentProps = this.getCurrentProps();
+        
+        if (currentProps.startDate) {
+            domain.push(["date_closed", ">=", currentProps.startDate]);
         }
-        if (this.props.endDate) {
-            domain.push(["date_closed", "<=", this.props.endDate]);
+        if (currentProps.endDate) {
+            domain.push(["date_closed", "<=", currentProps.endDate]);
         }
         return domain;
     }
 
-    // ✅ MÉTODO: Generar colores pastel
-    getPastelColors(count) {
-        const premiumColors = [
-            '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7', '#DDA0DD', '#FFB347',
-            '#98D8C8', '#F7DC6F', '#BB8FCE', '#85C1E9', '#F8C471', '#FF6B6B',
+    // ✅ NUEVO: Colores específicos para Polar Area
+    getPolarAreaColors(count) {
+        const vibrantColors = [
+            '#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8', 
+            '#F7DC6F', '#BB8FCE', '#85C1E9', '#F8C471', '#A3E4D7',
+            '#D5A6BD', '#F9E79F', '#AED6F1', '#A9DFBF', '#F4D03F'
         ];
 
-        if (count <= premiumColors.length) {
-            return premiumColors.slice(0, count);
+        if (count <= vibrantColors.length) {
+            return vibrantColors.slice(0, count);
         }
 
-        const colors = [...premiumColors];
-        for (let i = premiumColors.length; i < count; i++) {
-            const hue = Math.floor((360 / (count - premiumColors.length)) * (i - premiumColors.length));
-            const saturation = 65 + Math.random() * 20;
-            const lightness = 55 + Math.random() * 20;
+        const colors = [...vibrantColors];
+        for (let i = vibrantColors.length; i < count; i++) {
+            const hue = Math.floor((360 / (count - vibrantColors.length)) * (i - vibrantColors.length));
+            const saturation = 70 + Math.random() * 20;
+            const lightness = 50 + Math.random() * 20;
             colors.push(`hsl(${hue}, ${saturation}%, ${lightness}%)`);
         }
         
         return colors;
     }
 
-    // ✅ MÉTODO PÚBLICO: Recargar datos
+    // ✅ REFINADO: Método de refresh optimizado
     async refresh() {
         console.log("🔄 RecruitmentSourcesChart: Iniciando refresh...");
         
-        // Mostrar loading
-        this.state.isLoading = true;
+        // ✅ LIMPIAR estado antes de recargar
+        this.showEmptyChart();
         
-        try {
-            // Cargar nuevos datos
-            await this.loadChart();
-            
-            // ✅ TRUCO: Forzar re-render completo
-            this.state.sourceRecruitment = { 
-                ...this.state.sourceRecruitment,
-                _forceUpdate: Date.now() // Timestamp para forzar cambio
-            };
-            
-            this.state.indicatorsSourceRecruitment = { 
-                ...this.state.indicatorsSourceRecruitment,
-                _forceUpdate: Date.now()
-            };
-            
-            console.log("✅ RecruitmentSourcesChart: Refresh completado");
-        } catch (error) {
-            console.error("❌ RecruitmentSourcesChart: Error en refresh:", error);
-        }
+        // ✅ Pequeña pausa para asegurar limpieza
+        await new Promise(resolve => setTimeout(resolve, 100));
+        
+        await this.loadChart();
+        console.log("✅ RecruitmentSourcesChart: Refresh completado");
     }
 }
