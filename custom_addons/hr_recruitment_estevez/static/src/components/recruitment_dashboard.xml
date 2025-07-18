@@ -71,13 +71,12 @@
                     <div class="row">
                         <div class="col-lg-6 m-0 p-0">
                             <div class="shadow-sm border m-2 p-4 bg-white">
-                                <div class="d-flex align-items-center justify-content-between">
-                                    <h3 class="text-primary fw-bold">Indicadores de Requisición</h3>
-                                    <div class="px-3 py-1 bg-primary cursor-pointer">
-                                        <span class="fa fa-arrow-right text-white"/>
-                                    </div>
-                                </div>
-                                <ChartRenderer type="'bar'" title="'Requisiciones por Estado'" config="state.requisitionStats"/>
+                                <!-- ✅ NUEVO COMPONENTE -->
+                                <RequisitionStatsChart startDate="state.startDate"
+                                                       endDate="state.endDate"
+                                                       title="'Indicadores de Requisición'"
+                                                       height="400"
+                                                       onMounted.bind="onRequisitionStatsMounted"/>
                             </div>
                         </div>
 
@@ -87,7 +86,7 @@
                                         startDate="state.startDate"
                                         endDate="state.endDate"
                                         title="'Eficiencia del Proceso de Contratación'"
-                                        height="400"
+                                        height="610"
                                         onMounted.bind="onProcessEfficiencyMounted"/>
                             </div>
                         </div>

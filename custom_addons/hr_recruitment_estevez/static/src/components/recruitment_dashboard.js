@@ -10,6 +10,7 @@ import { ProcessEfficiencyChart } from "./charts/process_efficiency_chart/proces
 import { RecruitmentSourcesChart } from "./charts/recruitment_sources_chart/recruitment_sources_chart";
 import { RejectionReasonsChart } from "./charts/rejection_reasons_chart/rejection_reasons_chart";
 import { RecruitmentFunnelChart } from "./charts/recruitment_funnel_chart/recruitment_funnel_chart";
+import { RequisitionStatsChart } from "./charts/requisition_stats_chart/requisition_stats_chart";
 
 import { ChartRenderer } from "./chart_renderer/chart_renderer";
 
@@ -26,6 +27,7 @@ export class RecruitmentDashboard extends Component {
         this.recruitmentSourcesComponent = null;
         this.rejectionReasonsComponent = null;
         this.recruitmentFunnelComponent = null;
+        this.requisitionStatsComponent = null;
 
         this.state = useState({
             // Filtros
@@ -131,6 +133,11 @@ export class RecruitmentDashboard extends Component {
         this.recruitmentFunnelComponent = recruitmentFunnelComponent;
     }
 
+    onRequisitionStatsMounted(requisitionStatsComponent) {
+        console.log("📊 Dashboard: RequisitionStatsChart montado", requisitionStatsComponent);
+        this.requisitionStatsComponent = requisitionStatsComponent;
+    }
+
     async openRecruitmentList(userId, onlyHired = false, onlyOngoing = false) {
         let domain = [
             "|",
@@ -217,6 +224,11 @@ export class RecruitmentDashboard extends Component {
         if (this.recruitmentFunnelComponent) {
             console.log("🔄 Dashboard: Recargando embudo de reclutamiento...");
             reloadPromises.push(this.recruitmentFunnelComponent.refresh());
+        }
+
+        if (this.requisitionStatsComponent) {
+            console.log("🔄 Dashboard: Recargando estadísticas de requisiciones...");
+            reloadPromises.push(this.requisitionStatsComponent.refresh());
         }
         
         // ✅ ESPERAR todas las recargas en paralelo
@@ -356,7 +368,8 @@ RecruitmentDashboard.components = {
     DashboardHeader, KpisGrid, 
     ChartRenderer, RecruiterEfficiencyChart,
     ProcessEfficiencyChart, RecruitmentSourcesChart,
-    RejectionReasonsChart, RecruitmentFunnelChart
+    RejectionReasonsChart, RecruitmentFunnelChart,
+    RequisitionStatsChart
 };
 
 // Registrar el dashboard OWL
