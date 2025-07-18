@@ -119,31 +119,17 @@ class CalendarEvent(models.Model):
         if not self.videocall_location:
             meet_link = self._create_google_meet()
             if not meet_link:
-                raise UserError(_("""
-                📌 Generando enlace de reunión
-                Estamos generando el enlace de Google Meet para tu reunión.
-                Al cerrar este mensaje y volver al calendario, podrás verlo reflejado junto con los detalles del evento.
-                Si el enlace no aparece de inmediato, espera unos segundos y actualiza la vista del calendario.
-                """))
-            
-            self.videocall_location = meet_link
+                raise UserError(_("No se pudo generar el enlace Meet."))
+            self.write({'videocall_location': meet_link})
 
         return {
-            'type': 'ir.actions.client',
-            'tag': 'display_notification',
-            'params': {
-                'title': _("✅ Meet Generado"),
-                'message': _("Enlace: <a href='%s' target='_blank'>%s</a>") % (self.videocall_location, self.videocall_location),
-                'type': 'success',
-                'sticky': False,
-                'next': {
-                    'type': 'ir.actions.act_window',
-                    'res_model': 'calendar.event',
-                    'res_id': self.id,
-                    'views': [(False, 'form')],
-                    'target': 'current',
-                }
-            }
+            'type': 'ir.actions.act_window',
+            'res_model': 'calendar.event',
+            'res_id': self.id,
+            'view_mode': 'form',
+            'view_id': self.env.ref('calendar.view_calendar_event_form').id,
+            'target': 'current',
+            'flags': {'reload': True},
         }
 
     def _sync_with_google(self):
