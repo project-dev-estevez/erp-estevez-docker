@@ -6,7 +6,7 @@
             <div class="d-flex align-items-center justify-content-center mb-4">
                 <h3 class="text-primary text-center fw-bold">
                     <i class="fa fa-chart-bar me-2"></i>
-                    <t t-esc="props.title || 'Rechazos y Declinaciones en el Reclutamiento'"/>
+                    <b><t t-esc="props.title || 'Rechazos y Declinaciones en el Reclutamiento'"/></b>
                 </h3>
             </div>
 
