@@ -15,7 +15,7 @@
             <div t-else="" class="row g-3">
                 <!-- Gráfico Polar Area -->
                 <div class="col-12 col-lg-7">
-                    <div class="bg-white rounded shadow-sm p-3">
+                    <div class="bg-white rounded shadow-sm">
                         <div t-if="state.hasData">
                             <!-- ✅ USAR CHARTRENDERAPEX -->
                             <ChartRendererApex 
@@ -34,9 +34,11 @@
 
                 <!-- Tabla de indicadores -->
                 <div class="col-12 col-lg-5">
-                    <div class="card border-0 shadow-sm h-100">
+                    <div class="card border-0 shadow-sm">
                         <div class="card-body p-0">
-                            <div class="table-responsive">
+                            <div style="height: 418px; overflow-y: hidden; overflow-x: hidden;"
+                                onmouseenter="this.style.overflowY='auto'"
+                                onmouseleave="this.style.overflowY='hidden'">
                                 <table class="table table-hover mb-0">
                                     <thead class="table-light">
                                         <tr>
