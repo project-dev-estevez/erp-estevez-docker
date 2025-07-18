@@ -10,72 +10,34 @@
                     <DashboardHeader title="'Dashboard Reclutamiento'"
                                     startDate="state.startDate"
                                     endDate="state.endDate"
-                                    onDateChange.bind="onDateRangeChange" />
+                                     onDateChange.bind="onDateRangeChange" />
 
                     <!-- KPIs principales -->
                     <div class="row">
-                        <KpisGrid 
-                            startDate="state.startDate"
-                            endDate="state.endDate"
-                            onMounted.bind="onKpisGridMounted"/>
+                        <KpisGrid startDate="state.startDate"
+                                  endDate="state.endDate"
+                                  onMounted.bind="onKpisGridMounted"/>
                     </div>
 
                     <!-- Postulaciones por reclutador y fuentes de reclutamiento -->
                     <div class="row">
                         <div class="col-lg-6 m-0 p-0">
                             <div class="shadow-sm border m-2 p-4 bg-white">
-                                <RecruiterEfficiencyChart
-                                        startDate="state.startDate"
-                                        endDate="state.endDate"
-                                        title="'Eficiencia de Contratación por Reclutador'"
-                                        height="400"
-                                        onMounted.bind="onRecruiterEfficiencyMounted"/>
+                                <RecruiterEfficiencyChart startDate="state.startDate"
+                                                          endDate="state.endDate"
+                                                          title="'Eficiencia de Contratación por Reclutador'"
+                                                          height="400"
+                                                          onMounted.bind="onRecruiterEfficiencyMounted"/>
                             </div>
                         </div>
                         <div class="col-lg-6 m-0 p-0">
                             <div class="shadow-sm border m-2 p-4 bg-white">
                                 <RecruitmentSourcesChart startDate="state.startDate"
-                                                        endDate="state.endDate"
-                                                        title="'Efectividad de las Fuentes de Reclutamiento'"
-                                                        height="443"
-                                                        onMounted.bind="onRecruitmentSourcesMounted"/>
+                                                         endDate="state.endDate"
+                                                         title="'Efectividad de las Fuentes de Reclutamiento'"
+                                                         height="443"
+                                                         onMounted.bind="onRecruitmentSourcesMounted"/>
                             </div>
-                            <!-- <div class="shadow-sm border m-2 p-4 bg-white">
-                                <div class="d-flex align-items-center justify-content-between">
-                                    <h3 class="text-primary fw-bold">Efectividad de las Fuentes de Reclutamiento</h3>
-                                    <div class="px-3 py-1 bg-primary cursor-pointer">
-                                        <span class="fa fa-arrow-right text-white"/>
-                                    </div>
-                                </div>
-                                
-                                <div class="row">
-                                    <div class="col-12 col-md-6 mb-3">
-                                        <ChartRenderer type="'pie'" title="'Fuentes de Reclutamiento'" config="state.sourceRecruitment"/>
-                                    </div>
-                                    <div class="col-12 col-md-6">
-                                        <div class="table-responsive">
-                                            <table class="table table-borderless align-middle">
-                                                <thead>
-                                                    <tr>
-                                                        <th>Fuente</th>
-                                                        <th class="text-end"># Contratados</th>
-                                                        <th class="text-end">% Contratación</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    <t t-foreach="state.indicatorsSourceRecruitment.sources" t-as="item" t-key="item.label">
-                                                        <tr>
-                                                            <td><span t-esc="item.label"/></td>
-                                                            <td class="text-end"><span t-esc="item.hired"/></td>
-                                                            <td class="text-end"><span t-esc="item.percentage"/>%</td>
-                                                        </tr>
-                                                    </t>
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div> -->
                         </div>
                     </div>
 
@@ -88,15 +50,9 @@
                                 </div>
                                 <div class="row mt-2">
                                     <div class="col">
-                                        <!-- <div class="text-center">
-                                            <span class="h4">Declinaciones Candidatos</span>
-                                        </div> -->
                                         <ChartRenderer type="'bar'" config="state.rejectionReasons.candidate"/>
                                     </div>
                                     <div class="col">
-                                        <!-- <div class="text-center">
-                                            <span class="h4">Declinaciones Empresa</span>
-                                        </div> -->
                                         <ChartRenderer type="'bar'" config="state.rejectionReasons.company"/>
                                     </div>
                                 </div>
