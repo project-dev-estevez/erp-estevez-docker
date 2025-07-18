@@ -160,3 +160,25 @@ class CalendarEvent(models.Model):
         except Exception as e:
             _logger.exception("Error en sincronización: %s", str(e))
             raise UserError(_("Error sincronizando con Google: %s") % str(e))
+        
+    @api.model_create_multi
+    def create(self, vals_list):
+        events = super().create(vals_list)
+        for ev in events:
+            # Si está marcado para Meet y aún no tiene enlace
+            if ev.is_google_meet and not ev.videocall_location:
+                link = ev._create_google_meet()
+                if link:
+                    # Graba el enlace en la base de datos
+                    ev.write({'videocall_location': link})
+        return events
+
+    def write(self, vals):
+        res = super().write(vals)
+        # Si en edición activan Google Meet o cambian google_id
+        for ev in self:
+            if ev.is_google_meet and ev.google_id and not ev.videocall_location:
+                link = ev._create_google_meet()
+                if link:
+                    ev.write({'videocall_location': link})
+        return res
