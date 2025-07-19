@@ -1,0 +1,14 @@
+<odoo>
+  <template id="calendar_event_popover_inherit" inherit_id="calendar.CalendarEventPopover">
+    <xpath expr="//div[hasclass('o_calendar_event_location')]" position="after">
+      <t t-if="event.extendedProps.record.videocall_location">
+        <div class="o_calendar_event_meet">
+          <i class="fa fa-video-camera"/> 
+          <a t-att-href="event.extendedProps.record.videocall_location" target="_blank">
+            Unirse a Meet
+          </a>
+        </div>
+      </t>
+    </xpath>
+  </template>
+</odoo>
