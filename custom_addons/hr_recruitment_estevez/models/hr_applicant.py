@@ -40,14 +40,28 @@ class HrApplicant(models.Model):
     ], string='Estado Civil', tracking=True)
     religion = fields.Char(string="Religión")
     housing_type = fields.Selection([('own', 'Propia'), ('rented', 'Rentada')], string="Tipo de Vivienda")
-    construction_material = fields.Selection([('durable', 'Durable'), ('non_durable', 'No Durable')], string="Material de Construcción")
-    housing_services = fields.Char(string="Servicios de Vivienda")
+    construction_material = fields.Selection([('durable', 'Durable'), ('non_durable', 'No Durable')], string="Material de Construcción", default='durable')
+    housing_services = fields.Selection([
+        ('intradomiciliarios', 'Intradomiciliarios'),
+        ('extradomiciliarios', 'Extradomiciliarios'),
+        ('intra_extradomiciliarios', 'Intra y Extradomiciliarios')
+    ], string="Servicios de Vivienda")
     weekly_clothing_change = fields.Char(string="Cambio de Ropa Semanal")
     occupations = fields.Text(string="Oficios Desempeñados")
     daily_teeth_brushing = fields.Integer(string="Cepillado de Dientes Diario")
     zoonosis = fields.Selection([('negative', 'Negativo'), ('positive', 'Positivo')], string="Zoonosis")
+    pet = fields.Char(string="Mascota", readonly=False)
+    
     overcrowding = fields.Selection([('negative', 'Negativo'), ('positive', 'Positivo')], string="Hacinamiento")
-    tattoos_piercings = fields.Char(string="Tatuajes y Perforaciones")
+    tattoos_piercings = fields.Selection(
+        [('negative', 'Negativo'), ('positive', 'Positivo')],
+        string="Tatuajes y Perforaciones"
+    )
+    tattoos_number = fields.Integer(
+        string="Número de Tatuajes",
+        readonly=False
+    )
+
     blood_type = fields.Char(string="Tipo de Sangre")
     donor = fields.Boolean(string="Donador")
 
@@ -185,6 +199,15 @@ class HrApplicant(models.Model):
         help='Historial completo de etapas por las que ha pasado el candidato'
     )
 
+    @api.onchange('zoonosis')
+    def _onchange_zoonosis(self):
+        if self.zoonosis != 'positive':
+            self.pet = False
+
+    @api.onchange('tattoos_piercings')
+    def _onchange_tattoos_piercings(self):
+        if self.tattoos_piercings != 'positive':
+            self.tattoos_number = False
 
     @api.depends('create_date', 'date_closed')
     def _compute_process_duration(self):
