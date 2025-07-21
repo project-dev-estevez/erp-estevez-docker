@@ -16,21 +16,26 @@
             string="Generar Meet ahora"
             type="object"
             class="btn-primary"
-            invisible="not show_meet_button"/>
+            invisible="meet_generation_state != 'pending' or not show_meet_button"/>
         
-        <!-- Campo de enlace con mensaje de ayuda -->
+        <!-- Indicador de progreso -->
+        <div class="text-warning" invisible="meet_generation_state != 'processing'">
+          <i class="fa fa-spinner fa-spin"/> Generando enlace Meet...
+        </div>
+        
+        <!-- Mensaje de error -->
+        <div class="text-danger" invisible="meet_generation_state != 'failed'">
+          <i class="fa fa-warning"/> Error generando Meet. Intenta nuevamente.
+        </div>
+        
+        <!-- Campo de enlace -->
         <field
           name="videocall_location"
           widget="url"
           string="Enlace Meet"
           readonly="1"
+          invisible="not videocall_location"
         />
-        
-        <!-- Mensaje de ayuda -->
-        <div class="alert alert-warning mt-2" invisible="not show_meet_button">
-          <i class="fa fa-info-circle"/> 
-          Si el enlace no aparece automáticamente, haz clic en "Generar Meet ahora"
-        </div>
       </xpath>
     </field>
   </record>
