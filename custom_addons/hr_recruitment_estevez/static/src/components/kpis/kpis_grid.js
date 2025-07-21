@@ -169,11 +169,38 @@ export class KpisGrid extends Component {
     }
 
     async calculateInProgressApplicants() {
-        let domain = [["application_status", "=", "ongoing"]];
-        domain = this._addDateRangeToDomain(domain);
+        try {
+            // 1. ✅ Buscar la etapa "Primer contacto" (OBLIGATORIA)
+            const primerContactoStage = await this.orm.searchRead(
+                'hr.recruitment.stage',
+                [['name', 'ilike', 'primer contacto']],
+                ['id', 'name', 'sequence'],
+                { limit: 1 }
+            );
 
-        const data = await this.orm.searchCount("hr.applicant", domain);
-        this.state.inProgressApplicants.value = data;
+            if (!primerContactoStage.length) {
+                console.error("❌ KpisGrid: Etapa 'Primer contacto' NO encontrada para En Progreso");
+                this.state.inProgressApplicants.value = 0;
+                return;
+            }
+
+            const primerContactoSequence = primerContactoStage[0].sequence;
+
+            // 2. ✅ Contar candidatos que han superado "Primer contacto" 
+            //    PERO que NO están rechazados ni contratados
+            let domain = [
+                ['stage_id.sequence', '>', primerContactoSequence],    // ✅ Después de primer contacto
+                ['application_status', '!=', 'refused'],              // ✅ NO rechazados
+                ['application_status', '!=', 'hired']                 // ✅ NO contratados
+            ];
+            domain = this._addDateRangeToDomain(domain);
+
+            const count = await this.orm.searchCount("hr.applicant", domain);
+            this.state.inProgressApplicants.value = count;
+        } catch (error) {
+            console.error("❌ KpisGrid: Error calculando En Progreso:", error);
+            this.state.inProgressApplicants.value = 0;
+        }
     }
 
     async calculatePreselectedApplicants() {
@@ -268,18 +295,44 @@ export class KpisGrid extends Component {
         }
     }
 
-    viewInProgressApplicants() {
-        console.log(`🔄 KpisGrid: ¡Navegando a postulaciones en progreso!`);
-        let domain = [["application_status", "=", "ongoing"]];
-        domain = this._addDateRangeToDomain(domain);
+    async viewInProgressApplicants() {
+        try {
+            // Buscar etapa "Primer contacto"
+            const primerContactoStage = await this.orm.searchRead(
+                'hr.recruitment.stage',
+                [['name', 'ilike', 'primer contacto']],
+                ['sequence'],
+                { limit: 1 }
+            );
 
-        this.actionService.doAction({
-            type: "ir.actions.act_window",
-            name: "🔄 Postulaciones en Progreso",
-            res_model: "hr.applicant",
-            domain: domain,
-            views: [[false, "list"], [false, "form"]],
-        });
+            let domain = [];
+            
+            if (primerContactoStage.length > 0) {
+                const sequence = primerContactoStage[0].sequence;
+                domain = [
+                    ['stage_id.sequence', '>', sequence],      // ✅ Después de primer contacto
+                    ['application_status', '!=', 'refused'],  // ✅ NO rechazados
+                    ['application_status', '!=', 'hired']     // ✅ NO contratados
+                ];
+            } else {
+                console.error("❌ KpisGrid: Etapa 'Primer contacto' no encontrada en navegación");
+                // Sin modal, usar dominio básico
+                domain = [["application_status", "=", "ongoing"]];
+            }
+            
+            domain = this._addDateRangeToDomain(domain);
+
+            await this.actionService.doAction({
+                type: "ir.actions.act_window",
+                name: "🔄 Postulaciones en Progreso (Post-Primer Contacto)",
+                res_model: "hr.applicant",
+                domain: domain,
+                views: [[false, "list"], [false, "form"]],
+            });
+            
+        } catch (error) {
+            console.error("❌ KpisGrid: Error en navegación En Progreso:", error);
+        }
     }
 
     viewPreselectedApplicants() {

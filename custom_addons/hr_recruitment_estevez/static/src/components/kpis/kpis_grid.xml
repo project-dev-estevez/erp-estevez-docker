@@ -8,12 +8,18 @@
                 <t t-foreach="kpis" t-as="kpi" t-key="kpi.name">
                     <!-- ✅ Columnas responsivas Bootstrap -->
                     <div class="col-12 col-sm-6 col-md-4 col-lg-2">
-                        <KpiCard 
+                        <KpiCard t-if="kpi.value > 0"
                             name="kpi.name"
                             value="kpi.value"
                             percentage="kpi.percentage"
                             showPercentage="kpi.showPercentage"
                             onClick="kpi.onClick"/>
+                        
+                        <KpiCard t-else=""
+                            name="kpi.name"
+                            value="kpi.value"
+                            percentage="kpi.percentage"
+                            showPercentage="kpi.showPercentage"/>
                     </div>
                 </t>
             </div>
