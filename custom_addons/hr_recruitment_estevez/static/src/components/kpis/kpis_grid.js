@@ -68,42 +68,42 @@ export class KpisGrid extends Component {
             {
                 name: "Postulaciones",
                 value: this.state.totalApplicants.value,
-                percentage: null,
+                percentage: 0,
                 showPercentage: false,
                 onClick: () => this.viewTotalApplicants()
             },
             {
                 name: "En Progreso",
                 value: this.state.inProgressApplicants.value,
-                percentage: null,
+                percentage: 0,
                 showPercentage: false,
                 onClick: () => this.viewInProgressApplicants()
             },
             {
                 name: "Preseleccionados",
                 value: this.state.preselectedApplicants.value,
-                percentage: null,
+                percentage: 0,
                 showPercentage: false,
                 onClick: () => this.viewPreselectedApplicants()
             },
             {
                 name: "Rechazados",
                 value: this.state.rejectedApplicants.value,
-                percentage: null,
+                percentage: 0,
                 showPercentage: false,
                 onClick: () => this.viewRejectedApplicants()
             },
             {
                 name: "Contratados",
                 value: this.state.hiredApplicants.value,
-                percentage: null,
+                percentage: 0,
                 showPercentage: false,
                 onClick: () => this.viewHiredApplicants()
             },
             {
                 name: "Tiempo Promedio (Días)",
                 value: this.state.averageHiringTime.value,
-                percentage: null,
+                percentage: 0,
                 showPercentage: false,
                 onClick: () => this.viewAverageHiringTime()
             }
@@ -133,10 +133,8 @@ export class KpisGrid extends Component {
     }
 
     async calculateTotalApplicants() {
-        console.log("📊 KpisGrid: Calculando postulaciones después de 'Primer contacto'...");
-        
         try {
-            // 1. ✅ Buscar la etapa "Primer contacto"
+            // 1. ✅ Buscar la etapa "Primer contacto" (OBLIGATORIA)
             const primerContactoStage = await this.orm.searchRead(
                 'hr.recruitment.stage',
                 [['name', 'ilike', 'primer contacto']],
@@ -145,41 +143,29 @@ export class KpisGrid extends Component {
             );
 
             if (!primerContactoStage.length) {
-                console.warn("⚠️ KpisGrid: No se encontró la etapa 'Primer contacto'");
-                // Fallback: usar el método anterior
-                return this.calculateTotalApplicantsLegacy();
+                this.state.totalApplicants.value = 0;
+                return;
             }
 
             const primerContactoSequence = primerContactoStage[0].sequence;
-            console.log(`🎯 KpisGrid: Etapa 'Primer contacto' encontrada con secuencia: ${primerContactoSequence}`);
 
-            // 2. ✅ Contar candidatos que han superado "Primer contacto"
-            const context = { context: { active_test: false } };
+            // 2. ✅ Contar candidatos que han SUPERADO "Primer contacto"
             let domain = [
-                ['stage_id.sequence', '>', primerContactoSequence]  // ✅ CLAVE: Mayor que primer contacto
+                ['stage_id.sequence', '>', primerContactoSequence]
             ];
             domain = this._addDateRangeToDomain(domain);
 
-            const data = await this.orm.searchCount("hr.applicant", domain, context);
-            this.state.totalApplicants.value = data;
-            
-            console.log(`✅ KpisGrid: Postulaciones después de 'Primer contacto': ${data}`);
-            
+            const count = await this.orm.searchCount(
+                "hr.applicant", 
+                domain, 
+                { context: { active_test: false } }
+            );
+
+            this.state.totalApplicants.value = count;
         } catch (error) {
-            console.error("❌ KpisGrid: Error calculando postulaciones:", error);
-            // Fallback en caso de error
+            console.error("❌ KpisGrid: Error calculando Total Postulaciones:", error);
             this.state.totalApplicants.value = 0;
         }
-    }
-
-    async calculateTotalApplicantsLegacy() {
-        const context = { context: { active_test: false } };
-        let domain = [];
-        domain = this._addDateRangeToDomain(domain);
-
-        const data = await this.orm.searchCount("hr.applicant", domain, context);
-        this.state.totalApplicants.value = data;
-        console.log("📋 Total applicants:", data);
     }
 
     async calculateInProgressApplicants() {
@@ -188,7 +174,6 @@ export class KpisGrid extends Component {
 
         const data = await this.orm.searchCount("hr.applicant", domain);
         this.state.inProgressApplicants.value = data;
-        console.log("🔄 In progress applicants:", data);
     }
 
     async calculatePreselectedApplicants() {
@@ -251,7 +236,7 @@ export class KpisGrid extends Component {
     }
 
     // ✅ Métodos de navegación
-    async viewTotalApplicants() {        
+    async viewTotalApplicants() {
         try {
             // Buscar etapa "Primer contacto"
             const primerContactoStage = await this.orm.searchRead(
@@ -261,45 +246,26 @@ export class KpisGrid extends Component {
                 { limit: 1 }
             );
 
-            const context = { active_test: false };
-            let domain = [];
-            
-            if (primerContactoStage.length > 0) {
-                const sequence = primerContactoStage[0].sequence;
-                domain.push(['stage_id.sequence', '>', sequence]);
+            if (!primerContactoStage.length) {
+                return;
             }
-            
+
+            const sequence = primerContactoStage[0].sequence;
+            let domain = [['stage_id.sequence', '>', sequence]];
             domain = this._addDateRangeToDomain(domain);
 
-            this.actionService.doAction({
+            await this.actionService.doAction({
                 type: "ir.actions.act_window",
-                name: "📋 Postulaciones (Después de Primer Contacto)",
+                name: "📋 Postulaciones Activas (Post-Primer Contacto)",
                 res_model: "hr.applicant",
                 domain: domain,
                 views: [[false, "list"], [false, "form"]],
-                context: context,
+                context: { active_test: false }
             });
             
         } catch (error) {
-            console.error("❌ KpisGrid: Error en navegación:", error);
-            // Fallback: mostrar todas
-            this.viewTotalApplicantsLegacy();
+            console.error("❌ KpisGrid: Error en navegación Total Postulaciones:", error);
         }
-    }
-
-    viewTotalApplicantsLegacy() {
-        const context = { active_test: false };
-        let domain = [];
-        domain = this._addDateRangeToDomain(domain);
-
-        this.actionService.doAction({
-            type: "ir.actions.act_window",
-            name: "📋 Todas las Postulaciones",
-            res_model: "hr.applicant",
-            domain: domain,
-            views: [[false, "list"], [false, "form"]],
-            context: context,
-        });
     }
 
     viewInProgressApplicants() {
