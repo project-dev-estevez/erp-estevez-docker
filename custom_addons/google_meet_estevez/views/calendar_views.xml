@@ -18,13 +18,19 @@
             class="btn-primary"
             invisible="not show_meet_button"/>
         
-        <!-- Campo de enlace - siempre visible para pruebas -->
+        <!-- Campo de enlace con mensaje de ayuda -->
         <field
           name="videocall_location"
           widget="url"
           string="Enlace Meet"
           readonly="1"
         />
+        
+        <!-- Mensaje de ayuda -->
+        <div class="alert alert-warning mt-2" invisible="not show_meet_button">
+          <i class="fa fa-info-circle"/> 
+          Si el enlace no aparece automáticamente, haz clic en "Generar Meet ahora"
+        </div>
       </xpath>
     </field>
   </record>

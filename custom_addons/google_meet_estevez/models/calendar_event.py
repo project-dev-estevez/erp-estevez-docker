@@ -4,6 +4,8 @@ from odoo import models, fields, api, _
 from odoo.exceptions import UserError
 from odoo.addons.google_calendar.utils.google_calendar import GoogleCalendarService
 from odoo.addons.google_calendar.models.google_sync import GoogleSync
+from datetime import timedelta
+import json
 
 _logger = logging.getLogger(__name__)
 
@@ -19,7 +21,7 @@ class CalendarEvent(models.Model):
         compute="_compute_show_meet_button",
         store=True,
     )
-    videocall_location = fields.Char(string="Enlace Meet")  # Asegúrate de tener este campo
+    videocall_location = fields.Char(string="Enlace Meet")
 
     @api.depends('is_google_meet', 'videocall_location', 'google_id')
     def _compute_show_meet_button(self):
@@ -37,14 +39,30 @@ class CalendarEvent(models.Model):
             request_id = str(uuid.uuid4())
             
             _logger.info("Creando Google Meet para evento: %s", self.name)
+            _logger.debug("Google ID del evento: %s", self.google_id)
             
-            body = {
-                'conferenceData': {
-                    'createRequest': {
-                        'conferenceSolutionKey': {'type': 'hangoutsMeet'},
-                        'requestId': request_id,
-                    }
+            # 1. Obtener el evento actual de Google
+            existing_event = service.get(
+                calendar_id='primary',
+                event_id=self.google_id
+            )
+            
+            # 2. Preparar datos de conferencia
+            conference_data = {
+                'createRequest': {
+                    'conferenceSolutionKey': {'type': 'hangoutsMeet'},
+                    'requestId': request_id,
                 }
+            }
+            
+            # 3. Si ya tiene conferencia, usar esa
+            if existing_event.get('conferenceData'):
+                conference_data = existing_event['conferenceData']
+                _logger.info("Usando conferencia existente")
+            
+            # 4. Actualizar el evento
+            body = {
+                'conferenceData': conference_data
             }
             
             res = service.patch(
@@ -52,21 +70,37 @@ class CalendarEvent(models.Model):
                 event_id=self.google_id,
                 body=body,
                 params={'conferenceDataVersion': 1},
-                timeout=15
+                timeout=20
             )
             
-            # Extraer el enlace de Meet
-            meet_link = res.get('hangoutLink') or ''
-            if not meet_link and res.get('conferenceData'):
-                for entry_point in res['conferenceData'].get('entryPoints', []):
-                    if entry_point.get('entryPointType') == 'video':
-                        meet_link = entry_point.get('uri')
+            # 5. Extraer el enlace de Meet
+            meet_link = res.get('hangoutLink', '')
+            
+            # 6. Si no está en hangoutLink, buscar en conferenceData
+            if not meet_link:
+                conference_data = res.get('conferenceData', {})
+                entry_points = conference_data.get('entryPoints', [])
+                
+                for entry in entry_points:
+                    if entry.get('entryPointType') == 'video':
+                        meet_link = entry.get('uri', '')
                         break
             
-            return meet_link
+            # 7. Si aún no se encuentra, buscar en la descripción
+            if not meet_link:
+                description = res.get('description', '')
+                if 'meet.google.com' in description:
+                    meet_link = description.split('meet.google.com')[0] + 'meet.google.com' + description.split('meet.google.com')[1].split()[0]
+            
+            if meet_link:
+                _logger.info("Enlace Meet generado: %s", meet_link)
+                return meet_link
+            else:
+                _logger.error("No se encontró enlace Meet en la respuesta: %s", json.dumps(res, indent=2))
+                return False
             
         except Exception as e:
-            _logger.error("Error creando Meet: %s", str(e))
+            _logger.error("Error creando Meet: %s", str(e), exc_info=True)
             return False
 
     def action_force_create_meet(self):
@@ -78,11 +112,14 @@ class CalendarEvent(models.Model):
         
         # 2. Sincronizar si es necesario
         if not self.google_id:
-            # Usar la sincronización nativa de Odoo
-            self.with_context(sync_google_calendar=True).write({
-                'need_sync': True
-            })
-            self.env['calendar.event']._sync_google2odoo(self.env.user)
+            # Forzar sincronización inmediata
+            self.with_context(sync_google_calendar=True).write({'need_sync': True})
+            # Ejecutar sincronización de Odoo a Google
+            self.env['calendar.event']._sync_odoo2google(self.env.user)
+            # Esperar 5 segundos (puede ser necesario debido a demoras de Google)
+            import time
+            time.sleep(5)
+            # Recargar el registro
             self.env.cache.invalidate()
             self = self.search([('id', '=', self.id)])
             if not self.google_id:
@@ -100,7 +137,15 @@ class CalendarEvent(models.Model):
                     'tag': 'reload',
                 }
             else:
-                raise UserError(_("No se pudo generar el enlace de Meet. Intenta nuevamente."))
+                # Mostrar mensaje detallado
+                error_msg = _(
+                    "No se pudo generar el enlace de Meet. "
+                    "Por favor verifica:\n"
+                    "1. Que tienes permiso para crear reuniones de Google Meet\n"
+                    "2. Que el evento está correctamente sincronizado con Google Calendar\n"
+                    "3. Revisa los logs de Odoo para más detalles"
+                )
+                raise UserError(error_msg)
         
         return {
             'type': 'ir.actions.client',
@@ -110,38 +155,48 @@ class CalendarEvent(models.Model):
                 'type': 'success',
             }
         }
-    
+
     @api.model
     def _sync_google_meet(self):
         """Sincronizar eventos que tienen Meet pero no enlace en Odoo"""
-        events = self.search([
-            ('google_id', '!=', False),
-            ('is_google_meet', '=', True),
-            ('videocall_location', '=', False)
-        ])
-        
-        for event in events:
-            try:
-                service = GoogleCalendarService(self.env['google.service'])
-                google_event = service.get(event.google_id, calendar_id='primary')
-                
-                # Extraer enlace Meet
-                meet_link = google_event.get('hangoutLink') or ''
-                if not meet_link and google_event.get('conferenceData'):
-                    for entry_point in google_event['conferenceData'].get('entryPoints', []):
-                        if entry_point.get('entryPointType') == 'video':
-                            meet_link = entry_point.get('uri')
-                            break
-                
-                if meet_link:
-                    event.videocall_location = meet_link
-                    _logger.info("Sincronizado Meet para evento %s: %s", event.name, meet_link)
+        try:
+            # Solo procesar eventos de los últimos 7 días para eficiencia
+            date_limit = fields.Datetime.now() - timedelta(days=7)
+            
+            events = self.search([
+                ('google_id', '!=', False),
+                ('is_google_meet', '=', True),
+                ('videocall_location', '=', False),
+                ('start', '>=', date_limit)
+            ])
+            
+            _logger.info("Sincronizando %d eventos con Google Meet", len(events))
+            
+            service = GoogleCalendarService(self.env['google.service'])
+            
+            for event in events:
+                try:
+                    google_event = service.get(event.google_id, calendar_id='primary')
                     
-            except Exception as e:
-                _logger.error("Error sincronizando Meet para evento %s: %s", event.name, str(e))
-
-    def write(self, vals):
-        # Registrar cambios para depuración
-        if 'videocall_location' in vals:
-            _logger.info("Actualizando videocall_location: %s", vals['videocall_location'])
-        return super().write(vals)
+                    # Extraer enlace Meet
+                    meet_link = google_event.get('hangoutLink') or ''
+                    if not meet_link and google_event.get('conferenceData'):
+                        for entry_point in google_event['conferenceData'].get('entryPoints', []):
+                            if entry_point.get('entryPointType') == 'video':
+                                meet_link = entry_point.get('uri')
+                                break
+                    
+                    if meet_link:
+                        event.write({'videocall_location': meet_link})
+                        _logger.info("Sincronizado Meet para evento %s: %s", event.name, meet_link)
+                        # Pequeña pausa para evitar sobrecargar la API
+                        time.sleep(0.5)
+                        
+                except Exception as e:
+                    _logger.error("Error sincronizando Meet para evento %s: %s", event.name, str(e))
+            
+            return True
+                    
+        except Exception as e:
+            _logger.error("Error general en sincronización de Meet: %s", str(e))
+            return False
