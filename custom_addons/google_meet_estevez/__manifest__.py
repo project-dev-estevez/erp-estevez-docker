@@ -4,8 +4,7 @@
     'summary': 'Agrega enlaces de Google Meet a eventos',
     'depends': ['google_calendar', 'calendar'],
     'data': [
-        'views/calendar_views.xml',
-        'views/calendar_templates.xml'
+        'views/calendar_views.xml'
     ],
     'installable': True,
     'application': False,

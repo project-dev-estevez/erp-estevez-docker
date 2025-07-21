@@ -24,6 +24,7 @@ class CalendarEvent(models.Model):
         string="Enlace Meet",
         compute="_compute_videocall_location",
         store=True,
+        groups="base.group_user",
     )
 
     @api.depends('is_google_meet', 'videocall_location', 'google_id')
@@ -107,48 +108,36 @@ class CalendarEvent(models.Model):
 
     def action_force_create_meet(self):
         self.ensure_one()
-
-        # Verificación de conexión
+        
+        # 1. Verificar conexión Google
         if not self.env.user.google_calendar_token:
             raise UserError(_("Configura tu conexión con Google Calendar primero"))
         
-        # Validación básica del evento
-        required_fields = ['start', 'stop', 'name', 'user_id.email']
-        if any(not getattr(self, field.split('.')[0]) for field in required_fields):
-            raise UserError(_("Faltan datos requeridos en el evento"))
-
-        # Sincronización con Google si es necesario
+        # 2. Sincronizar si es necesario
         if not self.google_id:
             self._sync_with_google()
+            # Recargar el registro
+            self.env.cache.invalidate()
+            self = self.search([('id', '=', self.id)])
         
-        # Crear Meet
+        # 3. Crear Meet si no existe
         if not self.videocall_location:
             meet_link = self._create_google_meet()
-            if not meet_link:
-                raise UserError(_("""
-                📌 Generando enlace de reunión
-                Estamos generando el enlace de Google Meet para tu reunión.
-                Al cerrar este mensaje y volver al calendario, podrás verlo reflejado junto con los detalles del evento.
-                Si el enlace no aparece de inmediato, espera unos segundos y actualiza la vista del calendario.
-                """))
-            
-            self.videocall_location = meet_link
-
+            if meet_link:
+                # Guardar directamente en la base de datos
+                self.sudo().write({'videocall_location': meet_link})
+                # Recargar vista
+                return {
+                    'type': 'ir.actions.client',
+                    'tag': 'reload',
+                }
+        
         return {
             'type': 'ir.actions.client',
             'tag': 'display_notification',
             'params': {
-                'title': _("✅ Meet Generado"),
-                'message': _("Enlace: <a href='%s' target='_blank'>%s</a>") % (self.videocall_location, self.videocall_location),
+                'message': _("Enlace Meet generado: %s") % self.videocall_location,
                 'type': 'success',
-                'sticky': False,
-                'next': {
-                    'type': 'ir.actions.act_window',
-                    'res_model': 'calendar.event',
-                    'res_id': self.id,
-                    'views': [(False, 'form')],
-                    'target': 'current',
-                }
             }
         }
 
@@ -180,11 +169,7 @@ class CalendarEvent(models.Model):
         return events
 
     def write(self, vals):
-        res = super().write(vals)
-        # Si en edición activan Google Meet o cambian google_id
-        for ev in self:
-            if ev.is_google_meet and ev.google_id and not ev.videocall_location:
-                link = ev._create_google_meet()
-                if link:
-                    ev.write({'videocall_location': link})
-        return res
+        _logger.info("Guardando calendario: %s", vals)
+        if 'videocall_location' in vals:
+            _logger.info("Guardando enlace Meet: %s", vals['videocall_location'])
+        return super().write(vals)

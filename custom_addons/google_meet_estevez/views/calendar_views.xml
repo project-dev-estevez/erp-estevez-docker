@@ -19,13 +19,11 @@
             invisible="['|', ('is_google_meet','=',False), ('videocall_location','!=',False)]"/>
         
         <!-- Campo de enlace -->
-        <field
-          name="videocall_location"
-          widget="url"
-          string="Enlace Meet"
-          readonly="1"
-          invisible="not videocall_location"
-        />
+        <field name="videocall_location"
+            widget="url"
+            string="Enlace Meet"
+            readonly="1"
+            invisible="0"/>
       </xpath>
     </field>
   </record>
