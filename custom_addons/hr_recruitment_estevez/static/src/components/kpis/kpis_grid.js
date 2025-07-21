@@ -41,6 +41,75 @@ export class KpisGrid extends Component {
         });
     }
 
+    // ✅ Métodos de filtrado por fechas
+    _addDateRangeToDomain(domain = []) {
+        if (this.props.startDate) {
+            domain.push(["create_date", ">=", this.props.startDate]);
+        }
+        if (this.props.endDate) {
+            domain.push(["create_date", "<=", this.props.endDate]);
+        }
+        return domain;
+    }
+
+    _getHiredDateRangeDomain(domain = []) {
+        if (this.props.startDate) {
+            domain.push(["date_closed", ">=", this.props.startDate]);
+        }
+        if (this.props.endDate) {
+            domain.push(["date_closed", "<=", this.props.endDate]);
+        }
+        return domain;
+    }
+
+    // ✅ Getter para los KPIs (ahora usa el estado local)
+    get kpis() {
+        return [
+            {
+                name: "Postulaciones",
+                value: this.state.totalApplicants.value,
+                percentage: null,
+                showPercentage: false,
+                onClick: () => this.viewTotalApplicants()
+            },
+            {
+                name: "En Progreso",
+                value: this.state.inProgressApplicants.value,
+                percentage: null,
+                showPercentage: false,
+                onClick: () => this.viewInProgressApplicants()
+            },
+            {
+                name: "Preseleccionados",
+                value: this.state.preselectedApplicants.value,
+                percentage: null,
+                showPercentage: false,
+                onClick: () => this.viewPreselectedApplicants()
+            },
+            {
+                name: "Rechazados",
+                value: this.state.rejectedApplicants.value,
+                percentage: null,
+                showPercentage: false,
+                onClick: () => this.viewRejectedApplicants()
+            },
+            {
+                name: "Contratados",
+                value: this.state.hiredApplicants.value,
+                percentage: null,
+                showPercentage: false,
+                onClick: () => this.viewHiredApplicants()
+            },
+            {
+                name: "Tiempo Promedio (Días)",
+                value: this.state.averageHiringTime.value,
+                percentage: null,
+                showPercentage: false,
+                onClick: () => this.viewAverageHiringTime()
+            }
+        ];
+    }
+
     // ✅ Método principal para cargar todos los KPIs
     async loadKpisData() {
         console.log("📊 KpisGrid: Cargando datos de KPIs...");
@@ -63,8 +132,47 @@ export class KpisGrid extends Component {
         }
     }
 
-    // ✅ Métodos de cálculo de KPIs
     async calculateTotalApplicants() {
+        console.log("📊 KpisGrid: Calculando postulaciones después de 'Primer contacto'...");
+        
+        try {
+            // 1. ✅ Buscar la etapa "Primer contacto"
+            const primerContactoStage = await this.orm.searchRead(
+                'hr.recruitment.stage',
+                [['name', 'ilike', 'primer contacto']],
+                ['id', 'name', 'sequence'],
+                { limit: 1 }
+            );
+
+            if (!primerContactoStage.length) {
+                console.warn("⚠️ KpisGrid: No se encontró la etapa 'Primer contacto'");
+                // Fallback: usar el método anterior
+                return this.calculateTotalApplicantsLegacy();
+            }
+
+            const primerContactoSequence = primerContactoStage[0].sequence;
+            console.log(`🎯 KpisGrid: Etapa 'Primer contacto' encontrada con secuencia: ${primerContactoSequence}`);
+
+            // 2. ✅ Contar candidatos que han superado "Primer contacto"
+            const context = { context: { active_test: false } };
+            let domain = [
+                ['stage_id.sequence', '>', primerContactoSequence]  // ✅ CLAVE: Mayor que primer contacto
+            ];
+            domain = this._addDateRangeToDomain(domain);
+
+            const data = await this.orm.searchCount("hr.applicant", domain, context);
+            this.state.totalApplicants.value = data;
+            
+            console.log(`✅ KpisGrid: Postulaciones después de 'Primer contacto': ${data}`);
+            
+        } catch (error) {
+            console.error("❌ KpisGrid: Error calculando postulaciones:", error);
+            // Fallback en caso de error
+            this.state.totalApplicants.value = 0;
+        }
+    }
+
+    async calculateTotalApplicantsLegacy() {
         const context = { context: { active_test: false } };
         let domain = [];
         domain = this._addDateRangeToDomain(domain);
@@ -142,78 +250,44 @@ export class KpisGrid extends Component {
         console.log("⏱️ Average hiring time:", `${averageDays.toFixed(1)} días`);
     }
 
-    // ✅ Métodos de filtrado por fechas
-    _addDateRangeToDomain(domain = []) {
-        if (this.props.startDate) {
-            domain.push(["create_date", ">=", this.props.startDate]);
-        }
-        if (this.props.endDate) {
-            domain.push(["create_date", "<=", this.props.endDate]);
-        }
-        return domain;
-    }
+    // ✅ Métodos de navegación
+    async viewTotalApplicants() {        
+        try {
+            // Buscar etapa "Primer contacto"
+            const primerContactoStage = await this.orm.searchRead(
+                'hr.recruitment.stage',
+                [['name', 'ilike', 'primer contacto']],
+                ['sequence'],
+                { limit: 1 }
+            );
 
-    _getHiredDateRangeDomain(domain = []) {
-        if (this.props.startDate) {
-            domain.push(["date_closed", ">=", this.props.startDate]);
-        }
-        if (this.props.endDate) {
-            domain.push(["date_closed", "<=", this.props.endDate]);
-        }
-        return domain;
-    }
-
-    // ✅ Getter para los KPIs (ahora usa el estado local)
-    get kpis() {
-        return [
-            {
-                name: "Postulaciones",
-                value: this.state.totalApplicants.value,
-                percentage: null,
-                showPercentage: false,
-                onClick: () => this.viewTotalApplicants()
-            },
-            {
-                name: "En Progreso",
-                value: this.state.inProgressApplicants.value,
-                percentage: null,
-                showPercentage: false,
-                onClick: () => this.viewInProgressApplicants()
-            },
-            {
-                name: "Preseleccionados",
-                value: this.state.preselectedApplicants.value,
-                percentage: null,
-                showPercentage: false,
-                onClick: () => this.viewPreselectedApplicants()
-            },
-            {
-                name: "Rechazados",
-                value: this.state.rejectedApplicants.value,
-                percentage: null,
-                showPercentage: false,
-                onClick: () => this.viewRejectedApplicants()
-            },
-            {
-                name: "Contratados",
-                value: this.state.hiredApplicants.value,
-                percentage: null,
-                showPercentage: false,
-                onClick: () => this.viewHiredApplicants()
-            },
-            {
-                name: "Tiempo Promedio (Días)",
-                value: this.state.averageHiringTime.value,
-                percentage: null,
-                showPercentage: false,
-                onClick: () => this.viewAverageHiringTime()
+            const context = { active_test: false };
+            let domain = [];
+            
+            if (primerContactoStage.length > 0) {
+                const sequence = primerContactoStage[0].sequence;
+                domain.push(['stage_id.sequence', '>', sequence]);
             }
-        ];
+            
+            domain = this._addDateRangeToDomain(domain);
+
+            this.actionService.doAction({
+                type: "ir.actions.act_window",
+                name: "📋 Postulaciones (Después de Primer Contacto)",
+                res_model: "hr.applicant",
+                domain: domain,
+                views: [[false, "list"], [false, "form"]],
+                context: context,
+            });
+            
+        } catch (error) {
+            console.error("❌ KpisGrid: Error en navegación:", error);
+            // Fallback: mostrar todas
+            this.viewTotalApplicantsLegacy();
+        }
     }
 
-    // ✅ Métodos de navegación (SIN CAMBIOS)
-    viewTotalApplicants() {
-        console.log(`🎯 KpisGrid: ¡Navegando a postulaciones totales!`);
+    viewTotalApplicantsLegacy() {
         const context = { active_test: false };
         let domain = [];
         domain = this._addDateRangeToDomain(domain);

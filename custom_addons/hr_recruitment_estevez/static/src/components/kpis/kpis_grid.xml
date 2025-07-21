@@ -3,7 +3,7 @@
     
     <t t-name="hr_recruitment_estevez.KpisGrid" owl="1">
         <!-- ✅ Container sin margin para alinear con dashboard -->
-        <div class="container-fluid p-1">
+        <div class="container-fluid p-2">
             <div class="row g-3">
                 <t t-foreach="kpis" t-as="kpi" t-key="kpi.name">
                     <!-- ✅ Columnas responsivas Bootstrap -->

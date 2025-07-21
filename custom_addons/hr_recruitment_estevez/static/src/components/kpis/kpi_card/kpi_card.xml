@@ -4,7 +4,7 @@
     <t t-name="hr_recruitment_estevez.KpiCard" owl="1">
         <div class="h-100">
             <!-- ✅ 100% Bootstrap utilities -->
-            <div class="card h-100 border-0 shadow-sm bg-white text-center position-relative rounded-3"
+            <div class="card h-100 border-1 shadow-sm bg-white text-center position-relative rounded-3"
                 t-att-class="props.onClick ? 'cursor-pointer' : ''"
                 t-on-click="onCardClick"
                 onmouseover="this.classList.replace('shadow-sm', 'shadow-lg'); this.style.transform='translateY(-0.5rem) scale(1.02)'"
