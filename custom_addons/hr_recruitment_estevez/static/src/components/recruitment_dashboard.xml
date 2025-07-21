@@ -8,8 +8,8 @@
 
                     <!-- Titulo y filtro -->
                     <DashboardHeader title="'Dashboard Reclutamiento'"
-                                    startDate="state.startDate"
-                                    endDate="state.endDate"
+                                     startDate="state.startDate"
+                                     endDate="state.endDate"
                                      onDateChange.bind="onDateRangeChange" />
 
                     <!-- KPIs principales -->

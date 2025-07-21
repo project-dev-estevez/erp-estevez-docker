@@ -5,6 +5,7 @@ import { useService } from "@web/core/utils/hooks";
 import { ChartRendererApex } from "../../chart_renderer_apex/chart_renderer_apex";
 
 export class RecruiterEfficiencyChart extends Component {
+
     static template = "hr_recruitment_estevez.RecruiterEfficiencyChart";
     static components = { ChartRendererApex };
     static props = {
@@ -12,7 +13,7 @@ export class RecruiterEfficiencyChart extends Component {
         endDate: { type: String, optional: true },
         title: { type: String, optional: true },
         height: { type: [String, Number], optional: true },
-        onMounted: { type: Function, optional: true },  // ✅ NUEVO: Callback prop
+        onMounted: { type: Function, optional: true }
     };
 
     setup() {
@@ -152,12 +153,7 @@ export class RecruiterEfficiencyChart extends Component {
         const labels = recruiterStats.map(r => r.name);
         const ongoingCounts = recruiterStats.map(r => r.ongoing);
         const hiredCounts = recruiterStats.map(r => r.hired);
-        const totalCounts = recruiterStats.map(r => r.total);  // ✅ NUEVA serie
-
-        console.log("📊 Labels:", labels);
-        console.log("📊 OngoingCounts:", ongoingCounts);
-        console.log("📊 HiredCounts:", hiredCounts);
-        console.log("📊 TotalCounts:", totalCounts);
+        const totalCounts = recruiterStats.map(r => r.total);
 
         // 7. ✅ CONFIGURAR: Tres series con Total separado
         this.state.chartData = {
@@ -223,8 +219,12 @@ export class RecruiterEfficiencyChart extends Component {
                 },
                 dataLabels: {
                     enabled: true,
-                    formatter: function (val) {
-                        return val > 0 ? val : '';
+                    formatter: function (val, opts) {
+                        if (val > 5) {
+                            return val;
+                        }
+
+                        return '';
                     },
                     style: {
                         colors: ['#fff'],
