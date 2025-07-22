@@ -43,7 +43,6 @@
         "views/hr_candidate_view_form.xml",
         "views/hr_job_views.xml",
         'views/hr_applicant_tree_custom.xml',
-        'views/hr_job_view_list.xml',
         'views/hr_candidate_view_list.xml',
 
     ],
