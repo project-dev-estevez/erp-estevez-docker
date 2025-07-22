@@ -1,0 +1,12 @@
+<odoo>
+    <record id="hr_applicant_view_tree_custom" model="ir.ui.view">
+        <field name="name">hr.applicant.tree.custom</field>
+        <field name="model">hr.applicant</field>
+        <field name="inherit_id" ref="hr_recruitment.crm_case_tree_view_job"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='source_id']" position="attributes">
+                <attribute name="string">Fuente de reclutamiento</attribute>
+            </xpath>
+        </field>
+    </record>
+</odoo>
