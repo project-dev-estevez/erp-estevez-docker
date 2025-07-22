@@ -8,74 +8,36 @@
 
                     <!-- Titulo y filtro -->
                     <DashboardHeader title="'Dashboard Reclutamiento'"
-                                    startDate="state.startDate"
-                                    endDate="state.endDate"
-                                    onDateChange.bind="onDateRangeChange" />
+                                     startDate="state.startDate"
+                                     endDate="state.endDate"
+                                     onDateChange.bind="onDateRangeChange" />
 
                     <!-- KPIs principales -->
                     <div class="row">
-                        <KpisGrid 
-                            startDate="state.startDate"
-                            endDate="state.endDate"
-                            onMounted.bind="onKpisGridMounted"/>
+                        <KpisGrid startDate="state.startDate"
+                                  endDate="state.endDate"
+                                  onMounted.bind="onKpisGridMounted"/>
                     </div>
 
                     <!-- Postulaciones por reclutador y fuentes de reclutamiento -->
                     <div class="row">
                         <div class="col-lg-6 m-0 p-0">
                             <div class="shadow-sm border m-2 p-4 bg-white">
-                                <RecruiterEfficiencyChart
-                                        startDate="state.startDate"
-                                        endDate="state.endDate"
-                                        title="'Eficiencia de Contratación por Reclutador'"
-                                        height="400"
-                                        onMounted.bind="onRecruiterEfficiencyMounted"/>
+                                <RecruiterEfficiencyChart startDate="state.startDate"
+                                                          endDate="state.endDate"
+                                                          title="'Eficiencia de Contratación por Reclutador'"
+                                                          height="400"
+                                                          onMounted.bind="onRecruiterEfficiencyMounted"/>
                             </div>
                         </div>
                         <div class="col-lg-6 m-0 p-0">
                             <div class="shadow-sm border m-2 p-4 bg-white">
                                 <RecruitmentSourcesChart startDate="state.startDate"
-                                                        endDate="state.endDate"
-                                                        title="'Efectividad de las Fuentes de Reclutamiento'"
-                                                        height="400"
-                                                        onMounted.bind="onRecruitmentSourcesMounted"/>
+                                                         endDate="state.endDate"
+                                                         title="'Efectividad de las Fuentes de Reclutamiento'"
+                                                         height="437"
+                                                         onMounted.bind="onRecruitmentSourcesMounted"/>
                             </div>
-                            <!-- <div class="shadow-sm border m-2 p-4 bg-white">
-                                <div class="d-flex align-items-center justify-content-between">
-                                    <h3 class="text-primary fw-bold">Efectividad de las Fuentes de Reclutamiento</h3>
-                                    <div class="px-3 py-1 bg-primary cursor-pointer">
-                                        <span class="fa fa-arrow-right text-white"/>
-                                    </div>
-                                </div>
-                                
-                                <div class="row">
-                                    <div class="col-12 col-md-6 mb-3">
-                                        <ChartRenderer type="'pie'" title="'Fuentes de Reclutamiento'" config="state.sourceRecruitment"/>
-                                    </div>
-                                    <div class="col-12 col-md-6">
-                                        <div class="table-responsive">
-                                            <table class="table table-borderless align-middle">
-                                                <thead>
-                                                    <tr>
-                                                        <th>Fuente</th>
-                                                        <th class="text-end"># Contratados</th>
-                                                        <th class="text-end">% Contratación</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    <t t-foreach="state.indicatorsSourceRecruitment.sources" t-as="item" t-key="item.label">
-                                                        <tr>
-                                                            <td><span t-esc="item.label"/></td>
-                                                            <td class="text-end"><span t-esc="item.hired"/></td>
-                                                            <td class="text-end"><span t-esc="item.percentage"/>%</td>
-                                                        </tr>
-                                                    </t>
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div> -->
                         </div>
                     </div>
 
@@ -83,23 +45,11 @@
                     <div class="row">
                         <div class="col-12 m-0 p-0">
                             <div class="shadow-sm border m-2 p-4 bg-white">
-                                <div class="d-flex align-items-center justify-content-center">
-                                    <h3 class="text-primary text-center fw-bold">Rechazos y Declinaciones en el Reclutamiento</h3>
-                                </div>
-                                <div class="row mt-2">
-                                    <div class="col">
-                                        <!-- <div class="text-center">
-                                            <span class="h4">Declinaciones Candidatos</span>
-                                        </div> -->
-                                        <ChartRenderer type="'bar'" config="state.rejectionReasons.candidate"/>
-                                    </div>
-                                    <div class="col">
-                                        <!-- <div class="text-center">
-                                            <span class="h4">Declinaciones Empresa</span>
-                                        </div> -->
-                                        <ChartRenderer type="'bar'" config="state.rejectionReasons.company"/>
-                                    </div>
-                                </div>
+                                <RejectionReasonsChart startDate="state.startDate"
+                                                       endDate="state.endDate"
+                                                       title="'Rechazos y Declinaciones en el Reclutamiento'"
+                                                       height="350"
+                                                       onMounted.bind="onRejectionReasonsMounted"/>
                             </div>
                         </div>                        
                     </div>
@@ -108,133 +58,11 @@
                     <div class="row">
                         <div class="col-12 m-0 p-0">
                             <div class="shadow-sm border m-2 p-4 bg-white">
-                                <div class="d-flex align-items-center justify-content-center mt-4">
-                                    <h3 class="text-primary text-center fw-bold">Embudo de reclutamiento por vacante</h3>
-                                </div>
-                                <div class="row">
-                                    <div class="col-4">
-                                        <div class="m-2 p-4">
-                                            <!-- Selector de vacante -->
-                                            <div class="mb-3 position-relative">
-                                                <div class="input-group">
-                                                    <input type="text"
-                                                        class="form-control"
-                                                        placeholder="Buscar vacante..."
-                                                        autocomplete="off"
-                                                        aria-autocomplete="list"
-                                                        aria-controls="vacancy-autocomplete-list"
-                                                        t-on-focus="onVacancyInputFocus"
-                                                        t-on-blur="onVacancyInputBlur"
-                                                        t-on-input="onVacancySearchInput"
-                                                        t-model="state.vacancySearchText"
-                                                    />
-                                                    <button class="btn btn-outline-secondary"
-                                                        type="button"
-                                                        t-if="state.vacancySearchText"
-                                                        t-on-mousedown.prevent="clearVacancySearch">
-                                                        <i class="fa fa-times"></i>
-                                                    </button>
-                                                </div>
-
-                                                <div
-                                                    class="list-group position-absolute w-100 shadow"
-                                                    id="vacancy-autocomplete-list"
-                                                    t-if="state.isVacancyDropdownOpen &amp;&amp; state.filteredVacancyOptions.length"
-                                                    style="z-index: 10; max-height: 200px; overflow-y: auto;">
-                                                    <div type="button"
-                                                        class="list-group-item list-group-item-action text-muted"
-                                                        t-on-mousedown="() => { selectVacancy(vacancy); selectVacancy(vacancy); }">
-                                                        Todas las vacantes
-                                                    </div>
-                                                    <t t-foreach="state.filteredVacancyOptions"
-                                                        t-as="vacancy" t-key="vacancy.id">
-                                                        <div type="button"
-                                                            class="list-group-item list-group-item-action"
-                                                            t-on-mousedown="() => { selectVacancy(vacancy); selectVacancy(vacancy); }">
-                                                            <t t-esc="vacancy.name" />
-                                                        </div>
-                                                    </t>
-                                                </div>
-                                            </div>
-
-                                            <!-- Métricas en vertical -->
-                                            <t t-if="!state.isVacancyDropdownOpen">
-                                                <div class="bg-white rounded shadow-sm p-3"
-                                                    style="min-width:220px;">
-                                                    <div class="mb-3">
-                                                        <div class="fw-bold text-muted small mb-1">Estado
-                                                            de la vacante</div>
-                                                        <span
-                                                            t-attf-style="background:#{state.vacancyMetrics.status === 'Abierta' ? '#28a745' : state.vacancyMetrics.status === 'Cerrada' ? '#dc3545' : '#ffc107'};width:12px;height:12px;display:inline-block;border-radius:50%;vertical-align:middle; margin-right:8px;">
-                                                            &#160;
-                                                        </span>
-                                                        <span class="fw-semibold fs-5"
-                                                            t-esc="state.vacancyMetrics.status" />
-                                                    </div>
-
-                                                    <t t-if="state.vacancyMetrics.openDuration">
-                                                        <div
-                                                            class="mb-2 border-top pt-2 d-flex justify-content-between align-items-center">
-                                                            <div class="text-muted small">Tiempo abierta</div>
-                                                            <div class="fw-semibold fs-5">
-                                                                <t
-                                                                    t-esc="state.vacancyMetrics.openDuration || '—'" />
-                                                            </div>
-                                                        </div>
-                                                    </t>
-
-                                                    <div
-                                                        class="mb-2 border-top pt-2 d-flex justify-content-between align-items-center">
-                                                        <span class="text-muted small">Postulaciones</span>
-                                                        <span class="fw-semibold fs-5">
-                                                            <t
-                                                                t-esc="state.vacancyMetrics.applicants" />
-                                                        </span>
-                                                    </div>
-                                                    <div
-                                                        class="mb-2 border-top pt-2 d-flex justify-content-between align-items-center">
-                                                        <span class="text-muted small">
-                                                            Contrataciones</span>
-                                                        <span class="fw-semibold fs-5 text-success">
-                                                            <t t-esc="state.vacancyMetrics.hired" />
-                                                        </span>
-                                                    </div>
-                                                    <div
-                                                        class="mb-2 border-top pt-2 d-flex justify-content-between align-items-center">
-                                                        <span class="text-muted small">Rechazos</span>
-                                                        <span class="fw-semibold fs-5 text-danger">
-                                                            <t t-esc="state.vacancyMetrics.refused" />
-                                                        </span>
-                                                    </div>
-
-                                                    <t t-if="state.vacancyMetrics.topRefuseReason">
-                                                        <div class="border-top pt-2 mt-2">
-                                                            <div class="text-muted small">
-                                                                Motivo de rechazo más frecuente
-                                                            </div>
-                                                            <div class="fw-semibold">
-                                                                <t
-                                                                    t-esc="state.vacancyMetrics.topRefuseReason || '—'" />
-                                                            </div>
-                                                        </div>
-                                                    </t>
-
-                                                </div>
-                                            </t>
-                                        </div>
-                                    </div>
-                                    <div class="col-8">
-                                        <div class="m-2 p-4">
-                                            <!-- <h3 class="text-primary fw-bold">Embudo de
-                                            Etapas</h3> -->
-                                            <div style="height: 500px; overflow-y: auto;">
-                                                <ChartRenderer
-                                                    type="'funnel'"
-                                                    config="state.funnelRecruitment" />
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+                                <RecruitmentFunnelChart startDate="state.startDate"
+                                                        endDate="state.endDate"
+                                                        title="'Embudo de Reclutamiento por Vacante'"
+                                                        height="400"
+                                                        onMounted.bind="onRecruitmentFunnelMounted"/>
                             </div>
                         </div>
                     </div>
@@ -243,13 +71,12 @@
                     <div class="row">
                         <div class="col-lg-6 m-0 p-0">
                             <div class="shadow-sm border m-2 p-4 bg-white">
-                                <div class="d-flex align-items-center justify-content-between">
-                                    <h3 class="text-primary fw-bold">Indicadores de Requisición</h3>
-                                    <div class="px-3 py-1 bg-primary cursor-pointer">
-                                        <span class="fa fa-arrow-right text-white"/>
-                                    </div>
-                                </div>
-                                <ChartRenderer type="'bar'" title="'Requisiciones por Estado'" config="state.requisitionStats"/>
+                                <!-- ✅ NUEVO COMPONENTE -->
+                                <RequisitionStatsChart startDate="state.startDate"
+                                                       endDate="state.endDate"
+                                                       title="'Indicadores de Requisición'"
+                                                       height="400"
+                                                       onMounted.bind="onRequisitionStatsMounted"/>
                             </div>
                         </div>
 
@@ -259,7 +86,7 @@
                                         startDate="state.startDate"
                                         endDate="state.endDate"
                                         title="'Eficiencia del Proceso de Contratación'"
-                                        height="400"
+                                        height="610"
                                         onMounted.bind="onProcessEfficiencyMounted"/>
                             </div>
                         </div>

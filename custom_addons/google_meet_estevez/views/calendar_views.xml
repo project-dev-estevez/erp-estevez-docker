@@ -10,14 +10,23 @@
       </xpath>
       
       <xpath expr="//field[@name='location']" position="after">
-        <!-- Botón visible cuando se cumplen todas las condiciones -->
+        <!-- Botón para generar Meet -->
         <button
             name="action_force_create_meet"
             string="Generar Meet ahora"
             type="object"
             class="btn-primary"
-            invisible="is_google_meet and not videocall_location and google_id"
-        />
+            invisible="meet_generation_state != 'pending' or not show_meet_button"/>
+        
+        <!-- Indicador de progreso -->
+        <div class="text-warning" invisible="meet_generation_state != 'processing'">
+          <i class="fa fa-spinner fa-spin"/> Generando enlace Meet...
+        </div>
+        
+        <!-- Mensaje de error -->
+        <div class="text-danger" invisible="meet_generation_state != 'failed'">
+          <i class="fa fa-warning"/> Error generando Meet. Intenta nuevamente.
+        </div>
         
         <!-- Campo de enlace -->
         <field
