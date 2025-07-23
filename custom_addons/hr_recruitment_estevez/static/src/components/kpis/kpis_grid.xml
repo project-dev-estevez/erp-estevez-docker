@@ -26,6 +26,9 @@
         </div>
 
         <PostulationsDetailModal t-if="state.showModal"
+                                 startDate="props.startDate"
+                                 endDate="props.endDate"
+                                 actionService="actionService"
                                  onClose="() => this.closeModal()"/>
     </t>
 

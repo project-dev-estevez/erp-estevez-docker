@@ -268,35 +268,6 @@ export class KpisGrid extends Component {
     // ✅ Métodos de navegación
     async viewTotalApplicants() {
         this.state.showModal = true;
-        // try {
-        //     // Buscar etapa "Primer contacto"
-        //     const primerContactoStage = await this.orm.searchRead(
-        //         'hr.recruitment.stage',
-        //         [['name', 'ilike', 'primer contacto']],
-        //         ['sequence'],
-        //         { limit: 1 }
-        //     );
-
-        //     if (!primerContactoStage.length) {
-        //         return;
-        //     }
-
-        //     const sequence = primerContactoStage[0].sequence;
-        //     let domain = [['stage_id.sequence', '>', sequence]];
-        //     domain = this._addDateRangeToDomain(domain);
-
-        //     await this.actionService.doAction({
-        //         type: "ir.actions.act_window",
-        //         name: "📋 Postulaciones Activas (Post-Primer Contacto)",
-        //         res_model: "hr.applicant",
-        //         domain: domain,
-        //         views: [[false, "list"], [false, "form"]],
-        //         context: { active_test: false }
-        //     });
-            
-        // } catch (error) {
-        //     console.error("❌ KpisGrid: Error en navegación Total Postulaciones:", error);
-        // }
     }
 
     async viewInProgressApplicants() {
