@@ -234,7 +234,6 @@ export class KpisGrid extends Component {
 
         const data = await this.orm.searchCount("hr.applicant", domain);
         this.state.hiredApplicants.value = data;
-        console.log("✅ Hired applicants:", data);
     }
 
     async calculateAverageHiringTime() {
@@ -338,7 +337,12 @@ export class KpisGrid extends Component {
             res_model: "hr.applicant",
             domain: domain,
             views: [[false, "list"], [false, "form"]],
-            context: context
+            context: {
+                ...context,
+                list_view_ref: "hr_recruitment_estevez.hr_applicant_rejected_list_view",
+                search_default_group_by_refuse_reason: 1,  // ✅ Agrupar por motivo de rechazo
+                search_default_filter_refused: 1           // ✅ Filtro por rechazados
+            }
         });
     }
 
