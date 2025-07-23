@@ -3,10 +3,12 @@
 import { Component, onWillStart, onMounted, useState } from "@odoo/owl";
 import { useService } from "@web/core/utils/hooks";
 import { KpiCard } from "./kpi_card/kpi_card";
+import { PostulationsDetailModal } from "./modals/postulations_detail_modal";
 
 export class KpisGrid extends Component {
+
     static template = "hr_recruitment_estevez.KpisGrid";
-    static components = { KpiCard };
+    static components = { KpiCard, PostulationsDetailModal };
     static props = {
         startDate: { type: String, optional: true },
         endDate: { type: String, optional: true },
@@ -25,7 +27,8 @@ export class KpisGrid extends Component {
             rejectedApplicants: { value: 0 },
             hiredApplicants: { value: 0 },
             averageHiringTime: { value: "0 días" },
-            isLoading: true
+            isLoading: true,
+            showModal: false
         });
 
         // ✅ Cargar datos cuando el componente se inicializa
@@ -264,35 +267,36 @@ export class KpisGrid extends Component {
 
     // ✅ Métodos de navegación
     async viewTotalApplicants() {
-        try {
-            // Buscar etapa "Primer contacto"
-            const primerContactoStage = await this.orm.searchRead(
-                'hr.recruitment.stage',
-                [['name', 'ilike', 'primer contacto']],
-                ['sequence'],
-                { limit: 1 }
-            );
+        this.state.showModal = true;
+        // try {
+        //     // Buscar etapa "Primer contacto"
+        //     const primerContactoStage = await this.orm.searchRead(
+        //         'hr.recruitment.stage',
+        //         [['name', 'ilike', 'primer contacto']],
+        //         ['sequence'],
+        //         { limit: 1 }
+        //     );
 
-            if (!primerContactoStage.length) {
-                return;
-            }
+        //     if (!primerContactoStage.length) {
+        //         return;
+        //     }
 
-            const sequence = primerContactoStage[0].sequence;
-            let domain = [['stage_id.sequence', '>', sequence]];
-            domain = this._addDateRangeToDomain(domain);
+        //     const sequence = primerContactoStage[0].sequence;
+        //     let domain = [['stage_id.sequence', '>', sequence]];
+        //     domain = this._addDateRangeToDomain(domain);
 
-            await this.actionService.doAction({
-                type: "ir.actions.act_window",
-                name: "📋 Postulaciones Activas (Post-Primer Contacto)",
-                res_model: "hr.applicant",
-                domain: domain,
-                views: [[false, "list"], [false, "form"]],
-                context: { active_test: false }
-            });
+        //     await this.actionService.doAction({
+        //         type: "ir.actions.act_window",
+        //         name: "📋 Postulaciones Activas (Post-Primer Contacto)",
+        //         res_model: "hr.applicant",
+        //         domain: domain,
+        //         views: [[false, "list"], [false, "form"]],
+        //         context: { active_test: false }
+        //     });
             
-        } catch (error) {
-            console.error("❌ KpisGrid: Error en navegación Total Postulaciones:", error);
-        }
+        // } catch (error) {
+        //     console.error("❌ KpisGrid: Error en navegación Total Postulaciones:", error);
+        // }
     }
 
     async viewInProgressApplicants() {
@@ -399,5 +403,9 @@ export class KpisGrid extends Component {
                 search_default_group_by_applicant: 1
             }
         });
+    }
+
+    closeModal() {
+        this.state.showModal = false;
     }
 }

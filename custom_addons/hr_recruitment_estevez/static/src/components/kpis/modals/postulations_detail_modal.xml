@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    
+    <t t-name="hr_recruitment_estevez.PostulationsDetailModal" owl="1">
+        <!-- ✅ Modal Bootstrap básico -->
+        <div class="modal show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <!-- ✅ Header -->
+                    <div class="modal-header">
+                        <h5 class="modal-title">
+                            <i class="bi bi-bar-chart-fill me-2"></i>
+                            Detalle de Postulaciones
+                        </h5>
+                        <button type="button" class="btn-close" t-on-click="onCloseModal"></button>
+                    </div>
+                    
+                    <!-- ✅ Body con Hola Mundo -->
+                    <div class="modal-body text-center py-5">
+                        <h2 class="text-primary">¡Hola Mundo! 👋</h2>
+                        <p class="text-muted">Este será el modal con la gráfica detallada</p>
+                    </div>
+                    
+                    <!-- ✅ Footer -->
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" t-on-click="onCloseModal">
+                            Cerrar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </t>
+
+</templates>

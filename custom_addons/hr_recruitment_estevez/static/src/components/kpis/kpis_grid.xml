@@ -24,6 +24,9 @@
                 </t>
             </div>
         </div>
+
+        <PostulationsDetailModal t-if="state.showModal"
+                                 onClose="() => this.closeModal()"/>
     </t>
 
 </templates>
