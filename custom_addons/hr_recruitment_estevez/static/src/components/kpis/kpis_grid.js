@@ -328,7 +328,6 @@ export class KpisGrid extends Component {
     }
 
     viewRejectedApplicants() {
-        console.log(`❌ KpisGrid: ¡Navegando a rechazados!`);
         const context = { active_test: false };
         let domain = [["application_status", "=", "refused"]];
         domain = this._addDateRangeToDomain(domain);
