@@ -26,6 +26,8 @@ export class KpisGrid extends Component {
             preselectedApplicants: { value: 0 },
             rejectedApplicants: { value: 0 },
             hiredApplicants: { value: 0 },
+            openPositions: { value: 0 },
+            pendingRequisitions: { value: 0 },
             isLoading: true,
             showModal: false
         });
@@ -101,13 +103,26 @@ export class KpisGrid extends Component {
                 percentage: 0,
                 showPercentage: false,
                 onClick: () => this.viewHiredApplicants()
+            },
+            {
+                name: "Vacantes Abiertas",
+                value: this.state.openPositions.value,
+                percentage: 0,
+                showPercentage: false,
+                onClick: () => this.viewOpenPositions()
+            },
+            {
+                name: "Requisiciones por Aprobar",
+                value: this.state.pendingRequisitions.value,
+                percentage: 0,
+                showPercentage: false,
+                onClick: () => this.viewPendingRequisitions()
             }
         ];
     }
 
     // ✅ Método principal para cargar todos los KPIs
     async loadKpisData() {
-        console.log("📊 KpisGrid: Cargando datos de KPIs...");
         this.state.isLoading = true;
         
         try {
@@ -117,8 +132,9 @@ export class KpisGrid extends Component {
                 this.calculatePreselectedApplicants(),
                 this.calculateRejectedApplicants(),
                 this.calculateHiredApplicants(),
+                this.calculateOpenPositions(),
+                this.calculatePendingRequisitions(),
             ]);
-            console.log("✅ KpisGrid: Datos cargados exitosamente");
         } catch (error) {
             console.error("❌ KpisGrid: Error cargando datos:", error);
         } finally {
@@ -227,6 +243,47 @@ export class KpisGrid extends Component {
         this.state.hiredApplicants.value = data;
     }
 
+    async calculateOpenPositions() {
+        try {
+            // ✅ PASO 1: Debug - Ver todas las vacantes primero
+            const allJobs = await this.orm.searchRead("hr.job", [], ["name", "active", "no_of_recruitment", "no_of_hired_employee"]);
+            // ✅ PASO 2: Contar vacantes realmente abiertas
+            // Una vacante está abierta si:
+            // - Está activa (active = true)
+            // - Tiene vacantes por llenar (no_of_recruitment > no_of_hired_employee)
+            let domain = [
+                ["active", "=", true],                                      // ✅ Vacante activa
+                ["no_of_recruitment", ">", 0],                             // ✅ Tiene vacantes que llenar
+                // ✅ Opcional: Que aún tenga vacantes disponibles
+                // ["no_of_recruitment", ">", "no_of_hired_employee"]
+            ];
+            
+            const count = await this.orm.searchCount("hr.job", domain);
+            this.state.openPositions.value = count;
+        } catch (error) {
+            console.error("❌ KpisGrid: Error calculando Vacantes Abiertas:", error);
+            this.state.openPositions.value = 0;
+        }
+    }
+
+    async calculatePendingRequisitions() {
+        try {
+            // ✅ Contar requisiciones en estado 'to_approve' (por aprobar)
+            let domain = [
+                ["state", "=", "to_approve"]  // Estado por aprobar
+            ];
+            
+            // ✅ Si quieres aplicar filtros de fecha, puedes usar:
+            // domain = this._addDateRangeToDomain(domain);
+
+            const count = await this.orm.searchCount("hr.requisition", domain);
+            this.state.pendingRequisitions.value = count;
+        } catch (error) {
+            console.error("❌ KpisGrid: Error calculando Requisiciones por Aprobar:", error);
+            this.state.pendingRequisitions.value = 0;
+        }
+    }
+
     // ✅ Métodos de navegación
     async viewTotalApplicants() {
         this.state.showModal = true;
@@ -328,7 +385,41 @@ export class KpisGrid extends Component {
             }
         });
     }
-    
+
+    viewOpenPositions() {
+        this.actionService.doAction({
+            type: "ir.actions.act_window",
+            name: "💼 Vacantes Abiertas",
+            res_model: "hr.job",
+            domain: [
+                ["active", "=", true],              // ✅ Vacantes activas
+                ["no_of_recruitment", ">", 0]       // ✅ Con vacantes por llenar
+            ],
+            views: [[false, "list"], [false, "form"]],
+            context: {
+                search_default_group_by_department: 1,  // ✅ Agrupar por departamento
+                // search_default_filter_open: 1        // ✅ Comentar si causa problemas
+            }
+        });
+    }
+
+    viewPendingRequisitions() {
+        this.actionService.doAction({
+            type: "ir.actions.act_window",
+            name: "📋 Requisiciones por Aprobar",
+            res_model: "hr.requisition",
+            domain: [
+                ["state", "=", "to_approve"]
+            ],
+            views: [[false, "list"], [false, "form"]],
+            context: {
+                search_default_group_by_requestor: 1,        // ✅ Agrupar por solicitante
+                search_default_filter_pending: 1,            // ✅ Filtro por pendientes
+                // search_default_group_by_department: 1     // ✅ Alternativa: agrupar por departamento
+            }
+        });
+    }
+
     closeModal() {
         this.state.showModal = false;
     }
