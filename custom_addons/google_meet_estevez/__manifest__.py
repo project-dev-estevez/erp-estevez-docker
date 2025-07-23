@@ -5,7 +5,7 @@
     'depends': ['google_calendar', 'calendar'],
     'data': [
         'views/calendar_views.xml',
-        'views/calendar_templates.xml'
+        'data/cron.xml',
     ],
     'installable': True,
     'application': False,

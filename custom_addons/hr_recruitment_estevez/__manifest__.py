@@ -32,6 +32,7 @@
         'views/hr_applicant_document_views.xml',
         'views/hr_applicant_view_form_inherit.xml',
         #'views/hr_candidate_view_form_inherit.xml',
+        'views/hr_applicant_view_tree_inherit.xml',
         "views/hr_recruitment_menu_views.xml",
         "views/hr_requisition_views.xml",
         "views/hr_applicant_view_list_general_report_inherit.xml",
@@ -42,7 +43,6 @@
         "views/hr_candidate_view_form.xml",
         "views/hr_job_views.xml",
         'views/hr_applicant_tree_custom.xml',
-        'views/hr_job_view_list.xml',
         'views/hr_candidate_view_list.xml',
 
     ],

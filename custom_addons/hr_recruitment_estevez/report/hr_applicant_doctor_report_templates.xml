@@ -5,92 +5,124 @@
                 <t t-call="web.external_layout">
                     <div class="page">
                         <div class="container">
+
                             <!-- Titulo, Código y Revisión -->
-                            <table class="table">
+                            <table style="width: 100%; margin: 0 0 5px 0; border-collapse: collapse; font-size: 10pt;">
                                 <tbody>
                                     <tr>
-                                        <td rowspan="2">
-                                            <div class="text-center">
-                                                <h2><strong>HISTORIA CLÍNICA GENERAL</strong></h2>
-                                            </div> 
+                                        <td rowspan="2" 
+                                            style="width: 70%; padding: 3px; border: 1px vertical-align: middle; text-align: center;">
+                                            <strong style="font-size: 11pt;">HISTORIA CLÍNICA GENERAL</strong>
                                         </td>
-                                        <td>
-                                            <div class="text-center">
-                                                <strong>Código:</strong> 
-                                                DA-FE-HS-043
-                                            </div>
+                                        <td style="padding: 3px; border: 1px  text-align: center;">
+                                            <strong>Código:</strong> DA-FE-HS-043
                                         </td>
                                     </tr>
+
                                     <tr>
-                                        <td>
-                                            <div class="text-center">
-                                                <strong>Revisión:</strong> 
-                                                01
-                                            </div>
+                                        <td style="padding: 3px; border: 1px text-align: center;">
+                                            <strong>Revisión:</strong> 01
                                         </td>
                                     </tr>
+
                                 </tbody>
                             </table>
 
                             <!-- Centro Laboral, Expediente, Fecha, Hora, Tipo interrogatorio -->
-                            <table class="table">
+                            <table class="table" 
+                                   style="width: 100%; margin: 5px 0; border-collapse: collapse; font-size: 9pt;">
                                 <tbody>
                                     <tr>
                                         <td colspan="2">
-                                            <strong>Centro Laboral:</strong> <t t-esc="doc.company_id.name"/>
-                                            
+                                            <strong style="padding: 3px;">Centro Laboral:</strong> 
+                                            <t t-esc="doc.company_id.name"/>  
                                         </td>
                                         <td>
-                                            <strong>Expediente</strong>
+                                            <strong style="padding: 3px;">Expediente</strong>
                                         </td>
                                     </tr>
+
                                     <tr>
-                                        <td><strong>Fecha de Elaboración:</strong> <t t-esc="doc.create_date.strftime('%d-%m-%Y')"/></td>
-                                        <td><strong>Hora de Elaboración:</strong> <t t-esc="doc.create_date.strftime('%H:%M')"/></td>
-                                        <td><strong>Tipo de Interrogatorio:</strong> <t t-esc="dict([('direct', 'Directo'), ('indirect', 'Indirecto')]).get(doc.interrogation_type)"/></td>
+                                        <td>
+                                            <strong style="padding: 3px;">Fecha de Elaboración:</strong> 
+                                            <t t-esc="doc.create_date.strftime('%d-%m-%Y')"/>
+                                        </td>
+                                        <td>
+                                            <strong style="padding: 3px;">Hora de Elaboración:</strong> 
+                                            <t t-esc="doc.create_date.strftime('%H:%M')"/>
+                                        </td>
+                                        <td>
+                                            <strong style="padding: 3px;">Tipo de Interrogatorio:</strong> 
+                                            <t t-esc="dict([('direct', 'Directo'), ('indirect', 'Indirecto')]).get(doc.interrogation_type)"/>
+                                        </td>
                                     </tr>
+
                                 </tbody>
                             </table>
 
                             <!-- Ficha de identificación -->
-                            <h4><strong>I. FICHA DE IDENTIFICACIÓN</strong></h4>
-                            <table class="table table-bordered">
-                                <tbody>
-                                    <!-- Nombre y sexo -->
-                                    <tr>
-                                        <td>
-                                            <t t-esc="doc.patient_name"/>
-                                        </td>
-                                        <td>
-                                            <strong>Sexo:</strong>
-                                            <t t-esc="dict([('male', 'Masculino'), ('female', 'Femenino')]).get(doc.gender)"/>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td><strong>Fecha de Nacimiento:</strong> <t t-esc="doc.birth_date.strftime('%Y-%m-%d')"/></td>
-                                        <td><strong>Puesto Laboral:</strong> <t t-esc="doc.job_position"/></td>
-                                    </tr>
-                                    
-                                    <tr>
-                                        <td><strong>Edad:</strong> <t t-esc="doc.age"/></td>
-                                        <td><strong>Escolaridad:</strong> <t t-esc="doc.degree_id.name"/></td>
-                                    </tr>
+                            <div style="margin-top: 5px;">
+                                <h5 style="margin: 5px 0; font-size: 12pt;">
+                                    <strong>I. FICHA DE IDENTIFICACIÓN</strong>
+                                </h5>
+                                <table style="width: 100%; margin: 0; border-collapse: collapse; font-size: 10pt;">
+                                    <tbody>
+                                        <!-- Nombre y sexo -->
+                                        <tr>
+                                            <td style="border: 1px padding: 3px;">
+                                                <t t-esc="doc.patient_name"/>
+                                            </td>
+                                            <td style="border: 1px  padding: 3px;">
+                                                <strong>Sexo:</strong>
+                                                <t t-esc="dict([('male', 'Masculino'), ('female', 'Femenino')]).get(doc.gender)"/>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="border: 1px  padding: 3px;">
+                                                <strong>Fecha Nac.:</strong> 
+                                                <t t-esc="doc.birth_date.strftime('%Y-%m-%d')"/>
+                                            </td>
+                                            <td style="border: 1px  padding: 3px;">
+                                                <strong>Puesto Laboral:</strong> 
+                                                <t t-esc="doc.job_position"/>
+                                            </td>
+                                        </tr>
+                                        
+                                        <tr>
+                                            <td style="border: 1px  padding: 3px;">
+                                                <strong>Edad:</strong> 
+                                                <t t-esc="doc.age"/>
+                                            </td>
+                                            <td style="border: 1px  padding: 3px;">
+                                                <strong>Escolaridad:</strong> <t t-esc="doc.degree_id.name"/>
+                                            </td>
+                                        </tr>
 
-                                    <tr>
-                                        <td><strong>Domicilio:</strong> <t t-esc="doc.address"/></td>
-                                        <td><strong>Teléfono:</strong> <t t-esc="doc.phone"/></td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                                        <tr>
+                                            <td style="border: 1px  padding: 3px;">
+                                                <strong>Domicilio:</strong> 
+                                                <t t-esc="doc.address"/>
+                                            </td>
+                                            <td style="border: 1px  padding: 3px;">
+                                                <strong>Teléfono:</strong> 
+                                                <t t-esc="doc.phone"/>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
 
                             <!-- Antecedentes heredo familiares -->
-                            <h4><strong>II. ANTECEDENTES HEREDO FAMILIARES</strong></h4>
+                            <h5>
+                                <strong style="margin: 5px 0; font-size: 12pt;">II. ANTECEDENTES HEREDO FAMILIARES</strong>
+                            </h5>
                             <p><t t-esc="doc.family_medical_history"/></p>
                             <hr/>
 
-                            <h4><strong>III. ANTECEDENTES PERSONALES NO PATOLÓGICOS</strong></h4>
-
-                            <p>
+                            <h5>
+                                <strong style="margin: 5px 0; font-size: 12pt;">III. ANTECEDENTES PERSONALES NO PATOLÓGICOS</strong>
+                            </h5>
+                            <p style="border: 1px  padding: 3px;">
                                 Paciente originario de <t t-esc="doc.place_of_origin"/>,
                                 reside en <t t-esc="doc.place_of_residence"/>, 
                                 <t t-esc="dict([('single', 'Soltero'), ('married', 'Casado'), ('divorced', 'Divorciado'), ('widowed', 'Viudo')]).get(doc.marital_status)"/>, 
@@ -101,29 +133,29 @@
                                 Realiza baño <t t-esc="doc.weekly_clothing_change"/> veces a la semana, 
                                 cambio de ropa interior y exterior a diario, 
                                 realiza cepillado de dientes <t t-esc="doc.daily_teeth_brushing"/> veces al día.                                
-                                <strong>Zoonosis:</strong> <t t-esc="dict([('negative', 'Negativo'), ('positive', 'Positivo')]).get(doc.zoonosis)"/> 
-                                <strong>Hacinamiento:</strong> <t t-esc="dict([('negative', 'Negativo'), ('positive', 'Positivo')]).get(doc.overcrowding)"/> 
-                                <strong>Tatuajes y Perforaciones:</strong> <t t-esc="doc.tattoos_piercings"/>
-                                <strong>Tipo Sanguíneo:</strong> <t t-esc="doc.blood_type"/> 
-                                <strong>Donador:</strong> <t t-esc="doc.donor and 'Sí' or 'No'"/>
+                                <strong style="border: 1px  padding: 3px;">Zoonosis:</strong> <t t-esc="dict([('negative', 'Negativo'), ('positive', 'Positivo')]).get(doc.zoonosis)"/> 
+                                <strong style="border: 1px  padding: 3px;">Hacinamiento:</strong> <t t-esc="dict([('negative', 'Negativo'), ('positive', 'Positivo')]).get(doc.overcrowding)"/> 
+                                <strong style="border: 1px  padding: 3px;">Tatuajes y Perforaciones:</strong> <t t-esc="doc.tattoos_piercings"/>
+                                <strong style="border: 1px  padding: 3px;">Tipo Sanguíneo:</strong> <t t-esc="doc.blood_type"/> 
+                                <strong style="border: 1px  padding: 3px;">Donador:</strong> <t t-esc="doc.donor and 'Sí' or 'No'"/>
                                 <br/>
-                                <strong>Oficios desempeñados:</strong> <t t-esc="doc.occupations"/>
+                                <strong style="border: 1px  padding: 3px;">Oficios desempeñados:</strong> <t t-esc="doc.occupations"/>
                             </p>
                             
                             <hr/>
 
-                            <h4><strong>IV. ANTECEDENTES PERSONALES PATOLÓGICOS</strong></h4>
+                            <h5><strong style="margin: 5px 0; font-size: 12pt;">IV. ANTECEDENTES PERSONALES PATOLÓGICOS</strong></h5>
 
                             <p>
-                                <strong>Quirúrgicos:</strong> <t t-esc="doc.previous_surgeries"/>.
-                                <strong>Traumáticos:</strong> <t t-esc="doc.traumas"/>.
-                                <strong>Transfusionales:</strong> <t t-esc="doc.transfusions"/>.
-                                <strong>Alérgicos:</strong> <t t-esc="doc.allergies"/>.
-                                <strong>Crónico-degenerativos:</strong> <t t-esc="doc.chronic_diseases"/>.
-                                <strong>Enfermedades de la infancia:</strong> <t t-esc="doc.childhood_diseases"/>.
-                                <strong>Tabaquismo:</strong> <t t-esc="dict([('yes', 'Sí'), ('no', 'No'), ('social', 'Social')]).get(doc.smoking)"/>.
-                                <strong>Alcoholismo:</strong> <t t-esc="dict([('yes', 'Sí'), ('no', 'No'), ('social', 'Social')]).get(doc.alcoholism)"/>.
-                                <strong>Toxicomanías:</strong> <t t-esc="dict([('yes', 'Sí'), ('no', 'No'), ('social', 'Social')]).get(doc.drug_addiction)"/>.
+                                <strong style="border: 1px  padding: 3px;">Quirúrgicos:</strong> <t t-esc="doc.previous_surgeries"/>.
+                                <strong style="border: 1px  padding: 3px;">Traumáticos:</strong> <t t-esc="doc.traumas"/>.
+                                <strong style="border: 1px  padding: 3px;">Transfusionales:</strong> <t t-esc="doc.transfusions"/>.
+                                <strong style="border: 1px  padding: 3px;">Alérgicos:</strong> <t t-esc="doc.allergies"/>.
+                                <strong style="border: 1px  padding: 3px;">Crónico-degenerativos:</strong> <t t-esc="doc.chronic_diseases"/>.
+                                <strong style="border: 1px  padding: 3px;">Enfermedades de la infancia:</strong> <t t-esc="doc.childhood_diseases"/>.
+                                <strong style="border: 1px  padding: 3px;">Tabaquismo:</strong> <t t-esc="dict([('yes', 'Sí'), ('no', 'No'), ('social', 'Social')]).get(doc.smoking)"/>.
+                                <strong style="border: 1px  padding: 3px;">Alcoholismo:</strong> <t t-esc="dict([('yes', 'Sí'), ('no', 'No'), ('social', 'Social')]).get(doc.alcoholism)"/>.
+                                <strong style="border: 1px  padding: 3px;">Toxicomanías:</strong> <t t-esc="dict([('yes', 'Sí'), ('no', 'No'), ('social', 'Social')]).get(doc.drug_addiction)"/>.
                             </p>
 
                             <div class="row text-center">
@@ -140,97 +172,116 @@
 
                             <hr/>
 
-                            <h4><strong>V. PADECIMIENTO ACTUAL </strong></h4>
+                            <h5><strong style="margin: 5px 0; font-size: 12pt;">V. PADECIMIENTO ACTUAL </strong></h5>
                             <p><t t-esc="doc.current_condition"/></p>
                             
                             <hr/>
 
-                            <h4><strong>VI. INTERROGATORIO POR APARATOS Y SISTEMAS </strong></h4>
-
-                            <p><strong>Cardiovascular: </strong> <t t-esc="doc.cardiovascular or 'disnea, taquicardia, bradicardia, cianosis, plétora yugular y lipotimia negados'"/></p>
-                            <p><strong>Respiratorio: </strong> <t t-esc="doc.respiratory or 'disnea, tiros intercostales, aleteo nasal, tos persistente y crónica, expectoración y hemoptisis'"/></p>
-                            <p><strong>Gastrointestinal: </strong> <t t-esc="doc.gastrointestinal or 'disfagia, reflujo gastroesofágico, pirosis, plenitud postprandial, constipación, flatulencia, nausea, vómito y diarrea negados, evacuaciones normales'"/></p>
-                            <p><strong>Genitourinario: </strong> <t t-esc="doc.genitourinary or 'disuria, poliuria, tenesmo vesical, piuria, hematuria, incontinencia urinaria, disminución del chorro de orina, negados, diuresis normal'"/></p>
-                            <p><strong>Endócrino: </strong> <t t-esc="doc.endocrine or 'interrogados y negados'"/></p>
-                            <p><strong>Nervioso: </strong> <t t-esc="doc.nervous or 'epilepsia, cefalea, miopía, astigmatismo, negados'"/></p>
-                            <p><strong>Músculo-Esquelético: </strong> <t t-esc="doc.musculoskeletal or 'mialgias, artralgias, debilidad muscular, negados'"/></p>
-                            <p><strong>Piel, Mucosas y Anexos: </strong> <t t-esc="doc.skin_mucous or 'nevos, condilomas, xerosis, negados'"/></p>
+                            <h5><strong style="margin: 5px 0; font-size: 12pt;">VI. INTERROGATORIO POR APARATOS Y SISTEMAS </strong></h5>
                             
+                            <div style="width: 100%; font-size: 10pt;">
+                                <div style="width: 49%; float: left; margin-right: 1%;">
+                                    <p style="margin: 2px 0;"><strong>Cardiovascular: </strong> <t t-esc="doc.cardiovascular or 'disnea, taquicardia, bradicardia, cianosis, plétora yugular y lipotimia negados'"/></p>
+                                    <p style="margin: 2px 0;"><strong>Respiratorio: </strong> <t t-esc="doc.respiratory or 'disnea, tiros intercostales, aleteo nasal, tos persistente y crónica, expectoración y hemoptisis'"/></p>
+                                    <p style="margin: 2px 0;"><strong>Gastrointestinal: </strong> <t t-esc="doc.gastrointestinal or 'disfagia, reflujo gastroesofágico, pirosis, plenitud postprandial, constipación, flatulencia, nausea, vómito y diarrea negados, evacuaciones normales'"/></p>
+                                    <p style="margin: 2px 0;"><strong>Genitourinario: </strong> <t t-esc="doc.genitourinary or 'disuria, poliuria, tenesmo vesical, piuria, hematuria, incontinencia urinaria, disminución del chorro de orina, negados, diuresis normal'"/></p>
+                                </div>
+                                
+                                <div style="width: 49%; float: left; margin-left: 1%;">
+                                    <p style="margin: 2px 0;"><strong>Endócrino: </strong> <t t-esc="doc.endocrine or 'interrogados y negados'"/></p>
+                                    <p style="margin: 2px 0;"><strong>Nervioso: </strong> <t t-esc="doc.nervous or 'epilepsia, cefalea, miopía, astigmatismo, negados'"/></p>
+                                    <p style="margin: 2px 0;"><strong>Músculo-Esquelético: </strong> <t t-esc="doc.musculoskeletal or 'mialgias, artralgias, debilidad muscular, negados'"/></p>
+                                    <p style="margin: 2px 0;"><strong>Piel, Mucosas y Anexos: </strong> <t t-esc="doc.skin_mucous or 'nevos, condilomas, xerosis, negados'"/></p>
+                                </div>
+                                
+                                <div style="clear: both;"></div>
+                            </div>
+
                             <hr/>
 
-                            <h4><strong>VII. SIGNOS VITALES </strong></h4>
+                            <h5><strong style="margin: 5px 0; font-size: 12pt;">VII. SIGNOS VITALES </strong></h5>
 
-                            <table class="table">
+                            <table style="width: 100%; margin: 5px 0; border-collapse: collapse; font-size: 9pt;">
                                 <tbody>
                                     <tr>
-                                        <td class="text-center"><strong>Frecuencia Cardiaca</strong></td>
-                                        <td class="text-center"><strong>Frecuencia Respiratoria</strong></td>
-                                        <td class="text-center"><strong>Temperatura</strong></td>
-                                        <td class="text-center"><strong>Tensión Arterial</strong></td>
-                                        <td class="text-center"><strong>Sat O2</strong></td>
-                                        <td class="text-center"><strong>Peso</strong></td>
-                                        <td class="text-center"><strong>Talla</strong></td>
-                                        <td class="text-center"><strong>IMC</strong></td>
+                                        <td style="border: 1px padding: 3px; text-align: center;"><strong>Frecuencia Cardiaca</strong></td>
+                                        <td style="border: 1px padding: 3px; text-align: center;"><strong>Frecuencia Respiratoria</strong></td>
+                                        <td style="border: 1px padding: 3px; text-align: center;"><strong>Temperatura</strong></td>
+                                        <td style="border: 1px padding: 3px; text-align: center;"><strong>Tensión Arterial</strong></td>
+                                        <td style="border: 1px padding: 3px; text-align: center;"><strong>SatO₂</strong></td>
+                                        <td style="border: 1px padding: 3px; text-align: center;"><strong>Peso</strong></td>
+                                        <td style="border: 1px padding: 3px; text-align: center;"><strong>Talla</strong></td>
+                                        <td style="border: 1px padding: 3px; text-align: center;"><strong>IMC</strong></td>
                                     </tr>
-
                                     <tr>
-                                        <td class="text-center"><t t-esc="doc.heart_rate"/> lpm</td>
-                                        <td class="text-center"><t t-esc="doc.respiratory_rate"/> rpm</td>
-                                        <td class="text-center"><t t-esc="doc.temperature"/> °c</td>
-                                        <td class="text-center"><t t-esc="doc.blood_pressure"/></td>
-                                        <td class="text-center"><t t-esc="doc.oxygen_saturation"/> %</td>
-                                        <td class="text-center"><t t-esc="doc.weight"/> kg</td>
-                                        <td class="text-center"><t t-esc="doc.height"/> cm</td>
-                                        <td class="text-center"><t t-esc="doc.bmi"/></td>
+                                        <td style="border: 1px padding: 3px; text-align: center;"><t t-esc="doc.heart_rate"/> lpm</td>
+                                        <td style="border: 1px padding: 3px; text-align: center;"><t t-esc="doc.respiratory_rate"/> rpm</td>
+                                        <td style="border: 1px padding: 3px; text-align: center;"><t t-esc="doc.temperature"/> °c</td>
+                                        <td style="border: 1px padding: 3px; text-align: center;"><t t-esc="doc.blood_pressure"/></td>
+                                        <td style="border: 1px padding: 3px; text-align: center;"><t t-esc="doc.oxygen_saturation"/> %</td>
+                                        <td style="border: 1px padding: 3px; text-align: center;"><t t-esc="doc.weight"/> kg</td>
+                                        <td style="border: 1px padding: 3px; text-align: center;"><t t-esc="doc.height"/> cm</td>
+                                        <td style="border: 1px padding: 3px; text-align: center;"><t t-esc="doc.bmi"/></td>
                                     </tr>
                                 </tbody>
                             </table>
 
                             <hr/>
 
-                            <h4><strong>VIII. EXPLORACIÓN FÍSICA </strong></h4>
+                            <h5><strong style="margin: 5px 0; font-size: 12pt;">VIII. EXPLORACIÓN FÍSICA </strong></h5>
 
                             <!-- <p><strong>Habitus Exterior: </strong></p> -->
-                            <p><strong>Cabeza y Cuello: </strong><t t-esc="doc.head_neck"/></p>
-                            <p><strong>Tórax: </strong><t t-esc="doc.chest"/></p>
-                            <p><strong>Abdomen: </strong><t t-esc="doc.abdomen"/></p>
-                            <p><strong>Extremidades: </strong><t t-esc="doc.extremities"/></p>
-                            <p><strong>Neurológico: </strong><t t-esc="doc.neurological"/></p>
-                            <p><strong>Piel: </strong><t t-esc="doc.skin"/></p>
+                            <div style="width: 100%; font-size: 10pt;">
+                                <div style="width: 49%; float: left; margin-right: 1%;">
+                                    <p style="margin: 2px 0;"><strong>Cabeza y Cuello: </strong><t t-esc="doc.head_neck"/></p>
+                                    <p style="margin: 2px 0;"><strong>Tórax: </strong><t t-esc="doc.chest"/></p>
+                                    <p style="margin: 2px 0;"><strong>Abdomen: </strong><t t-esc="doc.abdomen"/></p>
+                                </div>
+                                
+                                <div style="width: 49%; float: left; margin-left: 1%;">
+                                    <p style="margin: 2px 0;"><strong>Extremidades: </strong><t t-esc="doc.extremities"/></p>
+                                    <p style="margin: 2px 0;"><strong>Neurológico: </strong><t t-esc="doc.neurological"/></p>
+                                    <p style="margin: 2px 0;"><strong>Piel: </strong><t t-esc="doc.skin"/></p>
+                                </div>
+                                
+                                <div style="clear: both;"></div>
+                            </div>
+                            
                             <!-- <p><strong>Antidoping: NA</strong></p>
                             <p><strong>Glucosa: NA mg/dL</strong></p> -->
-                            
+
                             <hr/>
 
-                            <h4><strong>IX. RESULTADOS PREVIOS Y ACTUALES DE LABORATORIO, GABINETE Y OTROS:</strong></h4>
+                            <h5><strong style="margin: 5px 0; font-size: 12pt;">IX. RESULTADOS PREVIOS Y ACTUALES DE LABORATORIO, GABINETE Y OTROS:</strong></h5>
                             <p><t t-esc="doc.laboratory_results"/></p>
                             <hr/>
-                            <h4><strong>X. DIAGNÓSTICOS O PROBLEMAS CLÍNICOS:</strong></h4>
+                            <h5><strong style="margin: 5px 0; font-size: 12pt;">X. DIAGNÓSTICOS O PROBLEMAS CLÍNICOS:</strong></h5>
                             <p><t t-esc="doc.diagnosis"/></p>
                             <hr/>
 
-                            <h4><strong>XI. TERAPÉUTICA EMPLEADA Y RESULTADOS (PREVIOS):  </strong></h4>
+                            <h5><strong style="margin: 5px 0; font-size: 12pt;">XI. TERAPÉUTICA EMPLEADA Y RESULTADOS (PREVIOS):</strong></h5>
                             <p><t t-esc="doc.previous_treatment or 'No aplica'"/></p>
                             <hr/>
 
-                            <h4><strong>XII. TRATAMIENTO E INDICACIONES: </strong></h4>
-                            <p><t t-esc="doc.treatment_recommendations"/></p>
+                            <h5><strong style="margin: 5px 0; font-size: 12pt;">XII. TRATAMIENTO E INDICACIONES: </strong></h5>
+                            <p style="border: 1px  padding: 3px;"><t t-esc="doc.treatment_recommendations"/></p>
                             <hr/>
 
-                            <h4><strong>XIII. PROXIMA CITA: </strong> <t t-esc="doc.next_appointment or 'ABIERTA'"/></h4>
+                            <h5><strong style="margin: 5px 0; font-size: 12pt;">XIII. PROXIMA CITA: </strong> <t t-esc="doc.next_appointment or 'ABIERTA'"/></h5>
                             <hr/>
-                            <h4><strong>XIV. PRONÓSTICO: </strong> <t t-esc="doc.prognosis or 'LIGADO A EVOLUCIÓN'"/></h4>
+                            <h5><strong style="margin: 5px 0; font-size: 12pt;">XIV. PRONÓSTICO: </strong> <t t-esc="doc.prognosis or 'LIGADO A EVOLUCIÓN'"/></h5>
                             <hr/>
 
                             <br/><br/><br/><br/><br/>
-                            <div class="d-flex justify-content-between">
-                                <div class="text-center">
-                                    <p>____________________________________________________</p>
-                                    <strong>FIRMA Y SELLO REGISTRO MÉDICO</strong>
+
+                            <div class="d-flex justify-content-between" style="display: flex; justify-content: space-between; margin-top: -20px;">
+                                <div class="text-center" style="text-align: center; width: 48%;">
+                                    <p style="margin: 0; line-height: 1;">____________________________________________________</p>
+                                    <strong style="font-size: 12pt; margin-top: -5px;">FIRMA Y SELLO REGISTRO MÉDICO</strong>
                                 </div>
-                                <div class="text-center">
-                                    <p>____________________________________________________</p>
-                                    <strong>FIRMA DEL TRABAJADOR</strong>
+                                <div class="text-center" style="text-align: center; width: 48%;">
+                                    <p style="margin: 0; line-height: 1;">____________________________________________________</p>
+                                    <strong style="font-size: 12pt; margin-top: -5px;">FIRMA DEL TRABAJADOR</strong>
                                 </div>
                             </div>
 
