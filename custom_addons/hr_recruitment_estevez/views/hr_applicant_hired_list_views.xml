@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- filepath: c:\Developer\Estevez.Jor\erp-estevez-docker\custom_addons\hr_recruitment_estevez\views\hr_applicant_hired_list_views.xml -->
+<odoo>
+    
+    <!-- ✅ Vista de lista personalizada para contratados -->
+    <record id="hr_applicant_hired_list_view" model="ir.ui.view">
+        <field name="name">hr.applicant.hired.list</field>
+        <field name="model">hr.applicant</field>
+        <field name="arch" type="xml">
+            <list string="Candidatos Contratados" 
+                  default_order="job_id, date_closed desc, id"
+                  decoration-success="application_status == 'hired'"
+                  create="false"
+                  edit="false">
+                
+                <!-- ✅ 1. Duración del Proceso -->
+                <field name="process_duration" 
+                       string="Duración del Proceso" 
+                       optional="show"/>
+                
+                <!-- ✅ 2. Postulante -->
+                <field name="partner_name" 
+                       string="Postulante" 
+                       optional="show"/>
+                
+                <!-- ✅ 3. Puesto de Trabajo -->
+                <field name="job_id" 
+                       string="Puesto de Trabajo" 
+                       optional="show"/>
+                
+                <!-- ✅ 4. Etiquetas -->
+                <field name="categ_ids" 
+                       string="Etiquetas" 
+                       widget="many2many_tags" 
+                       options="{'color_field': 'color'}"
+                       optional="show"/>
+                
+                <!-- ✅ 5. Etapa -->
+                <field name="stage_id" 
+                       string="Etapa" 
+                       optional="show"/>
+                
+                <!-- ✅ 6. Reclutador -->
+                <field name="user_id" 
+                       string="Reclutador" 
+                       widget="many2one_avatar_user"
+                       optional="show"/>
+                
+                <!-- ✅ 7. Fuente de Reclutamiento (antes "origen") -->
+                <field name="source_id" 
+                       string="Fuente de Reclutamiento" 
+                       optional="show"/>
+                
+                <!-- ✅ Campos adicionales útiles (opcionales) -->
+                <field name="date_closed" 
+                       string="Fecha de Contratación" 
+                       widget="datetime"
+                       optional="hide"/>
+                
+                <field name="salary_proposed" 
+                       string="Salario Propuesto" 
+                       optional="hide"/>
+                
+                <!-- ✅ Campos invisibles para filtros/agrupación -->
+                <field name="application_status" column_invisible="True"/>
+                <field name="create_date" column_invisible="True"/>
+                
+            </list>
+        </field>
+    </record>
+
+    <!-- ✅ Vista de búsqueda personalizada para contratados (CORREGIDA) -->
+    <record id="hr_applicant_hired_search_view" model="ir.ui.view">
+        <field name="name">hr.applicant.hired.search</field>
+        <field name="model">hr.applicant</field>
+        <field name="arch" type="xml">
+            <search string="Buscar Candidatos Contratados">
+                
+                <!-- ✅ Búsquedas rápidas -->
+                <field name="partner_name" string="Postulante"/>
+                <field name="job_id" string="Puesto"/>
+                <field name="user_id" string="Reclutador"/>
+                <field name="source_id" string="Fuente de Reclutamiento"/>
+                <field name="date_closed" string="Fecha de Contratación"/>
+                
+                <!-- ✅ Filtros predefinidos CORREGIDOS -->
+                <filter name="filter_hired" 
+                        string="Solo Contratados" 
+                        domain="[('application_status', '=', 'hired')]"
+                        help="Mostrar solo candidatos contratados"/>
+                
+                <filter name="filter_this_week" 
+                        string="Contratados Esta Semana" 
+                        domain="[('date_closed', '&gt;=', (context_today() - datetime.timedelta(days=7)).strftime('%Y-%m-%d'))]"
+                        help="Contratados en los últimos 7 días"/>
+                
+                <filter name="filter_this_month" 
+                        string="Contratados Este Mes" 
+                        domain="[('date_closed', '&gt;=', (context_today().replace(day=1)).strftime('%Y-%m-%d'))]"
+                        help="Contratados en el mes actual"/>
+                
+                <separator/>
+                
+                <!-- ✅ Agrupaciones -->
+                <group expand="0" string="Agrupar Por">
+                    <filter name="group_by_job" 
+                            string="Puesto de Trabajo" 
+                            context="{'group_by': 'job_id'}"
+                            help="Agrupar por puesto de trabajo"/>
+                    
+                    <filter name="group_by_recruiter" 
+                            string="Reclutador" 
+                            context="{'group_by': 'user_id'}"
+                            help="Agrupar por reclutador"/>
+                    
+                    <filter name="group_by_source" 
+                            string="Fuente de Reclutamiento" 
+                            context="{'group_by': 'source_id'}"
+                            help="Agrupar por fuente de reclutamiento"/>
+                    
+                    <filter name="group_by_stage" 
+                            string="Etapa" 
+                            context="{'group_by': 'stage_id'}"
+                            help="Agrupar por etapa final"/>
+                    
+                    <filter name="group_by_date_hired" 
+                            string="Fecha de Contratación" 
+                            context="{'group_by': 'date_closed:month'}"
+                            help="Agrupar por mes de contratación"/>
+                </group>
+                
+            </search>
+        </field>
+    </record>
+
+</odoo>

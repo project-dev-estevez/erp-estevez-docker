@@ -346,8 +346,8 @@ export class KpisGrid extends Component {
         });
     }
 
-    viewHiredApplicants() {
-        console.log(`✅ KpisGrid: ¡Navegando a contratados!`);
+    viewHiredApplicants() 
+    {
         let domain = [["application_status", "=", "hired"]];
         domain = this._getHiredDateRangeDomain(domain);
 
@@ -356,7 +356,13 @@ export class KpisGrid extends Component {
             name: "✅ Candidatos Contratados",
             res_model: "hr.applicant",
             domain: domain,
-            views: [[false, "list"], [false, "form"]]
+            views: [[false, "list"], [false, "form"]],
+            context: {
+                // ✅ NUEVO: Configuración de vista personalizada
+                list_view_ref: "hr_recruitment_estevez.hr_applicant_hired_list_view",
+                search_default_filter_hired: 1,  // ✅ Filtro por contratados
+                search_default_group_by_job: 1   // ✅ Agrupar por puesto de trabajo
+            }
         });
     }
 
