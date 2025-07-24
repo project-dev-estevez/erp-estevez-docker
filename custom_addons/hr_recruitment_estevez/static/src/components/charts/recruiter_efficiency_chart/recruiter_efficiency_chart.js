@@ -353,6 +353,19 @@ export class RecruiterEfficiencyChart extends Component {
                     tooltip: {
                         shared: false,
                         intersect: true,
+                        fixed: {
+                            enabled: true,
+                            position: 'topRight',  // ✅ Siempre en la esquina superior derecha
+                            offsetX: -50,
+                            offsetY: 0,
+                        },
+                        // ✅ Evitar que se salga del contenedor
+                        followCursor: false,
+                        theme: 'light',
+                        style: {
+                            fontSize: '12px',
+                            fontFamily: undefined
+                        },
                         custom: function ({ series, seriesIndex, dataPointIndex, w }) {
                             const stat = recruiterStats[dataPointIndex];
                             const value = series[seriesIndex][dataPointIndex];
