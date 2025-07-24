@@ -119,10 +119,12 @@ class HrRequisition(models.Model):
         copy=False,
         tracking=True
     )
+
     publish_date = fields.Datetime(
         string='Fecha de Publicación',
         copy=False
     )
+    
     close_date = fields.Datetime(
         string='Fecha de Cierre',
         copy=False

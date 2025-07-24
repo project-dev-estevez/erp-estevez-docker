@@ -245,21 +245,13 @@ export class KpisGrid extends Component {
 
     async calculateOpenPositions() {
         try {
-            // ✅ PASO 1: Debug - Ver todas las vacantes primero
-            const allJobs = await this.orm.searchRead("hr.job", [], ["name", "active", "no_of_recruitment", "no_of_hired_employee"]);
-            // ✅ PASO 2: Contar vacantes realmente abiertas
-            // Una vacante está abierta si:
-            // - Está activa (active = true)
-            // - Tiene vacantes por llenar (no_of_recruitment > no_of_hired_employee)
             let domain = [
-                ["active", "=", true],                                      // ✅ Vacante activa
-                ["no_of_recruitment", ">", 0],                             // ✅ Tiene vacantes que llenar
-                // ✅ Opcional: Que aún tenga vacantes disponibles
-                // ["no_of_recruitment", ">", "no_of_hired_employee"]
+                ["is_published", "=", true],
             ];
             
-            const count = await this.orm.searchCount("hr.job", domain);
+            const count = await this.orm.searchCount("hr.requisition", domain);            
             this.state.openPositions.value = count;
+            
         } catch (error) {
             console.error("❌ KpisGrid: Error calculando Vacantes Abiertas:", error);
             this.state.openPositions.value = 0;
@@ -387,18 +379,19 @@ export class KpisGrid extends Component {
     }
 
     viewOpenPositions() {
+
+        let domain = [
+            ["is_published", "=", true],
+        ];
+
         this.actionService.doAction({
             type: "ir.actions.act_window",
             name: "💼 Vacantes Abiertas",
-            res_model: "hr.job",
-            domain: [
-                ["active", "=", true],              // ✅ Vacantes activas
-                ["no_of_recruitment", ">", 0]       // ✅ Con vacantes por llenar
-            ],
+            res_model: "hr.requisition",
+            domain: domain,
             views: [[false, "list"], [false, "form"]],
             context: {
-                search_default_group_by_department: 1,  // ✅ Agrupar por departamento
-                // search_default_filter_open: 1        // ✅ Comentar si causa problemas
+                search_default_filter_open_positions: 1,
             }
         });
     }
