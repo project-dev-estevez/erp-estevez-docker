@@ -199,6 +199,43 @@ class HrApplicant(models.Model):
         help='Historial completo de etapas por las que ha pasado el candidato'
     )
 
+    first_name = fields.Char(string="Primer Nombre")
+    second_name = fields.Char(string="Segundo Nombre")
+    last_name_1 = fields.Char(string="Apellido Paterno")
+    last_name_2 = fields.Char(string="Apellido Materno")
+    
+    def _split_names(self, full_name):
+        partes = full_name.strip().split()
+        if len(partes) >= 4:
+            return {
+                'first_name': partes[0],
+                'second_name': partes[1],
+                'last_name_1': partes[-2],
+                'last_name_2': partes[-1],
+            }
+        if len(partes) == 3:
+            return {
+                'first_name': partes[0],
+                'second_name': '',
+                'last_name_1': partes[1],
+                'last_name_2': partes[2],
+            }
+        if len(partes) == 2:
+            return {
+                'first_name': partes[0],
+                'second_name': '',
+                'last_name_1': partes[1],
+                'last_name_2': '',
+            }
+        # Solo uno
+        return {
+            'first_name': full_name,
+            'second_name': '',
+            'last_name_1': '',
+            'last_name_2': '',
+        }    
+   
+
     @api.onchange('zoonosis')
     def _onchange_zoonosis(self):
         if self.zoonosis != 'positive':
@@ -233,6 +270,9 @@ class HrApplicant(models.Model):
     def create(self, vals):
         if 'user_id' not in vals or not vals['user_id']:
             vals['user_id'] = self.env.user.id  # Asigna el usuario logueado por defecto
+
+        if vals.get('partner_name'):
+            vals.update(self._split_names(vals['partner_name']))
         
         # Crear el applicant
         applicant = super(HrApplicant, self).create(vals)
@@ -246,8 +286,12 @@ class HrApplicant(models.Model):
             })
         
         return applicant
-    
-    def write(self, vals):
+        
+
+    def write(self, vals):      
+        # 0) Si cambió el nombre completo, aplica el split sobre partner_name
+        if vals.get('partner_name'):
+            vals.update(self._split_names(vals['partner_name']))
         # Validar si el postulante está bloqueado
         if 'stage_id' in vals and any(applicant.kanban_state == 'blocked' for applicant in self):
             raise UserError(_("El postulante está bloqueado y no puede avanzar en el proceso hasta que el bloqueo sea resuelto o eliminado manualmente por un usuario autorizado."))
@@ -457,13 +501,32 @@ class HrApplicant(models.Model):
         action = self.candidate_id.create_employee_from_candidate()
         employee = self.env['hr.employee'].browse(action['res_id'])
         
+        # Asegurarse de dividir el nombre COMPLETO (incluso si ya existen campos divididos)
+        name_fields = {}
+        if self.partner_name:
+            # Siempre usar el nombre completo actualizado
+            name_fields = self._split_names(self.partner_name)
+        else:
+            # Fallback a los campos existentes (pueden estar vacíos)
+            name_fields = {
+                'first_name': self.first_name,
+                'second_name': self.second_name,
+                'last_name_1': self.last_name_1,
+                'last_name_2': self.last_name_2,
+            }
         # Actualizar los datos del empleado con información del applicant
-        employee.write({
+        employee.write({            
             'job_id': self.job_id.id,
             'job_title': self.job_id.name,
             'department_id': self.department_id.id,
             'work_email': self.department_id.company_id.email or self.email_from,  # Para tener un correo válido por defecto
-            'work_phone': self.department_id.company_id.phone,
+            'work_phone': self.department_id.company_id.phone,            
+            'first_name': name_fields.get('first_name'),            
+            'second_name': name_fields.get('second_name'),
+            'names': f"{name_fields.get('first_name', '')} {name_fields.get('second_name', '')}".strip(),
+            'last_name_1': name_fields.get('last_name_1'),
+            'last_name_2': name_fields.get('last_name_2'),
+            'project': self.project_id.name
         })
 
         # Transferir documentos asociados al applicant al empleado
