@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    
+    <!-- ✅ Vista de lista personalizada para rechazados (CORREGIDA) -->
+    <record id="hr_applicant_rejected_list_view" model="ir.ui.view">
+        <field name="name">hr.applicant.rejected.list</field>
+        <field name="model">hr.applicant</field>
+        <field name="arch" type="xml">
+            <list string="Postulaciones Rechazadas" 
+                  default_order="refuse_reason_id, refuse_date desc, id"
+                  decoration-danger="application_status == 'refused'"
+                  create="false"
+                  edit="false">
+                
+                <!-- ✅ 1. Motivo de Rechazo -->
+                <field name="refuse_reason_id" 
+                       string="Motivo de Rechazo" 
+                       optional="show"/>
+                
+                <!-- ✅ 2. Fecha y Hora de Rechazo (CORREGIDO) -->
+                <field name="refuse_date" 
+                       string="Fecha y Hora" 
+                       widget="datetime"
+                       optional="show"/>
+                
+                <!-- ✅ 3. Postulante -->
+                <field name="partner_name" 
+                       string="Postulante" 
+                       optional="show"/>
+                
+                <!-- ✅ 4. Puesto de Trabajo -->
+                <field name="job_id" 
+                       string="Puesto de Trabajo" 
+                       optional="show"/>
+                
+                <!-- ✅ 5. Etiquetas -->
+                <field name="categ_ids" 
+                       string="Etiquetas" 
+                       widget="many2many_tags" 
+                       options="{'color_field': 'color'}"
+                       optional="show"/>
+                
+                <!-- ✅ 6. Etapa -->
+                <field name="stage_id" 
+                       string="Etapa" 
+                       optional="show"/>
+                
+                <!-- ✅ 7. Reclutador -->
+                <field name="user_id" 
+                       string="Reclutador" 
+                       widget="many2one_avatar_user"
+                       optional="show"/>
+                
+                <!-- ✅ 8. Teléfono -->
+                <field name="partner_phone" 
+                       string="Teléfono" 
+                       optional="show"/>
+                
+                <!-- ✅ Campos invisibles para filtros/agrupación -->
+                <field name="application_status" column_invisible="True"/>
+                <field name="active" column_invisible="True"/>
+                
+            </list>
+        </field>
+    </record>
+
+    <!-- ✅ Vista de búsqueda actualizada -->
+    <record id="hr_applicant_rejected_search_view" model="ir.ui.view">
+        <field name="name">hr.applicant.rejected.search</field>
+        <field name="model">hr.applicant</field>
+        <field name="arch" type="xml">
+            <search string="Buscar Postulaciones Rechazadas">
+                
+                <!-- ✅ Búsquedas rápidas -->
+                <field name="partner_name" string="Postulante"/>
+                <field name="job_id" string="Puesto"/>
+                <field name="refuse_reason_id" string="Motivo de Rechazo"/>
+                <field name="user_id" string="Reclutador"/>
+                <field name="refuse_date" string="Fecha de Rechazo"/>
+                
+                <!-- ✅ Filtros predefinidos -->
+                <filter name="filter_refused" 
+                        string="Solo Rechazados" 
+                        domain="[('application_status', '=', 'refused')]"
+                        help="Mostrar solo candidatos rechazados"/>
+                
+                <filter name="filter_this_week" 
+                        string="Esta Semana" 
+                        domain="[('refuse_date', '&gt;=', (context_today() - datetime.timedelta(days=7)).strftime('%Y-%m-%d'))]"
+                        help="Rechazados en los últimos 7 días"/>
+                
+                <filter name="filter_this_month" 
+                        string="Este Mes" 
+                        domain="[('refuse_date', '&gt;=', (context_today().replace(day=1)).strftime('%Y-%m-%d'))]"
+                        help="Rechazados en el mes actual"/>
+                
+                <separator/>
+                
+                <!-- ✅ Agrupaciones -->
+                <group expand="0" string="Agrupar Por">
+                    <filter name="group_by_refuse_reason" 
+                            string="Motivo de Rechazo" 
+                            context="{'group_by': 'refuse_reason_id'}"
+                            help="Agrupar por motivo de rechazo"/>
+                    
+                    <filter name="group_by_job" 
+                            string="Puesto de Trabajo" 
+                            context="{'group_by': 'job_id'}"
+                            help="Agrupar por puesto de trabajo"/>
+                    
+                    <filter name="group_by_recruiter" 
+                            string="Reclutador" 
+                            context="{'group_by': 'user_id'}"
+                            help="Agrupar por reclutador"/>
+                    
+                    <filter name="group_by_stage" 
+                            string="Etapa" 
+                            context="{'group_by': 'stage_id'}"
+                            help="Agrupar por etapa donde fue rechazado"/>
+                    
+                    <!-- ✅ ACTUALIZADO: Agrupación por fecha de rechazo -->
+                    <filter name="group_by_date_refused" 
+                            string="Fecha de Rechazo" 
+                            context="{'group_by': 'refuse_date:month'}"
+                            help="Agrupar por mes de rechazo"/>
+                </group>
+                
+            </search>
+        </field>
+    </record>
+
+</odoo>

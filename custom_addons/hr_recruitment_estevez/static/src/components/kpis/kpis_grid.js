@@ -26,7 +26,8 @@ export class KpisGrid extends Component {
             preselectedApplicants: { value: 0 },
             rejectedApplicants: { value: 0 },
             hiredApplicants: { value: 0 },
-            averageHiringTime: { value: "0 días" },
+            openPositions: { value: 0 },
+            pendingRequisitions: { value: 0 },
             isLoading: true,
             showModal: false
         });
@@ -104,18 +105,24 @@ export class KpisGrid extends Component {
                 onClick: () => this.viewHiredApplicants()
             },
             {
-                name: "Tiempo Promedio (Días)",
-                value: this.state.averageHiringTime.value,
+                name: "Vacantes Abiertas",
+                value: this.state.openPositions.value,
                 percentage: 0,
                 showPercentage: false,
-                onClick: () => this.viewAverageHiringTime()
+                onClick: () => this.viewOpenPositions()
+            },
+            {
+                name: "Requisiciones por Aprobar",
+                value: this.state.pendingRequisitions.value,
+                percentage: 0,
+                showPercentage: false,
+                onClick: () => this.viewPendingRequisitions()
             }
         ];
     }
 
     // ✅ Método principal para cargar todos los KPIs
     async loadKpisData() {
-        console.log("📊 KpisGrid: Cargando datos de KPIs...");
         this.state.isLoading = true;
         
         try {
@@ -125,9 +132,9 @@ export class KpisGrid extends Component {
                 this.calculatePreselectedApplicants(),
                 this.calculateRejectedApplicants(),
                 this.calculateHiredApplicants(),
-                this.calculateAverageHiringTime(),
+                this.calculateOpenPositions(),
+                this.calculatePendingRequisitions(),
             ]);
-            console.log("✅ KpisGrid: Datos cargados exitosamente");
         } catch (error) {
             console.error("❌ KpisGrid: Error cargando datos:", error);
         } finally {
@@ -234,35 +241,39 @@ export class KpisGrid extends Component {
 
         const data = await this.orm.searchCount("hr.applicant", domain);
         this.state.hiredApplicants.value = data;
-        console.log("✅ Hired applicants:", data);
     }
 
-    async calculateAverageHiringTime() {
-        let domain = [["application_status", "=", "hired"]];
-        domain = this._addDateRangeToDomain(domain);
-
-        const applicants = await this.orm.searchRead('hr.applicant', domain, ["create_date", "date_closed"]);
-        if (!applicants.length) {
-            this.state.averageHiringTime.value = "0";
-            return;
+    async calculateOpenPositions() {
+        try {
+            let domain = [
+                ["is_published", "=", true],
+            ];
+            
+            const count = await this.orm.searchCount("hr.requisition", domain);            
+            this.state.openPositions.value = count;
+            
+        } catch (error) {
+            console.error("❌ KpisGrid: Error calculando Vacantes Abiertas:", error);
+            this.state.openPositions.value = 0;
         }
+    }
 
-        let totalDays = 0;
-        let count = 0;
-        for (const applicant of applicants) {
-            if (applicant.create_date && applicant.date_closed) {
-                const created = new Date(applicant.create_date);
-                const closed = new Date(applicant.date_closed);
-                const diffTime = closed - created;
-                const diffDays = diffTime / (1000 * 60 * 60 * 24);
-                totalDays += diffDays;
-                count += 1;
-            }
+    async calculatePendingRequisitions() {
+        try {
+            // ✅ Contar requisiciones en estado 'to_approve' (por aprobar)
+            let domain = [
+                ["state", "=", "to_approve"]  // Estado por aprobar
+            ];
+            
+            // ✅ Si quieres aplicar filtros de fecha, puedes usar:
+            // domain = this._addDateRangeToDomain(domain);
+
+            const count = await this.orm.searchCount("hr.requisition", domain);
+            this.state.pendingRequisitions.value = count;
+        } catch (error) {
+            console.error("❌ KpisGrid: Error calculando Requisiciones por Aprobar:", error);
+            this.state.pendingRequisitions.value = 0;
         }
-
-        const averageDays = count ? (totalDays / count) : 0;
-        this.state.averageHiringTime.value = `${averageDays.toFixed(1)}`;
-        console.log("⏱️ Average hiring time:", `${averageDays.toFixed(1)} días`);
     }
 
     // ✅ Métodos de navegación
@@ -328,7 +339,6 @@ export class KpisGrid extends Component {
     }
 
     viewRejectedApplicants() {
-        console.log(`❌ KpisGrid: ¡Navegando a rechazados!`);
         const context = { active_test: false };
         let domain = [["application_status", "=", "refused"]];
         domain = this._addDateRangeToDomain(domain);
@@ -339,12 +349,17 @@ export class KpisGrid extends Component {
             res_model: "hr.applicant",
             domain: domain,
             views: [[false, "list"], [false, "form"]],
-            context: context
+            context: {
+                ...context,
+                list_view_ref: "hr_recruitment_estevez.hr_applicant_rejected_list_view",
+                search_default_group_by_refuse_reason: 1,  // ✅ Agrupar por motivo de rechazo
+                search_default_filter_refused: 1           // ✅ Filtro por rechazados
+            }
         });
     }
 
-    viewHiredApplicants() {
-        console.log(`✅ KpisGrid: ¡Navegando a contratados!`);
+    viewHiredApplicants() 
+    {
         let domain = [["application_status", "=", "hired"]];
         domain = this._getHiredDateRangeDomain(domain);
 
@@ -353,25 +368,47 @@ export class KpisGrid extends Component {
             name: "✅ Candidatos Contratados",
             res_model: "hr.applicant",
             domain: domain,
-            views: [[false, "list"], [false, "form"]]
+            views: [[false, "list"], [false, "form"]],
+            context: {
+                // ✅ NUEVO: Configuración de vista personalizada
+                list_view_ref: "hr_recruitment_estevez.hr_applicant_hired_list_view",
+                search_default_filter_hired: 1,  // ✅ Filtro por contratados
+                search_default_group_by_job: 1   // ✅ Agrupar por puesto de trabajo
+            }
         });
     }
 
-    viewAverageHiringTime() {
-        console.log(`⏱️ KpisGrid: ¡Mostrando análisis de tiempo!`);
-        
+    viewOpenPositions() {
+
+        let domain = [
+            ["is_published", "=", true],
+        ];
+
         this.actionService.doAction({
             type: "ir.actions.act_window",
-            name: "⏱️ Análisis de Tiempo de Contratación",
-            res_model: "hr.applicant.stage.history",
+            name: "💼 Vacantes Abiertas",
+            res_model: "hr.requisition",
+            domain: domain,
             views: [[false, "list"], [false, "form"]],
-            domain: [
-                ['applicant_id.application_status', '=', 'hired'],
-                ['leave_date', '!=', false]
-            ],
             context: {
-                search_default_group_by_stage: 1,
-                search_default_group_by_applicant: 1
+                search_default_filter_open_positions: 1,
+            }
+        });
+    }
+
+    viewPendingRequisitions() {
+        this.actionService.doAction({
+            type: "ir.actions.act_window",
+            name: "📋 Requisiciones por Aprobar",
+            res_model: "hr.requisition",
+            domain: [
+                ["state", "=", "to_approve"]
+            ],
+            views: [[false, "list"], [false, "form"]],
+            context: {
+                search_default_group_by_requestor: 1,        // ✅ Agrupar por solicitante
+                search_default_filter_pending: 1,            // ✅ Filtro por pendientes
+                // search_default_group_by_department: 1     // ✅ Alternativa: agrupar por departamento
             }
         });
     }

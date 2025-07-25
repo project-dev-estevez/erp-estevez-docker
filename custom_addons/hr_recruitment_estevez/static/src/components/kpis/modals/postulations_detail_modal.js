@@ -86,29 +86,58 @@ export class PostulationsDetailModal extends Component {
             const stageNames = [];
             const stageCounts = [];
 
+            // 3.1 ✅ Contar candidatos ACTIVOS por etapa
             for (const stage of stages) {
                 let domain = [['stage_id', '=', stage.id]];
-                domain = this._addDateRangeToDomain(domain);  // ✅ IMPORTANTE: Aplica filtros de fecha
+                domain = this._addDateRangeToDomain(domain);
 
                 const count = await this.orm.searchCount("hr.applicant", domain);
 
-                // ✅ Solo incluir etapas con candidatos
                 if (count > 0) {
                     stageData.push({
                         id: stage.id,
                         name: stage.name,
                         count: count,
-                        sequence: stage.sequence
+                        sequence: stage.sequence,
+                        type: 'active'  // ✅ Marcar como activo
                     });
                     stageNames.push(stage.name);
                     stageCounts.push(count);
                 }
             }
 
+            // 3.2 ✅ NUEVO: Contar candidatos RECHAZADOS que superaron primer contacto
+            let rejectedDomain = [
+                ['stage_id.sequence', '>', primerContactoSequence],
+                ['application_status', '=', 'refused']  // ✅ Solo rechazados
+            ];
+            rejectedDomain = this._addDateRangeToDomain(rejectedDomain);
+
+            const rejectedCount = await this.orm.searchCount(
+                "hr.applicant", 
+                rejectedDomain, 
+                { context: { active_test: false } }  // ✅ Incluir inactivos
+            );
+
+            // 3.3 ✅ Agregar rechazados como etapa especial si hay candidatos
+            if (rejectedCount > 0) {
+                stageData.push({
+                    id: null,  // No tiene etapa específica
+                    name: 'Rechazados',
+                    count: rejectedCount,
+                    sequence: 999,  // Al final
+                    type: 'rejected'  // ✅ Marcar como rechazado
+                });
+                stageNames.push('Rechazados');
+                stageCounts.push(rejectedCount);
+            }
+
             // 4. ✅ Actualizar título con información del rango
             const totalCandidatos = stageCounts.reduce((a, b) => a + b, 0);
             const rangeText = this.getRangeText();
             this.state.title = `Total de Postulaciones${rangeText ? ` ${rangeText}` : ''}`;
+
+            console.log(`📊 Modal: Total candidatos: ${totalCandidatos} (KPI debe coincidir)`);
 
             // 5. ✅ Guardar datos para navegación
             this.state.stageData = stageData;
@@ -121,14 +150,14 @@ export class PostulationsDetailModal extends Component {
                 return;
             }
 
-            // 7. ✅ Preparar configuración de la gráfica con título dinámico
+            // 7. ✅ Preparar configuración de la gráfica con colores especiales
             this.state.chartConfig = {
                 series: [{
                     name: 'Candidatos',
                     data: stageCounts
                 }],
                 categories: stageNames,
-                colors: this.generateColors(stageNames.length),
+                colors: this.generateColorsWithRejected(stageNames.length, rejectedCount > 0),
                 yAxisTitle: 'Número de Candidatos',
                 options: {
                     chart: {
@@ -154,7 +183,7 @@ export class PostulationsDetailModal extends Component {
                             color: '#263238'
                         }
                     },
-                    // ...resto de configuración sin cambios...
+                    // ...resto de configuración igual...
                     plotOptions: {
                         bar: {
                             horizontal: false,
@@ -176,7 +205,7 @@ export class PostulationsDetailModal extends Component {
                             colors: ['#fff']
                         }
                     },
-                    colors: this.generateColors(stageNames.length),
+                    colors: this.generateColorsWithRejected(stageNames.length, rejectedCount > 0),
                     xaxis: {
                         labels: {
                             show: true,
@@ -214,32 +243,52 @@ export class PostulationsDetailModal extends Component {
     }
 
     async openStageApplicants(stage) {
-        
         try {
-            // 1. ✅ Crear dominio para la etapa específica con filtros de fecha
-            let domain = [['stage_id', '=', stage.id]];
+            let domain = [];
+            let title = '';
+            const rangeText = this.getRangeText();
+
+            if (stage.type === 'rejected') {
+                // ✅ Dominio especial para rechazados
+                const primerContactoStage = await this.orm.searchRead(
+                    'hr.recruitment.stage',
+                    [['name', 'ilike', 'primer contacto']],
+                    ['sequence'],
+                    { limit: 1 }
+                );
+                
+                if (primerContactoStage.length > 0) {
+                    const sequence = primerContactoStage[0].sequence;
+                    domain = [
+                        ['stage_id.sequence', '>', sequence],
+                        ['application_status', '=', 'refused']
+                    ];
+                } else {
+                    domain = [['application_status', '=', 'refused']];
+                }
+                
+                title = `❌ ${stage.name}${rangeText ? ` ${rangeText}` : ''} (${stage.count} candidatos)`;
+            } else {
+                // ✅ Dominio normal para etapas activas
+                domain = [['stage_id', '=', stage.id]];
+                title = `📊 ${stage.name}${rangeText ? ` ${rangeText}` : ''} (${stage.count} candidatos)`;
+            }
+
             domain = this._addDateRangeToDomain(domain);
 
-            // 2. ✅ Crear título dinámico
-            const rangeText = this.getRangeText();
-            const title = `📊 ${stage.name}${rangeText ? ` ${rangeText}` : ''} (${stage.count} candidatos)`;
-
-            // 3. ✅ Navegar usando actionService
+            // ✅ Navegar usando actionService
             await this.actionService.doAction({
                 type: "ir.actions.act_window",
                 name: title,
                 res_model: "hr.applicant",
                 domain: domain,
                 views: [[false, "list"], [false, "form"]],
-                target: "current",  // ✅ Abrir en la misma ventana
-                context: {
-                    // ✅ Contexto adicional para la vista
-                    default_stage_id: stage.id,
-                    search_default_stage_id: stage.id
-                }
+                target: "current",
+                context: stage.type === 'rejected' ? 
+                    { active_test: false } :  // ✅ Para rechazados, incluir inactivos
+                    { default_stage_id: stage.id }
             });
 
-            // 4. ✅ Opcional: Cerrar el modal después de navegar
             this.onCloseModal();
 
         } catch (error) {
@@ -283,6 +332,23 @@ export class PostulationsDetailModal extends Component {
             '#AED6F1', '#A9DFBF', '#F9E79F', '#F8BBD0', '#DCEDC8', '#FFF9C4'
         ];
         return colors.slice(0, count);
+    }
+
+    generateColorsWithRejected(count, hasRejected) {
+        const colors = [
+            '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7', '#DDA0DD', '#FFB347',
+            '#98D8C8', '#F7DC6F', '#BB8FCE', '#85C1E9', '#F8C471', '#FF6B6B',
+            '#AED6F1', '#A9DFBF', '#F9E79F', '#F8BBD0', '#DCEDC8', '#FFF9C4'
+        ];
+        
+        let finalColors = colors.slice(0, count);
+        
+        // ✅ Si hay rechazados, el último color debe ser rojo
+        if (hasRejected) {
+            finalColors[finalColors.length - 1] = '#FF6B6B';  // Rojo para rechazados
+        }
+        
+        return finalColors;
     }
 
     onCloseModal() {
