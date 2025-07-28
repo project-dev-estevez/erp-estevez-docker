@@ -514,11 +514,21 @@ class HrApplicant(models.Model):
                 'last_name_1': self.last_name_1,
                 'last_name_2': self.last_name_2,
             }
+
+        # Obtener valores desde el puesto (si existe)
+        job = self.job_id
+        direction_id = job.direction_id.id if job and job.direction_id else False
+        department_id = job.department_id.id if job and job.department_id else self.department_id.id
+        area_id = job.area_id.id if job and job.area_id else False
+
+        
         # Actualizar los datos del empleado con información del applicant
         employee.write({            
             'job_id': self.job_id.id,
             'job_title': self.job_id.name,
-            'department_id': self.department_id.id,
+            'direction_id': direction_id,
+            'department_id': department_id,
+            'area_id': area_id,
             'work_email': self.department_id.company_id.email or self.email_from,  # Para tener un correo válido por defecto
             'work_phone': self.department_id.company_id.phone,            
             'first_name': name_fields.get('first_name'),            
