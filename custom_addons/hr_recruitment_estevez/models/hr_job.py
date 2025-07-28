@@ -26,6 +26,9 @@ class HrJob(models.Model):
         tracking=True
     )
 
+    direction_id = fields.Many2one('hr.direction', string='Dirección')
+    area_id = fields.Many2one('hr.area', string='Area')
+
     @api.depends()
     def _compute_refused_applicant_count(self):
         for job in self:
