@@ -13,7 +13,7 @@
                 <button class="oe_stat_button" name="action_open_documents" type="object" icon="fa-file-text-o" string="Documentos"/>
             </xpath>
 
-            <!-- Agregar Historia Clinica Page -->
+            <!-- Cuando el candidato está en la etapa de "Examen Médico", le mostramos este tab -->
             <xpath expr="//notebook" position="inside">
                 <page string="Historia Clínica General" name="clinical_history" invisible="not is_examen_medico">
 

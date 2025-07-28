@@ -494,6 +494,23 @@ class HrApplicant(models.Model):
             else:
                 record.is_examen_medico = False
 
+    @api.depends('stage_id.sequence')
+    def _compute_is_driving_test(self):
+        for record in self:
+            if record.stage_id:
+                # ✅ Buscar la etapa "Prueba de Manejo" para obtener su sequence
+                driving_test_stage = self.env['hr.recruitment.stage'].search([
+                    ('name', 'ilike', 'prueba de manejo')
+                ], limit=1)
+                
+                if driving_test_stage:
+                    # ✅ Visible si está en "Prueba de Manejo" o en etapas posteriores (sequence mayor o igual)
+                    record.is_driving_test = record.stage_id.sequence >= driving_test_stage.sequence
+                else:
+                    record.is_driving_test = False
+            else:
+                record.is_driving_test = False
+
     def create_employee_from_applicant(self):
         self.ensure_one()
         
