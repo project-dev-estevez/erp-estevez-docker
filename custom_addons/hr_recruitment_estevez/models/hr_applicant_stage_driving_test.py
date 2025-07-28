@@ -435,12 +435,5 @@ class HrApplicantStageDrivingTest(models.Model):
         if not self.evaluator_id:
             self.evaluator_id = self.env.user.id
         
-        return {
-            'type': 'ir.actions.client',
-            'tag': 'display_notification',
-            'params': {
-                'title': 'Información Guardada',
-                'message': f'La información de licencia para {self.partner_name} ha sido guardada exitosamente.',
-                'type': 'success',
-            }
-        }
+        # ✅ Descargar el PDF del reporte
+        return self.env.ref('hr_recruitment_estevez.action_hr_applicant_driving_test_report').report_action(self)

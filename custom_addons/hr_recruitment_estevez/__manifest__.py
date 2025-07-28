@@ -27,6 +27,8 @@
         # Archivos de informes
         'report/hr_applicant_doctor_report.xml',
         'report/hr_applicant_doctor_report_templates.xml',
+        'report/hr_applicant_driving_test_report.xml',
+        'report/hr_applicant_driving_test_report_templates.xml',
         
         # Archivos de vistas
         'views/hr_applicant_document_views.xml',

@@ -1,0 +1,62 @@
+<odoo>
+    <template id="hr_applicant_driving_test_report_document">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="applicant">
+                <div class="page">
+                    <h2 style="text-align:center;">REPORTE DE PRUEBA DE MANEJO</h2>
+                    <hr/>
+                    <h4>Información del Candidato</h4>
+                    <p><strong>Nombre:</strong> <span t-esc="applicant.partner_name"/></p>
+                    <p><strong>Puesto:</strong> <span t-esc="applicant.job_id.name"/></p>
+                    <p><strong>Evaluador:</strong> <span t-esc="applicant.evaluator_id.name"/></p>
+                    <p><strong>Puesto Evaluador:</strong> <span t-esc="applicant.evaluator_job_title"/></p>
+                    <p><strong>Tipo de Licencia:</strong> <span t-esc="applicant.license_type"/></p>
+                    <p><strong>Número de Licencia:</strong> <span t-esc="applicant.license_number"/></p>
+                    <p><strong>Descripción:</strong> <span t-esc="applicant.license_description"/></p>
+                    <br/>
+
+                    <h4>1. CONOCIMIENTO, INSPECCIÓN Y ADAPTACIÓN DEL VEHÍCULO</h4>
+                    <table class="table table-bordered">
+                        <tr><td>Inspección de los niveles</td><td><span t-esc="applicant.fluid_levels_inspection"/></td></tr>
+                        <tr><td>Inspección de batería</td><td><span t-esc="applicant.battery_inspection"/></td></tr>
+                        <tr><td>Verificación de llantas</td><td><span t-esc="applicant.tire_verification"/></td></tr>
+                        <tr><td>Adaptación de seguridad</td><td><span t-esc="applicant.safety_adaptation"/></td></tr>
+                        <tr><td>Verificación de luces</td><td><span t-esc="applicant.lights_verification"/></td></tr>
+                        <tr><td><strong>Promedio Sección 1</strong></td><td><span t-esc="applicant.knowledge_average"/></td></tr>
+                    </table>
+
+                    <h4>2. DESTREZA Y HABILIDADES EN EL MANEJO</h4>
+                    <table class="table table-bordered">
+                        <tr><td>Maniobra de encendido</td><td><span t-esc="applicant.ignition_maneuver"/></td></tr>
+                        <tr><td>Puesta en marcha</td><td><span t-esc="applicant.starting_movement"/></td></tr>
+                        <tr><td>Avance en línea recta</td><td><span t-esc="applicant.straight_line_advance"/></td></tr>
+                        <tr><td>Coordinación de maniobras</td><td><span t-esc="applicant.maneuver_coordination"/></td></tr>
+                        <tr><td>Aplicación de cambios</td><td><span t-esc="applicant.gear_application"/></td></tr>
+                        <tr><td>Terreno inclinado</td><td><span t-esc="applicant.inclined_terrain"/></td></tr>
+                        <tr><td>Circulación y adelantamiento</td><td><span t-esc="applicant.circulation_overtaking"/></td></tr>
+                        <tr><td>Aplicación del embrague</td><td><span t-esc="applicant.clutch_application"/></td></tr>
+                        <tr><td>Frenos y parqueo en reversa</td><td><span t-esc="applicant.brake_parking"/></td></tr>
+                        <tr><td>Ingreso al área de parqueo</td><td><span t-esc="applicant.parking_entry"/></td></tr>
+                        <tr><td><strong>Promedio Sección 2</strong></td><td><span t-esc="applicant.skills_average"/></td></tr>
+                    </table>
+
+                    <h4>3. COMPORTAMIENTO DEL CONDUCTOR FRENTE AL TRÁNSITO</h4>
+                    <table class="table table-bordered">
+                        <tr><td>Empleo del reglamento</td><td><span t-esc="applicant.regulation_employment"/></td></tr>
+                        <tr><td>Distancia de seguimiento</td><td><span t-esc="applicant.following_distance"/></td></tr>
+                        <tr><td>Cambios de carril</td><td><span t-esc="applicant.lane_changes"/></td></tr>
+                        <tr><td>Uso de cambio de carriles</td><td><span t-esc="applicant.lane_use"/></td></tr>
+                        <tr><td>Manejo de direccionales</td><td><span t-esc="applicant.directional_handling"/></td></tr>
+                        <tr><td><strong>Promedio Sección 3</strong></td><td><span t-esc="applicant.behavior_average"/></td></tr>
+                    </table>
+
+                    <h4>RESULTADO FINAL</h4>
+                    <table class="table table-bordered">
+                        <tr><td><strong>Calificación Final</strong></td><td><span t-esc="applicant.final_test_average"/></td></tr>
+                        <tr><td><strong>Resultado</strong></td><td><span t-esc="applicant.final_test_result"/></td></tr>
+                    </table>
+                </div>
+            </t>
+        </t>
+    </template>
+</odoo>
