@@ -46,6 +46,7 @@
         'views/hr_candidate_view_list.xml',
         'views/hr_applicant_rejected_list_views.xml',
         'views/hr_applicant_hired_list_views.xml',
+        'views/hr_employee_views.xml'
 
     ],
     'assets': {

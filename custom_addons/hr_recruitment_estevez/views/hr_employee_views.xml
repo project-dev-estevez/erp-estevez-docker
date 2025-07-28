@@ -1,0 +1,23 @@
+<odoo>
+    <record id="view_employee_form_inherit" model="ir.ui.view">
+        <field name="name">hr.employee.form.inherit</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr.view_employee_form"/>
+        <field name="arch" type="xml">
+
+            <!-- Eliminar campos antiguos si existen -->
+            <xpath expr="//field[@name='names']" position="replace"/>
+            <xpath expr="//field[@name='last_name']" position="replace"/>
+            <xpath expr="//field[@name='mother_last_name']" position="replace"/>
+
+            <!-- Insertar campos justo antes de Número de Empleado -->
+            <xpath expr="//group/group[1]/field[@name='identification_id'] | //group/group[1]/field[1]" position="before">
+                <field name="first_name"/>
+                <field name="second_name"/>
+                <field name="last_name_1"/>
+                <field name="last_name_2"/>
+            </xpath>
+
+        </field>
+    </record>
+</odoo>
