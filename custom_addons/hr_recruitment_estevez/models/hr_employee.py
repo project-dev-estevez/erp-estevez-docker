@@ -14,6 +14,8 @@ class HrEmployee(models.Model):
     last_name_1 = fields.Char(string="Apellido Paterno")
     last_name_2 = fields.Char(string="Apellido Materno")
     names = fields.Char(string="Nombre Completo")
+    direction_id = fields.Many2one('hr.direction', string='Dirección')
+    area_id = fields.Many2one('hr.area', string='Area')
 
     @api.onchange('first_name', 'second_name', 'last_name_1', 'last_name_2')
     def _onchange_name_fields(self):
@@ -46,3 +48,17 @@ class HrEmployee(models.Model):
             for rec in self:
                 rec.name = rec._compute_full_name()
         return res
+
+    def action_open_documents(self):
+        self.env['hr.applicant.document'].search([]).unlink()
+        docs = self.env['hr.applicant.document'].create_required_documents(self.id)
+
+        return {
+            'name': _('Documentos del Aplicanteeeeee'),
+            'view_mode': 'kanban',
+            'res_model': 'hr.applicant.document',
+            'type': 'ir.actions.act_window',
+            'target': 'new',
+            'context': {'create': False},
+            'views': [(self.env.ref('hr_recruitment_estevez.view_hr_applicant_documents_kanban').id, 'kanban')],  # Asegúrate de usar la vista correcta
+        }
