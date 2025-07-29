@@ -181,7 +181,7 @@ export class RecruitmentSourcesChart extends Component {
                     }
                 },
                 chart: {
-                    type: 'polarArea',
+                    type: 'pie',
                     height: this.props.height || 400,
                     // ✅ AGREGAR: ID único para forzar recreación
                     id: 'recruitment-sources-chart-' + Date.now(),
@@ -268,7 +268,7 @@ export class RecruitmentSourcesChart extends Component {
         }
 
         // Construir indicadores con porcentajes
-        const indicators = this.state.sourcesData.map(r => {
+        let indicators = this.state.sourcesData.map(r => {
             const percentage = r.total > 0 ? ((r.hired / r.total) * 100).toFixed(2) : "0.00";
             return { 
                 id: r.sourceId,
@@ -278,6 +278,9 @@ export class RecruitmentSourcesChart extends Component {
                 percentage 
             };
         });
+
+        // Filtrar solo los que tengan al menos 1 contratado
+        indicators = indicators.filter(ind => ind.hired > 0);
 
         // Ordenar por efectividad (porcentaje de contratación)
         indicators.sort((a, b) => parseFloat(b.percentage) - parseFloat(a.percentage));

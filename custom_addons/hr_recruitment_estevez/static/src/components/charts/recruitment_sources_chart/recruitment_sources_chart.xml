@@ -19,7 +19,7 @@
                         <div t-if="state.hasData">
                             <!-- ✅ USAR CHARTRENDERAPEX -->
                             <ChartRendererApex 
-                                type="'polarArea'" 
+                                type="'pie'" 
                                 config="state.apexConfig"
                                 height="props.height || 400" 
                                 t-key="state.chartKey" />
