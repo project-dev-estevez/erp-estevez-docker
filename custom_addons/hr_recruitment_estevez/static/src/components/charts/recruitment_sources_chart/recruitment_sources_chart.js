@@ -181,7 +181,7 @@ export class RecruitmentSourcesChart extends Component {
                     }
                 },
                 chart: {
-                    type: 'polarArea',
+                    type: 'pie',
                     height: this.props.height || 400,
                     // ✅ AGREGAR: ID único para forzar recreación
                     id: 'recruitment-sources-chart-' + Date.now(),
