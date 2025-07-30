@@ -372,26 +372,43 @@ export class RecruitmentSourcesChart extends Component {
         return domain;
     }
 
-    // ✅ NUEVO: Colores específicos para Polar Area
     getPolarAreaColors(count) {
-        const vibrantColors = [
-            '#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8', 
-            '#F7DC6F', '#BB8FCE', '#85C1E9', '#F8C471', '#A3E4D7',
-            '#D5A6BD', '#F9E79F', '#AED6F1', '#A9DFBF', '#F4D03F'
+        // Paleta extendida, tonos dorados, verdes y azules, sin repetir
+        const palette = [
+            '#FFD700', // Dorado
+            '#00E396', // Verde vibrante
+            '#3f51b5', // Azul vibrante
+            '#FF6F61', // Coral premium
+            '#2EC4B6', // Turquesa premium
+            '#FFB400', // Amarillo premium
+            '#5F4B8B', // Púrpura premium
+            '#009688', // Verde azulado
+            '#F95D6A', // Rojo coral
+            '#4ECDC4', // Verde pastel
+            '#5567FF', // Azul eléctrico
+            '#FFB7B2', // Rosa pastel
+            '#6A4C93', // Púrpura oscuro
+            '#43AA8B', // Verde suave
+            '#FFD6E0', // Rosa claro
+            '#B2B1CF', // Lavanda premium
+            '#FFAB00', // Amarillo intenso
+            '#2D9CDB', // Azul claro premium
+            '#9C27B0', // Morado vibrante
+            '#00BFAE', // Verde agua premium
         ];
 
-        if (count <= vibrantColors.length) {
-            return vibrantColors.slice(0, count);
+        // Si hay más fuentes que colores, genera tonos derivados (sin repetir)
+        if (count <= palette.length) {
+            return palette.slice(0, count);
         }
-
-        const colors = [...vibrantColors];
-        for (let i = vibrantColors.length; i < count; i++) {
-            const hue = Math.floor((360 / (count - vibrantColors.length)) * (i - vibrantColors.length));
-            const saturation = 70 + Math.random() * 20;
-            const lightness = 50 + Math.random() * 20;
+        const colors = [...palette];
+        for (let i = palette.length; i < count; i++) {
+            // Genera tonos derivados usando HSL, manteniendo la gama
+            const hue = 45 + (i * 25) % 360; // Entre dorado y azul
+            const saturation = 80;
+            const lightness = 55;
             colors.push(`hsl(${hue}, ${saturation}%, ${lightness}%)`);
         }
-        
         return colors;
     }
 

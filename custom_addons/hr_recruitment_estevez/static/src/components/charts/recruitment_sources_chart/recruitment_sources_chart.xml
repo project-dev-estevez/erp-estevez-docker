@@ -36,10 +36,9 @@
                 <div class="col-12 col-lg-5">
                     <div class="card border-0 shadow-sm">
                         <div class="card-body p-0">
-                            <div style="height: 418px; overflow-y: hidden; overflow-x: hidden;"
-                                onmouseenter="this.style.overflowY='auto'"
-                                onmouseleave="this.style.overflowY='hidden'">
-                                <table class="table table-hover mb-0">
+                            <div class="table-responsive"
+                                style="max-height: 400px; overflow-y: auto;">
+                                <table class="table table-hover mb-0 small">
                                     <thead class="table-light">
                                         <tr>
                                             <th class="border-0 py-3">Fuente</th>
@@ -48,30 +47,34 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <t t-if="state.indicatorsSourceRecruitment.sources.length > 0">
-                                            <t t-foreach="state.indicatorsSourceRecruitment.sources" t-as="item" t-key="item.label">
-                                                <tr style="cursor: pointer;" 
+                                        <t
+                                            t-if="state.indicatorsSourceRecruitment.sources.length > 0">
+                                            <t t-foreach="state.indicatorsSourceRecruitment.sources"
+                                                t-as="item" t-key="item.label">
+                                                <tr style="cursor: pointer;"
                                                     t-on-click="() => this.openSourceRecruitmentList(item.id)"
                                                     class="border-bottom">
                                                     <td class="py-3">
                                                         <div class="d-flex align-items-center">
                                                             <div class="flex-shrink-0 me-3">
-                                                                <div class="bg-secondary rounded-circle" 
-                                                                     style="width: 10px; height: 10px;"></div>
+                                                                <div
+                                                                    class="bg-secondary rounded-circle"
+                                                                    style="width: 10px; height: 10px;"></div>
                                                             </div>
                                                             <div class="flex-grow-1">
-                                                                <div class="fw-semibold text-dark" t-esc="item.label"/>
+                                                                <div class="fw-semibold text-dark"
+                                                                    t-esc="item.label" />
                                                             </div>
                                                         </div>
                                                     </td>
                                                     <td class="text-center py-3">
-                                                        <span class="badge bg-success fs-6" t-esc="item.hired"/>
+                                                        <span class="badge bg-success fs-6"
+                                                            t-esc="item.hired" />
                                                     </td>
                                                     <td class="text-center py-3">
-                                                        <span class="fw-bold fs-6" 
-                                                              t-att-class="getPercentageClass(item.percentage)">
-                                                            <t t-esc="item.percentage"/>%
-                                                        </span>
+                                                        <span class="fw-bold fs-6"
+                                                            t-att-class="getPercentageClass(item.percentage)">
+                                                            <t t-esc="item.percentage" />% </span>
                                                     </td>
                                                 </tr>
                                             </t>
@@ -88,6 +91,24 @@
                                         </t>
                                     </tbody>
                                 </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <!-- 💡 TIP -->
+                <div class="mt-5">
+                    <div class="alert alert-info border-0 shadow-sm">
+                        <div class="d-flex align-items-start">
+                            <i class="fa fa-lightbulb me-3 mt-1 text-primary"></i>
+                            <div>
+                                <strong>💡 Tips:</strong>
+                                <div class="mt-1 small">
+                                    <p class="mb-2">Analiza rápidamente qué fuentes de reclutamiento generan más contrataciones al comparar el número total de contratados y su porcentaje de efectividad.</p>
+                                    <!-- <p class="mb-2">Observa los colores de la gráfica y su correspondencia en la tabla para identificar las fuentes con mejor desempeño.</p> -->
+                                    <p class="mb-0">Haz clic sobre una sección o fila para explorar los candidatos provenientes de cada fuente.</p>
+                                </div>
                             </div>
                         </div>
                     </div>
