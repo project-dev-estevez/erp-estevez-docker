@@ -68,10 +68,11 @@ class HrJob(models.Model):
                     ('state', '=', 'approved')
                 ])
                 
-                # Ejecutar la acción correspondiente en las requisiciones
-                if vals['is_published']:
-                    requisitions.action_publish_vacancy(from_job=True)
-                else:
-                    requisitions.action_close_vacancy(from_job=True)
+                # SOLUCIÓN: Iterar sobre cada requisición individualmente
+                for requisition in requisitions:
+                    if vals['is_published']:
+                        requisition.action_publish_vacancy(from_job=True)
+                    else:
+                        requisition.action_close_vacancy(from_job=True)
         
         return super(HrJob, self).write(vals)
