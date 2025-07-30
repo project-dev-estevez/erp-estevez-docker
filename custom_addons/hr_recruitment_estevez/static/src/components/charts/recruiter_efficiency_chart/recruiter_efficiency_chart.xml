@@ -18,13 +18,13 @@
                     config="state.chartData"
                     height="props.height || 400"/>
                 
-                <!-- 💡 TIP ÚNICO -->
+                <!-- 💡 TIP -->
                 <div class="mt-3">
                     <div class="alert alert-info border-0 shadow-sm">
                         <div class="d-flex align-items-start">
                             <i class="fa fa-lightbulb me-3 mt-1 text-primary"></i>
                             <div>
-                                <strong>💡 Tip:</strong>
+                                <strong>💡 Tips:</strong>
                                 <div class="mt-1 small">
                                     <p class="mb-2">Compara rápidamente la eficiencia entre reclutadores observando el tamaño relativo de las barras de contratados respecto al total de postulaciones.</p>
                                     <p class="mb-0">Haz clic en una barra para ver el detalle de los candidatos que están bajo la gestión de cada reclutador.</p>
