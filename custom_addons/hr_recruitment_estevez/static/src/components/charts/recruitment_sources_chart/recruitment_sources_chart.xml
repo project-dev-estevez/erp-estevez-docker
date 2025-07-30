@@ -36,40 +36,45 @@
                 <div class="col-12 col-lg-5">
                     <div class="card border-0 shadow-sm">
                         <div class="card-body p-0">
-                            <div class="table-responsive">
-                                <table class="table table-hover mb-0">
-                                    <thead class="table-light small">
+                            <div class="table-responsive"
+                                style="max-height: 400px; overflow-y: auto;">
+                                <table class="table table-hover mb-0 small">
+                                    <thead class="table-light">
                                         <tr>
                                             <th class="border-0 py-3">Fuente</th>
                                             <th class="border-0 text-center py-3">Contratados</th>
                                             <th class="border-0 text-center py-3">Efectividad</th>
                                         </tr>
                                     </thead>
-                                    <tbody class="small">
-                                        <t t-if="state.indicatorsSourceRecruitment.sources.length > 0">
-                                            <t t-foreach="state.indicatorsSourceRecruitment.sources" t-as="item" t-key="item.label">
-                                                <tr style="cursor: pointer;" 
+                                    <tbody>
+                                        <t
+                                            t-if="state.indicatorsSourceRecruitment.sources.length > 0">
+                                            <t t-foreach="state.indicatorsSourceRecruitment.sources"
+                                                t-as="item" t-key="item.label">
+                                                <tr style="cursor: pointer;"
                                                     t-on-click="() => this.openSourceRecruitmentList(item.id)"
                                                     class="border-bottom">
                                                     <td class="py-3">
                                                         <div class="d-flex align-items-center">
                                                             <div class="flex-shrink-0 me-3">
-                                                                <div class="bg-secondary rounded-circle" 
-                                                                     style="width: 10px; height: 10px;"></div>
+                                                                <div
+                                                                    class="bg-secondary rounded-circle"
+                                                                    style="width: 10px; height: 10px;"></div>
                                                             </div>
                                                             <div class="flex-grow-1">
-                                                                <div class="fw-semibold text-dark" t-esc="item.label"/>
+                                                                <div class="fw-semibold text-dark"
+                                                                    t-esc="item.label" />
                                                             </div>
                                                         </div>
                                                     </td>
                                                     <td class="text-center py-3">
-                                                        <span class="badge bg-success fs-6" t-esc="item.hired"/>
+                                                        <span class="badge bg-success fs-6"
+                                                            t-esc="item.hired" />
                                                     </td>
                                                     <td class="text-center py-3">
-                                                        <span class="fw-bold fs-6" 
-                                                              t-att-class="getPercentageClass(item.percentage)">
-                                                            <t t-esc="item.percentage"/>%
-                                                        </span>
+                                                        <span class="fw-bold fs-6"
+                                                            t-att-class="getPercentageClass(item.percentage)">
+                                                            <t t-esc="item.percentage" />% </span>
                                                     </td>
                                                 </tr>
                                             </t>
@@ -90,6 +95,7 @@
                         </div>
                     </div>
                 </div>
+
 
                 <!-- 💡 TIP -->
                 <div class="mt-5">
