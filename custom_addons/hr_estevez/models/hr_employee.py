@@ -1,7 +1,12 @@
+import json
+import logging
 from odoo import api, models, fields, _
 from odoo.exceptions import UserError
 from datetime import date, timedelta, datetime
 import re
+import requests
+
+_logger = logging.getLogger(__name__)
 
 class HrEmployee(models.Model):
     _inherit = 'hr.employee'
@@ -309,15 +314,124 @@ class HrEmployee(models.Model):
             mother_last_name = record.mother_last_name or ''
             record.name = f"{names} {last_name} {mother_last_name}".strip()
 
+    def _sync_codeigniter(self, employee, operation='create'):
+        api_url = self.env['ir.config_parameter'].get_param('codeigniter.api_url')
+        api_token = self.env['ir.config_parameter'].get_param('codeigniter.api_token')
+        
+        if not api_url or not api_token:
+            _logger.error("Configuración de API para CodeIgniter faltante")
+            return False
+
+        # Asegurar valores no nulos
+        payload = {
+            'nombre': employee.names or '',
+            'apellido_paterno': employee.last_name or '',
+            'apellido_materno': employee.mother_last_name or '',
+            'curp': employee.curp or '',
+            'email': employee.work_email or '',
+            'sexo': employee.gender or 'other',
+            'numero_empleado': employee.employee_number or '',
+            'nss': employee.nss or '',
+            'fecha_nacimiento': employee.birthday.strftime('%Y-%m-%d') if employee.birthday else None,
+            'imss_registration_date': employee.imss_registration_date.strftime('%Y-%m-%d') if employee.imss_registration_date else None,
+            'nacionalidad': 'Mexico',
+            'clave_elector': employee.voter_key or '',
+            'odoo_id': employee.id,
+            'payment_type': employee.payment_type or '',
+            'work_phone': employee.work_phone or '',
+            'working_hours': employee.resource_calendar_id.display_name or '',
+            'private_street': employee.private_street or '',
+            'private_street2': employee.private_street2 or '',
+            'private_colonia': employee.private_colonia or '',
+            'private_zip': employee.private_zip or '',
+            'fiscal_zip': employee.fiscal_zip or '',
+            'private_email': employee.private_email or '',
+            'private_phone': employee.private_phone or '',
+            'infonavit': bool(employee.infonavit),
+            'license_number': employee.license_number or '',
+            'study_field': employee.study_field or '',
+            'study_school': employee.study_school or '',
+            'marital': employee.marital or '',
+            'children': employee.children or 0,
+            'job_title': employee.job_title or ''
+        }
+
+        try:
+            import json
+             # 1. Crear la sesión primero
+            session = requests.Session()
+            session.verify = False
+            
+            # 2. Preparar headers comunes
+            headers = {
+                'Authorization': f'Bearer {api_token}',
+                'Content-Type': 'application/json; charset=utf-8'
+            }
+            json_payload = json.dumps(payload, ensure_ascii=False)
+        
+            # Codificar a bytes UTF-8 explícitamente
+            utf8_payload = json_payload.encode('utf-8')
+            
+            _logger.info(f"Longitud UTF-8: {len(utf8_payload)} bytes")
+            _logger.info(f"Contenido: {json_payload[:100]}...")  # Muestra inicio
+            
+            # Enviar como bytes
+            endpoint = api_url
+            if operation == 'update':
+                endpoint = f"{api_url}/empleados/{employee.id}"
+                http_method = requests.put
+            else:
+                http_method = requests.post
+            
+            # Enviar con el método adecuado
+            response = http_method(
+                endpoint,
+                data=json_payload,
+                headers={
+                    'Authorization': f'Bearer {api_token}',
+                    'Content-Type': 'application/json; charset=utf-8',
+                    'Content-Length': str(len(json_payload))
+                },
+                timeout=30,
+                verify=False
+            )
+            
+            _logger.info(f"Respuesta de CodeIgniter: {response.status_code} - {response.text}")
+            
+            if (operation == 'create' and response.status_code == 201) or \
+            (operation == 'update' and response.status_code in (200, 204)):
+                _logger.info(f"Empleado {employee.name} sincronizado con CodeIgniter")
+                return True
+            else:
+                _logger.error(f"Error CI: {response.status_code} - {response.text}")
+                return False
+                        
+        except Exception as e:
+            _logger.error(f"Error de conexión con CodeIgniter: {str(e)}")
+            return False
+
     @api.model
     def create(self, vals):
+        # Construir nombre completo
         if 'names' in vals or 'last_name' in vals or 'mother_last_name' in vals:
             names = vals.get('names', '').strip()
             vals['name'] = f"{names} {vals.get('last_name', '')} {vals.get('mother_last_name', '')}".strip()
+        
+        # Crear empleado
         employee = super(HrEmployee, self).create(vals)
+        
+        # Lógica de dirección
         if 'direction_id' in vals and vals['direction_id']:
             direction = self.env['hr.direction'].browse(vals['direction_id'])
             direction.director_id = employee.id
+        
+        # Sincronizar con CodeIgniter (sin bloquear en caso de error)
+        try:
+            _logger.info("Intentando sincronizar con CodeIgniter")
+            self._sync_codeigniter(employee, 'create')
+        except Exception as e:
+            _logger.error(f"Error en sincronización: {str(e)}")
+        
         return employee
 
     def write(self, vals):
@@ -337,6 +451,15 @@ class HrEmployee(models.Model):
                     new_direction.director_id = record.id
 
         res = super(HrEmployee, self).write(vals)
+
+        sync_fields = ['names', 'last_name', 'work_email', 'department_id', 'job_id', 'work_phone']
+        if any(field in vals for field in sync_fields):
+            try:
+                _logger.info(f"Iniciando sincronización de actualización para {self.name}")
+                self._sync_codeigniter(self, 'update')
+            except Exception as e:
+                _logger.error(f"Error en sincronización de actualización: {str(e)}")
+
         return res
     
     @api.depends('birthday')

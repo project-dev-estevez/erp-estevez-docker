@@ -34,7 +34,7 @@
                             <div class="shadow-sm border m-2 p-4 bg-white">
                                 <RecruitmentSourcesChart startDate="state.startDate"
                                                          endDate="state.endDate"
-                                                         title="'Fuentes de Reclutamiento más Efectivas'"
+                                                         title="'Fuentes de Reclutamiento + Efectivas'"
                                                          height="437"
                                                          onMounted.bind="onRecruitmentSourcesMounted"/>
                             </div>
