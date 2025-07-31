@@ -15,3 +15,4 @@ from . import report
 from . import survey_survey
 from . import hr_candidate_custom
 from . import hr_employee
+from . import hr_candidates_new

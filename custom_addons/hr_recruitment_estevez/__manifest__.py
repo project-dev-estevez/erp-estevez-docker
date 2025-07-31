@@ -44,6 +44,7 @@
         "views/hr_applicant_view_search_inherit.xml",        
         #"views/hr_candidate_custom_views.xml"
         "views/hr_candidate_view_form.xml",
+        "views/hr_candidate_form_view_inherit_custom.xml",
         "views/hr_job_views.xml",
         'views/hr_applicant_tree_custom.xml',
         'views/hr_candidate_view_list.xml',
