@@ -452,13 +452,12 @@ class HrEmployee(models.Model):
 
         res = super(HrEmployee, self).write(vals)
 
-        sync_fields = ['names', 'last_name', 'work_email', 'department_id', 'job_id', 'work_phone']
-        if any(field in vals for field in sync_fields):
-            try:
-                _logger.info(f"Iniciando sincronización de actualización para {self.name}")
-                self._sync_codeigniter(self, 'update')
-            except Exception as e:
-                _logger.error(f"Error en sincronización de actualización: {str(e)}")
+        
+        try:
+            _logger.info(f"Iniciando sincronización de actualización para {self.name}")
+            self._sync_codeigniter(self, 'update')
+        except Exception as e:
+            _logger.error(f"Error en sincronización de actualización: {str(e)}")
 
         return res
     
