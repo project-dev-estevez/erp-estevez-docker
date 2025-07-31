@@ -199,8 +199,7 @@ class HrApplicant(models.Model):
         help='Historial completo de etapas por las que ha pasado el candidato'
     )
 
-    first_name = fields.Char(string="Primer Nombre")
-    second_name = fields.Char(string="Segundo Nombre")
+    first_name = fields.Char(string="Primer Nombre")    
     last_name_1 = fields.Char(string="Apellido Paterno")
     last_name_2 = fields.Char(string="Apellido Materno")
     
@@ -208,29 +207,25 @@ class HrApplicant(models.Model):
         partes = full_name.strip().split()
         if len(partes) >= 4:
             return {
-                'first_name': partes[0],
-                'second_name': partes[1],
+                'first_name': partes[0],                
                 'last_name_1': partes[-2],
                 'last_name_2': partes[-1],
             }
         if len(partes) == 3:
             return {
-                'first_name': partes[0],
-                'second_name': '',
+                'first_name': partes[0],                
                 'last_name_1': partes[1],
                 'last_name_2': partes[2],
             }
         if len(partes) == 2:
             return {
-                'first_name': partes[0],
-                'second_name': '',
+                'first_name': partes[0],                
                 'last_name_1': partes[1],
                 'last_name_2': '',
             }
         # Solo uno
         return {
-            'first_name': full_name,
-            'second_name': '',
+            'first_name': full_name,            
             'last_name_1': '',
             'last_name_2': '',
         }    
@@ -526,8 +521,7 @@ class HrApplicant(models.Model):
         else:
             # Fallback a los campos existentes (pueden estar vacíos)
             name_fields = {
-                'first_name': self.first_name,
-                'second_name': self.second_name,
+                'first_name': self.first_name,                
                 'last_name_1': self.last_name_1,
                 'last_name_2': self.last_name_2,
             }
@@ -548,9 +542,8 @@ class HrApplicant(models.Model):
             'area_id': area_id,
             'work_email': self.department_id.company_id.email or self.email_from,  # Para tener un correo válido por defecto
             'work_phone': self.department_id.company_id.phone,            
-            'first_name': name_fields.get('first_name'),            
-            'second_name': name_fields.get('second_name'),
-            'names': f"{name_fields.get('first_name', '')} {name_fields.get('second_name', '')}".strip(),
+            'first_name': name_fields.get('first_name'),                        
+            'names': f"{name_fields.get('first_name', '')}".strip(),
             'last_name_1': name_fields.get('last_name_1'),
             'last_name_2': name_fields.get('last_name_2'),
             'project': self.project_id.name

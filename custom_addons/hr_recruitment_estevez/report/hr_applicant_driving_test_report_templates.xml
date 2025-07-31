@@ -2,58 +2,151 @@
     <template id="hr_applicant_driving_test_report_document">
         <t t-call="web.html_container">
             <t t-foreach="docs" t-as="applicant">
-                <div class="page">
-                    <h2 style="text-align:center;">REPORTE DE PRUEBA DE MANEJO</h2>
-                    <hr/>
-                    <h4>Información del Candidato</h4>
-                    <p><strong>Nombre:</strong> <span t-esc="applicant.partner_name"/></p>
-                    <p><strong>Puesto:</strong> <span t-esc="applicant.job_id.name"/></p>
-                    <p><strong>Evaluador:</strong> <span t-esc="applicant.evaluator_id.name"/></p>
-                    <p><strong>Puesto Evaluador:</strong> <span t-esc="applicant.evaluator_job_title"/></p>
-                    <p><strong>Tipo de Licencia:</strong> <span t-esc="applicant.license_type"/></p>
-                    <p><strong>Número de Licencia:</strong> <span t-esc="applicant.license_number"/></p>
-                    <p><strong>Descripción:</strong> <span t-esc="applicant.license_description"/></p>
-                    <br/>
+                <div class="page" style="font-family: Arial; padding: 20px;">
+                    <!-- Encabezado -->
+                    <div style="text-align: center; margin-bottom: 30px;">
+                        <h2 style="margin-bottom: 5px;">REPORTE DE PRUEBA DE MANEJO</h2>
+                        <hr style="border-top: 1px solid #e0e0e0;"/>
+                    </div>
 
-                    <h4>1. CONOCIMIENTO, INSPECCIÓN Y ADAPTACIÓN DEL VEHÍCULO</h4>
-                    <table class="table table-bordered">
-                        <tr><td>Inspección de los niveles</td><td><span t-esc="applicant.fluid_levels_inspection"/></td></tr>
-                        <tr><td>Inspección de batería</td><td><span t-esc="applicant.battery_inspection"/></td></tr>
-                        <tr><td>Verificación de llantas</td><td><span t-esc="applicant.tire_verification"/></td></tr>
-                        <tr><td>Adaptación de seguridad</td><td><span t-esc="applicant.safety_adaptation"/></td></tr>
-                        <tr><td>Verificación de luces</td><td><span t-esc="applicant.lights_verification"/></td></tr>
-                        <tr><td><strong>Promedio Sección 1</strong></td><td><span t-esc="applicant.knowledge_average"/></td></tr>
+                    <!-- Información del Candidato - Tabla estilo estándar -->
+                    <table style="width: 100%; border-collapse: collapse; margin-bottom: 30px; border: 1px solid #e0e0e0;">
+                        <colgroup>
+                            <col style="width: 25%;"/>
+                            <col style="width: 25%;"/>
+                            <col style="width: 25%;"/>
+                            <col style="width: 25%;"/>
+                        </colgroup>
+                        <tr>
+                            <td colspan="4" style="padding: 8px; background-color: #f5f5f5; font-weight: bold; border-bottom: 1px solid #e0e0e0;">
+                                Información del Candidato
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px; font-weight: bold; border-right: 1px solid #e0e0e0; border-bottom: 1px solid #e0e0e0;">Nombre:</td>
+                            <td style="padding: 8px; border-right: 1px solid #e0e0e0; border-bottom: 1px solid #e0e0e0;"><span t-field="applicant.partner_name"/></td>
+                            <td style="padding: 8px; font-weight: bold; border-right: 1px solid #e0e0e0; border-bottom: 1px solid #e0e0e0;">Puesto:</td>
+                            <td style="padding: 8px; border-bottom: 1px solid #e0e0e0;"><span t-field="applicant.job_id.name"/></td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px; font-weight: bold; border-right: 1px solid #e0e0e0; border-bottom: 1px solid #e0e0e0;">Evaluador:</td>
+                            <td style="padding: 8px; border-right: 1px solid #e0e0e0; border-bottom: 1px solid #e0e0e0;"><span t-field="applicant.evaluator_id.name"/></td>
+                            <td style="padding: 8px; font-weight: bold; border-right: 1px solid #e0e0e0; border-bottom: 1px solid #e0e0e0;">Puesto Evaluador:</td>
+                            <td style="padding: 8px; border-bottom: 1px solid #e0e0e0;"><span t-field="applicant.evaluator_job_title"/></td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px; font-weight: bold; border-right: 1px solid #e0e0e0;">Tipo de Licencia:</td>    
+                            <td style="padding: 8px; border-right: 1px solid #e0e0e0;"><span t-field="applicant.license_type"/></td>
+                            <td style="padding: 8px; font-weight: bold; border-right: 1px solid #e0e0e0;">Número de Licencia:</td>
+                            <td style="padding: 8px;"><span t-field="applicant.license_number"/></td>
+                        </tr>
                     </table>
 
-                    <h4>2. DESTREZA Y HABILIDADES EN EL MANEJO</h4>
-                    <table class="table table-bordered">
-                        <tr><td>Maniobra de encendido</td><td><span t-esc="applicant.ignition_maneuver"/></td></tr>
-                        <tr><td>Puesta en marcha</td><td><span t-esc="applicant.starting_movement"/></td></tr>
-                        <tr><td>Avance en línea recta</td><td><span t-esc="applicant.straight_line_advance"/></td></tr>
-                        <tr><td>Coordinación de maniobras</td><td><span t-esc="applicant.maneuver_coordination"/></td></tr>
-                        <tr><td>Aplicación de cambios</td><td><span t-esc="applicant.gear_application"/></td></tr>
-                        <tr><td>Terreno inclinado</td><td><span t-esc="applicant.inclined_terrain"/></td></tr>
-                        <tr><td>Circulación y adelantamiento</td><td><span t-esc="applicant.circulation_overtaking"/></td></tr>
-                        <tr><td>Aplicación del embrague</td><td><span t-esc="applicant.clutch_application"/></td></tr>
-                        <tr><td>Frenos y parqueo en reversa</td><td><span t-esc="applicant.brake_parking"/></td></tr>
-                        <tr><td>Ingreso al área de parqueo</td><td><span t-esc="applicant.parking_entry"/></td></tr>
-                        <tr><td><strong>Promedio Sección 2</strong></td><td><span t-esc="applicant.skills_average"/></td></tr>
+                    <!-- Sección 1 - Tabla estilo estándar -->
+                    <table style="width: 100%; border-collapse: collapse; margin-bottom: 30px; border: 1px solid #e0e0e0;">
+                        <colgroup>
+                            <col style="width: 70%;"/>
+                            <col style="width: 30%;"/>
+                        </colgroup>
+                        <tr>
+                            <td colspan="2" style="padding: 8px; background-color: #f5f5f5; font-weight: bold; border-bottom: 1px solid #e0e0e0;">
+                                1. CONOCIMIENTO, INSPECCIÓN Y ADAPTACIÓN DEL VEHÍCULO
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px; border-right: 1px solid #e0e0e0; border-bottom: 1px solid #e0e0e0;">Inspección de los niveles</td>
+                            <td style="padding: 8px; text-align: center; border-bottom: 1px solid #e0e0e0;"><span t-field="applicant.fluid_levels_inspection"/></td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px; border-right: 1px solid #e0e0e0; border-bottom: 1px solid #e0e0e0;">Inspección de batería</td>
+                            <td style="padding: 8px; text-align: center; border-bottom: 1px solid #e0e0e0;"><span t-field="applicant.battery_inspection"/></td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px; border-right: 1px solid #e0e0e0; border-bottom: 1px solid #e0e0e0;">Verificación de llantas</td>
+                            <td style="padding: 8px; text-align: center; border-bottom: 1px solid #e0e0e0;"><span t-field="applicant.tire_verification"/></td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px; border-right: 1px solid #e0e0e0; border-bottom: 1px solid #e0e0e0;">Adaptación de seguridad</td>
+                            <td style="padding: 8px; text-align: center; border-bottom: 1px solid #e0e0e0;"><span t-field="applicant.safety_adaptation"/></td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px; border-right: 1px solid #e0e0e0;">Verificación de luces</td>
+                            <td style="padding: 8px; text-align: center;"><span t-field="applicant.lights_verification"/></td>
+                        </tr>
+                        <tr style="font-weight: bold; background-color: #f9f9f9;">
+                            <td style="padding: 8px; border-top: 1px solid #e0e0e0; border-right: 1px solid #e0e0e0;">Promedio Sección 1</td>
+                            <td style="padding: 8px; text-align: center; border-top: 1px solid #e0e0e0;"><span t-field="applicant.knowledge_average"/></td>
+                        </tr>
                     </table>
 
-                    <h4>3. COMPORTAMIENTO DEL CONDUCTOR FRENTE AL TRÁNSITO</h4>
-                    <table class="table table-bordered">
-                        <tr><td>Empleo del reglamento</td><td><span t-esc="applicant.regulation_employment"/></td></tr>
-                        <tr><td>Distancia de seguimiento</td><td><span t-esc="applicant.following_distance"/></td></tr>
-                        <tr><td>Cambios de carril</td><td><span t-esc="applicant.lane_changes"/></td></tr>
-                        <tr><td>Uso de cambio de carriles</td><td><span t-esc="applicant.lane_use"/></td></tr>
-                        <tr><td>Manejo de direccionales</td><td><span t-esc="applicant.directional_handling"/></td></tr>
-                        <tr><td><strong>Promedio Sección 3</strong></td><td><span t-esc="applicant.behavior_average"/></td></tr>
+                    <!-- Sección 2 -->
+                    <table style="width: 100%; border-collapse: collapse; margin-bottom: 30px; border: 1px solid #e0e0e0;">
+                        <colgroup>
+                            <col style="width: 70%;"/>
+                            <col style="width: 30%;"/>
+                        </colgroup>
+                        <tr>
+                            <td colspan="2" style="padding: 8px; background-color: #f5f5f5; font-weight: bold; border-bottom: 1px solid #e0e0e0;">
+                                2. DESTREZA Y HABILIDADES EN EL MANEJO
+                            </td>
+                        </tr>
+                        <tr><td style="padding: 8px; border-right: 1px solid #e0e0e0; border-bottom: 1px solid #e0e0e0;">Maniobra de encendido</td><td style="padding: 8px; text-align: center; border-bottom: 1px solid #e0e0e0;"><span t-field="applicant.ignition_maneuver"/></td></tr>
+                        <tr><td style="padding: 8px; border-right: 1px solid #e0e0e0; border-bottom: 1px solid #e0e0e0;">Puesta en marcha</td><td style="padding: 8px; text-align: center; border-bottom: 1px solid #e0e0e0;"><span t-field="applicant.starting_movement"/></td></tr>
+                        <tr><td style="padding: 8px; border-right: 1px solid #e0e0e0; border-bottom: 1px solid #e0e0e0;">Avance en línea recta</td><td style="padding: 8px; text-align: center; border-bottom: 1px solid #e0e0e0;"><span t-field="applicant.straight_line_advance"/></td></tr>
+                        <tr><td style="padding: 8px; border-right: 1px solid #e0e0e0; border-bottom: 1px solid #e0e0e0;">Coordinación de maniobras</td><td style="padding: 8px; text-align: center; border-bottom: 1px solid #e0e0e0;"><span t-field="applicant.maneuver_coordination"/></td></tr>
+                        <tr><td style="padding: 8px; border-right: 1px solid #e0e0e0; border-bottom: 1px solid #e0e0e0;">Aplicación de cambios</td><td style="padding: 8px; text-align: center; border-bottom: 1px solid #e0e0e0;"><span t-field="applicant.gear_application"/></td></tr>
+                        <tr><td style="padding: 8px; border-right: 1px solid #e0e0e0; border-bottom: 1px solid #e0e0e0;">Terreno inclinado</td><td style="padding: 8px; text-align: center; border-bottom: 1px solid #e0e0e0;"><span t-field="applicant.inclined_terrain"/></td></tr>
+                        <tr><td style="padding: 8px; border-right: 1px solid #e0e0e0; border-bottom: 1px solid #e0e0e0;">Circulación y adelantamiento</td><td style="padding: 8px; text-align: center; border-bottom: 1px solid #e0e0e0;"><span t-field="applicant.circulation_overtaking"/></td></tr>
+                        <tr><td style="padding: 8px; border-right: 1px solid #e0e0e0; border-bottom: 1px solid #e0e0e0;">Aplicación del embrague</td><td style="padding: 8px; text-align: center; border-bottom: 1px solid #e0e0e0;"><span t-field="applicant.clutch_application"/></td></tr>
+                        <tr><td style="padding: 8px; border-right: 1px solid #e0e0e0; border-bottom: 1px solid #e0e0e0;">Frenos y parqueo en reversa</td><td style="padding: 8px; text-align: center; border-bottom: 1px solid #e0e0e0;"><span t-field="applicant.brake_parking"/></td></tr>
+                        <tr><td style="padding: 8px; border-right: 1px solid #e0e0e0;">Ingreso al área de parqueo</td><td style="padding: 8px; text-align: center;"><span t-field="applicant.parking_entry"/></td></tr>
+                        <tr style="font-weight: bold; background-color: #f9f9f9;">
+                            <td style="padding: 8px; border-top: 1px solid #e0e0e0; border-right: 1px solid #e0e0e0;">Promedio Sección 2</td>
+                            <td style="padding: 8px; text-align: center; border-top: 1px solid #e0e0e0;"><span t-field="applicant.skills_average"/></td>
+                        </tr>
                     </table>
 
-                    <h4>RESULTADO FINAL</h4>
-                    <table class="table table-bordered">
-                        <tr><td><strong>Calificación Final</strong></td><td><span t-esc="applicant.final_test_average"/></td></tr>
-                        <tr><td><strong>Resultado</strong></td><td><span t-esc="applicant.final_test_result"/></td></tr>
+                    <!-- Sección 3 -->
+                    <table style="width: 100%; border-collapse: collapse; margin-bottom: 30px; border: 1px solid #e0e0e0;">
+                        <colgroup>
+                            <col style="width: 70%;"/>
+                            <col style="width: 30%;"/>
+                        </colgroup>
+                        <tr>
+                            <td colspan="2" style="padding: 8px; background-color: #f5f5f5; font-weight: bold; border-bottom: 1px solid #e0e0e0;">
+                                3. COMPORTAMIENTO DEL CONDUCTOR FRENTE AL TRÁNSITO
+                            </td>
+                        </tr>
+                        <tr><td style="padding: 8px; border-right: 1px solid #e0e0e0; border-bottom: 1px solid #e0e0e0;">Empleo del reglamento</td><td style="padding: 8px; text-align: center; border-bottom: 1px solid #e0e0e0;"><span t-field="applicant.regulation_employment"/></td></tr>
+                        <tr><td style="padding: 8px; border-right: 1px solid #e0e0e0; border-bottom: 1px solid #e0e0e0;">Distancia de seguimiento</td><td style="padding: 8px; text-align: center; border-bottom: 1px solid #e0e0e0;"><span t-field="applicant.following_distance"/></td></tr>
+                        <tr><td style="padding: 8px; border-right: 1px solid #e0e0e0; border-bottom: 1px solid #e0e0e0;">Cambios de carril</td><td style="padding: 8px; text-align: center; border-bottom: 1px solid #e0e0e0;"><span t-field="applicant.lane_changes"/></td></tr>
+                        <tr><td style="padding: 8px; border-right: 1px solid #e0e0e0; border-bottom: 1px solid #e0e0e0;">Uso de cambio de carriles</td><td style="padding: 8px; text-align: center; border-bottom: 1px solid #e0e0e0;"><span t-field="applicant.lane_use"/></td></tr>
+                        <tr><td style="padding: 8px; border-right: 1px solid #e0e0e0;">Manejo de direccionales</td><td style="padding: 8px; text-align: center;"><span t-field="applicant.directional_handling"/></td></tr>
+                        <tr style="font-weight: bold; background-color: #f9f9f9;">
+                            <td style="padding: 8px; border-top: 1px solid #e0e0e0; border-right: 1px solid #e0e0e0;">Promedio Sección 3</td>
+                            <td style="padding: 8px; text-align: center; border-top: 1px solid #e0e0e0;"><span t-field="applicant.behavior_average"/></td>
+                        </tr>
+                    </table>
+
+                    <!-- Resultado Final -->
+                    <table style="width: 100%; border-collapse: collapse; border: 1px solid #e0e0e0;">
+                        <colgroup>
+                            <col style="width: 70%;"/>
+                            <col style="width: 30%;"/>
+                        </colgroup>
+                        <tr>
+                            <td colspan="2" style="padding: 8px; background-color: #f5f5f5; font-weight: bold; border-bottom: 1px solid #e0e0e0;">
+                                RESULTADO FINAL
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 10px; border-right: 1px solid #e0e0e0; font-weight: bold;">Calificación Final</td>
+                            <td style="padding: 10px; text-align: center; font-weight: bold;"><span t-field="applicant.final_test_average"/></td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 10px; border-right: 1px solid #e0e0e0; font-weight: bold;">Resultado</td>
+                            <td style="padding: 10px; text-align: center; font-weight: bold;"><span t-field="applicant.final_test_result"/></td>
+                        </tr>
                     </table>
                 </div>
             </t>

@@ -18,6 +18,8 @@ class HrCandidate(models.Model):
         'utm.source',
         string='Fuente de Reclutamiento'
     )    
+
+    partner_id = fields.Many2one('res.partner', string="Contacto", required=False)
       
     def action_open_documents(self):
         self.env['hr.applicant.document'].search([]).unlink()

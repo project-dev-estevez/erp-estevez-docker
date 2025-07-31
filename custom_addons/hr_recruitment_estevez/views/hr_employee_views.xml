@@ -16,8 +16,7 @@
 
             <!-- Insertar campos justo antes de Número de Empleado -->
             <xpath expr="//group/group[1]/field[@name='identification_id'] | //group/group[1]/field[1]" position="before">
-                <field name="first_name"/>
-                <field name="second_name"/>
+                <field name="first_name"/>                
                 <field name="last_name_1"/>
                 <field name="last_name_2"/>
             </xpath>            
