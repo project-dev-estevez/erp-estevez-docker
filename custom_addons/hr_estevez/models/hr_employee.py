@@ -321,6 +321,7 @@ class HrEmployee(models.Model):
         if not api_url or not api_token:
             _logger.error("Configuración de API para CodeIgniter faltante")
             return False
+        
 
         # Asegurar valores no nulos
         payload = {
@@ -386,28 +387,29 @@ class HrEmployee(models.Model):
             # Enviar con el método adecuado
             response = http_method(
                 endpoint,
-                data=json_payload,
+                data=utf8_payload,
                 headers={
                     'Authorization': f'Bearer {api_token}',
                     'Content-Type': 'application/json; charset=utf-8',
-                    'Content-Length': str(len(json_payload))
+                    'Content-Length': str(len(utf8_payload))
                 },
                 timeout=30,
                 verify=False
             )
             
+            
             _logger.info(f"Respuesta de CodeIgniter: {response.status_code} - {response.text}")
             
             if (operation == 'create' and response.status_code == 201) or \
             (operation == 'update' and response.status_code in (200, 204)):
-                _logger.info(f"Empleado {employee.name} sincronizado con CodeIgniter")
+                _logger.info(f"Sincronización exitosa para empleado {employee.id}")
                 return True
             else:
-                _logger.error(f"Error CI: {response.status_code} - {response.text}")
+                _logger.error(f"Error en CI: {response.status_code} - {response.text}")
                 return False
                         
         except Exception as e:
-            _logger.error(f"Error de conexión con CodeIgniter: {str(e)}")
+            _logger.error(f"Error de conexión: {str(e)}")
             return False
 
     @api.model
@@ -435,6 +437,7 @@ class HrEmployee(models.Model):
         return employee
 
     def write(self, vals):
+        
         if 'names' in vals or 'last_name' in vals or 'mother_last_name' in vals:
             names = vals.get('names', self.names).strip()
             vals['name'] = f"{names} {vals.get('last_name', self.last_name)} {vals.get('mother_last_name', self.mother_last_name)}".strip()
@@ -452,13 +455,12 @@ class HrEmployee(models.Model):
 
         res = super(HrEmployee, self).write(vals)
 
-        sync_fields = ['names', 'last_name', 'work_email', 'department_id', 'job_id', 'work_phone']
-        if any(field in vals for field in sync_fields):
-            try:
-                _logger.info(f"Iniciando sincronización de actualización para {self.name}")
-                self._sync_codeigniter(self, 'update')
-            except Exception as e:
-                _logger.error(f"Error en sincronización de actualización: {str(e)}")
+        
+        try:
+            _logger.info(f"Iniciando sincronización de actualización para {self.name}")
+            self._sync_codeigniter(self, 'update')
+        except Exception as e:
+            _logger.error(f"Error en sincronización de actualización: {str(e)}")
 
         return res
     

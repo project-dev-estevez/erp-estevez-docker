@@ -22,13 +22,15 @@
           <attribute name="string">Reclutador</attribute>
         </xpath>
         <xpath expr="//group/field[@name='company_id'][@groups='base.group_multi_company']" position="after">
-          <field name="source_id" string="Fuente de reclutamiento" required="1"/>
+          <field name="source_id" string="Fuente de reclutamiento" required="1"
+          options="{'no_create': True, 'no_open': True}"/>
         </xpath>
         <xpath expr="//button[@name='create_employee_from_candidate']" position="attributes">
             <attribute name="invisible">1</attribute> <!-- Siempre oculto -->
         </xpath>
         <xpath expr="//field[@name='source_id']" position="after">
-            <field name="job_ids" widget="many2many_tags" required="1"/>
+            <field name="job_ids" widget="many2many_tags" required="1"
+            options="{'no_create': True, 'no_open': True}"/>
         </xpath>
         <xpath expr="//field[@name='partner_phone']" position="attributes">
           <attribute name="required">1</attribute>  <!-- Obligatorio -->
