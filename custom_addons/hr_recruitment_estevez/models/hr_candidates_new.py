@@ -7,9 +7,9 @@ _logger = logging.getLogger(__name__)
 class HRCandidate(models.Model):
     _inherit = 'hr.candidate'
 
-    first_name = fields.Char(string='Nombre(s)')
-    last_name = fields.Char(string='Apellido paterno')
-    mother_last_name = fields.Char(string='Apellido materno')
+    first_name = fields.Char(string='Nombre(s)', required=True)
+    last_name = fields.Char(string='Apellido paterno', required=True)
+    mother_last_name = fields.Char(string='Apellido materno', required=True)
 
     @api.onchange('first_name', 'last_name', 'mother_last_name')
     def _onchange_fill_partner_name(self):
@@ -41,7 +41,7 @@ class HRCandidate(models.Model):
     def action_save(self):
         # Aquí puedes agregar cualquier lógica adicional antes de guardar
         self.ensure_one()        
-        _logger.info("Requisición guardada con éxito")
+        _logger.info("Candidato registrado con éxito")
         # Crear acción de retorno
         action = {
             'type': 'ir.actions.act_window',
@@ -54,7 +54,7 @@ class HRCandidate(models.Model):
         return {
         'effect': {
             'type': 'rainbow_man',
-            'message': '¡Requisición completada exitosamente!',
+            'message': '¡Candidato registrado exitosamente!',
             'fadeout': 'slow',
             'next': {
                 'type': 'ir.actions.act_window',

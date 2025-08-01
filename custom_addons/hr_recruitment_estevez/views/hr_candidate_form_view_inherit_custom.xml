@@ -4,7 +4,7 @@
       <field name="name">hr.candidate.view.form.inherit.placeholder</field>
       <field name="model">hr.candidate</field>
       <field name="inherit_id" ref="hr_recruitment.hr_candidate_view_form"/>
-      <field name="arch" type="xml">           
+      <field name="arch" type="xml">              
 
         <!-- Ocultar partner_id -->
         <field name="partner_id" position="attributes">
@@ -19,6 +19,7 @@
         </field>        
 
          <xpath expr="//field[@name='job_ids']" position="after">
+         <div class="d-flex justify-content-end w-100 mt-4">
           <button 
             name="action_save" 
             type="object" 
@@ -27,8 +28,9 @@
             confirm="¿Estás seguro de que deseas guardar un nuevo candidato?"
             context="{'show_sweet_alert': True}"
           />        
+          </div>
           </xpath>
       </field>
-    </record>
+    </record>    
   </data>
 </odoo>
