@@ -91,6 +91,22 @@ export class RejectionReasonsChart extends Component {
         let domain = [["application_status", "=", "refused"]];
         domain = this._addDateRangeToDomain(domain);
 
+        // 1. Buscar la etapa "Primer contacto"
+        const primerContactoStage = await this.orm.searchRead(
+            'hr.recruitment.stage',
+            [['name', 'ilike', 'primer contacto']],
+            ['id', 'name', 'sequence'],
+            { limit: 1 }
+        );
+        if (!primerContactoStage.length) {
+            this.showEmptyChart();
+            return;
+        }
+        const primerContactoSequence = primerContactoStage[0].sequence;
+
+        // 2. Agregar filtro para solo los que llegaron a "Primer contacto" o más
+        domain.push(['stage_id.sequence', '>=', primerContactoSequence]);
+
         // Agrupa por motivo de rechazo
         const data = await this.orm.readGroup(
             "hr.applicant",
@@ -165,10 +181,6 @@ export class RejectionReasonsChart extends Component {
                 console.log(`🏢 EMPRESA: "${label}"`);
             }
         }
-
-        console.log("📊 Resumen de clasificación de rechazos:");
-        console.log(`👤 Declinaciones de candidatos: ${candidateDeclines.length} tipos, ${candidateDeclines.reduce((sum, x) => sum + x.count, 0)} total`);
-        console.log(`🏢 Rechazos de empresa: ${companyRejections.length} tipos, ${companyRejections.reduce((sum, x) => sum + x.count, 0)} total`);
 
         // Verificar si hay datos
         if (candidateDeclines.length === 0 && companyRejections.length === 0) {
