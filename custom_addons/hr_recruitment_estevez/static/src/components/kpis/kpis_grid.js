@@ -161,7 +161,7 @@ export class KpisGrid extends Component {
 
             // 2. ✅ Contar candidatos que han SUPERADO "Primer contacto"
             let domain = [
-                ['stage_id.sequence', '>', primerContactoSequence]
+                ['stage_id.sequence', '>=', primerContactoSequence]
             ];
             domain = this._addDateRangeToDomain(domain);
 
@@ -199,7 +199,7 @@ export class KpisGrid extends Component {
             // 2. ✅ Contar candidatos que han superado "Primer contacto" 
             //    PERO que NO están rechazados ni contratados
             let domain = [
-                ['stage_id.sequence', '>', primerContactoSequence],    // ✅ Después de primer contacto
+                ['stage_id.sequence', '>=', primerContactoSequence],    // ✅ Después de primer contacto
                 ['application_status', '!=', 'refused'],              // ✅ NO rechazados
                 ['application_status', '!=', 'hired']                 // ✅ NO contratados
             ];
@@ -296,7 +296,7 @@ export class KpisGrid extends Component {
             if (primerContactoStage.length > 0) {
                 const sequence = primerContactoStage[0].sequence;
                 domain = [
-                    ['stage_id.sequence', '>', sequence],      // ✅ Después de primer contacto
+                    ['stage_id.sequence', '>=', sequence],      // ✅ Después de primer contacto
                     ['application_status', '!=', 'refused'],  // ✅ NO rechazados
                     ['application_status', '!=', 'hired']     // ✅ NO contratados
                 ];
