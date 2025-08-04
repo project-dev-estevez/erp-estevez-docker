@@ -6,9 +6,9 @@
     <field name="arch" type="xml">
 
       <!-- Botón de documentos -->
-      <xpath expr="//div[@name='button_box']/button[last()]" position="after">
+      <!--xpath expr="//div[@name='button_box']/button[last()]" position="after">
         <button name="action_open_documents" class="oe_stat_button" icon="fa-file-text-o" type="object" string="Documentos" />
-      </xpath>
+      </xpath-->
 
       <!-- Insertar los nombres separados antes del grupo "Citizenship" en Private Information -->
       <xpath expr="//page[@name='personal_information']//group[group[@string='Private Contact']]" position="before">
