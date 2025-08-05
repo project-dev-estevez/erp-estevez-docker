@@ -535,7 +535,19 @@ class HrApplicant(models.Model):
         # Aplicar cambios al empleado
         employee.write(employee_write_vals)
         
-        # Transferir documentos asociados al applicant al empleado
+         # Transferir etiquetas/categorías (sin duplicados)
+        for appl_cat in self.categ_ids:
+            emp_cat = self.env['hr.employee.category'].search(
+                [('name', '=ilike', appl_cat.name.strip())], limit=1
+            )
+            if not emp_cat:
+                emp_cat = self.env['hr.employee.category'].create({
+                    'name': appl_cat.name.strip()
+                })
+            if emp_cat.id not in employee.category_ids.ids:
+                employee.write({'category_ids': [(4, emp_cat.id)]})
+
+        # Transferir attachments
         attachments = self.env['ir.attachment'].search([
             ('res_model', '=', 'hr.applicant'),
             ('res_id', '=', self.id)
@@ -545,14 +557,13 @@ class HrApplicant(models.Model):
                 'res_model': 'hr.employee',
                 'res_id': employee.id,
             })
-        
-        # Registrar información final del empleado
-        _logger.info("==== EMPLEADO CREADO ====")
-        _logger.info(f"Empleado ID: {employee.id}")
-        _logger.info(f"Nombre completo: {employee.name}")
-        _logger.info(f"Email: {employee.work_email}")
-        _logger.info(f"Departamento: {employee.department_id.name if employee.department_id else 'N/A'}")
-        
+
+        # Logging para diagnóstico (opcional)
+        _logger.info(
+            "Empleado creado: names=%s last_name=%s mother_last_name=%s",
+            employee.name, employee.names, employee.last_name, employee.mother_last_name
+        )
+
         return action
-    
+
     
