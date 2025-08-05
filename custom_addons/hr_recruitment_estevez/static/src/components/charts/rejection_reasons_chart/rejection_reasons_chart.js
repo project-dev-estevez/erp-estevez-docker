@@ -35,7 +35,10 @@ export class RejectionReasonsChart extends Component {
             candidateData: [],
             companyData: [],
             chartKeyCand: 'candidate-chart-' + Date.now(),
-            chartKeyComp: 'company-chart-' + Date.now()
+            chartKeyComp: 'company-chart-' + Date.now(),
+            showStageModal: false,
+            selectedRefuseReasonId: null,
+            selectedRefuseReasonName: "",
         });
 
         onWillStart(async () => {
