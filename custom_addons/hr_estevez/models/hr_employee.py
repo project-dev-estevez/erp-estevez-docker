@@ -524,7 +524,7 @@ class HrEmployee(models.Model):
                 raise UserError("The employee does not have a phone number.")
             
 
-    def action_open_documents(self):
+    def action_open_employee_documents(self):
         return {
             'name': _('Documentos del Empleado'),
             'view_type': 'form',
