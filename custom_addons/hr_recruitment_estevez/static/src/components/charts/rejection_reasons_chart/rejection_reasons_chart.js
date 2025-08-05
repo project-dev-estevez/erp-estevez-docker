@@ -3,10 +3,11 @@
 import { Component, useState, onWillStart, onMounted, onWillUpdateProps } from "@odoo/owl";
 import { useService } from "@web/core/utils/hooks";
 import { ChartRendererApex } from "../../chart_renderer_apex/chart_renderer_apex";
+import { RejectionStageDistributionModal } from "../modals/rejection_stage_distribution_modal";
 
 export class RejectionReasonsChart extends Component {
     static template = "hr_recruitment_estevez.RejectionReasonsChart";
-    static components = { ChartRendererApex };
+    static components = { ChartRendererApex, RejectionStageDistributionModal };
     static props = {
         startDate: { type: String, optional: true },
         endDate: { type: String, optional: true },
@@ -39,6 +40,11 @@ export class RejectionReasonsChart extends Component {
             showStageModal: false,
             selectedRefuseReasonId: null,
             selectedRefuseReasonName: "",
+            showStageModal: false,
+            selectedRefuseReasonId: null,
+            selectedRefuseReasonName: "",
+            selectedIsCandidateDecline: false,
+
         });
 
         onWillStart(async () => {
@@ -229,7 +235,11 @@ export class RejectionReasonsChart extends Component {
                         events: {
                             dataPointSelection: (event, chartContext, config) => {
                                 const reasonData = this.state.candidateData[config.dataPointIndex];
-                                this.openRejectionList(reasonData.id);
+                                this.openStageDistributionModal(
+                                    reasonData.id,
+                                    reasonData.label,
+                                    true // o false según el tipo
+                                );
                             }
                         }
                     },
@@ -328,7 +338,11 @@ export class RejectionReasonsChart extends Component {
                         events: {
                             dataPointSelection: (event, chartContext, config) => {
                                 const reasonData = this.state.companyData[config.dataPointIndex];
-                                this.openRejectionList(reasonData.id);
+                                this.openStageDistributionModal(
+                                    reasonData.id,
+                                    reasonData.label,
+                                    true // o false según el tipo
+                                );
                             }
                         }
                     },
@@ -397,35 +411,35 @@ export class RejectionReasonsChart extends Component {
         console.log("✅ RejectionReasonsChart: Configuraciones ApexCharts preparadas");
     }
 
-    async openRejectionList(refuse_reason_id) {
-        const currentProps = this.getCurrentProps();
-        let domain = [["application_status", "=", "refused"]];
+    // async openRejectionList(refuse_reason_id) {
+    //     const currentProps = this.getCurrentProps();
+    //     let domain = [["application_status", "=", "refused"]];
 
-        if (refuse_reason_id === false) {
-            domain.push(["refuse_reason_id", "=", false]);
-        } else if (refuse_reason_id) {
-            domain.push(["refuse_reason_id", "=", refuse_reason_id]);
-        } else {
-            domain.push("|", 
-                   ["refuse_reason_id", "=", false],
-                   ["refuse_reason_id", "=", null]);
-        }
+    //     if (refuse_reason_id === false) {
+    //         domain.push(["refuse_reason_id", "=", false]);
+    //     } else if (refuse_reason_id) {
+    //         domain.push(["refuse_reason_id", "=", refuse_reason_id]);
+    //     } else {
+    //         domain.push("|", 
+    //                ["refuse_reason_id", "=", false],
+    //                ["refuse_reason_id", "=", null]);
+    //     }
 
-        domain = this._addDateRangeToDomain(domain);
+    //     domain = this._addDateRangeToDomain(domain);
 
-        await this.actionService.doAction({
-            type: 'ir.actions.act_window',
-            name: 'Solicitudes Rechazadas',
-            res_model: 'hr.applicant',
-            views: [[false, 'list'], [false, 'form']],
-            target: 'current',
-            domain: domain,
-            context: {
-                search_default_filter_refused: 1,
-                active_test: false
-            }
-        });
-    }
+    //     await this.actionService.doAction({
+    //         type: 'ir.actions.act_window',
+    //         name: 'Solicitudes Rechazadas',
+    //         res_model: 'hr.applicant',
+    //         views: [[false, 'list'], [false, 'form']],
+    //         target: 'current',
+    //         domain: domain,
+    //         context: {
+    //             search_default_filter_refused: 1,
+    //             active_test: false
+    //         }
+    //     });
+    // }
 
     showEmptyChart() {
         this.state.hasData = false;
@@ -498,5 +512,15 @@ export class RejectionReasonsChart extends Component {
         await new Promise(resolve => setTimeout(resolve, 100));
         await this.loadChart();
         console.log("✅ RejectionReasonsChart: Refresh completado");
+    }
+
+    openStageDistributionModal(refuseReasonId, refuseReasonName, isCandidateDecline) {
+        this.state.selectedRefuseReasonId = refuseReasonId;
+        this.state.selectedRefuseReasonName = refuseReasonName;
+        this.state.selectedIsCandidateDecline = isCandidateDecline;
+        this.state.showStageModal = true;
+    }
+    closeStageModal() {
+        this.state.showStageModal = false;
     }
 }

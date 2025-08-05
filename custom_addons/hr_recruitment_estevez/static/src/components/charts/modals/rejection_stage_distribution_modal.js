@@ -11,16 +11,20 @@ export class RejectionStageDistributionModal extends Component {
         refuseReasonId: { type: Number },
         refuseReasonName: { type: String },
         isCandidateDecline: { type: Boolean },
+        startDate: { type: String, optional: true },
+        endDate: { type: String, optional: true },
         onClose: { type: Function }
     };
 
     setup() {
         this.orm = useService("orm");
+        this.actionService = useService("action");
         this.state = useState({
             isLoading: true,
             chartConfig: null,
             title: "",
-            stageData: []
+            stageData: [],
+            stages: [],
         });
 
         onWillStart(async () => {
@@ -30,6 +34,16 @@ export class RejectionStageDistributionModal extends Component {
 
     get hasData() {
         return this.state.chartConfig && this.state.stageData.length > 0;
+    }
+
+    _addDateRangeToDomain(domain = []) {
+        if (this.props.startDate) {
+            domain.push(["refuse_date", ">=", this.props.startDate]);
+        }
+        if (this.props.endDate) {
+            domain.push(["refuse_date", "<=", this.props.endDate]);
+        }
+        return domain;
     }
 
     async loadStageDistribution() {
@@ -57,6 +71,7 @@ export class RejectionStageDistributionModal extends Component {
             );
 
             // 3. Contar candidatos rechazados/declinados por etapa y motivo
+            this.state.stages = stages;
             const stageNames = [];
             const stageCounts = [];
             const stageData = [];
@@ -67,11 +82,13 @@ export class RejectionStageDistributionModal extends Component {
                     ['refuse_reason_id', '=', this.props.refuseReasonId],
                     ['application_status', '=', 'refused']
                 ];
-                const count = await this.orm.searchCount("hr.applicant", domain);
+                domain = this._addDateRangeToDomain(domain);
+                // Incluye inactivos
+                const count = await this.orm.searchCount("hr.applicant", domain, { context: { active_test: false } });
                 if (count > 0) {
                     stageNames.push(stage.name);
                     stageCounts.push(count);
-                    stageData.push({ name: stage.name, count });
+                    stageData.push({ name: stage.name, count, id: stage.id }); // Guarda el id real
                 }
             }
 
@@ -83,8 +100,28 @@ export class RejectionStageDistributionModal extends Component {
             } else {
                 this.state.chartConfig = {
                     series: [{ name: "Candidatos", data: stageCounts }],
-                    categories: stageNames,
-                    yAxisTitle: "Número de Candidatos"
+                    options: {
+                        chart: {
+                            type: "bar",
+                            height: 350,
+                            events: {
+                                dataPointSelection: (event, chartContext, config) => {
+                                    const stageIndex = config.dataPointIndex;
+                                    // Usa el id real de la etapa desde stageData
+                                    const stageId = this.state.stageData[stageIndex].id;
+                                    const stageName = this.state.stageData[stageIndex].name;
+                                    this.openApplicantsByJob({ id: stageId, name: stageName });
+                                }
+                            }
+                        },
+                        xaxis: { categories: stageNames },
+                        yaxis: { title: { text: "Candidatos" } },
+                        dataLabels: { enabled: true },
+                        title: {
+                            text: `Etapas donde se presentó "${this.props.refuseReasonName}"`,
+                            align: "center"
+                        }
+                    }
                 };
             }
         } catch (error) {
@@ -92,6 +129,36 @@ export class RejectionStageDistributionModal extends Component {
         } finally {
             this.state.isLoading = false;
         }
+    }
+
+    async openApplicantsByJob(stage) {
+        let domain = [
+            ['stage_id', '=', stage.id],
+            ['refuse_reason_id', '=', this.props.refuseReasonId],
+            ['application_status', '=', 'refused'],
+            ['active', 'in', [true, false]],
+        ];
+        if (this.props.startDate) {
+            domain.push(["refuse_date", ">=", this.props.startDate]);
+        }
+        if (this.props.endDate) {
+            domain.push(["refuse_date", "<=", this.props.endDate]);
+        }
+
+        console.log("Dominio enviado a la acción:", JSON.stringify(domain, null, 2));
+        console.log("stage.id:", stage.id, "stage.name:", stage.name, "refuseReasonId:", this.props.refuseReasonId);
+
+        await this.actionService.doAction({
+            type: "ir.actions.act_window",
+            name: `Candidatos rechazados en "${stage.name}"`,
+            res_model: "hr.applicant",
+            domain: domain,
+            views: [[false, "list"], [false, "form"]],
+            context: {
+                search_default_group_by_job: 1,
+                active_test: false
+            }
+        });
     }
 
     onCloseModal() {

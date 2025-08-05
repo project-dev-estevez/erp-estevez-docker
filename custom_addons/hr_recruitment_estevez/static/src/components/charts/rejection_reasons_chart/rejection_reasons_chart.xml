@@ -64,5 +64,14 @@
                 <p class="text-muted mb-0">No hay motivos de rechazo en el rango seleccionado</p>
             </div>
         </div>
+
+        <RejectionStageDistributionModal
+                                        t-if="state.showStageModal"
+                                        refuseReasonId="state.selectedRefuseReasonId"
+                                        refuseReasonName="state.selectedRefuseReasonName"
+                                        isCandidateDecline="state.selectedIsCandidateDecline"
+                                        startDate="props.startDate"
+                                        endDate="props.endDate"
+                                        onClose="() => this.closeStageModal()"/>
     </t>
 </templates>
