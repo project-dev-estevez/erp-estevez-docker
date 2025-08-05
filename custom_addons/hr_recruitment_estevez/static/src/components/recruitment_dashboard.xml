@@ -47,7 +47,7 @@
                             <div class="shadow-sm border m-2 p-4 bg-white">
                                 <RejectionReasonsChart startDate="state.startDate"
                                                        endDate="state.endDate"
-                                                       title="'Rechazos y Declinaciones en el Reclutamiento'"
+                                                       title="'Declinaciones y Rechazos en el Reclutamiento'"
                                                        height="350"
                                                        onMounted.bind="onRejectionReasonsMounted"/>
                             </div>

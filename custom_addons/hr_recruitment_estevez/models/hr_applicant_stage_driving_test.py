@@ -437,3 +437,5 @@ class HrApplicantStageDrivingTest(models.Model):
         
         # ✅ Descargar el PDF del reporte
         return self.env.ref('hr_recruitment_estevez.action_hr_applicant_driving_test_report').report_action(self)
+    
+    
