@@ -437,24 +437,30 @@ class HrEmployee(models.Model):
         return employee
 
     def write(self, vals):
+       
+        if 'name' not in vals and ('names' in vals or 'last_name' in vals or 'mother_last_name' in vals):
+            # Obtener valores de forma segura (convertir a string)
+            names_val = str(vals.get('names', self.names)) if vals.get('names', self.names) is not False else ''
+            last_name_val = str(vals.get('last_name', self.last_name)) if vals.get('last_name', self.last_name) is not False else ''
+            mother_last_name_val = str(vals.get('mother_last_name', self.mother_last_name)) if vals.get('mother_last_name', self.mother_last_name) is not False else ''
+            
+            # Construir nombre completo
+            full_name = f"{names_val} {last_name_val} {mother_last_name_val}".strip()
+            
+        vals['name'] = self.name
         
-        if 'names' in vals or 'last_name' in vals or 'mother_last_name' in vals:
-            names = vals.get('names', self.names).strip()
-            vals['name'] = f"{names} {vals.get('last_name', self.last_name)} {vals.get('mother_last_name', self.mother_last_name)}".strip()
+        # Resto de tu lógica para direction_id...
         for record in self:
             if 'direction_id' in vals:
-                # Si el empleado ya tiene una dirección, desasocia el director de la dirección anterior
                 if record.direction_id:
                     old_direction = self.env['hr.direction'].browse(record.direction_id.id)
                     old_direction.director_id = False
 
-                # Asocia el director a la nueva dirección
                 if vals['direction_id']:
                     new_direction = self.env['hr.direction'].browse(vals['direction_id'])
                     new_direction.director_id = record.id
 
-        res = super(HrEmployee, self).write(vals)
-
+        res = super().write(vals)
         
         try:
             _logger.info(f"Iniciando sincronización de actualización para {self.name}")
