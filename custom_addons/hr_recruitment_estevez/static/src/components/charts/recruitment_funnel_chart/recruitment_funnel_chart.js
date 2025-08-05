@@ -35,7 +35,8 @@ export class RecruitmentFunnelChart extends Component {
                 applicants: 0,
                 hired: 0,
                 refused: 0,
-                topRefuseReason: ''
+                topRefuseReason: '',
+                requestedPositions: 0
             },
             
             // 🎪 Datos del embudo
@@ -176,68 +177,77 @@ export class RecruitmentFunnelChart extends Component {
         this.state.isVacancyDropdownOpen = true;
     }
 
-    // 📋 ============ CARGA DE DATOS ============ (getAllVacancies y getVacancyMetrics SIN CAMBIOS)
     async getAllVacancies() {
-        console.log("📋 FunnelChart: Cargando vacantes con requisiciones aprobadas...");
-        
         try {
-            const approvedRequisitions = await this.orm.searchRead(
+            const currentProps = this.getCurrentProps();
+
+            let domain = [['is_published', '=', true]];
+            if (currentProps.startDate) {
+                domain.push(['publish_date', '>=', currentProps.startDate]);
+            }
+            if (currentProps.endDate) {
+                domain.push(['publish_date', '<=', currentProps.endDate]);
+            }
+
+            // 1. Busca requisiciones publicadas en el rango
+            const publishedRequisitions = await this.orm.searchRead(
                 'hr.requisition',
-                [['state', '=', 'approved']],
+                [['state', '=', 'approved'], ...domain],
                 ['workstation_job_id', 'is_published', 'publish_date', 'close_date']
             );
-            
-            console.log("✅ FunnelChart: Requisiciones aprobadas encontradas:", approvedRequisitions.length);
-            
-            if (approvedRequisitions.length === 0) {
-                console.log("⚠️ FunnelChart: No hay requisiciones aprobadas, lista de vacantes vacía");
+
+            if (publishedRequisitions.length === 0) {
                 this.state.vacancyOptions = [];
                 this.state.filteredVacancyOptions = [];
                 this.state.vacancySearchText = "Sin vacantes disponibles";
+                this.state.vacancyMetrics.requestedPositions = 0;
                 return;
             }
-            
-            const approvedJobIds = [...new Set(
-                approvedRequisitions
+
+            // 2. Obtén los IDs únicos de los jobs
+            const publishedJobIds = [...new Set(
+                publishedRequisitions
                     .filter(req => req.workstation_job_id)
                     .map(req => req.workstation_job_id[0])
             )];
-            
-            console.log("🎯 FunnelChart: IDs de trabajos con requisiciones aprobadas:", approvedJobIds);
-            
-            if (approvedJobIds.length === 0) {
-                console.log("⚠️ FunnelChart: No hay trabajos asociados a requisiciones aprobadas");
+
+            if (publishedJobIds.length === 0) {
                 this.state.vacancyOptions = [];
                 this.state.filteredVacancyOptions = [];
                 this.state.vacancySearchText = "Sin vacantes disponibles";
+                this.state.vacancyMetrics.requestedPositions = 0;
                 return;
             }
-            
-            const approvedJobs = await this.orm.searchRead(
+
+            // 3. Lee los jobs y el campo no_of_recruitment
+            const publishedJobs = await this.orm.searchRead(
                 'hr.job',
-                [['id', 'in', approvedJobIds]],
-                ['id', 'name']
+                [['id', 'in', publishedJobIds]],
+                ['id', 'name', 'no_of_recruitment']
             );
-            
-            console.log("✅ FunnelChart: Vacantes con requisiciones aprobadas:", approvedJobs.length);
-            
-            this.state.vacancyOptions = approvedJobs.map(j => ({
+
+            // 4. Suma el total solicitado
+            const totalRequested = publishedJobs.reduce(
+                (sum, job) => sum + (job.no_of_recruitment || 0), 0
+            );
+            this.state.vacancyMetrics.requestedPositions = totalRequested;
+
+            this.state.vacancyOptions = publishedJobs.map(j => ({
                 id: j.id,
                 name: j.name,
             }));
             this.state.filteredVacancyOptions = this.state.vacancyOptions;
-            
+
             if (!this.state.vacancySearchText || this.state.vacancySearchText === "Sin vacantes disponibles") {
                 this.state.vacancySearchText = "Todas Las Vacantes";
             }
-            
-            console.log("✅ FunnelChart: Vacantes cargadas:", this.state.vacancyOptions.length);
-            
+
         } catch (error) {
             console.error("❌ FunnelChart: Error cargando vacantes:", error);
             this.state.vacancyOptions = [];
             this.state.filteredVacancyOptions = [];
             this.state.vacancySearchText = "Error cargando vacantes";
+            this.state.vacancyMetrics.requestedPositions = 0;
         }
     }
 
@@ -251,7 +261,8 @@ export class RecruitmentFunnelChart extends Component {
                 applicants: 0,
                 hired: 0,
                 refused: 0,
-                topRefuseReason: ''
+                topRefuseReason: '',
+                requestedPositions: this.state.vacancyMetrics.requestedPositions
             };
             console.log("ℹ️ FunnelChart: Métricas globales (sin vacante específica)");
             return;
@@ -339,7 +350,8 @@ export class RecruitmentFunnelChart extends Component {
                 applicants: applicantsCount,
                 hired: hiredCount,
                 refused: refusedCount,
-                topRefuseReason
+                topRefuseReason,
+                requestedPositions: this.state.vacancyMetrics.requestedPositions
             };
 
             console.log("✅ FunnelChart: Métricas de vacante cargadas:", this.state.vacancyMetrics);
@@ -352,7 +364,8 @@ export class RecruitmentFunnelChart extends Component {
                 applicants: 0,
                 hired: 0,
                 refused: 0,
-                topRefuseReason: ''
+                topRefuseReason: '',
+                requestedPositions: this.state.vacancyMetrics.requestedPositions
             };
         }
     }
