@@ -51,6 +51,7 @@
         'views/hr_applicant_rejected_list_views.xml',
         'views/hr_applicant_hired_list_views.xml',
         'views/hr_applicant_form_inherit.xml',
+        'views/hr_job_view_tree_inherit.xml'
         
 
     ],
