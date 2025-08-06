@@ -1,0 +1,112 @@
+/* ==========================================
+   INPUTS PREMIUM STYLE - ESTEVEZ ERP (RESPONSIVE FORM VIEW)
+   ========================================== */
+
+:root {
+  --input-border: #d0d7de;
+  --input-hover-border: #1a73e8;
+  --input-focus-border: #1a73e8;
+  --input-bg: #ffffff;
+  --input-hover-bg: #f9fafb;
+  --input-disabled-bg: #f1f3f4;
+  --input-readonly-bg: #f6f8fa;
+  --input-text: #1f2937;
+  --input-disabled-text: #6b7280;
+  --input-radius: 8px;
+  --input-transition: 0.2s ease-in-out;
+  --input-shadow-focus: 0 0 0 4px rgba(26, 115, 232, 0.12);
+
+  --input-padding-y: 6px;
+  --input-padding-x: 10px;
+  --input-font-size: 13px;
+}
+
+@media (max-width: 768px) {
+  :root {
+    --input-padding-y: 5px;
+    --input-padding-x: 8px;
+    --input-font-size: 12px;
+  }
+}
+
+.o_form_view input[type="text"],
+.o_form_view input[type="password"],
+.o_form_view input[type="number"],
+.o_form_view input[type="email"],
+.o_form_view input[type="tel"],
+.o_form_view input[type="url"],
+.o_form_view textarea,
+.o_form_view select,
+.o_form_view input[type="date"],
+.o_form_view input[type="datetime-local"],
+.o_form_view .o_datepicker_input {
+  border: 1px solid var(--input-border) !important;
+  border-radius: var(--input-radius) !important;
+  padding: var(--input-padding-y) var(--input-padding-x) !important;
+  background-color: var(--input-bg) !important;
+  color: var(--input-text) !important;
+  font-size: var(--input-font-size) !important;
+  transition: all var(--input-transition) !important;
+  box-shadow: none !important;
+}
+
+.o_form_view input:hover,
+.o_form_view textarea:hover,
+.o_form_view select:hover,
+.o_form_view input[type="date"]:hover,
+.o_form_view input[type="datetime-local"]:hover,
+.o_form_view .o_datepicker_input:hover {
+  border-color: var(--input-hover-border) !important;
+  background-color: var(--input-hover-bg) !important;
+}
+
+.o_form_view input:focus,
+.o_form_view textarea:focus,
+.o_form_view select:focus,
+.o_form_view input[type="date"]:focus,
+.o_form_view input[type="datetime-local"]:focus,
+.o_form_view .o_datepicker_input:focus {
+  outline: none !important;
+  border-color: var(--input-focus-border) !important;
+  box-shadow: var(--input-shadow-focus) !important;
+  background-color: #fff !important;
+}
+
+.o_form_view input:disabled,
+.o_form_view textarea:disabled,
+.o_form_view select:disabled,
+.o_form_view input[type="date"]:disabled,
+.o_form_view input[type="datetime-local"]:disabled,
+.o_form_view .o_datepicker_input:disabled {
+  background-color: var(--input-disabled-bg) !important;
+  border-color: #e0e0e0 !important;
+  color: var(--input-disabled-text) !important;
+  cursor: not-allowed !important;
+}
+
+.o_form_view input[readonly],
+.o_form_view textarea[readonly],
+.o_form_view select[readonly],
+.o_form_view input[type="date"][readonly],
+.o_form_view input[type="datetime-local"][readonly],
+.o_form_view .o_datepicker_input[readonly] {
+  background-color: var(--input-readonly-bg) !important;
+  border-color: #e5e7eb !important;
+  color: var(--input-disabled-text) !important;
+}
+
+.o_form_view textarea {
+  min-height: 64px !important;
+  resize: vertical !important;
+}
+
+.o_form_view input[type="checkbox"],
+.o_form_view input[type="radio"] {
+  all: unset !important;
+  appearance: checkbox !important;
+  margin-right: 4px;
+  transform: scale(1.1);
+}
+
+/* Eliminar estilos para listas/tree views */
+/* .o_list_view input... se eliminan para aplicar solo en form views */
