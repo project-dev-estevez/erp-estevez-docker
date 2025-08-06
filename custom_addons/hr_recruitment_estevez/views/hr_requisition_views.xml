@@ -383,10 +383,11 @@
                
                <!--Estado de la Vacante-->
                <separator string="Vacante"/>   
-                <filter name="filter_vacante" string="🚦ESTADO VACANTE" domain="[]"/>
-                    <filter name="filter_vacancy_open" string="Abierta" domain="[('publication_status','=','Abierta')]"/>
-                    <filter name="filter_vacancy_closed" string="Cerrada" domain="[('publication_status','=','Cerrada')]"/>
-                    <filter name="filter_vacancy_to_activate" string="Por Activar" domain="[('publication_status','=','Por Activar')]"/>
+                <filter name="filter_vacante" string="🚦ESTADO VACANTE" domain="[]"/>                                                                          
+                    <filter name="filter_to_approve" string="Por Aprobar" domain="[('state','=','to_approve')]"/>
+                    <filter name="filter_vacancy_open" string="Aprobada" domain="[('state','=','approved')]"/>  
+                    <filter name="filter_in_progress" string="En Curso" domain="[('state','=','first_approval')]"/>
+                    <filter name="filter_rejected" string="Rechazadas" domain="[('state','=','rejected')]"/>
 
                 <!-- Por Proyecto -->
                 <separator string="Proyecto"/>   

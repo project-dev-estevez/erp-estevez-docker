@@ -138,8 +138,27 @@ class HrRequisition(models.Model):
     publication_status = fields.Char(        
         compute='_compute_publication_status',
         store=False,
-        search=True
-    )    
+        search='_search_publication_status'
+    )        
+
+    def _search_publication_status(self, operator, value):
+    
+        if operator not in ('=', '!=', 'ilike', 'not ilike', 'in', 'not in'):
+            return []
+    
+        # Mapear los valores del estado de publicación a las condiciones correspondientes
+        status_mapping = {
+            'Por Abrir': [('state', '=', 'to_approved'), ('is_published', '=', False)],
+            'Abierta': [('state', '=', 'approved'), ('is_published', '=', True)],
+            'Cerrada': [('state', '=', 'approved'), ('is_published', '=', False)],
+        }
+    
+        # Si el valor buscado existe en nuestro mapeo
+        if value in status_mapping:
+            return status_mapping[value]
+    
+        # Si no, devolver un dominio vacío
+        return []
 
     @api.constrains('wizard_step', 'job_type', '')
 
@@ -154,7 +173,7 @@ class HrRequisition(models.Model):
             if record.state != 'approved':
                 record.publication_status = 'Por Abrir'            
             else:
-                record.publication_status = 'Abierta' if record.is_published else 'Por Abrir'
+                record.publication_status = 'Abierta' if record.is_published else 'Cerrada'
 
     # Acciones de estado
     def action_approve(self):
