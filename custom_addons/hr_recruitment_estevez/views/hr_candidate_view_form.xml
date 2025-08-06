@@ -28,8 +28,8 @@
         <xpath expr="//button[@name='create_employee_from_candidate']" position="attributes">
             <attribute name="invisible">1</attribute> <!-- Siempre oculto -->
         </xpath>
-        <xpath expr="//field[@name='source_id']" position="after" invisible="1">
-            <field name="job_ids" required="1"
+        <xpath expr="//field[@name='source_id']" position="after">
+            <field name="job_ids" invisible="1"
             options="{'no_create': True, 'no_open': True}"/>
         </xpath>
         <xpath expr="//field[@name='source_id']" position="after">
