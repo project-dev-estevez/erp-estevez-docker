@@ -9,7 +9,7 @@ class HRCandidate(models.Model):
 
     first_name = fields.Char(string='Nombre(s)', required=True)
     last_name = fields.Char(string='Apellido paterno', required=True)
-    mother_last_name = fields.Char(string='Apellido materno', required=True)
+    mother_last_name = fields.Char(string='Apellido materno')   
 
     @api.onchange('first_name', 'last_name', 'mother_last_name')
     def _onchange_fill_partner_name(self):
