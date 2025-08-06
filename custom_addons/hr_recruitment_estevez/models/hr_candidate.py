@@ -9,6 +9,11 @@ class HrCandidate(models.Model):
     _inherit = 'hr.candidate'
 
     rfc = fields.Char(string="RFC")
+    job_ids = fields.Many2many(
+        'hr.job',
+        string = 'Puesto de Trabajo'
+    )
+
     job_id = fields.Many2one(
         'hr.job',
         string = 'Puesto de Trabajo'
