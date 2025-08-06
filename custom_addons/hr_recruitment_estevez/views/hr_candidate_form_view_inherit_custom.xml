@@ -18,7 +18,7 @@
           <field name="mother_last_name"/>
         </field>        
 
-         <xpath expr="//field[@name='job_ids']" position="after">
+         <xpath expr="//field[@name='job_id']" position="after">
          <div class="d-flex justify-content-end w-100 mt-4">
           <button 
             name="action_save" 

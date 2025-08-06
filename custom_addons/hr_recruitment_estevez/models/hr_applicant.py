@@ -171,7 +171,7 @@ class HrApplicant(models.Model):
     source_id = fields.Many2one(
         'utm.source',        
         required = True,
-        string='Fuente de reclutamiento',
+        string='Fuente de reclutamiento',        
         help='Fuente de reclutamiento',
         ondelete='restrict'       
     )
@@ -202,6 +202,7 @@ class HrApplicant(models.Model):
     first_name = fields.Char(string="Nombre(s)", required=True)    
     last_name = fields.Char(string="Apellido Paterno", required=True)
     mother_last_name = fields.Char(string="Apellido Materno", required=True)
+
         
 
     @api.onchange('zoonosis')
@@ -384,7 +385,7 @@ class HrApplicant(models.Model):
         if self.candidate_id:            
             self.phone = self.candidate_id.partner_phone            
             self.source_id = self.candidate_id.source_id.id            
-            self.job_id = self.candidate_id.job_ids.id           
+            self.job_id = self.candidate_id.job_id.id           
 
 
     def action_open_whatsapp(self):
