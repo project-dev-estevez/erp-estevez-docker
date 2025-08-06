@@ -5,19 +5,19 @@
     <field name="model">hr.applicant</field>
     <field name="arch" type="xml">
       <list string="General Postulantes" default_order="create_date desc">
-        <field name="create_date" string="Fecha y Hora"/>
-        <field name="user_id" string="Reclutador" widget="many2one_avatar_user"/>
-        <field name="partner_name" string="Candidato"/>
-        <field name="job_id" string="Puesto de Trabajo"/>
-        <field name="project_id" string="Proyecto" optional="hide"/>
-        <field name="source_id" string="Fuente de Reclutamiento" optional="hide"/>
-        <field name="stage_id" string="Etapa Actual" optional="hide"/>
-        <field name="date_closed" string="Fecha de Contratación" optional="hide"/>
-        <field name="refuse_date" string="Fecha de Rechazo" optional="hide"/>
-        <field name="process_duration" string="Duración" optional="hide"/>
-        <field name="refuse_reason_id" string="Motivo de Rechazo" optional="hide"/>
-        <field name="applicant_notes" string="Comentarios" optional="hide"/>
-        <field name="priority" string="Calificación" optional="hide" widget="priority"/>
+        <field name="create_date" string="Fecha y Hora" width="200"/>
+        <field name="user_id" string="Reclutador" width="250" widget="many2one_avatar_user"/>
+        <field name="partner_name" string="Candidato" width="250"/>
+        <field name="job_id" string="Puesto de Trabajo" width="220"/>
+        <field name="project_id" string="Proyecto" optional="hide" width="220"/>
+        <field name="source_id" string="Fuente de Reclutamiento" optional="hide" width="180"/>
+        <field name="stage_id" string="Etapa Actual" optional="hide" width="170"/>
+        <field name="date_closed" string="Fecha de Contratación" optional="hide" width="170"/>
+        <field name="refuse_date" string="Fecha de Rechazo" optional="hide" width="170"/>
+        <field name="process_duration" string="Duración" optional="hide" width="120"/>
+        <field name="refuse_reason_id" string="Motivo de Rechazo" optional="hide" width="200"/>
+        <field name="applicant_notes" string="Comentarios" optional="hide" width="250"/>
+        <field name="priority" string="Calificación" optional="hide" widget="priority" width="100"/>
       </list>
     </field>
   </record>
