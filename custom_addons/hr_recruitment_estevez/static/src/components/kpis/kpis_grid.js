@@ -18,6 +18,7 @@ export class KpisGrid extends Component {
     setup() {
         this.orm = useService("orm");
         this.actionService = useService("action");
+        this.recruitmentStageService = useService("recruitment_stage");
         
         // ✅ Estado local para los KPIs
         this.state = useState({
@@ -144,24 +145,17 @@ export class KpisGrid extends Component {
 
     async calculateTotalApplicants() {
         try {
-            // 1. ✅ Buscar la etapa "Primer contacto" (OBLIGATORIA)
-            const primerContactoStage = await this.orm.searchRead(
-                'hr.recruitment.stage',
-                [['name', 'ilike', 'primer contacto']],
-                ['id', 'name', 'sequence'],
-                { limit: 1 }
-            );
-
-            if (!primerContactoStage.length) {
+            // ✅ NUEVO: Usar el servicio en lugar de consulta directa
+            const firstContactStage = await this.recruitmentStageService.getFirstContactStage();
+            
+            if (!firstContactStage) {
                 this.state.totalApplicants.value = 0;
                 return;
             }
 
-            const primerContactoSequence = primerContactoStage[0].sequence;
-
-            // 2. ✅ Contar candidatos que han SUPERADO "Primer contacto"
+            // ✅ Contar candidatos que han llegado al menos a "Primer contacto"
             let domain = [
-                ['stage_id.sequence', '>=', primerContactoSequence]
+                ['stage_id.sequence', '>=', firstContactStage.sequence]
             ];
             domain = this._addDateRangeToDomain(domain);
 
