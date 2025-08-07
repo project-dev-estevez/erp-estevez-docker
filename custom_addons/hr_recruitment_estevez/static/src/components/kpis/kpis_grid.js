@@ -208,17 +208,25 @@ export class KpisGrid extends Component {
 
         const data = await this.orm.searchCount("hr.applicant", domain);
         this.state.preselectedApplicants.value = data;
-        console.log("⭐ Preselected applicants:", data);
     }
 
     async calculateRejectedApplicants() {
-        const context = { context: { active_test: false } };
-        let domain = [["application_status", "=", "refused"]];
-        domain = this._addDateRangeToDomain(domain);
+        try {
+            const rejectedDomain = await this.recruitmentStageService.getRejectedDomainFromFirstContact(
+                this._addDateRangeToDomain([])
+            );
 
-        const data = await this.orm.searchCount("hr.applicant", domain, context);
-        this.state.rejectedApplicants.value = data;
-        console.log("❌ Rejected applicants:", data);
+            const count = await this.orm.searchCount(
+                "hr.applicant", 
+                rejectedDomain, 
+                { context: { active_test: false } }
+            );
+
+            this.state.rejectedApplicants.value = count;
+        } catch (error) {
+            console.error("❌ KpisGrid: Error calculando Rechazados:", error);
+            this.state.rejectedApplicants.value = 0;
+        }
     }
 
     async calculateHiredApplicants() {
@@ -301,7 +309,6 @@ export class KpisGrid extends Component {
     }
 
     viewPreselectedApplicants() {
-        console.log(`⭐ KpisGrid: ¡Navegando a preseleccionados!`);
         let domain = [
             ["stage_id.sequence", ">", 4],
             ["application_status", "!=", "hired"]
@@ -317,24 +324,29 @@ export class KpisGrid extends Component {
         });
     }
 
-    viewRejectedApplicants() {
-        const context = { active_test: false };
-        let domain = [["application_status", "=", "refused"]];
-        domain = this._addDateRangeToDomain(domain);
+    async viewRejectedApplicants() {
+        try {
+            // ✅ NUEVO: Usar el servicio para obtener dominio de rechazados desde primer contacto
+            const rejectedDomain = await this.recruitmentStageService.getRejectedDomainFromFirstContact(
+                this._addDateRangeToDomain([])
+            );
 
-        this.actionService.doAction({
-            type: "ir.actions.act_window",
-            name: "❌ Postulaciones Rechazadas",
-            res_model: "hr.applicant",
-            domain: domain,
-            views: [[false, "list"], [false, "form"]],
-            context: {
-                ...context,
-                list_view_ref: "hr_recruitment_estevez.hr_applicant_rejected_list_view",
-                search_default_group_by_refuse_reason: 1,  // ✅ Agrupar por motivo de rechazo
-                search_default_filter_refused: 1           // ✅ Filtro por rechazados
-            }
-        });
+            await this.actionService.doAction({
+                type: "ir.actions.act_window",
+                name: "❌ Postulaciones Rechazadas (Post-Primer Contacto)",
+                res_model: "hr.applicant",
+                domain: rejectedDomain,
+                views: [[false, "list"], [false, "form"]],
+                context: {
+                    active_test: false,
+                    list_view_ref: "hr_recruitment_estevez.hr_applicant_rejected_list_view",
+                    search_default_group_by_refuse_reason: 1,  // ✅ Agrupar por motivo de rechazo
+                    search_default_filter_refused: 1           // ✅ Filtro por rechazados
+                }
+            });
+        } catch (error) {
+            console.error("❌ KpisGrid: Error en navegación Rechazados:", error);
+        }
     }
 
     viewHiredApplicants() 
