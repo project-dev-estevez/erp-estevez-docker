@@ -261,8 +261,6 @@ export class RecruitmentFunnelChart extends Component {
     }
 
     async getVacancyMetrics() {
-        console.log("📊 FunnelChart: Cargando métricas de vacante...");
-        
         if (!this.state.selectedVacancy) {
             this.state.vacancyMetrics = {
                 status: 'Global',
@@ -271,9 +269,8 @@ export class RecruitmentFunnelChart extends Component {
                 hired: 0,
                 refused: 0,
                 topRefuseReason: '',
-                requestedPositions: this.state.vacancyMetrics.requestedPositions
+                requestedPositions: this.state.vacancyMetrics.requestedPositions // Mantiene el total global
             };
-            console.log("ℹ️ FunnelChart: Métricas globales (sin vacante específica)");
             return;
         }
 
@@ -282,22 +279,35 @@ export class RecruitmentFunnelChart extends Component {
                 'hr.requisition',
                 [
                     ['workstation_job_id', '=', this.state.selectedVacancy],
-                    ['state', '=', 'approved']
+                    ['state', '=', 'approved'],
+                    ['is_published', '=', true] // Solo requisiciones publicadas
                 ],
-                ['is_published', 'publish_date', 'close_date'],
-                { limit: 1 }
+                ['is_published', 'publish_date', 'close_date', 'number_of_vacancies']
             );
 
             if (requisitions.length === 0) {
-                console.log("⚠️ FunnelChart: No hay requisición aprobada para esta vacante");
-                this.state.vacancyMetrics.status = 'Sin requisición';
+                this.state.vacancyMetrics = {
+                    status: 'Sin requisición',
+                    openDuration: '',
+                    applicants: 0,
+                    hired: 0,
+                    refused: 0,
+                    topRefuseReason: '',
+                    requestedPositions: 0 // Sin requisición = 0 vacantes
+                };
                 return;
             }
 
+            // Tomar la primera requisición (o sumar si hay múltiples)
             const requisition = requisitions[0];
             const isPublished = requisition.is_published;
             const publishDate = requisition.publish_date;
             const closeDate = requisition.close_date;
+
+            // Calcular vacantes solicitadas específicas para este puesto
+            const specificRequestedPositions = requisitions.reduce(
+                (sum, req) => sum + (req.number_of_vacancies || 0), 0
+            );
 
             let status = 'Cerrada';
             let openDuration = '';
@@ -360,10 +370,8 @@ export class RecruitmentFunnelChart extends Component {
                 hired: hiredCount,
                 refused: refusedCount,
                 topRefuseReason,
-                requestedPositions: this.state.vacancyMetrics.requestedPositions
+                requestedPositions: specificRequestedPositions // ✅ Número específico del puesto
             };
-
-            console.log("✅ FunnelChart: Métricas de vacante cargadas:", this.state.vacancyMetrics);
 
         } catch (error) {
             console.error("❌ FunnelChart: Error cargando métricas de vacante:", error);
@@ -374,7 +382,7 @@ export class RecruitmentFunnelChart extends Component {
                 hired: 0,
                 refused: 0,
                 topRefuseReason: '',
-                requestedPositions: this.state.vacancyMetrics.requestedPositions
+                requestedPositions: 0 // Error = 0 vacantes
             };
         }
     }
