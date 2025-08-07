@@ -40,7 +40,7 @@
     <record id="view_hr_requisition_form" model="ir.ui.view">
         <field name="name">hr.requisition.form</field>
         <field name="model">hr.requisition</field>
-        <field name="arch" type="xml">
+        <field name="arch" type="xml">               
             <form>
                 <header>
                     <button name="action_approve" string="Aprobar" type="object" class="btn-primary" invisible="state in ('rejected', 'first_approval', 'second_approval', 'approved') or requestor_id == uid"/>
@@ -329,6 +329,10 @@
                         margin-top: 8px;
                     }
 
+                     /* Ocultar el botón "Guardar manual" */
+                    .o_form_button_save {
+                    display: none !important;
+                    }
                  
                 </style>
                 
