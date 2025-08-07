@@ -18,6 +18,7 @@ export class KpisGrid extends Component {
     setup() {
         this.orm = useService("orm");
         this.actionService = useService("action");
+        this.recruitmentStageService = useService("recruitment_stage");
         
         // ✅ Estado local para los KPIs
         this.state = useState({
@@ -144,24 +145,17 @@ export class KpisGrid extends Component {
 
     async calculateTotalApplicants() {
         try {
-            // 1. ✅ Buscar la etapa "Primer contacto" (OBLIGATORIA)
-            const primerContactoStage = await this.orm.searchRead(
-                'hr.recruitment.stage',
-                [['name', 'ilike', 'primer contacto']],
-                ['id', 'name', 'sequence'],
-                { limit: 1 }
-            );
-
-            if (!primerContactoStage.length) {
+            // ✅ NUEVO: Usar el servicio en lugar de consulta directa
+            const firstContactStage = await this.recruitmentStageService.getFirstContactStage();
+            
+            if (!firstContactStage) {
                 this.state.totalApplicants.value = 0;
                 return;
             }
 
-            const primerContactoSequence = primerContactoStage[0].sequence;
-
-            // 2. ✅ Contar candidatos que han SUPERADO "Primer contacto"
+            // ✅ Contar candidatos que han llegado al menos a "Primer contacto"
             let domain = [
-                ['stage_id.sequence', '>=', primerContactoSequence]
+                ['stage_id.sequence', '>=', firstContactStage.sequence]
             ];
             domain = this._addDateRangeToDomain(domain);
 
@@ -180,26 +174,18 @@ export class KpisGrid extends Component {
 
     async calculateInProgressApplicants() {
         try {
-            // 1. ✅ Buscar la etapa "Primer contacto" (OBLIGATORIA)
-            const primerContactoStage = await this.orm.searchRead(
-                'hr.recruitment.stage',
-                [['name', 'ilike', 'primer contacto']],
-                ['id', 'name', 'sequence'],
-                { limit: 1 }
-            );
-
-            if (!primerContactoStage.length) {
+            const firstContactStage = await this.recruitmentStageService.getFirstContactStage();
+            
+            if (!firstContactStage) {
                 console.error("❌ KpisGrid: Etapa 'Primer contacto' NO encontrada para En Progreso");
                 this.state.inProgressApplicants.value = 0;
                 return;
             }
 
-            const primerContactoSequence = primerContactoStage[0].sequence;
-
-            // 2. ✅ Contar candidatos que han superado "Primer contacto" 
+            // ✅ Contar candidatos que han superado "Primer contacto" 
             //    PERO que NO están rechazados ni contratados
             let domain = [
-                ['stage_id.sequence', '>=', primerContactoSequence],    // ✅ Después de primer contacto
+                ['stage_id.sequence', '>=', firstContactStage.sequence],    // ✅ Después de primer contacto
                 ['application_status', '!=', 'refused'],              // ✅ NO rechazados
                 ['application_status', '!=', 'hired']                 // ✅ NO contratados
             ];
@@ -283,26 +269,19 @@ export class KpisGrid extends Component {
 
     async viewInProgressApplicants() {
         try {
-            // Buscar etapa "Primer contacto"
-            const primerContactoStage = await this.orm.searchRead(
-                'hr.recruitment.stage',
-                [['name', 'ilike', 'primer contacto']],
-                ['sequence'],
-                { limit: 1 }
-            );
+            const firstContactStage = await this.recruitmentStageService.getFirstContactStage();
 
             let domain = [];
             
-            if (primerContactoStage.length > 0) {
-                const sequence = primerContactoStage[0].sequence;
+            if (firstContactStage) {
                 domain = [
-                    ['stage_id.sequence', '>=', sequence],      // ✅ Después de primer contacto
+                    ['stage_id.sequence', '>=', firstContactStage.sequence],      // ✅ Después de primer contacto
                     ['application_status', '!=', 'refused'],  // ✅ NO rechazados
                     ['application_status', '!=', 'hired']     // ✅ NO contratados
                 ];
             } else {
                 console.error("❌ KpisGrid: Etapa 'Primer contacto' no encontrada en navegación");
-                // Sin modal, usar dominio básico
+                // Fallback: usar dominio básico
                 domain = [["application_status", "=", "ongoing"]];
             }
             

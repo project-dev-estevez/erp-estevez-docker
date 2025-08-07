@@ -181,69 +181,78 @@ export class RecruitmentFunnelChart extends Component {
         try {
             const currentProps = this.getCurrentProps();
 
-            let domain = [['is_published', '=', true]];
-            if (currentProps.startDate) {
-                domain.push(['publish_date', '>=', currentProps.startDate]);
-            }
-            if (currentProps.endDate) {
-                domain.push(['publish_date', '<=', currentProps.endDate]);
-            }
+            // 1. Dominio base para requisiciones ABIERTAS (aprobadas y publicadas)
+            // SIN filtro de fechas de publicación
+            let domain = [
+                ['state', '=', 'approved'],
+                ['is_published', '=', true]
+            ];
 
-            // 1. Busca requisiciones publicadas en el rango
-            const publishedRequisitions = await this.orm.searchRead(
+            console.log("🔍 Dominio para requisiciones abiertas:", domain);
+
+            // 2. Buscar requisiciones que cumplen los criterios
+            const openRequisitions = await this.orm.searchRead(
                 'hr.requisition',
-                [['state', '=', 'approved'], ...domain],
-                ['workstation_job_id', 'is_published', 'publish_date', 'close_date']
+                domain,
+                ['workstation_job_id', 'is_published', 'number_of_vacancies']
             );
 
-            if (publishedRequisitions.length === 0) {
+            console.log("✅ Requisiciones abiertas encontradas:", openRequisitions.length);
+
+            if (openRequisitions.length === 0) {
                 this.state.vacancyOptions = [];
                 this.state.filteredVacancyOptions = [];
-                this.state.vacancySearchText = "Sin vacantes disponibles";
+                this.state.vacancySearchText = "Sin vacantes abiertas";
                 this.state.vacancyMetrics.requestedPositions = 0;
                 return;
             }
 
-            // 2. Obtén los IDs únicos de los jobs
-            const publishedJobIds = [...new Set(
-                publishedRequisitions
+            // 3. Obtener IDs únicos de los jobs con vacantes abiertas
+            const openJobIds = [...new Set(
+                openRequisitions
                     .filter(req => req.workstation_job_id)
                     .map(req => req.workstation_job_id[0])
             )];
 
-            if (publishedJobIds.length === 0) {
+            if (openJobIds.length === 0) {
                 this.state.vacancyOptions = [];
                 this.state.filteredVacancyOptions = [];
-                this.state.vacancySearchText = "Sin vacantes disponibles";
+                this.state.vacancySearchText = "Sin puestos con vacantes abiertas";
                 this.state.vacancyMetrics.requestedPositions = 0;
                 return;
             }
 
-            // 3. Lee los jobs y el campo no_of_recruitment
-            const publishedJobs = await this.orm.searchRead(
+            // 4. Obtener información de los jobs
+            const openJobs = await this.orm.searchRead(
                 'hr.job',
-                [['id', 'in', publishedJobIds]],
-                ['id', 'name', 'no_of_recruitment']
+                [['id', 'in', openJobIds]],
+                ['id', 'name']
             );
 
-            // 4. Suma el total solicitado
-            const totalRequested = publishedJobs.reduce(
-                (sum, job) => sum + (job.no_of_recruitment || 0), 0
+            // 5. Calcular total de vacantes solicitadas sumando number_of_vacancies de las requisiciones abiertas
+            const totalRequested = openRequisitions.reduce(
+                (sum, req) => sum + (req.number_of_vacancies || 0), 0
             );
             this.state.vacancyMetrics.requestedPositions = totalRequested;
 
-            this.state.vacancyOptions = publishedJobs.map(j => ({
+            // 6. Preparar opciones para el dropdown
+            this.state.vacancyOptions = openJobs.map(j => ({
                 id: j.id,
                 name: j.name,
             }));
             this.state.filteredVacancyOptions = this.state.vacancyOptions;
 
-            if (!this.state.vacancySearchText || this.state.vacancySearchText === "Sin vacantes disponibles") {
-                this.state.vacancySearchText = "Todas Las Vacantes";
+            if (!this.state.vacancySearchText || this.state.vacancySearchText === "Sin vacantes abiertas") {
+                this.state.vacancySearchText = "Todas Las Vacantes Abiertas";
             }
 
+            console.log("✅ Vacantes abiertas cargadas:", {
+                totalJobs: this.state.vacancyOptions.length,
+                totalVacancies: totalRequested
+            });
+
         } catch (error) {
-            console.error("❌ FunnelChart: Error cargando vacantes:", error);
+            console.error("❌ FunnelChart: Error cargando vacantes abiertas:", error);
             this.state.vacancyOptions = [];
             this.state.filteredVacancyOptions = [];
             this.state.vacancySearchText = "Error cargando vacantes";
@@ -252,8 +261,6 @@ export class RecruitmentFunnelChart extends Component {
     }
 
     async getVacancyMetrics() {
-        console.log("📊 FunnelChart: Cargando métricas de vacante...");
-        
         if (!this.state.selectedVacancy) {
             this.state.vacancyMetrics = {
                 status: 'Global',
@@ -262,9 +269,8 @@ export class RecruitmentFunnelChart extends Component {
                 hired: 0,
                 refused: 0,
                 topRefuseReason: '',
-                requestedPositions: this.state.vacancyMetrics.requestedPositions
+                requestedPositions: this.state.vacancyMetrics.requestedPositions // Mantiene el total global
             };
-            console.log("ℹ️ FunnelChart: Métricas globales (sin vacante específica)");
             return;
         }
 
@@ -273,22 +279,35 @@ export class RecruitmentFunnelChart extends Component {
                 'hr.requisition',
                 [
                     ['workstation_job_id', '=', this.state.selectedVacancy],
-                    ['state', '=', 'approved']
+                    ['state', '=', 'approved'],
+                    ['is_published', '=', true] // Solo requisiciones publicadas
                 ],
-                ['is_published', 'publish_date', 'close_date'],
-                { limit: 1 }
+                ['is_published', 'publish_date', 'close_date', 'number_of_vacancies']
             );
 
             if (requisitions.length === 0) {
-                console.log("⚠️ FunnelChart: No hay requisición aprobada para esta vacante");
-                this.state.vacancyMetrics.status = 'Sin requisición';
+                this.state.vacancyMetrics = {
+                    status: 'Sin requisición',
+                    openDuration: '',
+                    applicants: 0,
+                    hired: 0,
+                    refused: 0,
+                    topRefuseReason: '',
+                    requestedPositions: 0 // Sin requisición = 0 vacantes
+                };
                 return;
             }
 
+            // Tomar la primera requisición (o sumar si hay múltiples)
             const requisition = requisitions[0];
             const isPublished = requisition.is_published;
             const publishDate = requisition.publish_date;
             const closeDate = requisition.close_date;
+
+            // Calcular vacantes solicitadas específicas para este puesto
+            const specificRequestedPositions = requisitions.reduce(
+                (sum, req) => sum + (req.number_of_vacancies || 0), 0
+            );
 
             let status = 'Cerrada';
             let openDuration = '';
@@ -351,10 +370,8 @@ export class RecruitmentFunnelChart extends Component {
                 hired: hiredCount,
                 refused: refusedCount,
                 topRefuseReason,
-                requestedPositions: this.state.vacancyMetrics.requestedPositions
+                requestedPositions: specificRequestedPositions // ✅ Número específico del puesto
             };
-
-            console.log("✅ FunnelChart: Métricas de vacante cargadas:", this.state.vacancyMetrics);
 
         } catch (error) {
             console.error("❌ FunnelChart: Error cargando métricas de vacante:", error);
@@ -365,7 +382,7 @@ export class RecruitmentFunnelChart extends Component {
                 hired: 0,
                 refused: 0,
                 topRefuseReason: '',
-                requestedPositions: this.state.vacancyMetrics.requestedPositions
+                requestedPositions: 0 // Error = 0 vacantes
             };
         }
     }

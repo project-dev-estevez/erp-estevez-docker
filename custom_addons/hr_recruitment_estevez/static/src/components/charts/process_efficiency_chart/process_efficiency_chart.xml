@@ -19,6 +19,32 @@
                     config="state.chartData" 
                     height="props.height || 400"
                 />
+
+                <!-- 💡 TIP -->
+                <div class="mt-5">
+                    <div class="alert alert-info border-0 shadow-sm">
+                        <div class="d-flex align-items-start">
+                            <i class="fa fa-lightbulb me-3 mt-1 text-primary"></i>
+                            <div>
+                                <strong>💡 Tips:</strong>
+                                <div class="mt-1 small">
+                                    <p class="mb-2">Pasa el cursor sobre cada sección del gráfico
+                                        para ver el tiempo promedio que los candidatos permanecen en
+                                        esa etapa.</p>
+                                    <p class="mb-2">El promedio total en el centro representa el
+                                        tiempo acumulado desde el primer contacto hasta la
+                                        contratación de todas las vacantes abiertas en las fechas
+                                        filtradas.</p>
+                                    <p class="mb-2">Esta gráfica solo considera a candidatos que
+                                        fueron contratados y refleja el promedio de duración de su
+                                        proceso.</p>
+                                    <p class="mb-0">Usa esta información para identificar cuellos de
+                                        botella o etapas que demoran más de lo esperado.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
         </div>

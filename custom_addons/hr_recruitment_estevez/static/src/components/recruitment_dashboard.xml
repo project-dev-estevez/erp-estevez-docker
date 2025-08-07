@@ -74,7 +74,7 @@
                                 <!-- ✅ NUEVO COMPONENTE -->
                                 <RequisitionStatsChart startDate="state.startDate"
                                                        endDate="state.endDate"
-                                                       title="'Indicadores de Requisición'"
+                                                       title="'Indicadores de Requisición de Personal'"
                                                        height="400"
                                                        onMounted.bind="onRequisitionStatsMounted"/>
                             </div>

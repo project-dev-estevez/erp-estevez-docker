@@ -86,7 +86,6 @@ export class RequisitionStatsChart extends Component {
 
     async getRequisitionStats() {
         let domain = [];
-        domain = this._addDateRangeToDomain(domain);
 
         const data = await this.orm.readGroup(
             'hr.requisition',
@@ -101,42 +100,56 @@ export class RequisitionStatsChart extends Component {
             countMap[r.state] = r.state_count;
         });
 
-        // Definir labels y conteos en orden
+        // ✅ Definir labels con la nueva barra "Por Aprobar"
         const labels = [
             'Total',
-            'Por Activar',  // to_approve
+            'Por Aprobar',  // to_approve (nueva barra)
+            'Por Abrir',    // first_approval + approved no publicadas
             'Abiertas',     // approved & is_published = true
-            'Cerradas'      // approved & is_published = false
+            'Cerradas'      // approved & is_published = false (pero que ya estuvieron abiertas)
         ];
 
         // Total = suma de todos
         const total = data.reduce((sum, r) => sum + r.state_count, 0);
 
-        // Contar cada estado
+        // ✅ Por Aprobar = solo to_approve
         const countToApprove = countMap['to_approve'] || 0;
+
+        // ✅ Por Abrir = first_approval + approved no publicadas
+        const countFirstApproval = countMap['first_approval'] || 0;
+        const countApprovedNotPublished = await this.orm.searchCount(
+            'hr.requisition',
+            [...domain, ['state', '=', 'approved'], ['is_published', '=', false], ['close_date', '=', false]]
+        );
+        const countPorAbrir = countFirstApproval + countApprovedNotPublished;
+        
         const countApprovedOpen = await this.orm.searchCount(
             'hr.requisition',
             [...domain, ['state', '=', 'approved'], ['is_published', '=', true]]
         );
+        
+        // ✅ Cerradas = las que estuvieron abiertas pero ya se cerraron (tienen close_date)
         const countApprovedClosed = await this.orm.searchCount(
             'hr.requisition',
-            [...domain, ['state', '=', 'approved'], ['is_published', '=', false]]
+            [...domain, ['state', '=', 'approved'], ['is_published', '=', false], ['close_date', '!=', false]]
         );
 
         const counts = [
             total,
-            countToApprove,
+            countToApprove,     // Nueva barra
+            countPorAbrir,      // Renombrada para claridad
             countApprovedOpen,
             countApprovedClosed,
         ];
 
         const colors = this.getPastelColors(labels.length);
 
-        // Crear metadata para el click
+        // ✅ Crear metadata para el click (con nueva barra)
         const meta = [
-            { state: null },               // para "Total"
-            { state: 'to_approve' },
-            { state: 'approved_open' },    // código interno
+            { state: null },                // para "Total"
+            { state: 'to_approve' },        // nueva barra "Por Aprobar"
+            { state: 'por_abrir' },         // código especial para "Por Abrir"
+            { state: 'approved_open' },     
             { state: 'approved_closed' },
         ];
 
@@ -172,7 +185,7 @@ export class RequisitionStatsChart extends Component {
                 plotOptions: {
                     bar: {
                         borderRadius: 6,
-                        horizontal: false, // ✅ Barras verticales
+                        horizontal: false,
                         columnWidth: '60%',
                         dataLabels: {
                             position: 'top'
@@ -181,7 +194,7 @@ export class RequisitionStatsChart extends Component {
                 },
                 colors: colors,
                 dataLabels: {
-                    enabled: true,
+                    enabled: false,
                     formatter: function (val) {
                         return val > 0 ? val : '';
                     },
@@ -255,6 +268,7 @@ export class RequisitionStatsChart extends Component {
         this.state.requisitionData = {
             total,
             countToApprove,
+            countPorAbrir,
             countApprovedOpen,
             countApprovedClosed,
             meta
@@ -264,30 +278,45 @@ export class RequisitionStatsChart extends Component {
 
         console.log("✅ RequisitionStatsChart: Datos configurados:", {
             total,
-            toApprove: countToApprove,
+            toApprove: countToApprove,        // Nueva métrica
+            porAbrir: countPorAbrir,          // Renombrada
             open: countApprovedOpen,
             closed: countApprovedClosed
         });
     }
 
     async openRequisitionList(stateCode) {
-        console.log("🔍 RequisitionStatsChart: Abriendo requisiciones:", stateCode);
-        
-        const currentProps = this.getCurrentProps();
         let domain = [];
-        domain = this._addDateRangeToDomain(domain);
 
-        if (stateCode === 'approved_open') {
+        if (stateCode === 'to_approve') {
+            // ✅ Nueva condición para "Por Aprobar"
+            domain.push(['state', '=', 'to_approve']);
+        } else if (stateCode === 'approved_open') {
             domain.push(['state', '=', 'approved'], ['is_published', '=', true]);
         } else if (stateCode === 'approved_closed') {
-            domain.push(['state', '=', 'approved'], ['is_published', '=', false]);
+            domain.push(['state', '=', 'approved'], ['is_published', '=', false], ['close_date', '!=', false]);
+        } else if (stateCode === 'por_abrir') {
+            // ✅ Incluir first_approval + approved no publicadas (sin close_date)
+            domain.push('|', 
+                ['state', '=', 'first_approval'],
+                '&', ['state', '=', 'approved'], 
+                '&', ['is_published', '=', false], 
+                ['close_date', '=', false]
+            );
         } else if (stateCode) {
             domain.push(['state', '=', stateCode]);
         }
+        // Para stateCode === null (Total), no agregar ningún filtro
+
+        console.log("🔍 Dominio aplicado:", domain);
 
         await this.actionService.doAction({
             type: 'ir.actions.act_window',
-            name: 'Requisiciones',
+            name: `Requisiciones${
+                stateCode === 'to_approve' ? ' - Por Aprobar' : 
+                stateCode === 'por_abrir' ? ' - Por Abrir' : 
+                (stateCode ? ` - ${stateCode}` : ' (Todas)')
+            }`,
             res_model: 'hr.requisition',
             views: [[false, 'list'], [false, 'form']],
             target: 'current',
@@ -330,7 +359,8 @@ export class RequisitionStatsChart extends Component {
     getPastelColors(count) {
         const premiumColors = [
             '#4ECDC4', // Total - Turquesa
-            '#FFB347', // Por Activar - Naranja suave  
+            '#FFA07A', // Por Aprobar - Salmón (nuevo color)
+            '#FFB347', // Por Abrir - Naranja suave  
             '#98D8C8', // Abiertas - Verde menta
             '#BB8FCE', // Cerradas - Lavanda
         ];

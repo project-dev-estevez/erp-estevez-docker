@@ -21,21 +21,30 @@
                 />
                 
                 <!-- 📈 RESUMEN NUMÉRICO -->
-                <div class="row mt-3 pt-3 border-top">
-                    <div class="col-3 text-center">
-                        <div class="text-primary fw-bold fs-4" t-esc="state.requisitionData.total || 0"/>
+                <div class="row mt-3 pt-3 border-top mx-2">
+                    <div class="col text-center">
+                        <div class="text-primary fw-bold fs-4"
+                            t-esc="state.requisitionData.total || 0" />
                         <small class="text-muted d-block">Total</small>
                     </div>
-                    <div class="col-3 text-center">
-                        <div class="text-warning fw-bold fs-4" t-esc="state.requisitionData.countToApprove || 0"/>
-                        <small class="text-muted d-block">Por Activar</small>
+                    <div class="col text-center">
+                        <div class="text-warning fw-bold fs-4"
+                            t-esc="state.requisitionData.countToApprove || 0" />
+                        <small class="text-muted d-block">Por Aprobar</small>
                     </div>
-                    <div class="col-3 text-center">
-                        <div class="text-success fw-bold fs-4" t-esc="state.requisitionData.countApprovedOpen || 0"/>
+                    <div class="col text-center">
+                        <div class="text-warning fw-bold fs-4"
+                            t-esc="state.requisitionData.countPorAbrir || 0" />
+                        <small class="text-muted d-block">Por Abrir</small>
+                    </div>
+                    <div class="col text-center">
+                        <div class="text-success fw-bold fs-4"
+                            t-esc="state.requisitionData.countApprovedOpen || 0" />
                         <small class="text-muted d-block">Abiertas</small>
                     </div>
-                    <div class="col-3 text-center">
-                        <div class="text-secondary fw-bold fs-4" t-esc="state.requisitionData.countApprovedClosed || 0"/>
+                    <div class="col text-center">
+                        <div class="text-danger fw-bold fs-4"
+                            t-esc="state.requisitionData.countApprovedClosed || 0" />
                         <small class="text-muted d-block">Cerradas</small>
                     </div>
                 </div>
@@ -58,12 +67,18 @@
 
             <!-- 💡 AYUDA CONTEXTUAL -->
             <div t-if="!state.isLoading and state.hasData" class="mt-3">
-                <div class="alert alert-info border-0 shadow-sm">
-                    <div class="d-flex align-items-start">
-                        <i class="fa fa-lightbulb me-3 mt-1 text-primary"></i>
-                        <div>
-                            <strong>💡 Tip:</strong>
-                            Haz clic en cualquier barra para ver las requisiciones de ese estado.
+                <!-- 💡 TIP -->
+                <div class="mt-2">
+                    <div class="alert alert-info border-0 shadow-sm">
+                        <div class="d-flex align-items-start">
+                            <i class="fa fa-lightbulb me-3 mt-1 text-primary"></i>
+                            <div>
+                                <strong>💡 Tips:</strong>
+                                <div class="mt-1 small">
+                                    <p class="mb-2">Haz clic en cualquier barra para ver el listado de requisiciones correspondientes a ese estado.</p>
+                                    <p class="mb-2">Esta gráfica muestra todas las requisiciones del sistema, sin importar su fecha de aprobación o creación.</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
