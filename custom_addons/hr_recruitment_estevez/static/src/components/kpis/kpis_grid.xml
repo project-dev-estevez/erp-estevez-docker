@@ -11,8 +11,8 @@
                         <KpiCard t-if="kpi.value > 0"
                             name="kpi.name"
                             value="kpi.value"
-                            percentage="kpi.percentage"
-                            showPercentage="kpi.showPercentage"
+                            secondaryValue="kpi.secondaryValue"
+                            showSecondaryValue="kpi.showSecondaryValue"
                             onClick="kpi.onClick"/>
                         
                         <KpiCard t-else=""
