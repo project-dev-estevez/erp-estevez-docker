@@ -44,7 +44,7 @@
                         <!-- ✅ Info adicional -->
                         <div t-if="hasData" class="mt-4">
                             <div class="alert alert-info">
-                                <i class="bi bi-info-circle me-2"></i>
+                                💡
                                 <strong>Información:</strong> Haz clic en cualquier barra para ver los candidatos específicos de esa etapa.
                                 Los datos mostrados corresponden a candidatos a partir de la etapa de "Primer Contacto".
                             </div>
