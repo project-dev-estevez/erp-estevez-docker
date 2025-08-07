@@ -19,6 +19,23 @@
                     config="state.chartData" 
                     height="props.height || 400"
                 />
+
+                <!-- 💡 TIP -->
+                <div class="mt-5">
+                    <div class="alert alert-info border-0 shadow-sm">
+                        <div class="d-flex align-items-start">
+                            <i class="fa fa-lightbulb me-3 mt-1 text-primary"></i>
+                            <div>
+                                <strong>💡 Tips:</strong>
+                                <div class="mt-1 small">
+                                    <p class="mb-2">Haz clic en cualquier barra para ver el listado de requisiciones correspondientes a ese estado.</p>
+                                    <p class="mb-2">Esta gráfica muestra todas las requisiciones del sistema, sin importar su fecha de aprobación o creación.</p>
+                                    <p class="mb-0">Usa los filtros de fecha si deseas enfocar el análisis en un periodo específico.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
         </div>
