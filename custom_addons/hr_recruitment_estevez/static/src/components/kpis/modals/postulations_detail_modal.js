@@ -76,7 +76,7 @@ export class PostulationsDetailModal extends Component {
             // 2. ✅ Obtener todas las etapas después de primer contacto
             const stages = await this.orm.searchRead(
                 'hr.recruitment.stage',
-                [['sequence', '>', primerContactoSequence]],
+                [['sequence', '>=', primerContactoSequence]],
                 ['id', 'name', 'sequence'],
                 { order: 'sequence asc' }
             );
@@ -108,7 +108,7 @@ export class PostulationsDetailModal extends Component {
 
             // 3.2 ✅ NUEVO: Contar candidatos RECHAZADOS que superaron primer contacto
             let rejectedDomain = [
-                ['stage_id.sequence', '>', primerContactoSequence],
+                ['stage_id.sequence', '>=', primerContactoSequence],
                 ['application_status', '=', 'refused']  // ✅ Solo rechazados
             ];
             rejectedDomain = this._addDateRangeToDomain(rejectedDomain);
@@ -260,7 +260,7 @@ export class PostulationsDetailModal extends Component {
                 if (primerContactoStage.length > 0) {
                     const sequence = primerContactoStage[0].sequence;
                     domain = [
-                        ['stage_id.sequence', '>', sequence],
+                        ['stage_id.sequence', '>=', sequence],
                         ['application_status', '=', 'refused']
                     ];
                 } else {
