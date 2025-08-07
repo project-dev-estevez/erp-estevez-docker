@@ -28,9 +28,18 @@
                             <div>
                                 <strong>💡 Tips:</strong>
                                 <div class="mt-1 small">
-                                    <p class="mb-2">Haz clic en cualquier barra para ver el listado de requisiciones correspondientes a ese estado.</p>
-                                    <p class="mb-2">Esta gráfica muestra todas las requisiciones del sistema, sin importar su fecha de aprobación o creación.</p>
-                                    <p class="mb-0">Usa los filtros de fecha si deseas enfocar el análisis en un periodo específico.</p>
+                                    <p class="mb-2">Pasa el cursor sobre cada sección del gráfico
+                                        para ver el tiempo promedio que los candidatos permanecen en
+                                        esa etapa.</p>
+                                    <p class="mb-2">El promedio total en el centro representa el
+                                        tiempo acumulado desde el primer contacto hasta la
+                                        contratación de todas las vacantes abiertas en las fechas
+                                        filtradas.</p>
+                                    <p class="mb-2">Esta gráfica solo considera a candidatos que
+                                        fueron contratados y refleja el promedio de duración de su
+                                        proceso.</p>
+                                    <p class="mb-0">Usa esta información para identificar cuellos de
+                                        botella o etapas que demoran más de lo esperado.</p>
                                 </div>
                             </div>
                         </div>
