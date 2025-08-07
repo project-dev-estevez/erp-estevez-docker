@@ -249,7 +249,7 @@ export class RecruiterEfficiencyChart extends Component {
         this.state.chartData = {
             series: [
                 {
-                    name: 'Total (Pasaron de Primera Entrevista)',
+                    name: 'Total (Superaron la Primera Entrevista)',
                     data: totalCounts,
                     stack: 'total'
                 },
@@ -397,7 +397,7 @@ export class RecruiterEfficiencyChart extends Component {
                         content = `
                             <div class="px-3 py-2">
                                 <div class="fw-bold">${stat.name}</div>
-                                <div class="text-muted">Candidatos que pasaron de Primera Entrevista</div>
+                                <div class="text-muted">Candidatos que superaron la Primera Entrevista</div>
                                 <div class="small fw-bold">
                                     <span style="color: #2238b3ff;">Total: ${value}</span> | 
                                     <span style="color: #00E396;">En Proceso: ${stat.ongoing}</span> | 
@@ -412,7 +412,7 @@ export class RecruiterEfficiencyChart extends Component {
                         content = `
                             <div class="px-3 py-2">
                                 <div class="fw-bold">${stat.name}</div>
-                                <div class="text-muted">Candidatos que pasaron de Primera Entrevista y siguen en proceso</div>
+                                <div class="text-muted">Candidatos que superaron la Primera Entrevista y siguen en proceso</div>
                                 <div class="fw-bold text-success">En proceso: <span>${value}</span></div>
                             </div>`;
                     } else if (seriesIndex === 2) {
@@ -420,7 +420,7 @@ export class RecruiterEfficiencyChart extends Component {
                         content = `
                             <div class="px-3 py-2">
                                 <div class="fw-bold">${stat.name}</div>
-                                <div class="text-muted">Candidatos que pasaron de Primera Entrevista y fueron contratados</div>
+                                <div class="text-muted">Candidatos que superaron la Primera Entrevista y fueron contratados</div>
                                 <div class="fw-bold text-warning">Contratados: <span>${value}</span></div>
                                 <div class="text-muted">Conversion rate post-First Interview: ${stat.percentage}%</div>
                             </div>`;

@@ -84,7 +84,7 @@ class RecruitmentStageService {
 
         const domain = [
             ...baseDomain,
-            ['stage_id.sequence', '>=', firstInterview.sequence]
+            ['stage_id.sequence', '>', firstInterview.sequence]
         ];
 
         // ✅ Include ALL statuses (ongoing, hired, refused, inactive)
