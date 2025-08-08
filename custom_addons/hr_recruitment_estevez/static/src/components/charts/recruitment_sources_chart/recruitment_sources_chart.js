@@ -290,7 +290,7 @@ export class RecruitmentSourcesChart extends Component {
         console.log("✅ RecruitmentSourcesChart: Indicadores calculados:", indicators.length);
     }
 
-    // ✅ MANTENER: Método de navegación original
+    // ✅ CORREGIDO: Método de navegación más robusto
     async openSourceRecruitmentList(sourceId) {
         const currentProps = this.getCurrentProps();
         let domain = [];
@@ -301,22 +301,27 @@ export class RecruitmentSourcesChart extends Component {
         if (currentProps.endDate) {
             domain.push(["create_date", "<=", currentProps.endDate]);
         }
-    
+
         // Filtra por source_id
         if (sourceId) {
             domain.push(["source_id", "=", sourceId]);
         } else {
             domain.push(["source_id", "=", false]);
         }
-    
-        await this.actionService.doAction({
-            type: 'ir.actions.act_window',
-            name: 'Postulaciones por Fuente',
-            res_model: 'hr.applicant',
-            views: [[false, 'list'], [false, 'form']],
-            domain: domain,
-            context: { active_test: false },
-        });
+
+        // ✅ Obtener el nombre de la fuente para el título
+        const sourceData = this.state.sourcesData.find(s => s.sourceId === sourceId);
+        const sourceName = sourceData ? sourceData.label : "Sin fuente";
+
+        try {
+            await this.actionService.doAction('hr_recruitment_estevez.action_hr_applicant_sources_dashboard', {
+                additionalContext: {
+                    'search_default_source_id': sourceId,
+                }
+            });
+        } catch (error) {
+            console.error("❌ Error abriendo lista de postulaciones:", error);
+        }
     }
 
     // ✅ REFINADO: Gráfico vacío para ApexCharts (forzar limpieza)
