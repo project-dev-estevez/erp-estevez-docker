@@ -4,12 +4,13 @@ import { registry } from "@web/core/registry";
 
 /**
  * Service to handle recruitment stages
- * Avoids repeating "First Contact" queries in multiple places
+ * Avoids repeating stage queries in multiple places
  */
 class RecruitmentStageService {
     constructor(env, { orm }) {
         this.orm = orm;
-        this._firstContactCache = null; // Cache to avoid repeated queries
+        this._firstContactCache = null;
+        this._firstInterviewCache = null;  // ✅ Cache for First Interview
     }
 
     /**
@@ -17,7 +18,6 @@ class RecruitmentStageService {
      * Only queries once, then uses cache
      */
     async getFirstContactStage() {
-        // If we already have the info in cache, return it
         if (this._firstContactCache) {
             return this._firstContactCache;
         }
@@ -39,6 +39,66 @@ class RecruitmentStageService {
         } catch (error) {
             return null;
         }
+    }
+
+    /**
+     * Gets the "First Interview" stage
+     * Only queries once, then uses cache
+     */
+    async getFirstInterviewStage() {
+        if (this._firstInterviewCache) {
+            return this._firstInterviewCache;
+        }
+
+        try {
+            const stages = await this.orm.searchRead(
+                'hr.recruitment.stage',
+                [['name', 'ilike', 'primera entrevista']],
+                ['id', 'name', 'sequence'],
+                { limit: 1 }
+            );
+
+            if (stages.length > 0) {
+                this._firstInterviewCache = stages[0];
+                return this._firstInterviewCache;
+            } else {
+                return null;
+            }
+        } catch (error) {
+            return null;
+        }
+    }
+
+    /**
+     * Creates domain for candidates post-First Interview
+     * @param {Array} baseDomain - Base domain conditions
+     * @param {Boolean} includeAllStatuses - Include all statuses (ongoing, hired, refused, inactive)
+     * @returns {Array} Domain with First Interview conditions
+     */
+    async getPostFirstInterviewDomain(baseDomain = [], includeAllStatuses = true) {
+        const firstInterview = await this.getFirstInterviewStage();
+        if (!firstInterview) {
+            console.warn("⚠️ RecruitmentStageService: 'First Interview' stage not found");
+            return baseDomain;
+        }
+
+        const domain = [
+            ...baseDomain,
+            ['stage_id.sequence', '>', firstInterview.sequence]
+        ];
+
+        // ✅ Include ALL statuses (ongoing, hired, refused, inactive)
+        if (includeAllStatuses) {
+            domain.push(
+                "|", "|", "|",
+                ["application_status", "=", "ongoing"],
+                ["application_status", "=", "hired"],
+                ["application_status", "=", "refused"],
+                ["active", "=", false]
+            );
+        }
+
+        return domain;
     }
 
     /**
@@ -69,7 +129,6 @@ class RecruitmentStageService {
     async getRejectedDomainFromFirstContact(baseDomain = []) {
         const firstContact = await this.getFirstContactStage();
         if (!firstContact) {
-            // If we don't find first contact, only filter by rejected
             return [...baseDomain, ['application_status', '=', 'refused']];
         }
 
@@ -81,10 +140,11 @@ class RecruitmentStageService {
     }
 
     /**
-     * Clears the cache (useful for tests or when stages are modified)
+     * Clears all caches (useful for tests or when stages are modified)
      */
     clearCache() {
         this._firstContactCache = null;
+        this._firstInterviewCache = null;
     }
 }
 

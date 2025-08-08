@@ -26,7 +26,7 @@ export class KpisGrid extends Component {
             inProgressApplicants: { value: 0 },
             preselectedApplicants: { value: 0 },
             rejectedApplicants: { value: 0 },
-            hiredApplicants: { value: 0 },
+            hiredApplicants: { value: 0, secondaryValue: 0 },
             openPositions: { value: 0 },
             pendingRequisitions: { value: 0 },
             isLoading: true,
@@ -57,66 +57,80 @@ export class KpisGrid extends Component {
         return domain;
     }
 
-    _getHiredDateRangeDomain(domain = []) {
-        if (this.props.startDate) {
-            domain.push(["date_closed", ">=", this.props.startDate]);
+    _getCombinedHiredDomain() {
+        if (!this.props.startDate || !this.props.endDate) {
+            // Si no hay fechas, mostrar todos los contratados
+            return [['application_status', '=', 'hired']];
         }
-        if (this.props.endDate) {
-            domain.push(["date_closed", "<=", this.props.endDate]);
-        }
-        return domain;
+
+        return [
+            '|', // ✅ Operador OR de Odoo
+            // Grupo 1: Creados Y contratados en el rango
+            '&',
+            ['application_status', '=', 'hired'],
+            '&',
+            ['create_date', '>=', this.props.startDate],
+            ['create_date', '<=', this.props.endDate],
+            // Grupo 2: Contratados en el rango PERO creados antes
+            '&',
+            ['application_status', '=', 'hired'],
+            '&',
+            ['date_closed', '>=', this.props.startDate],
+            '&',
+            ['date_closed', '<=', this.props.endDate],
+            ['create_date', '<', this.props.startDate]
+        ];
     }
 
-    // ✅ Getter para los KPIs (ahora usa el estado local)
     get kpis() {
         return [
             {
                 name: "Postulaciones",
                 value: this.state.totalApplicants.value,
-                percentage: 0,
-                showPercentage: false,
+                secondaryValue: 0,
+                showSecondaryValue: false,
                 onClick: () => this.viewTotalApplicants()
             },
             {
                 name: "En Progreso",
                 value: this.state.inProgressApplicants.value,
-                percentage: 0,
-                showPercentage: false,
+                secondaryValue: 0,
+                showSecondaryValue: false,
                 onClick: () => this.viewInProgressApplicants()
             },
             {
                 name: "Preseleccionados",
                 value: this.state.preselectedApplicants.value,
-                percentage: 0,
-                showPercentage: false,
+                secondaryValue: 0,
+                showSecondaryValue: false,
                 onClick: () => this.viewPreselectedApplicants()
             },
             {
                 name: "Rechazados",
                 value: this.state.rejectedApplicants.value,
-                percentage: 0,
-                showPercentage: false,
+                secondaryValue: 0,
+                showSecondaryValue: false,
                 onClick: () => this.viewRejectedApplicants()
             },
             {
                 name: "Contratados",
                 value: this.state.hiredApplicants.value,
-                percentage: 0,
-                showPercentage: false,
+                secondaryValue: this.state.hiredApplicants.secondaryValue,
+                showSecondaryValue: true,  // ✅ Activar mostrar valor secundario
                 onClick: () => this.viewHiredApplicants()
             },
             {
                 name: "Vacantes Abiertas",
                 value: this.state.openPositions.value,
-                percentage: 0,
-                showPercentage: false,
+                secondaryValue: 0,
+                showSecondaryValue: false,
                 onClick: () => this.viewOpenPositions()
             },
             {
                 name: "Requisiciones por Aprobar",
                 value: this.state.pendingRequisitions.value,
-                percentage: 0,
-                showPercentage: false,
+                secondaryValue: 0,
+                showSecondaryValue: false,
                 onClick: () => this.viewPendingRequisitions()
             }
         ];
@@ -208,25 +222,69 @@ export class KpisGrid extends Component {
 
         const data = await this.orm.searchCount("hr.applicant", domain);
         this.state.preselectedApplicants.value = data;
-        console.log("⭐ Preselected applicants:", data);
     }
 
     async calculateRejectedApplicants() {
-        const context = { context: { active_test: false } };
-        let domain = [["application_status", "=", "refused"]];
-        domain = this._addDateRangeToDomain(domain);
+        try {
+            const rejectedDomain = await this.recruitmentStageService.getRejectedDomainFromFirstContact(
+                this._addDateRangeToDomain([])
+            );
 
-        const data = await this.orm.searchCount("hr.applicant", domain, context);
-        this.state.rejectedApplicants.value = data;
-        console.log("❌ Rejected applicants:", data);
+            const count = await this.orm.searchCount(
+                "hr.applicant", 
+                rejectedDomain, 
+                { context: { active_test: false } }
+            );
+
+            this.state.rejectedApplicants.value = count;
+        } catch (error) {
+            console.error("❌ KpisGrid: Error calculando Rechazados:", error);
+            this.state.rejectedApplicants.value = 0;
+        }
     }
 
     async calculateHiredApplicants() {
-        let domain = [["application_status", "=", "hired"]];
-        domain = this._getHiredDateRangeDomain(domain);
+        try {
+            // ✅ KPI PRINCIPAL: Creados en el rango Y contratados
+            let primaryDomain = [["application_status", "=", "hired"]];
+            primaryDomain = this._addDateRangeToDomain(primaryDomain);
 
-        const data = await this.orm.searchCount("hr.applicant", domain);
-        this.state.hiredApplicants.value = data;
+            const primaryCount = await this.orm.searchCount("hr.applicant", primaryDomain);
+            this.state.hiredApplicants.value = primaryCount;
+
+            // ✅ KPI SECUNDARIO: Contratados en el rango PERO creados antes
+            const secondaryCount = await this.calculateHiredInRangeButCreatedBefore();
+            this.state.hiredApplicants.secondaryValue = secondaryCount;
+
+            console.log(`📊 KPI Contratados - Principal: ${primaryCount}, Secundario: ${secondaryCount}`);
+
+        } catch (error) {
+            console.error("❌ KpisGrid: Error calculando Contratados:", error);
+            this.state.hiredApplicants.value = 0;
+            this.state.hiredApplicants.secondaryValue = 0;
+        }
+    }
+
+    async calculateHiredInRangeButCreatedBefore() {
+        try {
+            if (!this.props.startDate || !this.props.endDate) {
+                return 0;
+            }
+
+            // Dominio: contratados en el rango de fechas PERO creados ANTES del rango
+            let domain = [
+                ["application_status", "=", "hired"],
+                ["date_closed", ">=", this.props.startDate],     // ✅ Contratado en el rango
+                ["date_closed", "<=", this.props.endDate],       // ✅ Contratado en el rango
+                ["create_date", "<", this.props.startDate]       // ✅ Creado ANTES del rango
+            ];
+
+            const count = await this.orm.searchCount("hr.applicant", domain);
+            return count;
+        } catch (error) {
+            console.error("❌ KpisGrid: Error calculando contratados secundario:", error);
+            return 0;
+        }
     }
 
     async calculateOpenPositions() {
@@ -301,7 +359,6 @@ export class KpisGrid extends Component {
     }
 
     viewPreselectedApplicants() {
-        console.log(`⭐ KpisGrid: ¡Navegando a preseleccionados!`);
         let domain = [
             ["stage_id.sequence", ">", 4],
             ["application_status", "!=", "hired"]
@@ -317,30 +374,34 @@ export class KpisGrid extends Component {
         });
     }
 
-    viewRejectedApplicants() {
-        const context = { active_test: false };
-        let domain = [["application_status", "=", "refused"]];
-        domain = this._addDateRangeToDomain(domain);
+    async viewRejectedApplicants() {
+        try {
+            // ✅ NUEVO: Usar el servicio para obtener dominio de rechazados desde primer contacto
+            const rejectedDomain = await this.recruitmentStageService.getRejectedDomainFromFirstContact(
+                this._addDateRangeToDomain([])
+            );
 
-        this.actionService.doAction({
-            type: "ir.actions.act_window",
-            name: "❌ Postulaciones Rechazadas",
-            res_model: "hr.applicant",
-            domain: domain,
-            views: [[false, "list"], [false, "form"]],
-            context: {
-                ...context,
-                list_view_ref: "hr_recruitment_estevez.hr_applicant_rejected_list_view",
-                search_default_group_by_refuse_reason: 1,  // ✅ Agrupar por motivo de rechazo
-                search_default_filter_refused: 1           // ✅ Filtro por rechazados
-            }
-        });
+            await this.actionService.doAction({
+                type: "ir.actions.act_window",
+                name: "❌ Postulaciones Rechazadas (Post-Primer Contacto)",
+                res_model: "hr.applicant",
+                domain: rejectedDomain,
+                views: [[false, "list"], [false, "form"]],
+                context: {
+                    active_test: false,
+                    list_view_ref: "hr_recruitment_estevez.hr_applicant_rejected_list_view",
+                    search_default_group_by_refuse_reason: 1,  // ✅ Agrupar por motivo de rechazo
+                    search_default_filter_refused: 1           // ✅ Filtro por rechazados
+                }
+            });
+        } catch (error) {
+            console.error("❌ KpisGrid: Error en navegación Rechazados:", error);
+        }
     }
 
     viewHiredApplicants() 
     {
-        let domain = [["application_status", "=", "hired"]];
-        domain = this._getHiredDateRangeDomain(domain);
+        const domain = this._getCombinedHiredDomain();
 
         this.actionService.doAction({
             type: "ir.actions.act_window",

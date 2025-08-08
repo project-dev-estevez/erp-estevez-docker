@@ -9,14 +9,14 @@ export class KpiCard extends Component {
     static props = {
         name: String,                           // ✅ Nombre obligatorio: "Postulaciones"
         value: [String, Number],               // ✅ Valor: puede ser string o number
-        percentage: { 
+        secondaryValue: { 
             type: [String, Number], 
             optional: true 
-        },                                     // ✅ Porcentaje opcional
-        showPercentage: { 
+        },                                     // ✅ Valor secundario opcional
+        showSecondaryValue: { 
             type: Boolean, 
             optional: true 
-        },                                     // ✅ Mostrar porcentaje opcional
+        },
         onClick: { 
             type: Function, 
             optional: true 
@@ -25,8 +25,8 @@ export class KpiCard extends Component {
 
     // ✅ Defaults más completos
     static defaultProps = {
-        showPercentage: false,                 
-        percentage: null,                      
+        showSecondaryValue: false,
+        secondaryValue: null,                   
     };
 
     // ✅ Formatear el valor para mostrar
@@ -61,8 +61,8 @@ export class KpiCard extends Component {
 
     // ✅ Método limpio para manejar clicks
     onCardClick() {
-        if (this.props.onClick) {
-            this.props.onClick();
-        }
+        if(!this.props.onClick) return;
+
+        this.props.onClick();
     }
 }
