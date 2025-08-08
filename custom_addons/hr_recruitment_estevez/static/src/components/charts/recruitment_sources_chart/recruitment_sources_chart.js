@@ -215,7 +215,7 @@ export class RecruitmentSourcesChart extends Component {
                     }
                 },
                 dataLabels: {
-                    enabled: true,
+                    enabled: false,
                     formatter: function(val) {
                         return Math.round(val);
                     },
