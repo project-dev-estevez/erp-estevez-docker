@@ -436,17 +436,9 @@ export class RecruitmentFunnelChart extends Component {
                     maxSequence: null
                 },
                 {
-                    label: "Examen Técnico",
-                    stageNames: [
-                        "examen técnico", "examen tecnico", "prueba técnica", "prueba tecnica",
-                        "evaluacion técnica", "evaluacion tecnica", "conocimiento técnico"
-                    ],
-                    minSequence: null,
-                    maxSequence: null
-                },
-                {
                     label: "Entrevistas Técnicas",
                     stageNames: [
+                        "examen tecnico / conocimiento", "examen técnico / conocimiento",
                         "primera entrevista / técnica", "primera entrevista / tecnica",
                         "segunda entrevista / técnica", "segunda entrevista / tecnica", 
                         "tercera entrevista / técnica", "tercera entrevista / tecnica",
