@@ -389,7 +389,8 @@ export class RecruitmentFunnelChart extends Component {
 
     // 🎪 ============ EMBUDO CON APEXCHARTS ============
     async getFunnelRecruitment() {
-        console.log("🎪 FunnelChart: Cargando datos del embudo con lógica de grupos...");
+
+        console.log("📊 FunnelChart: Cargando datos del embudo de reclutamiento...");
         
         try {
             // 1) Leer jobId del state
@@ -417,8 +418,8 @@ export class RecruitmentFunnelChart extends Component {
             // 5) MAPEO DE ETAPAS A GRUPOS (ya en minúsculas)
             const stageGroups = [
                 {
-                    label: "Aplicaciones",
-                    stageNames: ["nuevo", "calificacion inicial", "primer contacto", "aplicacion inicial"],
+                    label: "Postulaciones",
+                    stageNames: ["nuevo", "calificacion inicial", "primer contacto"],
                     minSequence: null,
                     maxSequence: null
                 },
@@ -444,7 +445,7 @@ export class RecruitmentFunnelChart extends Component {
                     maxSequence: null
                 },
                 {
-                    label: "Entrevista Técnica",
+                    label: "Entrevistas Técnicas",
                     stageNames: [
                         "primera entrevista / técnica", "primera entrevista / tecnica",
                         "segunda entrevista / técnica", "segunda entrevista / tecnica", 
@@ -505,7 +506,8 @@ export class RecruitmentFunnelChart extends Component {
 
             // 9) ESTO ES CLAVE: Asegurar que el primer bloque tenga el total
             if (counts.length > 0) {
-                const totalApps = await this.orm.searchCount('hr.applicant', baseDomain) || 0;
+                const context = { context: { active_test: false } };
+                const totalApps = await this.orm.searchCount('hr.applicant', baseDomain, context) || 0;
                 counts[0] = totalApps;
             }
 
