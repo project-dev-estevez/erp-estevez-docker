@@ -494,19 +494,21 @@ export class RecruitmentFunnelChart extends Component {
                 return;
             }
 
+            const context = { context: { active_test: false } };
+
             // 8) Contar applicants para cada grupo (ACUMULATIVO)
             const counts = [];
             for (const group of validGroups) {
                 const cnt = await this.orm.searchCount(
                     'hr.applicant',
-                    [...baseDomain, ['stage_id.sequence', '>=', group.minSequence]]
+                    [...baseDomain, ['stage_id.sequence', '>=', group.minSequence]],
+                    context
                 );
                 counts.push(cnt);
             }
 
             // 9) ESTO ES CLAVE: Asegurar que el primer bloque tenga el total
             if (counts.length > 0) {
-                const context = { context: { active_test: false } };
                 const totalApps = await this.orm.searchCount('hr.applicant', baseDomain, context) || 0;
                 counts[0] = totalApps;
             }
