@@ -100,10 +100,15 @@ export class RecruiterEfficiencyChart extends Component {
             // ✅ STEP 4: HIRED - Hired in range + Post-First Interview
             const hiredStats = await this._calculateHiredPostFirstInterview();
 
+            const hiredInRangeButCreatedBeforeStats = await this._calculateHiredInRangeButCreatedBefore();
+
             const rejectedStats = await this._calculateRejectedPostFirstInterview();
 
             // ✅ STEP 5: Consolidate data by recruiter
-            const recruiterStats = this._consolidateRecruiterStats(totalStats, ongoingStats, hiredStats, rejectedStats);
+            const recruiterStats = this._consolidateRecruiterStats(
+                totalStats, ongoingStats, hiredStats, rejectedStats, 
+                hiredInRangeButCreatedBeforeStats
+            );
 
             // ✅ STEP 6: Build chart
             this._buildChartData(recruiterStats);
@@ -187,28 +192,51 @@ export class RecruiterEfficiencyChart extends Component {
     }
 
     // ✅ HELPER METHOD: Consolidate statistics by recruiter
-    _consolidateRecruiterStats(totalStats, ongoingStats, hiredStats, rejectedStats) {
+    _consolidateRecruiterStats(totalStats, ongoingStats, hiredStats, rejectedStats, hiredInRangeButCreatedBeforeStats) {
         const recruiterMap = {};
 
-        // Initialize with totals
+        // Initialize with totals (SOLO creados en rango)
         for (const stat of totalStats) {
             const id = (stat.user_id && stat.user_id[0]) || false;
             const name = (stat.user_id && stat.user_id[1]) || "Unassigned";
             recruiterMap[id] = {
                 id,
                 name,
-                total: stat.user_id_count,
+                total: stat.user_id_count,  // ✅ SOLO candidatos creados en rango
                 hired: 0,
+                hiredSecondary: 0,  // ✅ Solo para información en tooltip
                 ongoing: 0,
-                rejected: 0  // ✅ NUEVO: Agregar rejected
+                rejected: 0
             };
         }
 
-        // Add hired
+        // Add hired (creados en rango)
         for (const stat of hiredStats) {
             const id = (stat.user_id && stat.user_id[0]) || false;
             if (recruiterMap[id]) {
                 recruiterMap[id].hired = stat.user_id_count;
+            }
+        }
+
+        // ✅ Add hired secondary (SOLO para tooltip, NO afecta total)
+        for (const stat of hiredInRangeButCreatedBeforeStats) {
+            const id = (stat.user_id && stat.user_id[0]) || false;
+            
+            // ✅ Solo agregar hiredSecondary si el reclutador ya existe
+            if (recruiterMap[id]) {
+                recruiterMap[id].hiredSecondary = stat.user_id_count;
+            } else {
+                // ✅ Si no existe, crear entrada SOLO para hiredSecondary (total = 0)
+                const name = (stat.user_id && stat.user_id[1]) || "Unassigned";
+                recruiterMap[id] = {
+                    id,
+                    name,
+                    total: 0,  // ✅ NO cuenta en el total de barras
+                    hired: 0,
+                    hiredSecondary: stat.user_id_count,  // ✅ Solo información
+                    ongoing: 0,
+                    rejected: 0
+                };
             }
         }
 
@@ -220,7 +248,7 @@ export class RecruiterEfficiencyChart extends Component {
             }
         }
 
-        // ✅ NUEVO: Add rejected
+        // Add rejected
         for (const stat of rejectedStats) {
             const id = (stat.user_id && stat.user_id[0]) || false;
             if (recruiterMap[id]) {
@@ -232,11 +260,38 @@ export class RecruiterEfficiencyChart extends Component {
         const recruiterStats = Object.values(recruiterMap)
             .map(r => ({
                 ...r,
+                totalHired: r.hired + r.hiredSecondary,  // ✅ Para información en tooltip
                 percentage: r.total > 0 ? ((r.hired / r.total) * 100).toFixed(2) : "0.00"
             }))
-            .sort((a, b) => b.total - a.total);
+            .filter(r => r.total > 0 || r.hiredSecondary > 0)  // ✅ Mostrar si tiene total O hiredSecondary
+            .sort((a, b) => b.total - a.total);  // ✅ Ordenar SOLO por total (creados en rango)
 
+        console.log("📊 Consolidated stats by recruiter (total excludes hiredSecondary):", recruiterStats);
         return recruiterStats;
+    }
+
+    async _calculateHiredInRangeButCreatedBefore() {
+        if (!this.props.startDate || !this.props.endDate) {
+            return [];
+        }
+
+        const baseDomain = [
+            ["application_status", "=", "hired"],
+            ["date_closed", ">=", this.props.startDate],     // ✅ Contratado en el rango
+            ["date_closed", "<=", this.props.endDate],       // ✅ Contratado en el rango
+            ["create_date", "<", this.props.startDate]       // ✅ Creado ANTES del rango
+        ];
+        
+        const domain = await this.recruitmentStageService.getPostFirstInterviewDomain(baseDomain, false);
+
+        const data = await this.orm.readGroup(
+            "hr.applicant",
+            domain,
+            ["user_id"],
+            ["user_id"]
+        );
+
+        return data;
     }
 
     // ✅ HELPER METHOD: Build chart data
@@ -401,9 +456,14 @@ export class RecruiterEfficiencyChart extends Component {
                                 <div class="small fw-bold">
                                     <span style="color: #2238b3ff;">Total: ${value}</span> | 
                                     <span style="color: #00E396;">En Proceso: ${stat.ongoing}</span> | 
-                                    <span class="text-warning">Contratados: ${stat.hired}</span> | 
+                                    <span style="color: #FF8C00;">Contratados: ${stat.hired}</span> | 
                                     <span class="text-danger">Rechazados: ${stat.rejected}</span>
                                 </div>
+                                ${stat.hiredSecondary > 0 ? `
+                                    <div class="small fw-bold mb-2" style="color: #FF8C00;">
+                                        Contratados (Creados Antes del Rango): ${stat.hiredSecondary}
+                                    </div>
+                                ` : ''}
                                 <hr class="my-1">
                                 <div class="small">Tasa de conversión: ${stat.percentage}%</div>
                             </div>`;
@@ -421,8 +481,14 @@ export class RecruiterEfficiencyChart extends Component {
                             <div class="px-3 py-2">
                                 <div class="fw-bold">${stat.name}</div>
                                 <div class="text-muted">Candidatos que superaron la Primera Entrevista y fueron contratados</div>
-                                <div class="fw-bold text-warning">Contratados: <span>${value}</span></div>
-                                <div class="text-muted">Conversion rate post-First Interview: ${stat.percentage}%</div>
+                                <div class="fw-bold" style="color: #FF8C00;">Contratados: <span>${value}</span></div>
+                                ${stat.hiredSecondary > 0 ? `
+                                    <div class="small fw-bold mb-2" style="color: #FF8C00;">
+                                        Contratados (Creados Antes del Rango): ${stat.hiredSecondary}
+                                    </div>
+                                ` : ''}
+                                <hr class="my-1">
+                                <div class="text-muted">Tasa de conversión: ${stat.percentage}%</div>
                             </div>`;
                     }
 
