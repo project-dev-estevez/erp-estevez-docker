@@ -1,0 +1,132 @@
+<odoo>
+    <template id="hr_applicant_driving_test_report_document">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="applicant">
+                <t t-call="web.external_layout">
+
+                    <!-- Título y Fecha -->
+                    <div class="row align-items-center mb-2">
+                        <div class="col text-center">
+                            <h2 class="mb-0 fw-bold">PRUEBA DE MANEJO</h2>
+                        </div>
+                        <div class="col-auto text-end">
+                            <span class="fw-bold">FECHA: </span>
+                            <t t-esc="applicant.create_date.strftime('%d/%m/%Y')" />
+                        </div>
+                    </div>
+
+                    <!-- Información principal -->
+                    <table class="table table-sm table-borderless small mb-2">
+                        <tbody>
+                            <tr>
+                                <td><strong>NOMBRE DEL EVALUADOR:</strong> <span t-field="applicant.evaluator_id.name" /></td>
+                                <td><strong>TIPO DE LICENCIA:</strong> <span t-field="applicant.license_type" /></td>
+                            </tr>
+                            <tr>
+                                <td><strong>NOMBRE DEL APLICANTE:</strong> <span t-field="applicant.partner_name" /></td>
+                                <td><strong>No DE LICENCIA:</strong> <span t-field="applicant.license_number" /></td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <!-- Aviso -->
+                    <div class="text-center fw-bold text-uppercase mb-1">
+                        SE DARÁ AVISO AL USUARIO. SE COBRARÁN GOLPES E INFRACCIONES DE TRÁNSITO.
+                    </div>
+
+                    <!-- Escala de evaluación (solo una vez) -->
+                    <table class="table table-sm table-bordered text-center small mb-2">
+                        <thead>
+                            <tr>
+                                <th>5</th><th>4</th><th>3</th><th>2</th><th>1</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>EXCELENTE</td>
+                                <td>BUENO</td>
+                                <td>REGULAR</td>
+                                <td>MALO</td>
+                                <td>DEFICIENTE</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <!-- Tabla única para todas las secciones -->
+                    <table class="table table-sm table-bordered small align-middle">
+                        <thead class="text-center">
+                            <tr>
+                                <th class="col-8">FACTOR EVALUADO</th>
+                                <th class="col-2">EV</th>
+                                <th class="col-2">PROMEDIO</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Sección 1 -->
+                            <tr class="table-active fw-bold">
+                                <td colspan="3">CONOCIMIENTO, INSPECCIÓN Y ADAPTACIÓN DEL VEHÍCULO</td>
+                            </tr>
+                            <tr><td>Inspección de niveles (refrigerante, frenos, aceite)</td><td class="text-center"></td><td></td></tr>
+                            <tr><td>Inspección estado de batería</td><td class="text-center"></td><td></td></tr>
+                            <tr><td>Verificación estado y presión de llantas</td><td class="text-center"></td><td></td></tr>
+                            <tr><td>Ajuste de cinturón, espejos, asiento y retrovisor</td><td class="text-center"></td><td></td></tr>
+                            <tr><td>Verificación de luces</td><td class="text-center"></td><td></td></tr>
+
+                            <!-- Sección 2 -->
+                            <tr class="table-active fw-bold">
+                                <td colspan="3">DESTREZA Y HABILIDADES EN EL MANEJO</td>
+                            </tr>
+                            <tr><td>Encendido y arranque</td><td class="text-center"></td><td></td></tr>
+                            <tr><td>Puesta en marcha en plano y pendiente</td><td class="text-center"></td><td></td></tr>
+                            <tr><td>Avance en línea recta y con ángulos</td><td class="text-center"></td><td></td></tr>
+                            <tr><td>Coordinación de aceleración, freno, cambio y embrague</td><td class="text-center"></td><td></td></tr>
+                            <tr><td>Aplicación de cambios ascendentes/descendentes</td><td class="text-center"></td><td></td></tr>
+                            <tr><td>Descenso y ascenso en pendiente</td><td class="text-center"></td><td></td></tr>
+                            <tr><td>Circulación y adelantamiento</td><td class="text-center"></td><td></td></tr>
+                            <tr><td>Uso del embrague</td><td class="text-center"></td><td></td></tr>
+                            <tr><td>Frenos y parqueo en reversa</td><td class="text-center"></td><td></td></tr>
+                            <tr><td>Ingreso al parqueo en reversa</td><td class="text-center"></td><td></td></tr>
+
+                            <!-- Sección 3 -->
+                            <tr class="table-active fw-bold">
+                                <td colspan="3">COMPORTAMIENTO FRENTE AL TRÁNSITO</td>
+                            </tr>
+                            <tr><td>Respeto de señalizaciones y límites de velocidad</td><td class="text-center"></td><td></td></tr>
+                            <tr><td>Distancia de seguimiento y lateral</td><td class="text-center"></td><td></td></tr>
+                            <tr><td>Cambios de carril, calzada y adelantamientos</td><td class="text-center"></td><td></td></tr>
+                            <tr><td>Uso adecuado de carriles</td><td class="text-center"></td><td></td></tr>
+                            <tr><td>Manejo de luces direccionales</td><td class="text-center"></td><td></td></tr>
+                        </tbody>
+                    </table>
+
+                    <!-- Resultados examen -->
+                    <table class="table table-sm table-borderless small mb-1">
+                        <tbody>
+                            <tr>
+                                <td><strong>RESULTADO EXAMEN TEÓRICO: 20% =</strong></td>
+                                <td rowspan="2" class="text-center fw-bold">
+                                    CALIFICACIONES MENORES AL 70% SERÁN REPROBATORIAS
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>RESULTADO EXAMEN PRÁCTICO: 80% =</strong></td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <!-- Observaciones y promedio -->
+                    <table class="table table-sm table-borderless small">
+                        <tbody>
+                            <tr>
+                                <td><strong>OBSERVACIONES:</strong></td>
+                                <td class="text-center fw-bold">PROMEDIO</td>
+                                <td></td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>
