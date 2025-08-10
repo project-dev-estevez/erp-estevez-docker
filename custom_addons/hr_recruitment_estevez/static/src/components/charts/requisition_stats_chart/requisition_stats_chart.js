@@ -118,7 +118,7 @@ export class RequisitionStatsChart extends Component {
         // ✅ Por Abrir = first_approval + approved no publicadas
         const countPorAbrir = await this.orm.searchCount(
             'hr.requisition',
-            [...domain, ['state', '=', 'to_approved'], ['is_published', '=', false]]
+            [...domain, ['publication_status', '=', 'Por Abrir']]
         );
         
         const countApprovedOpen = await this.orm.searchCount(
@@ -294,7 +294,7 @@ export class RequisitionStatsChart extends Component {
         } else if (stateCode === 'approved_closed') {
             domain.push(['state', '=', 'approved'], ['is_published', '=', false], ['close_date', '!=', false]);
         } else if (stateCode === 'por_abrir') {
-            domain.push(['state', '=', 'to_approved'], ['is_published', '=', false]);
+            domain.push(['publication_status', '=', 'Por Abrir']);
         } else if (stateCode) {
             domain.push(['state', '=', stateCode]);
         }
