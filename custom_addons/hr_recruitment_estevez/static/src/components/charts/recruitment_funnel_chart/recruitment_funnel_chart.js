@@ -33,8 +33,10 @@ export class RecruitmentFunnelChart extends Component {
             vacancyMetrics: {
                 status: 'Global',
                 openDuration: '',
+                openDate: '',
                 applicants: 0,
                 hired: 0,
+                hiredFromPrevious: 0,
                 refused: 0,
                 topRefuseReason: '',
                 requestedPositions: 0
@@ -141,6 +143,66 @@ export class RecruitmentFunnelChart extends Component {
         return domain;
     }
 
+    _getHiredInRangeDomain(domain = []) {
+        const currentProps = this.getCurrentProps();
+        
+        // ✅ Filtro 1: Se crearon en el rango (create_date)
+        if (currentProps.startDate) {
+            domain.push(["create_date", ">=", currentProps.startDate]);
+        }
+        if (currentProps.endDate) {
+            domain.push(["create_date", "<=", currentProps.endDate]);
+        }
+        
+        // ✅ Filtro 2: Se contrataron en el rango (date_closed)
+        if (currentProps.startDate) {
+            domain.push(["date_closed", ">=", currentProps.startDate]);
+        }
+        if (currentProps.endDate) {
+            domain.push(["date_closed", "<=", currentProps.endDate]);
+        }
+        
+        return domain;
+    }
+
+    _getHiredFromPreviousPeriodDomain(domain = []) {
+        const currentProps = this.getCurrentProps();
+        
+        // ✅ Filtro 1: Se crearon ANTES del rango (create_date < startDate)
+        if (currentProps.startDate) {
+            domain.push(["create_date", "<", currentProps.startDate]);
+        }
+        
+        // ✅ Filtro 2: Se contrataron DENTRO del rango (date_closed >= startDate && <= endDate)
+        if (currentProps.startDate) {
+            domain.push(["date_closed", ">=", currentProps.startDate]);
+        }
+        if (currentProps.endDate) {
+            domain.push(["date_closed", "<=", currentProps.endDate]);
+        }
+        
+        return domain;
+    }
+
+    // ✅ NUEVA función para calcular hired count de período anterior (global)
+    async _calculateGlobalHiredFromPreviousPeriod() {
+        let hiredDomain = [
+            ['application_status', '=', 'hired']
+        ];
+        hiredDomain = this._getHiredFromPreviousPeriodDomain(hiredDomain);
+        return await this.orm.searchCount('hr.applicant', hiredDomain);
+    }
+
+    // ✅ NUEVA función para calcular hired count de período anterior (específico)
+    async _calculateHiredFromPreviousPeriod(jobId) {
+        let hiredDomain = [
+            ['job_id', '=', jobId],
+            ['application_status', '=', 'hired']
+        ];
+        hiredDomain = this._getHiredFromPreviousPeriodDomain(hiredDomain);
+        return await this.orm.searchCount('hr.applicant', hiredDomain);
+    }
+
     async _calculateApplicantsCount(jobId = null) {
         try {
             const firstContactStage = await this.recruitmentStageService.getFirstContactStage();
@@ -171,16 +233,64 @@ export class RecruitmentFunnelChart extends Component {
         }
     }
 
+    async _calculateGlobalHiredCount() {
+        let hiredDomain = [
+            ['application_status', '=', 'hired']
+        ];
+        hiredDomain = this._getHiredInRangeDomain(hiredDomain); // ✅ NUEVO
+        return await this.orm.searchCount('hr.applicant', hiredDomain);
+    }
+
+    async _calculateGlobalRefusedMetrics() {
+        let refusedDomain = [
+            ['application_status', '=', 'refused']
+        ];
+        refusedDomain = this._addDateRangeToDomain(refusedDomain);
+        
+        // ✅ AGREGAR context para incluir rechazados (inactivos)
+        const refusedCount = await this.orm.searchCount(
+            'hr.applicant', 
+            refusedDomain,
+            { context: { active_test: false } }  // ✅ CLAVE: Incluir inactivos
+        );
+
+        let topRefuseReason = '';
+        if (refusedCount > 0) {
+            const refusedReasons = await this.orm.readGroup(
+                'hr.applicant',
+                refusedDomain,
+                ['refuse_reason_id'],
+                ['refuse_reason_id'],
+                { context: { active_test: false } }  // ✅ TAMBIÉN en readGroup
+            );
+
+            if (refusedReasons.length > 0) {
+                refusedReasons.sort((a, b) => b.refuse_reason_id_count - a.refuse_reason_id_count);
+                const topReason = refusedReasons[0];
+                topRefuseReason = topReason.refuse_reason_id ? topReason.refuse_reason_id[1] : 'Sin motivo';
+            }
+        }
+
+        return { refusedCount, topRefuseReason };
+    }
+
     async _getGlobalMetrics() {
-        const applicantsCount = await this._calculateApplicantsCount();
+        const [applicantsCount, hiredCount, hiredFromPreviousCount, refusedMetrics] = await Promise.all([
+            this._calculateApplicantsCount(),
+            this._calculateGlobalHiredCount(),
+            this._calculateGlobalHiredFromPreviousPeriod(),
+            this._calculateGlobalRefusedMetrics()
+        ]);
         
         return {
             status: 'Global',
             openDuration: '',
+            openDate: '',
             applicants: applicantsCount,
-            hired: 0,
-            refused: 0,
-            topRefuseReason: '',
+            hired: hiredCount,
+            hiredFromPrevious: hiredFromPreviousCount,
+            refused: refusedMetrics.refusedCount,
+            topRefuseReason: refusedMetrics.topRefuseReason,
             requestedPositions: this.state.vacancyMetrics.requestedPositions
         };
     }
@@ -190,10 +300,20 @@ export class RecruitmentFunnelChart extends Component {
         
         let status = 'Cerrada';
         let openDuration = '';
+        let openDate = ''; // ✅ NUEVO campo para fecha de apertura
 
         if (is_published) {
             status = 'Abierta';
             if (publish_date) {
+                // ✅ Formatear fecha de apertura
+                const publishDateTime = new Date(publish_date);
+                openDate = publishDateTime.toLocaleDateString('es-ES', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+                
+                // ✅ Calcular duración
                 const startDate = new Date(publish_date);
                 const endDate = close_date ? new Date(close_date) : new Date();
                 const diffTime = Math.abs(endDate - startDate);
@@ -201,6 +321,14 @@ export class RecruitmentFunnelChart extends Component {
                 openDuration = `${diffDays} días`;
             }
         } else if (publish_date && close_date) {
+            // ✅ Para vacantes cerradas, también mostrar cuándo se abrió
+            const publishDateTime = new Date(publish_date);
+            openDate = publishDateTime.toLocaleDateString('es-ES', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+            
             const startDate = new Date(publish_date);
             const endDate = new Date(close_date);
             const diffTime = Math.abs(endDate - startDate);
@@ -208,7 +336,7 @@ export class RecruitmentFunnelChart extends Component {
             openDuration = `Estuvo ${diffDays} días abierta`;
         }
 
-        return { status, openDuration };
+        return { status, openDuration, openDate }; // ✅ DEVOLVER también openDate
     }
 
     async _calculateHiredCount(jobId) {
@@ -216,7 +344,7 @@ export class RecruitmentFunnelChart extends Component {
             ['job_id', '=', jobId],
             ['application_status', '=', 'hired']
         ];
-        hiredDomain = this._getHiredDateRangeDomain(hiredDomain);
+        hiredDomain = this._getHiredInRangeDomain(hiredDomain); // ✅ NUEVO
         return await this.orm.searchCount('hr.applicant', hiredDomain);
     }
 
@@ -226,7 +354,13 @@ export class RecruitmentFunnelChart extends Component {
             ['application_status', '=', 'refused']
         ];
         refusedDomain = this._addDateRangeToDomain(refusedDomain);
-        const refusedCount = await this.orm.searchCount('hr.applicant', refusedDomain);
+        
+        // ✅ AGREGAR context para incluir rechazados (inactivos)
+        const refusedCount = await this.orm.searchCount(
+            'hr.applicant', 
+            refusedDomain,
+            { context: { active_test: false } }  // ✅ CLAVE: Incluir inactivos
+        );
 
         let topRefuseReason = '';
         if (refusedCount > 0) {
@@ -234,7 +368,8 @@ export class RecruitmentFunnelChart extends Component {
                 'hr.applicant',
                 refusedDomain,
                 ['refuse_reason_id'],
-                ['refuse_reason_id']
+                ['refuse_reason_id'],
+                { context: { active_test: false } }  // ✅ TAMBIÉN en readGroup
             );
 
             if (refusedReasons.length > 0) {
@@ -273,7 +408,7 @@ export class RecruitmentFunnelChart extends Component {
             }
 
             // 2. Calcular status y duración
-            const { status, openDuration } = this._calculateVacancyStatusAndDuration(requisitions[0]);
+            const { status, openDuration, openDate } = this._calculateVacancyStatusAndDuration(requisitions[0]);
 
             // 3. Calcular posiciones solicitadas
             const requestedPositions = requisitions.reduce(
@@ -281,17 +416,20 @@ export class RecruitmentFunnelChart extends Component {
             );
 
             // 4. Calcular métricas en paralelo para mejor performance
-            const [applicantsCount, hiredCount, refusedMetrics] = await Promise.all([
+            const [applicantsCount, hiredCount, hiredFromPreviousCount, refusedMetrics] = await Promise.all([
                 this._calculateApplicantsCount(jobId),
                 this._calculateHiredCount(jobId),
+                this._calculateHiredFromPreviousPeriod(jobId),
                 this._calculateRefusedMetrics(jobId)
             ]);
 
             return {
                 status,
                 openDuration,
+                openDate,
                 applicants: applicantsCount,
                 hired: hiredCount,
+                hiredFromPrevious: hiredFromPreviousCount,
                 refused: refusedMetrics.refusedCount,
                 topRefuseReason: refusedMetrics.topRefuseReason,
                 requestedPositions
@@ -441,6 +579,7 @@ export class RecruitmentFunnelChart extends Component {
     }
 
     async getVacancyMetrics() {
+        // await this.debugMetrics(this.state.selectedVacancy);
         if (!this.state.selectedVacancy) {
             this.state.vacancyMetrics = await this._getGlobalMetrics();
             return;

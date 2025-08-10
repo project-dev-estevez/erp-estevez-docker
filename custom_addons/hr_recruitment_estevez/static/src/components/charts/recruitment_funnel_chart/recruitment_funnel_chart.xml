@@ -118,13 +118,20 @@
                                 </div>
 
                                 <!-- Duración -->
-                                <div t-if="state.vacancyMetrics.openDuration" 
+                                <div t-if="state.vacancyMetrics.openDuration || state.vacancyMetrics.openDate" 
                                     class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
                                     <span class="text-muted">
-                                        <i class="fa fa-hourglass-half me-1"></i>
-                                        Duración:
+                                        <i class="fa fa-calendar me-1"></i>
+                                        Apertura:
                                     </span>
-                                    <span class="fw-bold text-dark" t-esc="state.vacancyMetrics.openDuration"/>
+                                    <div class="text-end">
+                                        <div t-if="state.vacancyMetrics.openDate" class="fw-bold text-primary">
+                                            <span t-esc="state.vacancyMetrics.openDate"/>
+                                        </div>
+                                        <div t-if="state.vacancyMetrics.openDuration" class="small text-muted">
+                                            Hace <span t-esc="state.vacancyMetrics.openDuration"/>
+                                        </div>
+                                    </div>
                                 </div>
 
                                 <!-- Número de vacantes solicitadas -->
@@ -151,7 +158,16 @@
                                         <i class="fa fa-check-circle me-1"></i>
                                         Contratados:
                                     </span>
-                                    <span class="fw-bold text-success" t-esc="state.vacancyMetrics.hired"/>
+                                    <div class="text-end">
+                                        <span class="fw-bold text-success" t-esc="state.vacancyMetrics.hired"/>
+                                        <div class="small text-muted" t-if="state.vacancyMetrics.hiredFromPrevious > 0">
+                                            <i class="fa fa-history me-1"></i>
+                                            + <span t-esc="state.vacancyMetrics.hiredFromPrevious"/> del período anterior
+                                        </div>
+                                        <div class="small text-info fw-bold" t-if="state.vacancyMetrics.hiredFromPrevious > 0">
+                                            Total: <span t-esc="state.vacancyMetrics.hired + state.vacancyMetrics.hiredFromPrevious"/>
+                                        </div>
+                                    </div>
                                 </div>
 
                                 <!-- Rechazados -->
@@ -164,15 +180,17 @@
                                 </div>
 
                                 <!-- Motivo principal de rechazo -->
-                                <div t-if="state.vacancyMetrics.topRefuseReason" 
-                                    class="d-flex flex-column">
-                                    <span class="text-muted mb-1">
-                                        <i class="fa fa-exclamation-triangle me-1"></i>
-                                        Principal motivo de rechazo:
-                                    </span>
-                                    <small class="text-wrap fst-italic text-secondary" 
-                                        t-esc="state.vacancyMetrics.topRefuseReason"/>
-                                </div>
+                                <!-- <div t-if="state.vacancyMetrics.topRefuseReason" 
+                                    class="mt-2">
+                                    <div class="d-flex align-items-center mb-2">
+                                        <i class="fa fa-exclamation-triangle me-2 text-warning"></i>
+                                        <span class="text-muted small">Principal motivo de rechazo:</span>
+                                    </div>
+                                    <div class="border-start border-warning border-3 ps-3">
+                                        <span class="text-wrap fw-semibold text-dark" 
+                                            t-esc="state.vacancyMetrics.topRefuseReason"/>
+                                    </div>
+                                </div> -->
                             </div>
                         </div>
                     </div>
