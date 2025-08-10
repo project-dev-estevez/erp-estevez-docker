@@ -116,12 +116,10 @@ export class RequisitionStatsChart extends Component {
         const countToApprove = countMap['to_approve'] || 0;
 
         // ✅ Por Abrir = first_approval + approved no publicadas
-        const countFirstApproval = countMap['first_approval'] || 0;
-        const countApprovedNotPublished = await this.orm.searchCount(
+        const countPorAbrir = await this.orm.searchCount(
             'hr.requisition',
-            [...domain, ['state', '=', 'approved'], ['is_published', '=', false], ['close_date', '=', false]]
+            [...domain, ['state', '=', 'to_approved'], ['is_published', '=', false]]
         );
-        const countPorAbrir = countFirstApproval + countApprovedNotPublished;
         
         const countApprovedOpen = await this.orm.searchCount(
             'hr.requisition',
@@ -296,13 +294,7 @@ export class RequisitionStatsChart extends Component {
         } else if (stateCode === 'approved_closed') {
             domain.push(['state', '=', 'approved'], ['is_published', '=', false], ['close_date', '!=', false]);
         } else if (stateCode === 'por_abrir') {
-            // ✅ Incluir first_approval + approved no publicadas (sin close_date)
-            domain.push('|', 
-                ['state', '=', 'first_approval'],
-                '&', ['state', '=', 'approved'], 
-                '&', ['is_published', '=', false], 
-                ['close_date', '=', false]
-            );
+            domain.push(['state', '=', 'to_approved'], ['is_published', '=', false]);
         } else if (stateCode) {
             domain.push(['state', '=', stateCode]);
         }
