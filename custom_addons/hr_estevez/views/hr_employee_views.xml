@@ -346,6 +346,10 @@
                     </page>
                 </xpath>
 
+                <xpath expr="//notebook/page[@name='loans']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+
                 <!-- Nueva página de Vacaciones -->
                 <xpath expr="//notebook/page[@name='loans']" position="after">
                     <page name="vacations" string="Vacaciones">
