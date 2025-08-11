@@ -112,8 +112,22 @@
                         <field name="job_id" domain="[('department_id', '=', department_id)]" invisible="not department_id" options="{'no_create': True}"/>
                         <field name="parent_id" string="Jefe Inmediato" options="{'no_create': True}"/>
                         <field name="coach_id" string="Instructor" options="{'no_create': True}"/>
+                        
                     </group>
                 </xpath>
+
+                <xpath expr="//group/group[field[@name='coach_id']]" position="after">
+                    <div class="d-flex justify-content-end w-100 mt-4">
+                        <button              
+                            name="action_save" 
+                            type="object" 
+                            string="Guardar"
+                            class="btn-primary"     
+                            confirm="¿Estás seguro de que deseas guardar un empleado nuevo?"
+                        />  
+                    </div>
+                </xpath>
+
 
                 <!-- Información Laboral -->
                 <xpath expr="//notebook/page[@name='public']" position="replace">
