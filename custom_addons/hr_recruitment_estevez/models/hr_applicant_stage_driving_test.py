@@ -98,6 +98,13 @@ class HrApplicantStageDrivingTest(models.Model):
         digits=(3, 2)
     )
 
+    # Suma del Aspecto 1
+    knowledge_sum = fields.Integer(
+        string='Suma Conocimiento e Inspección',
+        compute='_compute_knowledge_average',
+        store=True
+    )
+
     # 2. DESTREZA Y HABILIDADES EN EL MANEJO (10 factores)
     ignition_maneuver = fields.Selection([
         ('1', '1 - Deficiente'),
@@ -265,8 +272,15 @@ class HrApplicantStageDrivingTest(models.Model):
             numeric_values = [int(factor) for factor in factors if factor]
             
             if numeric_values:
-                record.knowledge_average = sum(numeric_values) / len(numeric_values)
+                # Calcular suma
+                record.knowledge_sum = sum(numeric_values)
+                
+                # Calcular promedio con nueva fórmula: (suma_total * valor_seccion) / suma_maxima_posible
+                # Para sección 1: (suma * 10) / 25
+                # Donde 25 = 5 factores * 5 puntos máximo por factor
+                record.knowledge_average = (record.knowledge_sum * 10) / 25
             else:
+                record.knowledge_sum = 0
                 record.knowledge_average = 0.0
 
     @api.depends('ignition_maneuver', 'starting_movement', 'straight_line_advance', 'maneuver_coordination', 

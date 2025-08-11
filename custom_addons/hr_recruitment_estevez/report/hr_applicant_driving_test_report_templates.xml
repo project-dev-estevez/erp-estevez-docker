@@ -5,7 +5,7 @@
                 <t t-call="web.external_layout">
 
                     <!-- Titulo y Fecha -->
-                    <div class="row align-items-center mb-4">
+                    <div class="row align-items-center">
                         <div class="col text-center">
                             <h2 class="mb-0 fw-bold fs-3">PRUEBA DE MANEJO</h2>
                         </div>
@@ -18,49 +18,48 @@
                         </div>
                     </div>
 
-                    <!-- Información principal -->
-                    <table class="table table-sm table-borderless align-middle small">
+                    <!-- Información principal, Aviso y Escala de Evaluación -->
+                    <table class="table table-sm table-borderless align-middle" style="font-size: 11px;">
                         <tbody>
                             <tr>
-                                <td class="col-8">
+                                <td colspan="6" class="col-8">
                                     <strong>NOMBRE DEL EVALUADO:</strong>
                                     <span t-field="applicant.evaluator_id.name" />
                                 </td>
-                                <td class="col-4">
+                                <td colspan="6" class="col-4">
                                     <strong>TIPO DE LICENCIA:</strong>
                                     <span t-field="applicant.license_type" />
                                 </td>
                             </tr>
                             <tr>
-                                <td class="col-8">
+                                <td colspan="6" class="col-8">
                                     <strong>NOMBRE DEL APLICANTE:</strong>
                                     <span t-field="applicant.partner_name" />
                                 </td>
-                                <td class="col-4">
+                                <td colspan="6" class="col-4">
                                     <strong>No DE LICENCIA:</strong>
                                     <span t-field="applicant.license_number" />
                                 </td>
                             </tr>
-                        </tbody>
-                    </table>
-
-                    <!-- Aviso de Golpes e Infracciones -->
-                    <table class="table table-sm table-borderless align-middle small">
-                        <tbody>
                             <tr>
-                                <td class="col-10 text-center fw-bold text-uppercase">
-                                    SE DARA AVISO AL USUARIO SE COBRARAN GOLPES E INFRACCIONES DE
-                                    TRANSITO
+                                <td colspan="12" class="text-center fw-bold text-uppercase">
+                                    SE DARA AVISO AL USUARIO SE COBRARAN GOLPES E INFRACCIONES DE TRANSITO
+                                    <span class="float-end fw-bold">UNIDAD</span>
                                 </td>
-                                <td class="col-2 text-center fw-bold">
-                                    UNIDAD
-                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="2" class="text-center fw-bold">RANGO EVALUACIÓN:</td>
+                                <td colspan="2" class="text-center fw-bold">5 - EXCELENTE</td>
+                                <td colspan="2" class="text-center fw-bold">4 - BUENO</td>
+                                <td colspan="2" class="text-center fw-bold">3 - REGULAR</td>
+                                <td colspan="2" class="text-center fw-bold">2 - MALO</td>
+                                <td colspan="2" class="text-center fw-bold">1 - DEFICIENTE</td>
                             </tr>
                         </tbody>
                     </table>
 
-                    <!-- Sección 1 -->
-                    <table class="table table-sm table-borderless align-middle small">
+                    <!-- Tabla Unificada de Evaluación -->
+                    <table class="table table-sm table-borderless align-middle" style="font-size: 11px;">
                         <thead>
                             <tr>
                                 <th class="col-3 text-center">ASPECTOS DE EVALUACIÓN</th>
@@ -69,20 +68,10 @@
                             </tr>
                         </thead>
                         <tbody>
+                            <!-- SECCIÓN 1: CONOCIMIENTO, INSPECCIÓN Y ADAPTACIÓN DEL VEHÍCULO -->
                             <tr>
-                                <!-- Rango de Evaluación -->
-                                <td rowspan="6" class="text-center align-top">
+                                <td rowspan="6" class="text-center align-top fw-bold">
                                     CONOCIMIENTO, INSPECCIÓN Y ADAPTACIÓN DEL VEHÍCULO
-                                    <br /> RANGO DE EVALUACIÓN <br />
-                                    <table class="table table-sm table-borderless align-middle small mb-0">
-                                        <tbody>
-                                            <tr><td>5</td><td>EXCELENTE</td></tr>
-                                            <tr><td>4</td><td>BUENO</td></tr>
-                                            <tr><td>3</td><td>REGULAR</td></tr>
-                                            <tr><td>2</td><td>MALO</td></tr>
-                                            <tr><td>1</td><td>DEFICIENTE</td></tr>
-                                        </tbody>
-                                    </table>
                                 </td>
                                 <td>Inspección de los niveles (refrigerante, líquido de frenos, aceite)</td>
                                 <td class="text-center"><span t-field="applicant.fluid_levels_inspection" /></td>
@@ -103,51 +92,37 @@
                                 <td>Verificación del estado de las luces (altas, bajas, direccionales, freno de parqueo)</td>
                                 <td class="text-center"><span t-field="applicant.lights_verification" /></td>
                             </tr>
-
-                            <!-- Promedio -->
+                            <!-- Promedio Sección 1 -->
                             <tr>
-                                <td class="fw-bold text-end">PROMEDIO:</td>
+                                <td class="fw-bold text-end">RESULTADOS:</td>
                                 <td class="text-center">
-                                    <t t-if="applicant.knowledge_average >= 4">
-                                        <span class="badge text-success fw-bold"><t t-esc="applicant.knowledge_average" /></span>
-                                    </t>
-                                    <t t-elif="applicant.knowledge_average >= 3">
-                                        <span class="badge text-warning fw-bold"><t t-esc="applicant.knowledge_average" /></span>
-                                    </t>
-                                    <t t-else="">
-                                        <span class="badge text-danger fw-bold"><t t-esc="applicant.knowledge_average" /></span>
-                                    </t>
+                                    <div class="row">
+                                        <div class="col-6">
+                                            <small class="fw-bold">Suma:</small>
+                                            <span class="badge text-info text-dark fw-bold"><t t-esc="applicant.knowledge_sum" /></span>
+                                        </div>
+                                        <div class="col-6">
+                                            <small class="fw-bold">Prom:</small>
+                                            <t t-if="applicant.knowledge_average >= 8">
+                                                <span class="badge text-success fw-bold"><t t-esc="applicant.knowledge_average" /></span>
+                                            </t>
+                                            <t t-elif="applicant.knowledge_average >= 6">
+                                                <span class="badge text-warning fw-bold"><t t-esc="applicant.knowledge_average" /></span>
+                                            </t>
+                                            <t t-else="">
+                                                <span class="badge text-danger fw-bold"><t t-esc="applicant.knowledge_average" /></span>
+                                            </t>
+                                        </div>
+                                    </div>
                                 </td>
                             </tr>
-                        </tbody>
-                    </table>
 
-                    <!-- Sección 2 -->
-                    <table class="table table-sm table-borderless align-middle small">
-                        <thead>
+                            <!-- SECCIÓN 2: DESTREZA Y HABILIDADES -->
                             <tr>
-                                <th class="col-3 text-center">ASPECTOS DE EVALUACIÓN</th>
-                                <th class="col-7 text-center">FACTOR EVALUADO</th>
-                                <th class="col-2 text-center">EV</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <!-- Rango de Evaluación -->
-                                <td rowspan="10" class="text-center align-top">
-                                    DESTREZA Y HABILIDADES  EN EL MANEJO DE LOS MECANISMOS  DE CONTROL Y LA CONDUCCION  DEL VEHICULO
-                                    <br /> RANGO DE EVALUACIÓN <br />
-                                    <table class="table table-sm table-borderless align-middle small mb-0">
-                                        <tbody>
-                                            <tr><td>5</td><td>EXCELENTE</td></tr>
-                                            <tr><td>4</td><td>BUENO</td></tr>
-                                            <tr><td>3</td><td>REGULAR</td></tr>
-                                            <tr><td>2</td><td>MALO</td></tr>
-                                            <tr><td>1</td><td>DEFICIENTE</td></tr>
-                                        </tbody>
-                                    </table>
+                                <td rowspan="11" class="text-center align-top fw-bold">
+                                    DESTREZA Y HABILIDADES EN EL MANEJO DE LOS MECANISMOS DE CONTROL Y LA CONDUCCIÓN DEL VEHÍCULO
                                 </td>
-                                <td>Maniobra de encendido y arranque del vehiculo</td>
+                                <td>Maniobra de encendido y arranque del vehículo</td>
                                 <td class="text-center"><span t-field="applicant.ignition_maneuver" /></td>
                             </tr>
                             <tr>
@@ -155,11 +130,11 @@
                                 <td class="text-center"><span t-field="applicant.starting_movement" /></td>
                             </tr>
                             <tr>
-                                <td>Avance en linea recta y con angulos</td>
-                                <td class="text-center"><span t-field="applicant.starting_movement" /></td>
+                                <td>Avance en línea recta y con ángulos</td>
+                                <td class="text-center"><span t-field="applicant.straight_line_advance" /></td>
                             </tr>
                             <tr>
-                                <td>Coordinacion  de maniobras aceleracion, freno, cambio y embrague</td>
+                                <td>Coordinación de maniobras aceleración, freno, cambio y embrague</td>
                                 <td class="text-center"><span t-field="applicant.maneuver_coordination" /></td>
                             </tr>
                             <tr>
@@ -171,7 +146,7 @@
                                 <td class="text-center"><span t-field="applicant.inclined_terrain" /></td>
                             </tr>
                             <tr>
-                                <td>Maniobra de circulacion y adelantamiento</td>
+                                <td>Maniobra de circulación y adelantamiento</td>
                                 <td class="text-center"><span t-field="applicant.circulation_overtaking" /></td>
                             </tr>
                             <tr>
@@ -183,11 +158,10 @@
                                 <td class="text-center"><span t-field="applicant.brake_parking" /></td>
                             </tr>
                             <tr>
-                                <td>Ingreso al area de parqueo en reversa</td>
+                                <td>Ingreso al área de parqueo en reversa</td>
                                 <td class="text-center"><span t-field="applicant.parking_entry" /></td>
                             </tr>
-
-                            <!-- Promedio -->
+                            <!-- Promedio Sección 2 -->
                             <tr>
                                 <td class="fw-bold text-end">PROMEDIO:</td>
                                 <td class="text-center">
@@ -202,35 +176,11 @@
                                     </t>
                                 </td>
                             </tr>
-                        </tbody>
-                    </table>
 
-                    <!-- Sección 3 -->
-                    <table class="table table-sm table-borderless align-middle small">
-                        <thead>
+                            <!-- SECCIÓN 3: COMPORTAMIENTO DEL CONDUCTOR -->
                             <tr>
-                                <th class="col-3 text-center">ASPECTOS DE EVALUACIÓN</th>
-                                <th class="col-7 text-center">FACTOR EVALUADO</th>
-                                <th class="col-2 text-center">EV</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <!-- Columna 1 con rowspan y rango -->
-                                <td rowspan="6" class="text-center align-top">
-                                    COMPORTAMIENTO DEL CONDUCTOR FRENTE AL TRÁNSITO, RESPETO POR LAS
-                                    SEÑALES DE TRÁNSITO, POR EL PEATÓN, USO ADECUADO DE LA
-                                    INFRAESTRUCTURA
-                                    <br /> RANGO DE EVALUACIÓN <br />
-                                    <table class="table table-sm table-borderless align-middle small mb-0">
-                                        <tbody>
-                                            <tr><td>5</td><td>EXCELENTE</td></tr>
-                                            <tr><td>4</td><td>BUENO</td></tr>
-                                            <tr><td>3</td><td>REGULAR</td></tr>
-                                            <tr><td>2</td><td>MALO</td></tr>
-                                            <tr><td>1</td><td>DEFICIENTE</td></tr>
-                                        </tbody>
-                                    </table>
+                                <td rowspan="6" class="text-center align-top fw-bold">
+                                    COMPORTAMIENTO DEL CONDUCTOR FRENTE AL TRÁNSITO, RESPETO POR LAS SEÑALES DE TRÁNSITO, POR EL PEATÓN, USO ADECUADO DE LA INFRAESTRUCTURA
                                 </td>
                                 <td>Empleo del reglamento de tránsito (señalizaciones y límites de velocidad)</td>
                                 <td class="text-center"><span t-field="applicant.regulation_employment" /></td>
@@ -251,8 +201,7 @@
                                 <td>Manejo adecuado de las luces direccionales</td>
                                 <td class="text-center"><span t-field="applicant.directional_handling" /></td>
                             </tr>
-
-                            <!-- Promedio -->
+                            <!-- Promedio Sección 3 -->
                             <tr>
                                 <td class="fw-bold text-end">PROMEDIO:</td>
                                 <td class="text-center">
@@ -270,9 +219,8 @@
                         </tbody>
                     </table>
 
-
                     <!-- Resultados de examen -->
-                    <table class="table table-sm table-borderless align-middle small mb-0">
+                    <table class="table table-sm table-borderless align-middle mb-0" style="font-size: 11px;">
                         <tbody>
                             <tr>
                             <td class="col-8">
@@ -290,9 +238,8 @@
                         </tbody>
                     </table>
 
-
                     <!-- Observaciones y promedio -->
-                    <table class="table table-sm table-borderless align-middle small mb-0 mt-2">
+                    <table class="table table-sm table-borderless align-middle mb-0 mt-2" style="font-size: 11px;">
                         <tbody>
                             <tr>
                             <td class="col-8">
@@ -307,8 +254,6 @@
                             </tr>
                         </tbody>
                     </table>
-
-
                 </t>
             </t>
         </t>
