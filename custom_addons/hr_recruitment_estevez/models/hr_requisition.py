@@ -359,33 +359,22 @@ class HrRequisition(models.Model):
         return record
     
     def action_save(self):
-        # Aquí puedes agregar cualquier lógica adicional antes de guardar
         self.ensure_one()
-        self.write({'state': self.state})  # Esto guarda el registro
-        _logger.info("Requisición guardada con éxito")
-        # Crear acción de retorno
-        action = {
-            'type': 'ir.actions.act_window',
-            'res_model': self._name,
-            'res_id': self.id,
-            'views': [(False, 'form')],
-            'target': 'current',
-        }
-        
+
+        _logger.info("Mostrando vista lista + efecto rainbow_man")
+
         return {
-        'effect': {
-            'type': 'rainbow_man',
-            'message': '¡Requisición completada exitosamente!',
-            'fadeout': 'slow',
-            'next': {
-                'type': 'ir.actions.act_window',
-                'res_model': self._name,
-                'res_id': self.id,
-                'views': [(False, 'form')],
-                'target': 'current',
-            }
+            'effect': { 
+                'fadeout': 'slow',
+                'message': '¡Requisición registrada exitosamente!',
+                'type': 'rainbow_man',
+            },
+            'type': 'ir.actions.act_window',
+            'res_model': self._name, 
+            'view_mode': 'list',
+            'target': 'current',
+            
         }
-    }
     
     def action_previous(self):
         steps = {

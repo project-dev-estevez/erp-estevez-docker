@@ -24,12 +24,11 @@
          <xpath expr="//field[@name='job_id']" position="after">
          <div class="d-flex justify-content-end w-100 mt-4">
           <button              
-              name="action_save" 
+            name="action_save" 
             type="object" 
             string="Guardar"
-            class="btn-primary"             
-            confirm="¿Estás seguro de que deseas guardar un nuevo candidato?"
-            context="{'show_sweet_alert': True}"          
+            class="btn-primary"     
+            confirm="¿Estás seguro de que deseas guardar un nuevo candidato?"                    
             />        
           </div>
           </xpath>

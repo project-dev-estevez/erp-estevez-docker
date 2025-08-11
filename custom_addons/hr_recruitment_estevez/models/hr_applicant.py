@@ -567,4 +567,22 @@ class HrApplicant(models.Model):
 
         return action
 
+    def action_save(self):
+        self.ensure_one()
+
+        _logger.info("Mostrando vista lista + efecto rainbow_man")
+
+        return {
+            'effect': { 
+                'fadeout': 'slow',
+                'message': '¡Postulación registrada exitosamente!',
+                'type': 'rainbow_man',
+            },
+            'type': 'ir.actions.act_window',
+            'res_model': self._name, 
+            'view_mode': 'list',
+            'target': 'current',
+            
+        }
+
     

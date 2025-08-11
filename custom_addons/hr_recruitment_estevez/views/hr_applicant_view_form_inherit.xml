@@ -170,6 +170,18 @@
             <xpath expr="//field[@name='linkedin_profile']" position="after">
                 <field name="source_id" string="Fuente de reclutamiento"/>                
                 <field name="project_id"/>
+            </xpath>
+
+            <xpath expr="//field[@name='categ_ids']" position="after">
+                <div class="d-flex justify-content-end w-100 mt-4">
+          <button              
+            name="action_save" 
+            type="object" 
+            string="Guardar"
+            class="btn-primary"     
+            confirm="¿Estás seguro de que deseas guardar una nueva postulación?"
+            />        
+          </div>
             </xpath> 
 
             
