@@ -142,22 +142,18 @@ class HrRequisition(models.Model):
     )        
 
     def _search_publication_status(self, operator, value):
-    
         if operator not in ('=', '!=', 'ilike', 'not ilike', 'in', 'not in'):
             return []
-    
-        # Mapear los valores del estado de publicación a las condiciones correspondientes
+
         status_mapping = {
-            'Por Abrir': [('state', '=', 'to_approved'), ('is_published', '=', False)],
+            'Por Abrir': [('state', '!=', 'approved')],  # Coincide con tu _compute
             'Abierta': [('state', '=', 'approved'), ('is_published', '=', True)],
             'Cerrada': [('state', '=', 'approved'), ('is_published', '=', False)],
         }
-    
-        # Si el valor buscado existe en nuestro mapeo
+
         if value in status_mapping:
             return status_mapping[value]
-    
-        # Si no, devolver un dominio vacío
+
         return []
 
     @api.constrains('wizard_step', 'job_type', '')

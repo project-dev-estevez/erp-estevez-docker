@@ -18,6 +18,7 @@ export class RecruitmentFunnelChart extends Component {
     setup() {
         this.orm = useService("orm");
         this.actionService = useService("action");
+        this.recruitmentStageService = useService("recruitment_stage"); 
 
         this.state = useState({
             // 🔍 Selector de vacante
@@ -32,8 +33,10 @@ export class RecruitmentFunnelChart extends Component {
             vacancyMetrics: {
                 status: 'Global',
                 openDuration: '',
+                openDate: '',
                 applicants: 0,
                 hired: 0,
+                hiredFromPrevious: 0,
                 refused: 0,
                 topRefuseReason: '',
                 requestedPositions: 0
@@ -128,6 +131,324 @@ export class RecruitmentFunnelChart extends Component {
         return domain;
     }
 
+    _addPublishDateRangeToDomain(domain = []) {
+        const currentProps = this.getCurrentProps();
+        
+        if (currentProps.startDate) {
+            domain.push(["publish_date", ">=", currentProps.startDate]);
+        }
+        if (currentProps.endDate) {
+            domain.push(["publish_date", "<=", currentProps.endDate]);
+        }
+        return domain;
+    }
+
+    _getHiredInRangeDomain(domain = []) {
+        const currentProps = this.getCurrentProps();
+        
+        // ✅ Filtro 1: Se crearon en el rango (create_date)
+        if (currentProps.startDate) {
+            domain.push(["create_date", ">=", currentProps.startDate]);
+        }
+        if (currentProps.endDate) {
+            domain.push(["create_date", "<=", currentProps.endDate]);
+        }
+        
+        // ✅ Filtro 2: Se contrataron en el rango (date_closed)
+        if (currentProps.startDate) {
+            domain.push(["date_closed", ">=", currentProps.startDate]);
+        }
+        if (currentProps.endDate) {
+            domain.push(["date_closed", "<=", currentProps.endDate]);
+        }
+        
+        return domain;
+    }
+
+    _getHiredFromPreviousPeriodDomain(domain = []) {
+        const currentProps = this.getCurrentProps();
+        
+        // ✅ Filtro 1: Se crearon ANTES del rango (create_date < startDate)
+        if (currentProps.startDate) {
+            domain.push(["create_date", "<", currentProps.startDate]);
+        }
+        
+        // ✅ Filtro 2: Se contrataron DENTRO del rango (date_closed >= startDate && <= endDate)
+        if (currentProps.startDate) {
+            domain.push(["date_closed", ">=", currentProps.startDate]);
+        }
+        if (currentProps.endDate) {
+            domain.push(["date_closed", "<=", currentProps.endDate]);
+        }
+        
+        return domain;
+    }
+
+    // ✅ NUEVA función para calcular hired count de período anterior (global)
+    async _calculateGlobalHiredFromPreviousPeriod() {
+        let hiredDomain = [
+            ['application_status', '=', 'hired']
+        ];
+        hiredDomain = this._getHiredFromPreviousPeriodDomain(hiredDomain);
+        return await this.orm.searchCount('hr.applicant', hiredDomain);
+    }
+
+    // ✅ NUEVA función para calcular hired count de período anterior (específico)
+    async _calculateHiredFromPreviousPeriod(jobId) {
+        let hiredDomain = [
+            ['job_id', '=', jobId],
+            ['application_status', '=', 'hired']
+        ];
+        hiredDomain = this._getHiredFromPreviousPeriodDomain(hiredDomain);
+        return await this.orm.searchCount('hr.applicant', hiredDomain);
+    }
+
+    async _calculateApplicantsCount(jobId = null) {
+        try {
+            const firstContactStage = await this.recruitmentStageService.getFirstContactStage();
+            
+            let applicantDomain = jobId ? [['job_id', '=', jobId]] : [];
+            applicantDomain = this._addDateRangeToDomain(applicantDomain);
+            
+            if (firstContactStage) {
+                applicantDomain.push(['stage_id.sequence', '>=', firstContactStage.sequence]);
+                console.log(`✅ Calculando applicants (${jobId ? 'específico' : 'global'}): sequence >= ${firstContactStage.sequence}`);
+            } else {
+                console.log(`⚠️ No se encontró etapa 'Primer Contacto', contando 0`);
+                return 0;
+            }
+            
+            const count = await this.orm.searchCount(
+                'hr.applicant', 
+                applicantDomain,
+                { context: { active_test: false } }
+            ) || 0;
+            
+            console.log(`✅ ${jobId ? 'Específico' : 'Global'} applicants: ${count} candidatos`);
+            return count;
+            
+        } catch (error) {
+            console.error(`❌ Error calculando applicants (${jobId ? 'específico' : 'global'}):`, error);
+            return 0;
+        }
+    }
+
+    async _calculateGlobalHiredCount() {
+        let hiredDomain = [
+            ['application_status', '=', 'hired']
+        ];
+        hiredDomain = this._getHiredInRangeDomain(hiredDomain); // ✅ NUEVO
+        return await this.orm.searchCount('hr.applicant', hiredDomain);
+    }
+
+    async _calculateGlobalRefusedMetrics() {
+        let refusedDomain = [
+            ['application_status', '=', 'refused']
+        ];
+        refusedDomain = this._addDateRangeToDomain(refusedDomain);
+        
+        // ✅ AGREGAR context para incluir rechazados (inactivos)
+        const refusedCount = await this.orm.searchCount(
+            'hr.applicant', 
+            refusedDomain,
+            { context: { active_test: false } }  // ✅ CLAVE: Incluir inactivos
+        );
+
+        let topRefuseReason = '';
+        if (refusedCount > 0) {
+            const refusedReasons = await this.orm.readGroup(
+                'hr.applicant',
+                refusedDomain,
+                ['refuse_reason_id'],
+                ['refuse_reason_id'],
+                { context: { active_test: false } }  // ✅ TAMBIÉN en readGroup
+            );
+
+            if (refusedReasons.length > 0) {
+                refusedReasons.sort((a, b) => b.refuse_reason_id_count - a.refuse_reason_id_count);
+                const topReason = refusedReasons[0];
+                topRefuseReason = topReason.refuse_reason_id ? topReason.refuse_reason_id[1] : 'Sin motivo';
+            }
+        }
+
+        return { refusedCount, topRefuseReason };
+    }
+
+    async _getGlobalMetrics() {
+        const [applicantsCount, hiredCount, hiredFromPreviousCount, refusedMetrics] = await Promise.all([
+            this._calculateApplicantsCount(),
+            this._calculateGlobalHiredCount(),
+            this._calculateGlobalHiredFromPreviousPeriod(),
+            this._calculateGlobalRefusedMetrics()
+        ]);
+        
+        return {
+            status: 'Global',
+            openDuration: '',
+            openDate: '',
+            applicants: applicantsCount,
+            hired: hiredCount,
+            hiredFromPrevious: hiredFromPreviousCount,
+            refused: refusedMetrics.refusedCount,
+            topRefuseReason: refusedMetrics.topRefuseReason,
+            requestedPositions: this.state.vacancyMetrics.requestedPositions
+        };
+    }
+
+    _calculateVacancyStatusAndDuration(requisition) {
+        const { is_published, publish_date, close_date } = requisition;
+        
+        let status = 'Cerrada';
+        let openDuration = '';
+        let openDate = ''; // ✅ NUEVO campo para fecha de apertura
+
+        if (is_published) {
+            status = 'Abierta';
+            if (publish_date) {
+                // ✅ Formatear fecha de apertura
+                const publishDateTime = new Date(publish_date);
+                openDate = publishDateTime.toLocaleDateString('es-ES', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+                
+                // ✅ Calcular duración
+                const startDate = new Date(publish_date);
+                const endDate = close_date ? new Date(close_date) : new Date();
+                const diffTime = Math.abs(endDate - startDate);
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                openDuration = `${diffDays} días`;
+            }
+        } else if (publish_date && close_date) {
+            // ✅ Para vacantes cerradas, también mostrar cuándo se abrió
+            const publishDateTime = new Date(publish_date);
+            openDate = publishDateTime.toLocaleDateString('es-ES', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+            
+            const startDate = new Date(publish_date);
+            const endDate = new Date(close_date);
+            const diffTime = Math.abs(endDate - startDate);
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            openDuration = `Estuvo ${diffDays} días abierta`;
+        }
+
+        return { status, openDuration, openDate }; // ✅ DEVOLVER también openDate
+    }
+
+    async _calculateHiredCount(jobId) {
+        let hiredDomain = [
+            ['job_id', '=', jobId],
+            ['application_status', '=', 'hired']
+        ];
+        hiredDomain = this._getHiredInRangeDomain(hiredDomain); // ✅ NUEVO
+        return await this.orm.searchCount('hr.applicant', hiredDomain);
+    }
+
+    async _calculateRefusedMetrics(jobId) {
+        let refusedDomain = [
+            ['job_id', '=', jobId],
+            ['application_status', '=', 'refused']
+        ];
+        refusedDomain = this._addDateRangeToDomain(refusedDomain);
+        
+        // ✅ AGREGAR context para incluir rechazados (inactivos)
+        const refusedCount = await this.orm.searchCount(
+            'hr.applicant', 
+            refusedDomain,
+            { context: { active_test: false } }  // ✅ CLAVE: Incluir inactivos
+        );
+
+        let topRefuseReason = '';
+        if (refusedCount > 0) {
+            const refusedReasons = await this.orm.readGroup(
+                'hr.applicant',
+                refusedDomain,
+                ['refuse_reason_id'],
+                ['refuse_reason_id'],
+                { context: { active_test: false } }  // ✅ TAMBIÉN en readGroup
+            );
+
+            if (refusedReasons.length > 0) {
+                refusedReasons.sort((a, b) => b.refuse_reason_id_count - a.refuse_reason_id_count);
+                const topReason = refusedReasons[0];
+                topRefuseReason = topReason.refuse_reason_id ? topReason.refuse_reason_id[1] : 'Sin motivo';
+            }
+        }
+
+        return { refusedCount, topRefuseReason };
+    }
+
+    async _getSpecificVacancyMetrics(jobId) {
+        try {
+            // 1. Obtener requisiciones
+            const requisitions = await this.orm.searchRead(
+                'hr.requisition',
+                [
+                    ['workstation_job_id', '=', jobId],
+                    ['state', '=', 'approved'],
+                    ['is_published', '=', true]
+                ],
+                ['is_published', 'publish_date', 'close_date', 'number_of_vacancies']
+            );
+
+            if (requisitions.length === 0) {
+                return {
+                    status: 'Sin requisición',
+                    openDuration: '',
+                    applicants: 0,
+                    hired: 0,
+                    refused: 0,
+                    topRefuseReason: '',
+                    requestedPositions: 0
+                };
+            }
+
+            // 2. Calcular status y duración
+            const { status, openDuration, openDate } = this._calculateVacancyStatusAndDuration(requisitions[0]);
+
+            // 3. Calcular posiciones solicitadas
+            const requestedPositions = requisitions.reduce(
+                (sum, req) => sum + (req.number_of_vacancies || 0), 0
+            );
+
+            // 4. Calcular métricas en paralelo para mejor performance
+            const [applicantsCount, hiredCount, hiredFromPreviousCount, refusedMetrics] = await Promise.all([
+                this._calculateApplicantsCount(jobId),
+                this._calculateHiredCount(jobId),
+                this._calculateHiredFromPreviousPeriod(jobId),
+                this._calculateRefusedMetrics(jobId)
+            ]);
+
+            return {
+                status,
+                openDuration,
+                openDate,
+                applicants: applicantsCount,
+                hired: hiredCount,
+                hiredFromPrevious: hiredFromPreviousCount,
+                refused: refusedMetrics.refusedCount,
+                topRefuseReason: refusedMetrics.topRefuseReason,
+                requestedPositions
+            };
+
+        } catch (error) {
+            console.error("❌ Error calculando métricas específicas:", error);
+            return {
+                status: 'Error',
+                openDuration: '',
+                applicants: 0,
+                hired: 0,
+                refused: 0,
+                topRefuseReason: '',
+                requestedPositions: 0
+            };
+        }
+    }
+
     // 🔍 ============ MANEJO DE VACANTES ============ (SIN CAMBIOS)
     onVacancyInputFocus() {
         this.state.isVacancyDropdownOpen = true;
@@ -179,16 +500,13 @@ export class RecruitmentFunnelChart extends Component {
 
     async getAllVacancies() {
         try {
-            const currentProps = this.getCurrentProps();
-
             // 1. Dominio base para requisiciones ABIERTAS (aprobadas y publicadas)
-            // SIN filtro de fechas de publicación
             let domain = [
                 ['state', '=', 'approved'],
                 ['is_published', '=', true]
             ];
 
-            console.log("🔍 Dominio para requisiciones abiertas:", domain);
+            domain = this._addPublishDateRangeToDomain(domain);
 
             // 2. Buscar requisiciones que cumplen los criterios
             const openRequisitions = await this.orm.searchRead(
@@ -261,136 +579,18 @@ export class RecruitmentFunnelChart extends Component {
     }
 
     async getVacancyMetrics() {
+        // await this.debugMetrics(this.state.selectedVacancy);
         if (!this.state.selectedVacancy) {
-            this.state.vacancyMetrics = {
-                status: 'Global',
-                openDuration: '',
-                applicants: 0,
-                hired: 0,
-                refused: 0,
-                topRefuseReason: '',
-                requestedPositions: this.state.vacancyMetrics.requestedPositions // Mantiene el total global
-            };
+            this.state.vacancyMetrics = await this._getGlobalMetrics();
             return;
         }
 
-        try {
-            const requisitions = await this.orm.searchRead(
-                'hr.requisition',
-                [
-                    ['workstation_job_id', '=', this.state.selectedVacancy],
-                    ['state', '=', 'approved'],
-                    ['is_published', '=', true] // Solo requisiciones publicadas
-                ],
-                ['is_published', 'publish_date', 'close_date', 'number_of_vacancies']
-            );
-
-            if (requisitions.length === 0) {
-                this.state.vacancyMetrics = {
-                    status: 'Sin requisición',
-                    openDuration: '',
-                    applicants: 0,
-                    hired: 0,
-                    refused: 0,
-                    topRefuseReason: '',
-                    requestedPositions: 0 // Sin requisición = 0 vacantes
-                };
-                return;
-            }
-
-            // Tomar la primera requisición (o sumar si hay múltiples)
-            const requisition = requisitions[0];
-            const isPublished = requisition.is_published;
-            const publishDate = requisition.publish_date;
-            const closeDate = requisition.close_date;
-
-            // Calcular vacantes solicitadas específicas para este puesto
-            const specificRequestedPositions = requisitions.reduce(
-                (sum, req) => sum + (req.number_of_vacancies || 0), 0
-            );
-
-            let status = 'Cerrada';
-            let openDuration = '';
-
-            if (isPublished) {
-                status = 'Abierta';
-                if (publishDate) {
-                    const startDate = new Date(publishDate);
-                    const endDate = closeDate ? new Date(closeDate) : new Date();
-                    const diffTime = Math.abs(endDate - startDate);
-                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-                    openDuration = `${diffDays} días`;
-                }
-            } else if (publishDate && closeDate) {
-                const startDate = new Date(publishDate);
-                const endDate = new Date(closeDate);
-                const diffTime = Math.abs(endDate - startDate);
-                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-                openDuration = `Estuvo ${diffDays} días abierta`;
-            }
-
-            let applicantDomain = [['job_id', '=', this.state.selectedVacancy]];
-            applicantDomain = this._addDateRangeToDomain(applicantDomain);
-            const applicantsCount = await this.orm.searchCount('hr.applicant', applicantDomain);
-
-            let hiredDomain = [
-                ['job_id', '=', this.state.selectedVacancy],
-                ['application_status', '=', 'hired']
-            ];
-            hiredDomain = this._getHiredDateRangeDomain(hiredDomain);
-            const hiredCount = await this.orm.searchCount('hr.applicant', hiredDomain);
-
-            let refusedDomain = [
-                ['job_id', '=', this.state.selectedVacancy],
-                ['application_status', '=', 'refused']
-            ];
-            refusedDomain = this._addDateRangeToDomain(refusedDomain);
-            const refusedCount = await this.orm.searchCount('hr.applicant', refusedDomain);
-
-            let topRefuseReason = '';
-            if (refusedCount > 0) {
-                const refusedReasons = await this.orm.readGroup(
-                    'hr.applicant',
-                    refusedDomain,
-                    ['refuse_reason_id'],
-                    ['refuse_reason_id']
-                );
-
-                if (refusedReasons.length > 0) {
-                    refusedReasons.sort((a, b) => b.refuse_reason_id_count - a.refuse_reason_id_count);
-                    const topReason = refusedReasons[0];
-                    topRefuseReason = topReason.refuse_reason_id ? topReason.refuse_reason_id[1] : 'Sin motivo';
-                }
-            }
-
-            this.state.vacancyMetrics = {
-                status,
-                openDuration,
-                applicants: applicantsCount,
-                hired: hiredCount,
-                refused: refusedCount,
-                topRefuseReason,
-                requestedPositions: specificRequestedPositions // ✅ Número específico del puesto
-            };
-
-        } catch (error) {
-            console.error("❌ FunnelChart: Error cargando métricas de vacante:", error);
-            this.state.vacancyMetrics = {
-                status: 'Error',
-                openDuration: '',
-                applicants: 0,
-                hired: 0,
-                refused: 0,
-                topRefuseReason: '',
-                requestedPositions: 0 // Error = 0 vacantes
-            };
-        }
+        this.state.vacancyMetrics = await this._getSpecificVacancyMetrics(this.state.selectedVacancy);
     }
 
     // 🎪 ============ EMBUDO CON APEXCHARTS ============
     async getFunnelRecruitment() {
-        console.log("🎪 FunnelChart: Cargando datos del embudo con lógica de grupos...");
-        
+
         try {
             // 1) Leer jobId del state
             const jobId = this.state.selectedVacancy;
@@ -417,8 +617,8 @@ export class RecruitmentFunnelChart extends Component {
             // 5) MAPEO DE ETAPAS A GRUPOS (ya en minúsculas)
             const stageGroups = [
                 {
-                    label: "Aplicaciones",
-                    stageNames: ["nuevo", "calificacion inicial", "primer contacto", "aplicacion inicial"],
+                    label: "Postulaciones",
+                    stageNames: ["nuevo", "calificacion inicial", "primer contacto"],
                     minSequence: null,
                     maxSequence: null
                 },
@@ -435,17 +635,9 @@ export class RecruitmentFunnelChart extends Component {
                     maxSequence: null
                 },
                 {
-                    label: "Examen Técnico",
+                    label: "Entrevistas Técnicas",
                     stageNames: [
-                        "examen técnico", "examen tecnico", "prueba técnica", "prueba tecnica",
-                        "evaluacion técnica", "evaluacion tecnica", "conocimiento técnico"
-                    ],
-                    minSequence: null,
-                    maxSequence: null
-                },
-                {
-                    label: "Entrevista Técnica",
-                    stageNames: [
+                        "examen tecnico / conocimiento", "examen técnico / conocimiento",
                         "primera entrevista / técnica", "primera entrevista / tecnica",
                         "segunda entrevista / técnica", "segunda entrevista / tecnica", 
                         "tercera entrevista / técnica", "tercera entrevista / tecnica",
@@ -493,20 +685,26 @@ export class RecruitmentFunnelChart extends Component {
                 return;
             }
 
+            const context = { context: { active_test: false } };
+
             // 8) Contar applicants para cada grupo (ACUMULATIVO)
             const counts = [];
             for (const group of validGroups) {
                 const cnt = await this.orm.searchCount(
                     'hr.applicant',
-                    [...baseDomain, ['stage_id.sequence', '>=', group.minSequence]]
+                    [...baseDomain, ['stage_id.sequence', '>=', group.minSequence]],
+                    context
                 );
                 counts.push(cnt);
             }
 
             // 9) ESTO ES CLAVE: Asegurar que el primer bloque tenga el total
             if (counts.length > 0) {
-                const totalApps = await this.orm.searchCount('hr.applicant', baseDomain) || 0;
+                // ✅ Usar la función reutilizable
+                const totalApps = await this._calculateApplicantsCount(jobId);
                 counts[0] = totalApps;
+                
+                console.log(`✅ POSTULACIONES (usando función reutilizable): ${totalApps} candidatos`);
             }
 
             // 10) Calcular porcentajes de conversión entre etapas consecutivas
@@ -565,7 +763,7 @@ export class RecruitmentFunnelChart extends Component {
                     title: {
                         text: this.state.selectedVacancy ? 
                             `Embudo: ${this.state.vacancySearchText}` : 
-                            'Embudo: Todas las Vacantes',
+                            'Embudo Para Todas las Vacantes',
                         align: 'center',
                         style: {
                             fontSize: '16px',

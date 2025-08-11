@@ -3,480 +3,257 @@
         <t t-call="web.html_container">
             <t t-foreach="docs" t-as="applicant">
                 <t t-call="web.external_layout">
-                    <div class="page" style="font-family: Arial; padding: 20px;">
-                        <div style="text-align: right;">
-                            <span style="color: #888888;">FECHA</span>
-                            <span style="color: #000000;"> ______________</span>
-                        </div>
-                        <!-- Encabezado -->
-                        <div style="text-align: center; margin-bottom: 30px;">
-                            <h2 style="margin-bottom: 5px; color: #888888; font-size: 20px">ESTEVEZ.
-                                JOR SERVICIOS S.A. DE C.V.</h2>
+
+                    <!-- Titulo y Fecha -->
+                    <div class="row align-items-center">
+                        <div class="col text-center">
+                            <h2 class="mb-0 fw-bold fs-3">PRUEBA DE MANEJO</h2>
                         </div>
 
-                        <div style="text-align: center; margin-bottom: 30px;">
-                            <h2 style="5px; color: #888888; font-size: 15px">PRUEBA DE MANEJO</h2>
+                        <div class="col-auto text-end">
+                            <span class="fw-bold">FECHA:</span>
+                            <span class="fw-bold">
+                                <t t-esc="applicant.create_date.strftime('%d/%m/%Y')" />
+                            </span>
                         </div>
+                    </div>
 
-                        <!-- Información del Candidato -->
-                        <table
-                            style="width: 100%; border-collapse: collapse; font-size: 12px; text-align: left;">
-                            <!-- Primera fila -->
+                    <!-- Información principal, Aviso y Escala de Evaluación -->
+                    <table class="table table-sm table-borderless align-middle" style="font-size: 11px;">
+                        <tbody>
                             <tr>
-                                <td colspan="3" style="border: 1px solid #000; padding: 8px;">
+                                <td colspan="6" class="col-8">
                                     <strong>NOMBRE DEL EVALUADO:</strong>
-                                    <span t-field="applicant.partner_name"
-                                        style="margin-right: 20px;" />
-
-                                    <strong>FIRMA:</strong>
-                                    <span t-field="applicant.job_id.name"
-                                        style="margin-right: 60px;" />
-
-                                    <strong>FECHA:</strong>
                                     <span t-field="applicant.evaluator_id.name" />
                                 </td>
+                                <td colspan="6" class="col-4">
+                                    <strong>TIPO DE LICENCIA:</strong>
+                                    <span t-field="applicant.license_type" />
+                                </td>
                             </tr>
-
-                            <!-- Segunda fila -->
                             <tr>
-                                <td colspan="2" style="border: 1px solid #000; padding: 8px;">
+                                <td colspan="6" class="col-8">
                                     <strong>NOMBRE DEL APLICANTE:</strong>
                                     <span t-field="applicant.partner_name" />
                                 </td>
-
-                                <!-- TIPO y No DE LICENCIA (uno debajo del otro) -->
-                                <td style="padding: 0; border: 1px solid #000;">
-                                    <table
-                                        style="width: 100%; border-collapse: collapse; font-size: 12px;">
-                                        <tr>
-                                            <td style="border-bottom: 1px solid #000; padding: 8px;">
-                                                <strong>TIPO DE LICENCIA:</strong>
-                                                <span t-field="applicant.job_id.name" />
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td style="padding: 8px;">
-                                                <strong>No DE LICENCIA:</strong>
-                                                <span t-field="applicant.evaluator_id.name" />
-                                            </td>
-                                        </tr>
-                                    </table>
-                                </td>
-                            </tr>
-                        </table>
-
-                        <!-- Aviso de Golpes e Infracciones -->
-                        <table
-                            style="width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 20px;">
-                            <tr>
-                                <td colspan="2"
-                                    style="
-                                padding: 12px;
-                                border: 1px solid #000;
-                                text-align: center;
-                                text-transform: uppercase;
-                                font-weight: bold;">
-                                    SE DARA AVISO AL USUARIO SE COBRARAN GOLPES E INFRACCIONES DE
-                                    TRANSITO
-                                </td>
-                                <!-- Unidad a la derecha -->
-                                <td
-                                    style="padding: 4px 12px 12px 12px; border: 1px solid #000; text-align: center; font-weight: bold; width: 15%; vertical-align: top;">
-                                    UNIDAD
-                                </td>
-                            </tr>
-                        </table>
-
-                        <!-- Sección 1 -->
-                        <table
-                            style="width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 20px; text-align: left;">
-                            <!-- Encabezados -->
-                            <tr>
-                                <th style="border: 1px solid #000; padding: 8px; width: 30%;">ASPECTOS
-                                    DE EVALUACION</th>
-                                <th style="border: 1px solid #000; padding: 8px; width: 50%;">FACTOR
-                                    EVALUADO</th>
-                                <th style="border: 1px solid #000; padding: 8px; width: 10%;">EV</th>
-                                <th style="border: 1px solid #000; padding: 8px; width: 10%;">
-                                    PROMEDIO</th>
-                            </tr>
-
-                            <!-- Fila combinada de aspecto + escala -->
-                            <tr>
-                                <td rowspan="6"
-                                    style="border: 1px solid #000; padding: 8px; vertical-align: top; text-align: center;">
-                                    CONOCIMIENTO, INSPECCION Y ADAPTACION DEL VEHICULO<br /><br />
-                                    RANGO DE EVALUACION <br /><br />
-                                <table
-                                        style="margin: 0 auto; border-collapse: collapse; font-size: 11px;">
-                                        <tr>
-                                            <td style="border: 1px solid #000; padding: 2px;">5</td>
-                                            <td style="border: 1px solid #000; padding: 2px;">
-                                    EXCELENTE</td>
-                                        </tr>
-                                        <tr>
-                                            <td style="border: 1px solid #000; padding: 2px;">4</td>
-                                            <td style="border: 1px solid #000; padding: 2px;">BUENO</td>
-                                        </tr>
-                                        <tr>
-                                            <td style="border: 1px solid #000; padding: 2px;">3</td>
-                                            <td style="border: 1px solid #000; padding: 2px;">
-                                    REGULAR</td>
-                                        </tr>
-                                        <tr>
-                                            <td style="border: 1px solid #000; padding: 2px;">2</td>
-                                            <td style="border: 1px solid #000; padding: 2px;">MALO</td>
-                                        </tr>
-                                        <tr>
-                                            <td style="border: 1px solid #000; padding: 2px;">1</td>
-                                            <td style="border: 1px solid #000; padding: 2px;">
-                                    DEFICIENTE</td>
-                                        </tr>
-                                    </table>
-                                </td>
-                                <td style="border: 1px solid #000; padding: 8px;">Inspeccion de los
-                                    niveles (refrigerante, liquido de frenos, aceite)</td>
-                                <td style="border: 1px solid #000; text-align: center;">
-                                    <span t-field="applicant.fluid_levels_inspection" />
-                                </td>
-                                <td style="border: 1px solid #000;"></td>
-                            </tr>
-                            <tr>
-                                <td style="border: 1px solid #000; padding: 8px;">Inspeccion de
-                                    estado fisico de la bateria</td>
-                                <td style="border: 1px solid #000; text-align: center;">
-                                    <span t-field="applicant.battery_inspection" />
-                                </td>
-                                <td style="border: 1px solid #000;"></td>
-                            </tr>
-                            <tr>
-                                <td style="border: 1px solid #000; padding: 8px;">Verificacion
-                                    estado de llantas (estado y presion)</td>
-                                <td style="border: 1px solid #000; text-align: center;">
-                                    <span t-field="applicant.tire_verification" />
-                                </td>
-                                <td style="border: 1px solid #000;"></td>
-                            </tr>
-                            <tr>
-                                <td style="border: 1px solid #000; padding: 8px;">Adaptacion o
-                                    graduacion del cinturon de seguridad, espejos laterales, asiento
-                                    y retrovisor</td>
-                                <td style="border: 1px solid #000; text-align: center;">
-                                    <span t-field="applicant.safety_adaptation" />
-                                </td>
-                                <td style="border: 1px solid #000;"></td>
-                            </tr>
-                            <tr>
-                                <td style="border: 1px solid #000; padding: 8px;">Verificacion del
-                                    estado de las luces (altas, bajas, direccionales, freno de
-                                    parqueo)</td>
-                                <td style="border: 1px solid #000; text-align: center;">
-                                    <span t-field="applicant.lights_verification" />
-                                </td>
-                                <td style="border: 1px solid #000;"></td>
-                            </tr>
-
-                            <!-- Promedio -->
-                            <tr>
-                                <td style="border: 1px solid #000; font-weight: bold; padding: 8px;">Promedio
-                                    seccion 1</td>
-                                <td style="border: 1px solid #000;"></td>
-                                <td style="border: 1px solid #000; text-align: center;">
-                                    <span t-field="applicant.knowledge_average" />
-                                </td>
-                            </tr>
-                        </table>
-
-                        <!-- Sección 2 -->
-                        <table
-                            style="width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 20px; border: 1px solid #000;">
-                            <tr>
-                                <!-- Columna 1: ASPECTO -->
-                                <td rowspan="11"
-                                    style="border: 1px solid #000; padding: 8px; vertical-align: top; text-align: center; width: 30%;">
-                                    DESTREZA Y HABILIDADES EN EL<br /> MANEJO DE LOS MECANISMOS DE<br />
-                                    CONTROL Y LA CONDUCCION DEL<br /> VEHICULO<br /><br /> RANGO DE
-                                    EVALUACIÓN<br /><br />
-                                <table
-                                        style="margin: 0 auto; border-collapse: collapse; font-size: 11px;">
-                                        <tr>
-                                            <td style="border: 1px solid #000; padding: 2px;">5</td>
-                                            <td style="border: 1px solid #000; padding: 2px;">
-                                    EXCELENTE</td>
-                                        </tr>
-                                        <tr>
-                                            <td style="border: 1px solid #000; padding: 2px;">4</td>
-                                            <td style="border: 1px solid #000; padding: 2px;">BUENO</td>
-                                        </tr>
-                                        <tr>
-                                            <td style="border: 1px solid #000; padding: 2px;">3</td>
-                                            <td style="border: 1px solid #000; padding: 2px;">
-                                    REGULAR</td>
-                                        </tr>
-                                        <tr>
-                                            <td style="border: 1px solid #000; padding: 2px;">2</td>
-                                            <td style="border: 1px solid #000; padding: 2px;">MALO</td>
-                                        </tr>
-                                        <tr>
-                                            <td style="border: 1px solid #000; padding: 2px;">1</td>
-                                            <td style="border: 1px solid #000; padding: 2px;">
-                                    DEFICIENTE</td>
-                                        </tr>
-                                    </table>
-                                </td>
-
-                                <!-- Columna 2: FACTOR EVALUADO -->
-                                <td style="border: 1px solid #000; padding: 8px; width: 50%;">Maniobra
-                                    de encendido y arranque del vehiculo</td>
-
-                                <!-- Columna 3: EV -->
-                                <td style="border: 1px solid #000; width: 10%; text-align: center;">
-                                    <span t-field="applicant.ignition_maneuver" />
-                                </td>
-
-                                <!-- Columna 4: PROMEDIO -->
-                                <td style="border: 1px solid #000; width: 10%;"></td>
-                            </tr>
-
-                            <!-- Repite estructura para las siguientes filas -->
-                            <tr>
-                                <td style="border: 1px solid #000; padding: 8px;">Puesta en marcha
-                                    en plano y en pendiente</td>
-                                <td style="border: 1px solid #000; text-align: center;">
-                                    <span t-field="applicant.starting_movement" />
-                                </td>
-                                <td style="border: 1px solid #000;"></td>
-                            </tr>
-                            <tr>
-                                <td style="border: 1px solid #000; padding: 8px;">Avance en linea
-                                    recta y con angulos</td>
-                                <td style="border: 1px solid #000; text-align: center;">
-                                    <span t-field="applicant.starting_movement" />
-                                </td>
-                                <td style="border: 1px solid #000;"></td>
-                            </tr>
-                            <tr>
-                                <td style="border: 1px solid #000; padding: 8px;">Coordinacion de
-                                    maniobras aceleracion, freno, cambio y embrague</td>
-                                <td style="border: 1px solid #000; text-align: center;">
-                                    <span t-field="applicant.maneuver_coordination" />
-                                </td>
-                                <td style="border: 1px solid #000;"></td>
-                            </tr>
-                            <tr>
-                                <td style="border: 1px solid #000; padding: 8px;">Aplicacion de
-                                    cambios ascendentes y descendentes</td>
-                                <td style="border: 1px solid #000; text-align: center;">
-                                    <span t-field="applicant.gear_application" />
-                                </td>
-                                <td style="border: 1px solid #000;"></td>
-                            </tr>
-                            <tr>
-                                <td style="border: 1px solid #000; padding: 8px;">Descenso y ascenso
-                                    en terreno inclinado</td>
-                                <td style="border: 1px solid #000; text-align: center;">
-                                    <span t-field="applicant.inclined_terrain" />
-                                </td>
-                                <td style="border: 1px solid #000;"></td>
-                            </tr>
-                            <tr>
-                                <td style="border: 1px solid #000; padding: 8px;">Maniobra de
-                                    circulacion y adelantamiento</td>
-                                <td style="border: 1px solid #000; text-align: center;">
-                                    <span t-field="applicant.circulation_overtaking" />
-                                </td>
-                                <td style="border: 1px solid #000;"></td>
-                            </tr>
-                            <tr>
-                                <td style="border: 1px solid #000; padding: 8px;">Aplicacion del
-                                    embrague</td>
-                                <td style="border: 1px solid #000; text-align: center;">
-                                    <span t-field="applicant.clutch_application" />
-                                </td>
-                                <td style="border: 1px solid #000;"></td>
-                            </tr>
-                            <tr>
-                                <td style="border: 1px solid #000; padding: 8px;">Aplicacion de
-                                    frenos y parqueo en reversa</td>
-                                <td style="border: 1px solid #000; text-align: center;">
-                                    <span t-field="applicant.brake_parking" />
-                                </td>
-                                <td style="border: 1px solid #000;"></td>
-                            </tr>
-                            <tr>
-                                <td style="border: 1px solid #000; padding: 8px;">Ingreso al area de
-                                    parqueo en reversa</td>
-                                <td style="border: 1px solid #000; text-align: center;">
-                                    <span t-field="applicant.parking_entry" />
-                                </td>
-                                <td style="border: 1px solid #000;"></td>
-                            </tr>
-
-                            <!-- Promedio -->
-                            <tr>
-                                <td style="border: 1px solid #000; font-weight: bold; padding: 8px;">Promedio
-                                    Seccion 2</td>
-                                <td style="border: 1px solid #000;"></td>
-                                <td style="border: 1px solid #000; text-align: center;">
-                                    <span t-field="applicant.skills_average" />
-                                </td>
-                            </tr>
-
-                        </table>
-
-                        <!-- Sección 3 -->
-                        <table
-                            style="width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 20px; border: 1px solid #000;">
-                            <tr>
-                                <!-- Columna 1: ASPECTO -->
-                                <td rowspan="6"
-                                    style="border: 1px solid #000; padding: 8px; vertical-align: top; text-align: center; width: 30%;">
-                                    COMPORTAMIENTO DEL CONDUCTOR FRENTE AL TRANSITO, RESPETO POR LAS
-                                    SEÑALES DE TRANSITO, POR EL PEATON, USO ADECUADO DE LA
-                                    INFRAESTRUCTURA<br /><br /> RANGO DE EVALUACION<br /><br />
-                                <table
-                                        style="margin: 0 auto; border-collapse: collapse; font-size: 11px;">
-                                        <tr>
-                                            <td style="border: 1px solid #000; padding: 2px;">5</td>
-                                            <td style="border: 1px solid #000; padding: 2px;">
-                                    EXCELENTE</td>
-                                        </tr>
-                                        <tr>
-                                            <td style="border: 1px solid #000; padding: 2px;">4</td>
-                                            <td style="border: 1px solid #000; padding: 2px;">BUENO</td>
-                                        </tr>
-                                        <tr>
-                                            <td style="border: 1px solid #000; padding: 2px;">3</td>
-                                            <td style="border: 1px solid #000; padding: 2px;">
-                                    REGULAR</td>
-                                        </tr>
-                                        <tr>
-                                            <td style="border: 1px solid #000; padding: 2px;">2</td>
-                                            <td style="border: 1px solid #000; padding: 2px;">MALO</td>
-                                        </tr>
-                                        <tr>
-                                            <td style="border: 1px solid #000; padding: 2px;">1</td>
-                                            <td style="border: 1px solid #000; padding: 2px;">
-                                    DEFICIENTE</td>
-                                        </tr>
-                                    </table>
-                                </td>
-
-                                <!-- Columna 2: FACTOR EVALUADO -->
-                                <td style="border: 1px solid #000; padding: 8px; width: 50%;">Empleo
-                                    del reglamento de transito (señalizaciones y limites de
-                                    velocidad)</td>
-
-                                <!-- Columna 3: PUNTAJE -->
-                                <td style="border: 1px solid #000; width: 10%; text-align: center;">
-                                    <span t-field="applicant.regulation_employment" />
-                                </td>
-
-                                <!-- Columna 4: VALORACIÓN -->
-                                <td style="border: 1px solid #000; width: 10%; text-align: center;"></td>
-                            </tr>
-
-                            <tr>
-                                <td style="border: 1px solid #000; padding: 8px;">Distancia de
-                                    seguimiento de parada y lateral</td>
-                                <td style="border: 1px solid #000; text-align: center;">
-                                    <span t-field="applicant.following_distance" />
-                                </td>
-                                <td style="border: 1px solid #000;"></td>
-                            </tr>
-
-                            <tr>
-                                <td style="border: 1px solid #000; padding: 8px;">Cambios de carril,
-                                    de calzada y adelantamientos</td>
-                                <td style="border: 1px solid #000; text-align: center;">
-                                    <span t-field="applicant.lane_changes" />
-                                </td>
-                                <td style="border: 1px solid #000;"></td>
-                            </tr>
-
-                            <tr>
-                                <td style="border: 1px solid #000; padding: 8px;">Uso adecuado de
-                                    cambio de carriles</td>
-                                <td style="border: 1px solid #000; text-align: center;">
-                                    <span t-field="applicant.lane_use" />
-                                </td>
-                                <td style="border: 1px solid #000;"></td>
-                            </tr>
-
-                            <tr>
-                                <td style="border: 1px solid #000; padding: 8px;">Manejo adecuado de
-                                    las luces direccionales</td>
-                                <td style="border: 1px solid #000; text-align: center;">
-                                    <span t-field="applicant.directional_handling" />
-                                </td>
-                                <td style="border: 1px solid #000;"></td>
-                            </tr>
-
-                            <!-- Fila de Promedio -->
-                            <tr>
-                                <td colspan="2"
-                                    style="border: 1px solid #000; font-weight: bold; padding: 8px;">
-                                    Promedio Seccion 3
-                                </td>
-                                <td style="border: 1px solid #000; text-align: center;">
-                                    <span t-field="applicant.skills_average" />
-                                </td>
-                            </tr>
-
-                        </table>
-
-                        <!-- Resultados de examen y observaciones -->
-                        <table
-                            style="width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 20px; border: 1px solid #000;">
-                            <tr>
-                                <!-- Celda: Examen teórico -->
-                                <td style="padding: 4px; border-bottom: 1px solid #000;">
-                                    RESULTADO EXAMEN TEORICO: 20%=
-                                </td>
-
-                                <!-- Celda: resultado dinámico (teórico) -->
-                                <td style="padding: 4px; border-bottom: 1px solid #000;">
-                                    <!-- Campo dinámico, opcional -->
-                                </td>
-
-                                <!-- Celda derecha (unificada para ambas filas) -->
-                                <td rowspan="2"
-                                    style="padding: 4px; text-align: center; vertical-align: middle; border-left: 1px solid #000;">
-                                    <strong>CALIFICACIONES MENORES AL 70% DE LA EVALUACION SERAN
-                                        REPROBATORIAS</strong>
+                                <td colspan="6" class="col-4">
+                                    <strong>No DE LICENCIA:</strong>
+                                    <span t-field="applicant.license_number" />
                                 </td>
                             </tr>
                             <tr>
-                                <!-- Celda: Examen práctico -->
-                                <td style="padding: 4px;">
-                                    RESULTADO EXAMEN PRACTICO: 80%=
-                                </td>
-
-                                <!-- Celda: resultado dinámico (práctico) -->
-                                <td style="padding: 4px;">
-                                    <!-- Campo dinámico, opcional -->
+                                <td colspan="12" class="text-center fw-bold text-uppercase">
+                                    SE DARA AVISO AL USUARIO SE COBRARAN GOLPES E INFRACCIONES DE TRANSITO
+                                    <span class="float-end fw-bold">UNIDAD</span>
                                 </td>
                             </tr>
-                        </table>
-
-                        <!-- Observaciones y promedio -->
-                        <table
-                            style="width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 20px; border: 1px solid #000;">
                             <tr>
-                                <td style="padding: 4px; width: 70%; border-right: 1px solid #000;">
-                                    OBSERVACIONES:
+                                <td colspan="2" class="text-center fw-bold">RANGO EVALUACIÓN:</td>
+                                <td colspan="2" class="text-center fw-bold">5 - EXCELENTE</td>
+                                <td colspan="2" class="text-center fw-bold">4 - BUENO</td>
+                                <td colspan="2" class="text-center fw-bold">3 - REGULAR</td>
+                                <td colspan="2" class="text-center fw-bold">2 - MALO</td>
+                                <td colspan="2" class="text-center fw-bold">1 - DEFICIENTE</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <!-- Tabla Unificada de Evaluación -->
+                    <table class="table table-sm table-borderless align-middle" style="font-size: 11px;">
+                        <thead>
+                            <tr>
+                                <th class="col-3 text-center">ASPECTOS DE EVALUACIÓN</th>
+                                <th class="col-7 text-center">FACTOR EVALUADO</th>
+                                <th class="col-2 text-center">EV</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- SECCIÓN 1: CONOCIMIENTO, INSPECCIÓN Y ADAPTACIÓN DEL VEHÍCULO -->
+                            <tr>
+                                <td rowspan="6" class="text-center align-top fw-bold">
+                                    CONOCIMIENTO, INSPECCIÓN Y ADAPTACIÓN DEL VEHÍCULO
                                 </td>
-                                <td
-                                    style="padding: 4px; width: 15%; text-align: center; border-right: 1px solid #000;">
-                                    PROMEDIO
-                                </td>
-                                <td style="padding: 4px; width: 15%;">
-                                    <!-- Aquí puedes poner el campo correspondiente si es dinámico -->
+                                <td>Inspección de los niveles (refrigerante, líquido de frenos, aceite)</td>
+                                <td class="text-center"><span t-field="applicant.fluid_levels_inspection" /></td>
+                            </tr>
+                            <tr>
+                                <td>Inspección de estado físico de la batería</td>
+                                <td class="text-center"><span t-field="applicant.battery_inspection" /></td>
+                            </tr>
+                            <tr>
+                                <td>Verificación estado de llantas (estado y presión)</td>
+                                <td class="text-center"><span t-field="applicant.tire_verification" /></td>
+                            </tr>
+                            <tr>
+                                <td>Adaptación o graduación del cinturón de seguridad, espejos laterales, asiento y retrovisor</td>
+                                <td class="text-center"><span t-field="applicant.safety_adaptation" /></td>
+                            </tr>
+                            <tr>
+                                <td>Verificación del estado de las luces (altas, bajas, direccionales, freno de parqueo)</td>
+                                <td class="text-center"><span t-field="applicant.lights_verification" /></td>
+                            </tr>
+                            <!-- Promedio Sección 1 -->
+                            <tr>
+                                <td class="fw-bold text-end">RESULTADOS:</td>
+                                <td class="text-center">
+                                    <div class="row">
+                                        <div class="col-6">
+                                            <small class="fw-bold">Suma:</small>
+                                            <span class="badge text-info text-dark fw-bold"><t t-esc="applicant.knowledge_sum" /></span>
+                                        </div>
+                                        <div class="col-6">
+                                            <small class="fw-bold">Prom:</small>
+                                            <t t-if="applicant.knowledge_average >= 8">
+                                                <span class="badge text-success fw-bold"><t t-esc="applicant.knowledge_average" /></span>
+                                            </t>
+                                            <t t-elif="applicant.knowledge_average >= 6">
+                                                <span class="badge text-warning fw-bold"><t t-esc="applicant.knowledge_average" /></span>
+                                            </t>
+                                            <t t-else="">
+                                                <span class="badge text-danger fw-bold"><t t-esc="applicant.knowledge_average" /></span>
+                                            </t>
+                                        </div>
+                                    </div>
                                 </td>
                             </tr>
-                        </table>
 
-                    </div>
+                            <!-- SECCIÓN 2: DESTREZA Y HABILIDADES -->
+                            <tr>
+                                <td rowspan="11" class="text-center align-top fw-bold">
+                                    DESTREZA Y HABILIDADES EN EL MANEJO DE LOS MECANISMOS DE CONTROL Y LA CONDUCCIÓN DEL VEHÍCULO
+                                </td>
+                                <td>Maniobra de encendido y arranque del vehículo</td>
+                                <td class="text-center"><span t-field="applicant.ignition_maneuver" /></td>
+                            </tr>
+                            <tr>
+                                <td>Puesta en marcha en plano y en pendiente</td>
+                                <td class="text-center"><span t-field="applicant.starting_movement" /></td>
+                            </tr>
+                            <tr>
+                                <td>Avance en línea recta y con ángulos</td>
+                                <td class="text-center"><span t-field="applicant.straight_line_advance" /></td>
+                            </tr>
+                            <tr>
+                                <td>Coordinación de maniobras aceleración, freno, cambio y embrague</td>
+                                <td class="text-center"><span t-field="applicant.maneuver_coordination" /></td>
+                            </tr>
+                            <tr>
+                                <td>Aplicación de cambios ascendentes y descendentes</td>
+                                <td class="text-center"><span t-field="applicant.gear_application" /></td>
+                            </tr>
+                            <tr>
+                                <td>Descenso y ascenso en terreno inclinado</td>
+                                <td class="text-center"><span t-field="applicant.inclined_terrain" /></td>
+                            </tr>
+                            <tr>
+                                <td>Maniobra de circulación y adelantamiento</td>
+                                <td class="text-center"><span t-field="applicant.circulation_overtaking" /></td>
+                            </tr>
+                            <tr>
+                                <td>Aplicación del embrague</td>
+                                <td class="text-center"><span t-field="applicant.clutch_application" /></td>
+                            </tr>
+                            <tr>
+                                <td>Aplicación de frenos y parqueo en reversa</td>
+                                <td class="text-center"><span t-field="applicant.brake_parking" /></td>
+                            </tr>
+                            <tr>
+                                <td>Ingreso al área de parqueo en reversa</td>
+                                <td class="text-center"><span t-field="applicant.parking_entry" /></td>
+                            </tr>
+                            <!-- Promedio Sección 2 -->
+                            <tr>
+                                <td class="fw-bold text-end">PROMEDIO:</td>
+                                <td class="text-center">
+                                    <t t-if="applicant.skills_average >= 4">
+                                        <span class="badge text-success fw-bold"><t t-esc="applicant.skills_average" /></span>
+                                    </t>
+                                    <t t-elif="applicant.skills_average >= 3">
+                                        <span class="badge text-warning fw-bold"><t t-esc="applicant.skills_average" /></span>
+                                    </t>
+                                    <t t-else="">
+                                        <span class="badge text-danger fw-bold"><t t-esc="applicant.skills_average" /></span>
+                                    </t>
+                                </td>
+                            </tr>
+
+                            <!-- SECCIÓN 3: COMPORTAMIENTO DEL CONDUCTOR -->
+                            <tr>
+                                <td rowspan="6" class="text-center align-top fw-bold">
+                                    COMPORTAMIENTO DEL CONDUCTOR FRENTE AL TRÁNSITO, RESPETO POR LAS SEÑALES DE TRÁNSITO, POR EL PEATÓN, USO ADECUADO DE LA INFRAESTRUCTURA
+                                </td>
+                                <td>Empleo del reglamento de tránsito (señalizaciones y límites de velocidad)</td>
+                                <td class="text-center"><span t-field="applicant.regulation_employment" /></td>
+                            </tr>
+                            <tr>
+                                <td>Distancia de seguimiento de parada y lateral</td>
+                                <td class="text-center"><span t-field="applicant.following_distance" /></td>
+                            </tr>
+                            <tr>
+                                <td>Cambios de carril, de calzada y adelantamientos</td>
+                                <td class="text-center"><span t-field="applicant.lane_changes" /></td>
+                            </tr>
+                            <tr>
+                                <td>Uso adecuado de cambio de carriles</td>
+                                <td class="text-center"><span t-field="applicant.lane_use" /></td>
+                            </tr>
+                            <tr>
+                                <td>Manejo adecuado de las luces direccionales</td>
+                                <td class="text-center"><span t-field="applicant.directional_handling" /></td>
+                            </tr>
+                            <!-- Promedio Sección 3 -->
+                            <tr>
+                                <td class="fw-bold text-end">PROMEDIO:</td>
+                                <td class="text-center">
+                                    <t t-if="applicant.behavior_average >= 4">
+                                        <span class="badge text-success fw-bold"><t t-esc="applicant.behavior_average" /></span>
+                                    </t>
+                                    <t t-elif="applicant.behavior_average >= 3">
+                                        <span class="badge text-warning fw-bold"><t t-esc="applicant.behavior_average" /></span>
+                                    </t>
+                                    <t t-else="">
+                                        <span class="badge text-danger fw-bold"><t t-esc="applicant.behavior_average" /></span>
+                                    </t>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <!-- Resultados de examen -->
+                    <table class="table table-sm table-borderless align-middle mb-0" style="font-size: 11px;">
+                        <tbody>
+                            <tr>
+                            <td class="col-8">
+                                <strong>RESULTADO EXAMEN TEÓRICO: 20% =</strong>
+                            </td>
+                            <td class="col-4 text-center fw-bold align-middle" rowspan="2">
+                                CALIFICACIONES MENORES AL 70% DE LA EVALUACIÓN SERÁN REPROBATORIAS
+                            </td>
+                            </tr>
+                            <tr>
+                            <td>
+                                <strong>RESULTADO EXAMEN PRÁCTICO: 80% =</strong>
+                            </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <!-- Observaciones y promedio -->
+                    <table class="table table-sm table-borderless align-middle mb-0 mt-2" style="font-size: 11px;">
+                        <tbody>
+                            <tr>
+                            <td class="col-8">
+                                <strong>OBSERVACIONES:</strong>
+                            </td>
+                            <td class="col-2 text-center fw-bold">
+                                PROMEDIO
+                            </td>
+                            <td class="col-2">
+                                <!-- Aquí va el valor dinámico del promedio -->
+                            </td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </t>
             </t>
         </t>
