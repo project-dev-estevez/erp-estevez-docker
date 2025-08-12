@@ -69,6 +69,9 @@
     'assets': {
         'web.assets_backend': [
             'hr_estevez/static/src/css/custom_styles.css',
+            'hr_estevez/static/src/scss/dashboard.scss',
+            'hr_estevez/static/src/components/dashboard/dashboard.js',
+            'hr_estevez/static/src/components/dashboard/dashboard.xml',
         ],
     },
 }
