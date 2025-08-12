@@ -83,13 +83,6 @@ export class RecruitmentFunnelChart extends Component {
     }
 
     async loadFunnelData() {
-        const currentProps = this.getCurrentProps();
-        
-        console.log("🎪 RecruitmentFunnelChart: Cargando datos del embudo...", {
-            startDate: currentProps.startDate,
-            endDate: currentProps.endDate
-        });
-
         this.state.isLoading = true;
 
         try {
@@ -98,7 +91,6 @@ export class RecruitmentFunnelChart extends Component {
                 this.getVacancyMetrics(),
                 this.getFunnelRecruitment()
             ]);
-            console.log("✅ RecruitmentFunnelChart: Datos cargados correctamente");
         } catch (error) {
             console.error("❌ RecruitmentFunnelChart: Error cargando datos:", error);
             this.showEmptyChart();
@@ -505,8 +497,6 @@ export class RecruitmentFunnelChart extends Component {
                 ['state', '=', 'approved'],
                 ['is_published', '=', true]
             ];
-
-            domain = this._addPublishDateRangeToDomain(domain);
 
             // 2. Buscar requisiciones que cumplen los criterios
             const openRequisitions = await this.orm.searchRead(
