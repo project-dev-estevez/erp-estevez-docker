@@ -1,4 +1,5 @@
 from odoo import models, fields, api
+from odoo.exceptions import ValidationError
 
 class HrApplicantStageDrivingTest(models.Model):
     
@@ -47,6 +48,21 @@ class HrApplicantStageDrivingTest(models.Model):
     )
 
     license_number = fields.Char(string='Número de Licencia')
+
+    unit_number = fields.Char(string='Número de Unidad')
+
+    theoretical_exam_result = fields.Float(
+        string='Resultado Examen Teórico (%)',
+        help='Ingrese el resultado del examen teórico (0 a 100)',
+    )
+
+    @api.constrains('theoretical_exam_result')
+    def _check_theoretical_exam_result(self):
+        for record in self:
+            if record.theoretical_exam_result is not None:
+                if record.theoretical_exam_result < 0 or record.theoretical_exam_result > 100:
+                    raise ValidationError('El resultado del examen teórico debe estar entre 0 y 100.')
+
 
     # === EVALUACIÓN PRUEBA DE MANEJO ===
     # 1. CONOCIMIENTO, INSPECCIÓN Y ADAPTACIÓN DEL VEHÍCULO (5 factores)
@@ -265,6 +281,14 @@ class HrApplicantStageDrivingTest(models.Model):
         digits=(3, 2)
     )
 
+    # RESULTADO EXAMEN PRÁCTICO
+    practical_exam_result = fields.Float(
+        string='Resultado Examen Práctico (90%)',
+        compute='_compute_practical_exam_result',
+        store=True,
+        digits=(3, 2)
+    )
+
     final_test_result = fields.Selection([
         ('not_evaluated', 'No Evaluado'),
         ('failed', 'Reprobado'),
@@ -356,29 +380,36 @@ class HrApplicantStageDrivingTest(models.Model):
                 record.behavior_sum = 0
                 record.behavior_average = 0.0
 
-    @api.depends('knowledge_average', 'skills_average', 'behavior_average')
+    @api.depends('theoretical_exam_result', 'practical_exam_result')
     def _compute_final_test_average(self):
         for record in self:
-            averages = [
-                record.knowledge_average,
-                record.skills_average,
-                record.behavior_average
-            ]
+            # La calificación final es un promedio ponderado:
+            # Examen teórico: 10% de peso
+            # Examen práctico: 90% de peso
+            theoretical_score = record.theoretical_exam_result if record.theoretical_exam_result else 0.0
+            practical_score = record.practical_exam_result if record.practical_exam_result else 0.0
             
-            # Filtrar solo los que tienen valor mayor a 0
-            valid_averages = [avg for avg in averages if avg > 0]
+            # Calcular promedio ponderado: (teórico * 0.10) + (práctico * 0.90)
+            record.final_test_average = (theoretical_score * 0.10) + (practical_score * 0.90)
+
+    @api.depends('knowledge_average', 'skills_average', 'behavior_average')
+    def _compute_practical_exam_result(self):
+        for record in self:
+            # Calcular la suma de los promedios de cada sección
+            sum_of_averages = record.knowledge_average + record.skills_average + record.behavior_average
             
-            if valid_averages:
-                record.final_test_average = sum(valid_averages) / len(valid_averages)
+            # Aplicar la fórmula: (suma de promedios * 90) / 100
+            if sum_of_averages > 0:
+                record.practical_exam_result = (sum_of_averages * 90) / 100
             else:
-                record.final_test_average = 0.0
+                record.practical_exam_result = 0.0
 
     @api.depends('final_test_average')
     def _compute_final_test_result(self):
         for record in self:
             if record.final_test_average == 0:
                 record.final_test_result = 'not_evaluated'
-            elif record.final_test_average >= 3.0:  # 3.0 o más para aprobar
+            elif record.final_test_average >= 70.0:  # 70 puntos o más para aprobar
                 record.final_test_result = 'passed'
             else:
                 record.final_test_result = 'failed'

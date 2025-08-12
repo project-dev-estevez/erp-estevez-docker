@@ -27,6 +27,7 @@
                         <group>
                             <field name="license_type" readonly="not is_driving_test_editable"/>
                             <field name="license_number" readonly="not is_driving_test_editable"/>
+                            <field name="unit_number" readonly="not is_driving_test_editable"/>
                         </group>
                         <group>
                             <!-- ✅ Campo dinámico que se muestra cuando se selecciona un tipo -->
@@ -93,6 +94,10 @@
 
                     <!-- ✅ RESULTADO FINAL -->
                     <group string="Resultado Final de la Evaluación">
+                        <group>
+                            <field name="theoretical_exam_result" widget="float" readonly="not is_driving_test_editable"/>
+                            <field name="practical_exam_result" readonly="1" widget="float" />
+                        </group>
                         <group>
                             <field name="final_test_average" readonly="1" widget="float" />
                             <field name="final_test_result" readonly="1" />

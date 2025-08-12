@@ -23,7 +23,7 @@
                         <tbody>
                             <tr>
                                 <td colspan="6" class="col-8">
-                                    <strong>NOMBRE DEL EVALUADO:</strong>
+                                    <strong>NOMBRE DEL EVALUADOR:</strong>
                                     <span t-field="applicant.evaluator_id.name" />
                                 </td>
                                 <td colspan="6" class="col-4">
@@ -42,9 +42,12 @@
                                 </td>
                             </tr>
                             <tr>
-                                <td colspan="12" class="text-center fw-bold text-uppercase">
-                                    SE DARA AVISO AL USUARIO SE COBRARAN GOLPES E INFRACCIONES DE TRANSITO
-                                    <span class="float-end fw-bold">UNIDAD</span>
+                                <td colspan="6" class="col-8 text-warning">
+                                    <strong>En caso de daños al vehículo o infracciones de tránsito durante la prueba, los costos serán asumidos por el aplicante</strong>
+                                </td>
+                                <td colspan="6" class="col-4">
+                                    <strong>UNIDAD:</strong>
+                                    <span t-field="applicant.unit_number" />
                                 </td>
                             </tr>
                             <tr>
@@ -242,7 +245,16 @@
                         <tbody>
                             <tr>
                             <td class="col-8">
-                                <strong>RESULTADO EXAMEN TEÓRICO: 10% =</strong>
+                                <strong>RESULTADO EXAMEN TEÓRICO: 10% = </strong>
+                                <t t-if="applicant.theoretical_exam_result >= 70">
+                                    <span class="badge text-success fw-bold"><t t-esc="applicant.theoretical_exam_result" />%</span>
+                                </t>
+                                <t t-elif="applicant.theoretical_exam_result >= 45">
+                                    <span class="badge text-warning fw-bold"><t t-esc="applicant.theoretical_exam_result" />%</span>
+                                </t>
+                                <t t-else="">
+                                    <span class="badge text-danger fw-bold"><t t-esc="applicant.theoretical_exam_result" />%</span>
+                                </t>
                             </td>
                             <td class="col-4 text-center fw-bold align-middle" rowspan="2">
                                 CALIFICACIONES MENORES AL 70% DE LA EVALUACIÓN SERÁN REPROBATORIAS
@@ -250,7 +262,16 @@
                             </tr>
                             <tr>
                             <td>
-                                <strong>RESULTADO EXAMEN PRÁCTICO: 90% =</strong>
+                                <strong>RESULTADO EXAMEN PRÁCTICO: 90% = </strong>
+                                <t t-if="applicant.practical_exam_result >= 70">
+                                    <span class="badge text-success fw-bold"><t t-esc="applicant.practical_exam_result" />%</span>
+                                </t>
+                                <t t-elif="applicant.practical_exam_result >= 45">
+                                    <span class="badge text-warning fw-bold"><t t-esc="applicant.practical_exam_result" />%</span>
+                                </t>
+                                <t t-else="">
+                                    <span class="badge text-danger fw-bold"><t t-esc="applicant.practical_exam_result" />%</span>
+                                </t>
                             </td>
                             </tr>
                         </tbody>
@@ -261,13 +282,27 @@
                         <tbody>
                             <tr>
                             <td class="col-8">
-                                <strong>OBSERVACIONES:</strong>
+                                <strong>OBSERVACIONES: </strong>
+                                <t t-if="applicant.final_test_average >= 70">
+                                    <span class="badge text-success fw-bold">APROBADO</span>
+                                </t>
+                                <t t-else="">
+                                    <span class="badge text-danger fw-bold">REPROBADO</span>
+                                </t>
                             </td>
                             <td class="col-2 text-center fw-bold">
-                                PROMEDIO
+                                RESULTADO FINAL
                             </td>
-                            <td class="col-2">
-                                <!-- Aquí va el valor dinámico del promedio -->
+                            <td class="col-2 text-center">
+                                <t t-if="applicant.final_test_average >= 70">
+                                    <span class="badge text-success fw-bold"><t t-esc="applicant.final_test_average" />%</span>
+                                </t>
+                                <t t-elif="applicant.final_test_average >= 50">
+                                    <span class="badge text-warning fw-bold"><t t-esc="applicant.final_test_average" />%</span>
+                                </t>
+                                <t t-else="">
+                                    <span class="badge text-danger fw-bold"><t t-esc="applicant.final_test_average" />%</span>
+                                </t>
                             </td>
                             </tr>
                         </tbody>
