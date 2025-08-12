@@ -194,6 +194,13 @@ class HrApplicantStageDrivingTest(models.Model):
         digits=(3, 2)
     )
 
+    # Suma del Aspecto 2
+    skills_sum = fields.Integer(
+        string='Suma Destreza y Habilidades',
+        compute='_compute_skills_average',
+        store=True
+    )
+
     # 3. COMPORTAMIENTO DEL CONDUCTOR FRENTE AL TRÁNSITO (5 factores)
     regulation_employment = fields.Selection([
         ('1', '1 - Deficiente'),
@@ -241,6 +248,13 @@ class HrApplicantStageDrivingTest(models.Model):
         compute='_compute_behavior_average',
         store=True,
         digits=(3, 2)
+    )
+
+    # Suma del Aspecto 3
+    behavior_sum = fields.Integer(
+        string='Suma Comportamiento en Tránsito',
+        compute='_compute_behavior_average',
+        store=True
     )
 
     # PROMEDIO FINAL
@@ -305,8 +319,15 @@ class HrApplicantStageDrivingTest(models.Model):
             numeric_values = [int(factor) for factor in factors if factor]
             
             if numeric_values:
-                record.skills_average = sum(numeric_values) / len(numeric_values)
+                # Calcular suma
+                record.skills_sum = sum(numeric_values)
+                
+                # Calcular promedio con nueva fórmula: (suma * 70) / máximo posible
+                # Para sección 2: (suma * 70) / 50
+                # Donde 50 = 10 factores * 5 puntos máximo por factor
+                record.skills_average = (record.skills_sum * 70) / 50
             else:
+                record.skills_sum = 0
                 record.skills_average = 0.0
 
     @api.depends('regulation_employment', 'following_distance', 'lane_changes', 'lane_use', 'directional_handling')
@@ -324,8 +345,15 @@ class HrApplicantStageDrivingTest(models.Model):
             numeric_values = [int(factor) for factor in factors if factor]
             
             if numeric_values:
-                record.behavior_average = sum(numeric_values) / len(numeric_values)
+                # Calcular suma
+                record.behavior_sum = sum(numeric_values)
+                
+                # Calcular promedio con nueva fórmula: (suma * 20) / máximo posible
+                # Para sección 3: (suma * 20) / 25
+                # Donde 25 = 5 factores * 5 puntos máximo por factor
+                record.behavior_average = (record.behavior_sum * 20) / 25
             else:
+                record.behavior_sum = 0
                 record.behavior_average = 0.0
 
     @api.depends('knowledge_average', 'skills_average', 'behavior_average')

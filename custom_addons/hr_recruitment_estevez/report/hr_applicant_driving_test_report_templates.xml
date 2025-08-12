@@ -163,17 +163,26 @@
                             </tr>
                             <!-- Promedio Sección 2 -->
                             <tr>
-                                <td class="fw-bold text-end">PROMEDIO:</td>
+                                <td class="fw-bold text-end">RESULTADOS:</td>
                                 <td class="text-center">
-                                    <t t-if="applicant.skills_average >= 4">
-                                        <span class="badge text-success fw-bold"><t t-esc="applicant.skills_average" /></span>
-                                    </t>
-                                    <t t-elif="applicant.skills_average >= 3">
-                                        <span class="badge text-warning fw-bold"><t t-esc="applicant.skills_average" /></span>
-                                    </t>
-                                    <t t-else="">
-                                        <span class="badge text-danger fw-bold"><t t-esc="applicant.skills_average" /></span>
-                                    </t>
+                                    <div class="row">
+                                        <div class="col-6">
+                                            <small class="fw-bold">Suma:</small>
+                                            <span class="badge text-info text-dark fw-bold"><t t-esc="applicant.skills_sum" /></span>
+                                        </div>
+                                        <div class="col-6">
+                                            <small class="fw-bold">Prom:</small>
+                                            <t t-if="applicant.skills_average >= 56">
+                                                <span class="badge text-success fw-bold"><t t-esc="applicant.skills_average" /></span>
+                                            </t>
+                                            <t t-elif="applicant.skills_average >= 42">
+                                                <span class="badge text-warning fw-bold"><t t-esc="applicant.skills_average" /></span>
+                                            </t>
+                                            <t t-else="">
+                                                <span class="badge text-danger fw-bold"><t t-esc="applicant.skills_average" /></span>
+                                            </t>
+                                        </div>
+                                    </div>
                                 </td>
                             </tr>
 
@@ -203,17 +212,26 @@
                             </tr>
                             <!-- Promedio Sección 3 -->
                             <tr>
-                                <td class="fw-bold text-end">PROMEDIO:</td>
+                                <td class="fw-bold text-end">RESULTADOS:</td>
                                 <td class="text-center">
-                                    <t t-if="applicant.behavior_average >= 4">
-                                        <span class="badge text-success fw-bold"><t t-esc="applicant.behavior_average" /></span>
-                                    </t>
-                                    <t t-elif="applicant.behavior_average >= 3">
-                                        <span class="badge text-warning fw-bold"><t t-esc="applicant.behavior_average" /></span>
-                                    </t>
-                                    <t t-else="">
-                                        <span class="badge text-danger fw-bold"><t t-esc="applicant.behavior_average" /></span>
-                                    </t>
+                                    <div class="row">
+                                        <div class="col-6">
+                                            <small class="fw-bold">Suma:</small>
+                                            <span class="badge text-info text-dark fw-bold"><t t-esc="applicant.behavior_sum" /></span>
+                                        </div>
+                                        <div class="col-6">
+                                            <small class="fw-bold">Prom:</small>
+                                            <t t-if="applicant.behavior_average >= 16">
+                                                <span class="badge text-success fw-bold"><t t-esc="applicant.behavior_average" /></span>
+                                            </t>
+                                            <t t-elif="applicant.behavior_average >= 12">
+                                                <span class="badge text-warning fw-bold"><t t-esc="applicant.behavior_average" /></span>
+                                            </t>
+                                            <t t-else="">
+                                                <span class="badge text-danger fw-bold"><t t-esc="applicant.behavior_average" /></span>
+                                            </t>
+                                        </div>
+                                    </div>
                                 </td>
                             </tr>
                         </tbody>
@@ -224,7 +242,7 @@
                         <tbody>
                             <tr>
                             <td class="col-8">
-                                <strong>RESULTADO EXAMEN TEÓRICO: 20% =</strong>
+                                <strong>RESULTADO EXAMEN TEÓRICO: 10% =</strong>
                             </td>
                             <td class="col-4 text-center fw-bold align-middle" rowspan="2">
                                 CALIFICACIONES MENORES AL 70% DE LA EVALUACIÓN SERÁN REPROBATORIAS
@@ -232,7 +250,7 @@
                             </tr>
                             <tr>
                             <td>
-                                <strong>RESULTADO EXAMEN PRÁCTICO: 80% =</strong>
+                                <strong>RESULTADO EXAMEN PRÁCTICO: 90% =</strong>
                             </td>
                             </tr>
                         </tbody>
