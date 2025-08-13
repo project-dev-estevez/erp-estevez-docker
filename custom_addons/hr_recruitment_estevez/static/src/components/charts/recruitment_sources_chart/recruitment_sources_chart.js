@@ -188,7 +188,7 @@ export class RecruitmentSourcesChart extends Component {
                     events: {
                         dataPointSelection: (event, chartContext, config) => {
                             const sourceData = this.state.sourcesData[config.dataPointIndex];
-                            this.openSourceRecruitmentList(sourceData.sourceId);
+                            this.openSourceRecruitmentList(sourceData.sourceId, false);
                         }
                     }
                 },
@@ -291,15 +291,42 @@ export class RecruitmentSourcesChart extends Component {
     }
 
     // ✅ CORREGIDO: Método de navegación más robusto
-    async openSourceRecruitmentList(sourceId) {
+    async openSourceRecruitmentList(sourceId,  onlyHired = true) {
         const currentProps = this.getCurrentProps();
         let domain = [];
         
-        if (currentProps.startDate) {
-            domain.push(["create_date", ">=", currentProps.startDate]);
-        }
-        if (currentProps.endDate) {
-            domain.push(["create_date", "<=", currentProps.endDate]);
+        // 📌 Solo filtramos por "hired" si el flag lo indica
+        if (onlyHired) {
+            domain.push(["application_status", "=", "hired"]);
+            if (currentProps.startDate) {
+                domain.push(["date_closed", ">=", currentProps.startDate]);
+            }
+            if (currentProps.endDate) {
+                domain.push(["date_closed", "<=", currentProps.endDate]);
+            }
+        } else {
+            let subDomain = [];
+
+            // Postulantes no contratados (create_date)
+            let baseDomain = [];
+            if (currentProps.startDate) {
+                baseDomain.push(["create_date", ">=", currentProps.startDate]);
+            }
+            if (currentProps.endDate) {
+                baseDomain.push(["create_date", "<=", currentProps.endDate]);
+            }
+
+            // Contratados (date_closed)
+            let hiredDomain = [["application_status", "=", "hired"]];
+            if (currentProps.startDate) {
+                hiredDomain.push(["date_closed", ">=", currentProps.startDate]);
+            }
+            if (currentProps.endDate) {
+                hiredDomain.push(["date_closed", "<=", currentProps.endDate]);
+            }
+
+            // Unir con OR para que incluya ambos
+            domain.push("|", ...hiredDomain, ...baseDomain);
         }
 
         // Filtra por source_id
@@ -314,10 +341,16 @@ export class RecruitmentSourcesChart extends Component {
         const sourceName = sourceData ? sourceData.label : "Sin fuente";
 
         try {
-            await this.actionService.doAction('hr_recruitment_estevez.action_hr_applicant_sources_dashboard', {
-                additionalContext: {
-                    'search_default_source_id': sourceId,
-                }
+            await this.actionService.doAction({
+                type: 'ir.actions.act_window',
+                name: `Contratados - ${sourceName}`,
+                res_model: 'hr.applicant',
+                view_mode: 'list,form',
+                views: [[false, 'list'], [false, 'form']],
+                domain: domain, // ✅ Este es el filtro REAL
+                context: {
+                    search_default_application_status: 'hired'
+                },
             });
         } catch (error) {
             console.error("❌ Error abriendo lista de postulaciones:", error);

@@ -24,6 +24,5 @@
         <field name="res_model">hr.applicant</field>
         <field name="view_mode">list,form</field>
         <field name="view_id" ref="view_hr_applicant_sources_dashboard_list"/>
-        <field name="context">{'active_test': False}</field>
     </record>
 </odoo>
