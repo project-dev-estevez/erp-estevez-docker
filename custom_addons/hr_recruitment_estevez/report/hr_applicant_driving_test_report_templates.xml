@@ -246,14 +246,14 @@
                             <tr>
                             <td class="col-8">
                                 <strong>RESULTADO EXAMEN TEÓRICO: 10% = </strong>
-                                <t t-if="applicant.theoretical_exam_result >= 70">
-                                    <span class="badge text-success fw-bold"><t t-esc="applicant.theoretical_exam_result" />%</span>
+                                <t t-if="applicant.theoretical_exam_result_10 >= 7">
+                                    <span class="badge text-success fw-bold"><t t-esc="applicant.theoretical_exam_result_10" />%</span>
                                 </t>
-                                <t t-elif="applicant.theoretical_exam_result >= 45">
-                                    <span class="badge text-warning fw-bold"><t t-esc="applicant.theoretical_exam_result" />%</span>
+                                <t t-elif="applicant.theoretical_exam_result_10 >= 4.5">
+                                    <span class="badge text-warning fw-bold"><t t-esc="applicant.theoretical_exam_result_10" />%</span>
                                 </t>
                                 <t t-else="">
-                                    <span class="badge text-danger fw-bold"><t t-esc="applicant.theoretical_exam_result" />%</span>
+                                    <span class="badge text-danger fw-bold"><t t-esc="applicant.theoretical_exam_result_10" />%</span>
                                 </t>
                             </td>
                             <td class="col-4 text-center fw-bold align-middle" rowspan="2">

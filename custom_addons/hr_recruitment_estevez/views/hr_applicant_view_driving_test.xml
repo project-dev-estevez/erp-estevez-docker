@@ -95,7 +95,7 @@
                     <!-- ✅ RESULTADO FINAL -->
                     <group string="Resultado Final de la Evaluación">
                         <group>
-                            <field name="theoretical_exam_result" widget="float" readonly="not is_driving_test_editable"/>
+                            <field name="theoretical_exam_result" readonly="not is_driving_test_editable"/>
                             <field name="practical_exam_result" readonly="1" widget="float" />
                         </group>
                         <group>

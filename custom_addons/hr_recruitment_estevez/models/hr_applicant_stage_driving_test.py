@@ -52,8 +52,8 @@ class HrApplicantStageDrivingTest(models.Model):
     unit_number = fields.Char(string='Número de Unidad')
 
     theoretical_exam_result = fields.Float(
-        string='Resultado Examen Teórico (%)',
-        help='Ingrese el resultado del examen teórico (0 a 100)',
+        string='Resultado Examen Teórico',
+        help='Ingrese el resultado del examen teórico (0 a 10)',
     )
 
     @api.constrains('theoretical_exam_result')
@@ -280,6 +280,14 @@ class HrApplicantStageDrivingTest(models.Model):
         store=True,
         digits=(3, 2)
     )
+    
+    # RESULTADO EXAMEN TEÓRICO (10%)
+    theoretical_exam_result_10 = fields.Float(
+        string='Resultado Examen Teórico (10%)',
+        compute='_compute_theoretical_exam_result_10',
+        store=True,
+        digits=(3, 2)
+    )
 
     # RESULTADO EXAMEN PRÁCTICO
     practical_exam_result = fields.Float(
@@ -380,17 +388,24 @@ class HrApplicantStageDrivingTest(models.Model):
                 record.behavior_sum = 0
                 record.behavior_average = 0.0
 
-    @api.depends('theoretical_exam_result', 'practical_exam_result')
+    @api.depends('theoretical_exam_result')
+    def _compute_theoretical_exam_result_10(self):
+        for record in self:
+            if record.theoretical_exam_result:
+                # Calcular el 10% del resultado teórico
+                record.theoretical_exam_result_10 = (record.theoretical_exam_result * 10) / 100
+            else:
+                record.theoretical_exam_result_10 = 0.0
+
+    @api.depends('theoretical_exam_result_10', 'practical_exam_result')
     def _compute_final_test_average(self):
         for record in self:
-            # La calificación final es un promedio ponderado:
-            # Examen teórico: 10% de peso
-            # Examen práctico: 90% de peso
-            theoretical_score = record.theoretical_exam_result if record.theoretical_exam_result else 0.0
-            practical_score = record.practical_exam_result if record.practical_exam_result else 0.0
+            # La calificación final es la suma del examen teórico (10%) + examen práctico (90%)
+            theoretical_score_10 = record.theoretical_exam_result_10
+            practical_score = record.practical_exam_result
             
-            # Calcular promedio ponderado: (teórico * 0.10) + (práctico * 0.90)
-            record.final_test_average = (theoretical_score * 0.10) + (practical_score * 0.90)
+            # Suma: teórico (10%) + práctico (90%)
+            record.final_test_average = theoretical_score_10 + practical_score
 
     @api.depends('knowledge_average', 'skills_average', 'behavior_average')
     def _compute_practical_exam_result(self):
