@@ -361,10 +361,7 @@ export class RecruitmentSourcesChart extends Component {
                 res_model: 'hr.applicant',
                 view_mode: 'list,form',
                 views: [[false, 'list'], [false, 'form']],
-                domain: domain, // ✅ Este es el filtro REAL
-                context: {
-                    search_default_application_status: 'hired'
-                },
+                domain: domain,
             });
         } catch (error) {
             console.error("❌ Error abriendo lista de postulaciones:", error);
