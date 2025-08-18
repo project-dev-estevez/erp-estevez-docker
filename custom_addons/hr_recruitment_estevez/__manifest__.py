@@ -13,6 +13,7 @@
     "data": [
         # Archivos de seguridad
         "security/hr_recruitment_security.xml",
+        "security/hr_recruitment_driving_test_security.xml",
         "security/ir.model.access.csv",
         
         # Archivos de datos

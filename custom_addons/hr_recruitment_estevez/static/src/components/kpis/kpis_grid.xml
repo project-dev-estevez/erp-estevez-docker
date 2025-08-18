@@ -17,9 +17,7 @@
                         
                         <KpiCard t-else=""
                             name="kpi.name"
-                            value="kpi.value"
-                            percentage="kpi.percentage"
-                            showPercentage="kpi.showPercentage"/>
+                            value="kpi.value"/>
                     </div>
                 </t>
             </div>
