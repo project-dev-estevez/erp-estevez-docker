@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="template" xml:space="preserve">
+	<t t-name="hr_estevez.EmployeesDashboard" owl="1">
+		<div class="hr_employees_dashboard">
+			<!-- Header del Dashboard -->
+			<div class="dashboard-header">
+				<div class="d-flex justify-content-between align-items-center mb-3">
+					<h2 class="dashboard-title">
+						<i class="fa fa-users me-2"></i>
+						Dashboard de Empleados
+					</h2>
+					<button class="btn btn-primary" t-on-click="refreshDashboard">
+						<i class="fa fa-refresh me-1"></i>
+						Actualizar
+					</button>
+				</div>
+			</div>
+			<!-- Loading State -->
+			<div t-if="state.loading" class="text-center p-5">
+				<div class="spinner-border text-primary" role="status">
+					<span class="visually-hidden">Cargando...</span>
+				</div>
+				<p class="mt-2">Cargando datos del dashboard...</p>
+			</div>
+			<!-- Dashboard Content -->
+			<div t-else="" class="dashboard-content">
+				<!-- Tarjetas de Estadísticas Principales -->
+				<div class="row mb-4">
+					<div class="col-xl-3 col-md-6 mb-3">
+						<div class="card stat-card stat-card-primary" t-on-click="openEmployeesList">
+							<div class="card-body">
+								<div class="d-flex justify-content-between">
+									<div>
+										<h4 class="card-title text-primary" t-esc="state.totalEmployees"/>
+										<p class="card-text">Total Empleados</p>
+									</div>
+									<div class="stat-icon">
+										<i class="fa fa-users fa-2x text-primary"></i>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="col-xl-3 col-md-6 mb-3">
+						<div class="card stat-card stat-card-success">
+							<div class="card-body">
+								<div class="d-flex justify-content-between">
+									<div>
+										<h4 class="card-title text-success" t-esc="state.activeEmployees"/>
+										<p class="card-text">Empleados Activos</p>
+									</div>
+									<div class="stat-icon">
+										<i class="fa fa-user-check fa-2x text-success"></i>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<!-- ...existing code... -->
+				</div>
+			</div>
+		</div>
+	</t>
+</templates>

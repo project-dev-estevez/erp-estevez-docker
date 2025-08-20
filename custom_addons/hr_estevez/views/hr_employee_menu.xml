@@ -1,17 +1,17 @@
 <odoo>
     <data>
-        <!-- Acción para abrir el dashboard OWL de Empleados -->
+        <!-- Acción para abrir el OWL Employees Dashboard -->
         <record id="action_hr_employees_dashboard" model="ir.actions.client">
             <field name="name">Dashboard de Empleados</field>
-            <field name="tag">hr_employees.dashboard</field>
+            <field name="tag">hr_employees.employees_dashboard</field>
         </record>
 
-        <!-- Menú del dashboard de empleados -->
-        <menuitem id="menu_hr_employees_dashboard" 
-                  name="Dashboard" 
-                  parent="hr.menu_hr_root" 
-                  action="action_hr_employees_dashboard" 
-                  sequence="1"/>
+    <!-- Menú del Employees Dashboard -->
+    <menuitem id="menu_hr_employees_dashboard" 
+          name="Dashboard" 
+          parent="hr.menu_hr_root" 
+          action="action_hr_employees_dashboard" 
+          sequence="1"/>
 
         <menuitem id="menu_hr_direction" 
                   name="Direcciones" 
