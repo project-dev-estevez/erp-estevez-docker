@@ -82,4 +82,4 @@ export class ChartRendererApex extends Component {
     }
 }
 
-ChartRendererApex.template = "owl.ChartRendererApex";
+ChartRendererApex.template = "hr_estevez.ChartRenderApexHR";
