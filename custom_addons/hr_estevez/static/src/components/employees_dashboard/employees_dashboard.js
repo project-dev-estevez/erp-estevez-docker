@@ -53,6 +53,8 @@ export class EmployeesDashboard extends Component {
 				this.getDepartmentStats(),
 				this.getAreaStats(),
 				// ...existing code...
+
+			// ...existing code...
 			]);
 			// ...existing code...
 		} catch (error) {
@@ -61,3 +63,6 @@ export class EmployeesDashboard extends Component {
 	}
 	// ...existing code...
 }
+
+// Registrar el componente OWL en el registry de acciones de Odoo
+registry.category("actions").add("hr_estevez.EmployeesDashboard", EmployeesDashboard);

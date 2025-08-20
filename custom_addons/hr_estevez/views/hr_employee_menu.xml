@@ -3,7 +3,7 @@
         <!-- Acción para abrir el OWL Employees Dashboard -->
         <record id="action_hr_employees_dashboard" model="ir.actions.client">
             <field name="name">Dashboard de Empleados</field>
-            <field name="tag">hr_employees.employees_dashboard</field>
+            <field name="tag">hr_estevez.EmployeesDashboard</field>
         </record>
 
     <!-- Menú del Employees Dashboard -->
