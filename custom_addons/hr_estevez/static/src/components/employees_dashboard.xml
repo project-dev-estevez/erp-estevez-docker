@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<templates id="template" xml:space="preserve">
+
+<templates xml:space="preserve">
     <t t-name="hr_estevez.EmployeesDashboard" owl="1">
         <div class="vh-100 overflow-auto bg-muted mb-5 pb-5">
             <div class="row m-3">
                 <div class="col-lg-12">
+
                     <!-- Titulo y filtro -->
                     <DashboardHeader
                         title="'Dashboard de Empleados'"
@@ -12,7 +14,11 @@
                         onDateChange.bind="onDateChange"
                     />
                     <!-- KPIs principales -->
-                    <KpisGrid />
+                    <div class="row">
+                        <KpisGrid />
+                    </div>
+
+
                     <!-- Loading State -->
                     <div t-if="state.loading" class="text-center p-5">
                         <div class="spinner-border text-primary" role="status">
