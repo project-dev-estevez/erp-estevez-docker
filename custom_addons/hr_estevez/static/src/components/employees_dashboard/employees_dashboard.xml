@@ -1,61 +1,59 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <templates id="template" xml:space="preserve">
 	<t t-name="hr_estevez.EmployeesDashboard" owl="1">
-		<div class="container-fluid">
-			<!-- Header del Dashboard -->
-			<div class="row mb-3">
-				<div class="col-12 d-flex justify-content-between align-items-center">
-					<h2>
-						<i class="fa fa-users me-2"></i>
-						Dashboard de Empleados
-					</h2>
-					<button class="btn btn-primary" t-on-click="refreshDashboard">
-						<i class="fa fa-refresh me-1"></i>
-						Actualizar
-					</button>
-				</div>
-			</div>
-			<!-- Loading State -->
-			<div t-if="state.loading" class="text-center p-5">
-				<div class="spinner-border text-primary" role="status">
-					<span class="visually-hidden">Cargando...</span>
-				</div>
-				<p class="mt-2">Cargando datos del dashboard...</p>
-			</div>
-			<!-- Dashboard Content -->
-			<div t-else="" class="row mb-4">
-				<!-- Tarjetas de Estadísticas Principales -->
-				<div class="col-xl-3 col-md-6 mb-3">
-					<div class="card" t-on-click="openEmployeesList">
-						<div class="card-body">
-							<div class="d-flex justify-content-between">
-								<div>
-									<h4 class="text-primary" t-esc="state.totalEmployees"/>
-									<p>Total Empleados</p>
-								</div>
-								<div>
-									<i class="fa fa-users fa-2x text-primary"></i>
+		<div class="vh-100 overflow-auto bg-muted mb-5 pb-5">
+			<div class="row m-3">
+				<div class="col-lg-12">
+					<!-- Titulo y filtro -->
+					<DashboardHeader
+						title="'Dashboard de Empleados'"
+						startDate="state.startDate"
+						endDate="state.endDate"
+						onDateChange.bind="onDateChange"
+					/>
+					<!-- Loading State -->
+					<div t-if="state.loading" class="text-center p-5">
+						<div class="spinner-border text-primary" role="status">
+							<span class="visually-hidden">Cargando...</span>
+						</div>
+						<p class="mt-2">Cargando datos del dashboard...</p>
+					</div>
+					<!-- Dashboard Content -->
+					<div t-else="" class="row mb-4">
+						<!-- Tarjetas de Estadísticas Principales -->
+						<div class="col-xl-3 col-md-6 mb-3">
+							<div class="card" t-on-click="openEmployeesList">
+								<div class="card-body">
+									<div class="d-flex justify-content-between">
+										<div>
+											<h4 class="text-primary" t-esc="state.totalEmployees"/>
+											<p>Total Empleados</p>
+										</div>
+										<div>
+											<i class="fa fa-users fa-2x text-primary"></i>
+										</div>
+									</div>
 								</div>
 							</div>
 						</div>
-					</div>
-				</div>
-				<div class="col-xl-3 col-md-6 mb-3">
-					<div class="card">
-						<div class="card-body">
-							<div class="d-flex justify-content-between">
-								<div>
-									<h4 class="text-success" t-esc="state.activeEmployees"/>
-									<p>Empleados Activos</p>
-								</div>
-								<div>
-									<i class="fa fa-user-check fa-2x text-success"></i>
+						<div class="col-xl-3 col-md-6 mb-3">
+							<div class="card">
+								<div class="card-body">
+									<div class="d-flex justify-content-between">
+										<div>
+											<h4 class="text-success" t-esc="state.activeEmployees"/>
+											<p>Empleados Activos</p>
+										</div>
+										<div>
+											<i class="fa fa-user-check fa-2x text-success"></i>
+										</div>
+									</div>
 								</div>
 							</div>
 						</div>
+						<!-- ...existing code... -->
 					</div>
 				</div>
-				<!-- ...existing code... -->
 			</div>
 		</div>
 	</t>

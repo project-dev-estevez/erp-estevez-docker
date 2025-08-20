@@ -3,14 +3,19 @@
 import { Component, useState, onWillStart } from "@odoo/owl";
 import { registry } from "@web/core/registry";
 import { useService } from "@web/core/utils/hooks";
+import { DashboardHeader } from "../dashboard_header/dashboard_header.js";
 
 export class EmployeesDashboard extends Component {
 	static template = "hr_estevez.EmployeesDashboard";
+	static components = { DashboardHeader };
 
 	setup() {
 		this.orm = useService("orm");
 		this.action = useService("action");
-		this.state = useState({
+        const today = new Date();
+        const firstDay = new Date(today.getFullYear(), today.getMonth(), 1).toISOString().slice(0, 10);
+        const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0).toISOString().slice(0, 10);
+        this.state = useState({
 			// Estadísticas generales
 			totalEmployees: 0,
 			activeEmployees: 0,
@@ -30,12 +35,20 @@ export class EmployeesDashboard extends Component {
 				indefinite: 0,
 				temporary: 0
 			},
-			loading: true
+			loading: true,
+			startDate: firstDay,
+			endDate: lastDay
 		});
 
 		onWillStart(async () => {
 			await this.loadDashboardData();
 		});
+	}
+
+	onDateChange = (startDate, endDate) => {
+		this.state.startDate = startDate;
+		this.state.endDate = endDate;
+		this.loadDashboardData();
 	}
 
 	async loadDashboardData() {
