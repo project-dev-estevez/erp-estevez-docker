@@ -4,10 +4,12 @@ import { registry } from "@web/core/registry";
 import { useService } from "@web/core/utils/hooks";
 import { DashboardHeader } from "./dashboard_header/dashboard_header.js";
 import { KpisGrid } from "./kpis/kpis_grid.js";
+import { ChartRendererApex } from "./chart_renderer_apex/chart_renderer_apex.js";
+import { chartsDummy } from "./chart_renderer_apex/charts_dummy.js";
 
 export class EmployeesDashboard extends Component {
     static template = "hr_estevez.EmployeesDashboard";
-    static components = { DashboardHeader, KpisGrid };
+    static components = { DashboardHeader, KpisGrid, ChartRendererApex };
 
     setup() {
         this.orm = useService("orm");
@@ -33,6 +35,8 @@ export class EmployeesDashboard extends Component {
             startDate: firstDay,
             endDate: lastDay
         });
+
+    this.chartsDummy = chartsDummy;
 
         onWillStart(async () => {
             await this.loadDashboardData();

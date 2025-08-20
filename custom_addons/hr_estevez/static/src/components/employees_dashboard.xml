@@ -13,9 +13,40 @@
                         endDate="state.endDate"
                         onDateChange.bind="onDateChange"
                     />
+
                     <!-- KPIs principales -->
                     <div class="row">
                         <KpisGrid />
+                    </div>
+
+                    <!-- Gráficas principales -->
+                    <div class="row">
+                        <div class="col-lg-6 m-0 p-0">
+                            <div class="shadow-sm border m-2 p-4 bg-white">
+                                <ChartRendererApex config="chartsDummy[0].config" type="chartsDummy[0].type" />
+                                <h6 class="mt-3 text-center text-muted">Distribución por Departamento</h6>
+                            </div>
+                        </div>
+                        <div class="col-lg-6 m-0 p-0">
+                            <div class="shadow-sm border m-2 p-4 bg-white">
+                                <ChartRendererApex config="chartsDummy[1].config" type="chartsDummy[1].type" />
+                                <h6 class="mt-3 text-center text-muted">Empleados por Estado</h6>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-6 m-0 p-0">
+                            <div class="shadow-sm border m-2 p-4 bg-white">
+                                <ChartRendererApex config="chartsDummy[2].config" type="chartsDummy[2].type" />
+                                <h6 class="mt-3 text-center text-muted">Contratos por Vencer (Meses)</h6>
+                            </div>
+                        </div>
+                        <div class="col-lg-6 m-0 p-0">
+                            <div class="shadow-sm border m-2 p-4 bg-white">
+                                <ChartRendererApex config="chartsDummy[3].config" type="chartsDummy[3].type" />
+                                <h6 class="mt-3 text-center text-muted">Cumpleaños Próximos</h6>
+                            </div>
+                        </div>
                     </div>
 
 
