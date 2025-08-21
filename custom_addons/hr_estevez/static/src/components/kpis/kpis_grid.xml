@@ -4,13 +4,13 @@
         <div class="container-fluid p-2">
             <div class="row g-2">
                 <div class="col-12 col-sm-6 col-md-4 col-lg col-xl">
-                        <KpiChartCard value="125" label="'Total Empleados'" series="[100, 121, 139, 122, 90, 124, 180]" />
+                        <KpiChartCard value="state.totalEmployees" label="'Total Empleados'" series="state.totalSeries" />
                 </div>
                 <div class="col-12 col-sm-6 col-md-4 col-lg col-xl">
-                        <KpiCard icon="'fa-user'" color="'success'" value="98" label="'Empleados Activos'" />
+                        <KpiCard icon="'fa-user'" color="'success'" value="state.activeEmployees" label="'Empleados Activos'" />
                 </div>
                 <div class="col-12 col-sm-6 col-md-4 col-lg col-xl">
-                        <KpiCard icon="'fa-user-times'" color="'danger'" value="22" label="'Empleados Inactivos'" />
+                        <KpiCard icon="'fa-user-times'" color="'danger'" value="state.inactiveEmployees" label="'Empleados Inactivos'" />
                 </div>
                 <div class="col-12 col-sm-6 col-md-4 col-lg col-xl">
                         <KpiCard icon="'fa-calendar'" color="'info'" value="5" label="'Nuevos este mes'" />
