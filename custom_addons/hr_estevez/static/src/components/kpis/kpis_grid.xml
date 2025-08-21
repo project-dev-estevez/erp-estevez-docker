@@ -4,7 +4,7 @@
         <div class="container-fluid p-2">
             <div class="row g-2">
                 <div class="col-12 col-sm-6 col-md-4 col-lg col-xl">
-                        <KpiCard icon="'fa-users'" color="'primary'" value="120" label="'Total Empleados'" />
+                        <KpiChartCard value="125" label="'Total Empleados'" series="[100, 121, 139, 122, 90, 124, 180]" />
                 </div>
                 <div class="col-12 col-sm-6 col-md-4 col-lg col-xl">
                         <KpiCard icon="'fa-user'" color="'success'" value="98" label="'Empleados Activos'" />

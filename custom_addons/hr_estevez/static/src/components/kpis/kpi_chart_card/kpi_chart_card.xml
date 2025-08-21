@@ -1,0 +1,16 @@
+<templates xml:space="preserve">
+    <t t-name="hr_estevez.KpiChartCard" owl="1">
+        <div class="card h-100 border-1 shadow-sm bg-white text-center position-relative rounded-3 p-3">
+            <div class="d-flex flex-column align-items-center">
+                <div class="display-4 fw-bold text-primary mb-1">
+                    <t t-esc="props.value"/>
+                </div>
+                <h6 class="text-muted fw-medium text-uppercase ls-1 mb-2 opacity-75">
+                    <t t-esc="props.label"/>
+                </h6>
+                <!-- Gráfica sparkline -->
+                <div t-ref="chart" style="width:100%; min-height:80px;"></div>
+            </div>
+        </div>
+    </t>
+</templates>
