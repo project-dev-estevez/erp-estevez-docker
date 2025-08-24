@@ -12,6 +12,7 @@
                             value="kpi.value" 
                             label="kpi.name" 
                             series="kpi.series"
+                            labels="kpi.labels"
                             onClick="kpi.onClick"
                             isLoading="state.isLoading"
                         />

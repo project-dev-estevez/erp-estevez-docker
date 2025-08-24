@@ -21,7 +21,7 @@ export class KpisGrid extends Component {
         
         // ✅ Estado local para los KPIs
         this.state = useState({
-            totalEmployees: { value: 0, series: [] }, // ✅ Incluye series para la gráfica
+            totalEmployees: { value: 0, series: [], labels: [] }, // ✅ Incluye series y labels para la gráfica
             activeEmployees: { value: 0 },
             inactiveEmployees: { value: 0 },
             newThisMonth: { value: 0 },
@@ -63,6 +63,7 @@ export class KpisGrid extends Component {
                 showSecondaryValue: false,
                 showChart: true, // ✅ Solo este KPI tendrá gráfica
                 series: this.state.totalEmployees.series,
+                labels: this.state.totalEmployees.labels, // ✅ NUEVO: Pasar las etiquetas
                 onClick: () => this.viewTotalEmployees()
             },
             {
@@ -142,10 +143,18 @@ export class KpisGrid extends Component {
             // ✅ NUEVO: Calcular series para la gráfica (últimos 7 días)
             const today = new Date();
             let series = [];
+            let labels = [];
+            const diasSemana = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+            
             for (let i = 6; i >= 0; i--) {
                 const date = new Date(today);
                 date.setDate(today.getDate() - i);
                 const dateStr = date.toISOString().slice(0, 10);
+                
+                // Obtener el nombre del día en español
+                const dayName = diasSemana[date.getDay()];
+                labels.push(dayName);
+                
                 const dayCount = await this.orm.searchCount(
                     "hr.employee", 
                     [
@@ -158,11 +167,13 @@ export class KpisGrid extends Component {
             }
 
             this.state.totalEmployees.series = series;
-            console.log(`📊 KPI Total Empleados: ${count}, Series: [${series.join(', ')}]`);
+            this.state.totalEmployees.labels = labels; // ✅ NUEVO: Guardar las etiquetas
+            console.log(`📊 KPI Total Empleados: ${count}, Series: [${series.join(', ')}], Labels: [${labels.join(', ')}]`);
         } catch (error) {
             console.error("❌ KpisGrid HR: Error calculando Total Empleados:", error);
             this.state.totalEmployees.value = 0;
             this.state.totalEmployees.series = [];
+            this.state.totalEmployees.labels = [];
         }
     }
 
