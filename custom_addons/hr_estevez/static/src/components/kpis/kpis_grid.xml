@@ -14,6 +14,7 @@
                             series="kpi.series"
                             labels="kpi.labels"
                             onClick="kpi.onClick"
+                            onPointClick="kpi.onPointClick"
                             isLoading="state.isLoading"
                         />
                         <!-- KPI normal (todos los demás) -->

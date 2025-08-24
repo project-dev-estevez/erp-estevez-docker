@@ -21,7 +21,7 @@ export class KpisGrid extends Component {
         
         // ✅ Estado local para los KPIs
         this.state = useState({
-            totalEmployees: { value: 0, series: [], labels: [] }, // ✅ Incluye series y labels para la gráfica
+            totalEmployees: { value: 0, series: [], labels: [], dates: [] }, // ✅ Agregamos dates para los clicks
             activeEmployees: { value: 0 },
             inactiveEmployees: { value: 0 },
             newThisMonth: { value: 0 },
@@ -64,7 +64,8 @@ export class KpisGrid extends Component {
                 showChart: true, // ✅ Solo este KPI tendrá gráfica
                 series: this.state.totalEmployees.series,
                 labels: this.state.totalEmployees.labels, // ✅ NUEVO: Pasar las etiquetas
-                onClick: () => this.viewTotalEmployees()
+                onClick: () => this.viewTotalEmployees(),
+                onPointClick: (dayIndex, dayName) => this.viewEmployeesByDay(dayIndex, dayName) // ✅ NUEVO: Click en punto específico
             },
             {
                 name: "Empleados Activos",
@@ -144,6 +145,7 @@ export class KpisGrid extends Component {
             const today = new Date();
             let series = [];
             let labels = [];
+            let dates = []; // ✅ NUEVO: Guardar las fechas para los clicks
             const diasSemana = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
             
             for (let i = 6; i >= 0; i--) {
@@ -154,6 +156,7 @@ export class KpisGrid extends Component {
                 // Obtener el nombre del día en español
                 const dayName = diasSemana[date.getDay()];
                 labels.push(dayName);
+                dates.push(dateStr); // ✅ NUEVO: Guardar la fecha
                 
                 const dayCount = await this.orm.searchCount(
                     "hr.employee", 
@@ -168,12 +171,14 @@ export class KpisGrid extends Component {
 
             this.state.totalEmployees.series = series;
             this.state.totalEmployees.labels = labels; // ✅ NUEVO: Guardar las etiquetas
+            this.state.totalEmployees.dates = dates; // ✅ NUEVO: Guardar las fechas
             console.log(`📊 KPI Total Empleados: ${count}, Series: [${series.join(', ')}], Labels: [${labels.join(', ')}]`);
         } catch (error) {
             console.error("❌ KpisGrid HR: Error calculando Total Empleados:", error);
             this.state.totalEmployees.value = 0;
             this.state.totalEmployees.series = [];
             this.state.totalEmployees.labels = [];
+            this.state.totalEmployees.dates = [];
         }
     }
 
@@ -235,6 +240,37 @@ export class KpisGrid extends Component {
         } catch (error) {
             console.error("❌ KpisGrid HR: Error calculando Contratos por Vencer:", error);
             this.state.expiringContracts.value = 0;
+        }
+    }
+
+    // ✅ NUEVO: Método para manejar click en punto específico de la gráfica
+    async viewEmployeesByDay(dayIndex, dayName) {
+        try {
+            const selectedDate = this.state.totalEmployees.dates[dayIndex];
+            if (!selectedDate) {
+                console.error("❌ No se encontró la fecha para el índice:", dayIndex);
+                return;
+            }
+
+            const domain = [
+                ["create_date", ">=", selectedDate + " 00:00:00"],
+                ["create_date", "<=", selectedDate + " 23:59:59"]
+            ];
+
+            await this.actionService.doAction({
+                type: "ir.actions.act_window",
+                name: `👥 Empleados creados el ${dayName} (${selectedDate})`,
+                res_model: "hr.employee",
+                domain: domain,
+                views: [[false, "kanban"], [false, "list"], [false, "form"]],
+                view_mode: "kanban,list,form",
+                context: {
+                    active_test: false, // ✅ Mostrar activos e inactivos
+                    search_default_group_by_department: 1, // ✅ Agrupar por departamento
+                }
+            });
+        } catch (error) {
+            console.error("❌ KpisGrid HR: Error en navegación por día:", error);
         }
     }
 

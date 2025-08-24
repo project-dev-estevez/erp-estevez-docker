@@ -10,12 +10,14 @@ export class KpiChartCard extends Component {
         series: { type: Array, optional: true },
         labels: { type: Array, optional: true }, // ✅ NUEVO: Etiquetas para el eje X
         onClick: { type: Function, optional: true },
+        onPointClick: { type: Function, optional: true }, // ✅ NUEVO: Click en punto específico
         isLoading: { type: Boolean, optional: true },
     };
 
     setup() {
         this.chartRef = useRef("chart");
         this.chartInstance = null;
+        this.isPointClicked = false; // ✅ NUEVO: Flag para detectar click en punto
 
         onMounted(async () => {
             if (!this.props.isLoading) {
@@ -31,9 +33,18 @@ export class KpiChartCard extends Component {
     }
 
     onCardClick() {
-        if (this.hasClick) {
+        console.log("🖱️ Click en card, isPointClicked:", this.isPointClicked);
+        // ✅ NUEVO: Solo ejecutar si NO se hizo click en un punto
+        if (this.hasClick && !this.isPointClicked) {
+            console.log("✅ Ejecutando click general de card");
             this.props.onClick();
+        } else if (this.isPointClicked) {
+            console.log("❌ Click bloqueado porque se hizo click en punto");
         }
+        // ✅ Resetear el flag después de un pequeño delay
+        setTimeout(() => {
+            this.isPointClicked = false;
+        }, 200); // ✅ Aumentamos el timeout
     }
 
     renderChart() {
@@ -42,7 +53,23 @@ export class KpiChartCard extends Component {
                 type: "area",
                 height: 80,
                 sparkline: { enabled: true }, // ✅ VOLVER: Habilitar sparkline para gráfica limpia
-                toolbar: { show: false }
+                toolbar: { show: false },
+                events: {
+                    dataPointSelection: (event, chartContext, config) => {
+                        // ✅ NUEVO: Marcar que se hizo click en un punto
+                        this.isPointClicked = true;
+                        console.log("🎯 Click en punto específico:", config.dataPointIndex);
+                        
+                        // ✅ NUEVO: Manejar click en punto específico
+                        if (this.props.onPointClick) {
+                            const dayIndex = config.dataPointIndex;
+                            const dayName = this.props.labels && this.props.labels[dayIndex] 
+                                ? this.props.labels[dayIndex] 
+                                : `Día ${dayIndex + 1}`;
+                            this.props.onPointClick(dayIndex, dayName);
+                        }
+                    }
+                }
             },
             stroke: { curve: "smooth", width: 2 },
             fill: { opacity: 0.5 },
