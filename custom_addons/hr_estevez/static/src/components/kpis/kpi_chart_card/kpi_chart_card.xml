@@ -1,15 +1,42 @@
 <templates xml:space="preserve">
     <t t-name="hr_estevez.KpiChartCard" owl="1">
-        <div class="card h-100 border-1 shadow-sm bg-white text-center position-relative rounded-3 p-3">
-            <div class="d-flex flex-column align-items-center">
-                <div class="display-4 fw-bold text-primary mb-1">
-                    <t t-esc="props.value"/>
+        <div class="h-100">
+            <div class="card h-100 border-1 shadow-sm bg-white text-center position-relative rounded-3"
+                t-att-class="hasClick ? 'cursor-pointer' : ''"
+                t-on-click="onCardClick"
+                onmouseover="this.classList.replace('shadow-sm', 'shadow-lg'); this.style.transform='translateY(-0.5rem) scale(1.02)'"
+                onmouseout="this.classList.replace('shadow-lg', 'shadow-sm'); this.style.transform='translateY(0) scale(1)'"
+                style="transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);">
+                
+                <div class="card-body d-flex flex-column justify-content-center p-4 position-relative">
+                    <!-- Loading state -->
+                    <div t-if="props.isLoading" class="d-flex justify-content-center align-items-center h-100">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Cargando...</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Content -->
+                    <div t-else="" class="d-flex flex-column align-items-center">
+                        <!-- Valor principal grande -->
+                        <div class="display-3 fw-bold text-primary mb-2 lh-1">
+                            <t t-esc="props.value"/>
+                        </div>
+                        
+                        <!-- Título principal -->
+                        <h6 class="text-muted fw-medium text-uppercase ls-1 mb-3 opacity-75">
+                            <t t-esc="props.label"/>
+                        </h6>
+                        
+                        <!-- Gráfica sparkline -->
+                        <div t-ref="chart" style="width:100%; min-height:80px;"></div>
+                    </div>
                 </div>
-                <h6 class="text-muted fw-medium text-uppercase ls-1 mb-2 opacity-75">
-                    <t t-esc="props.label"/>
-                </h6>
-                <!-- Gráfica sparkline -->
-                <div t-ref="chart" style="width:100%; min-height:80px;"></div>
+                
+                <!-- Indicador de click (si es clickeable) -->
+                <div t-if="hasClick" class="position-absolute top-0 end-0 p-2">
+                    <i class="fa fa-external-link text-muted opacity-50" style="font-size: 0.75rem;"></i>
+                </div>
             </div>
         </div>
     </t>
