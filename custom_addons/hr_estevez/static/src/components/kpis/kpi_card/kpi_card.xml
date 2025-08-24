@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="hr_estevez.KpiCard" owl="1">
+        <div class="h-100">
+            <!-- 100% Bootstrap utilities, igual que reclutamiento -->
+            <div class="card h-100 border-1 shadow-sm bg-white text-center position-relative rounded-3"
+                t-att-class="props.onClick ? 'cursor-pointer' : ''"
+                t-on-click="onCardClick"
+                onmouseover="this.classList.replace('shadow-sm', 'shadow-lg'); this.style.transform='translateY(-0.5rem) scale(1.02)'"
+                onmouseout="this.classList.replace('shadow-lg', 'shadow-sm'); this.style.transform='translateY(0) scale(1)'"
+                style="transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);">
+                <div class="card-body d-flex flex-column justify-content-center p-4 position-relative">
+                    <!-- Icono principal -->
+                    <div class="mb-2">
+                        <i class="fa fs-3" t-att-class="'fa ' + props.icon + ' text-' + props.color"></i>
+                    </div>
+                    <!-- Valor principal grande -->
+                    <div class="display-3 fw-bold text-primary mb-2 lh-1">
+                        <t t-esc="props.value"/>
+                    </div>
+                    <!-- Título principal -->
+                    <h6 class="text-muted fw-medium text-uppercase ls-1 mb-0 opacity-75">
+                        <t t-esc="props.label"/>
+                    </h6>
+                </div>
+            </div>
+        </div>
+    </t>
+</templates>

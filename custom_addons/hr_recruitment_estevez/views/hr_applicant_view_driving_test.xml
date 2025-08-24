@@ -16,6 +16,15 @@
                         Para editar, el candidato debe estar en la etapa "Prueba de Manejo".
                     </div>
 
+                    <!-- ✅ Botón para enviar entrevista teórica -->
+                    <div class="text-center mb-3" invisible="not is_driving_test">
+                        <button name="action_send_theoretical_interview" 
+                                string="📝 Enviar Entrevista Teórica" 
+                                type="object" 
+                                class="btn btn-success"
+                                help="Envía la evaluación teórica de prueba de manejo al candidato"/>
+                    </div>
+
                     <group string="Información del Evaluador">
                         <group>
                             <field name="evaluator_id" readonly="not is_driving_test_editable"/>

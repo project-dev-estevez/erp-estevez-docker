@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="hr_estevez.KpisGrid" owl="1">
+        <div class="container-fluid p-2">
+            <div class="row g-2">
+                <div class="col-12 col-sm-6 col-md-4 col-lg col-xl">
+                        <KpiChartCard value="state.totalEmployees" label="'Total Empleados'" series="state.totalSeries" />
+                </div>
+                <div class="col-12 col-sm-6 col-md-4 col-lg col-xl">
+                        <KpiCard icon="'fa-user'" color="'success'" value="state.activeEmployees" label="'Empleados Activos'" />
+                </div>
+                <div class="col-12 col-sm-6 col-md-4 col-lg col-xl">
+                        <KpiCard icon="'fa-user-times'" color="'danger'" value="state.inactiveEmployees" label="'Empleados Inactivos'" />
+                </div>
+                <div class="col-12 col-sm-6 col-md-4 col-lg col-xl">
+                        <KpiCard icon="'fa-calendar'" color="'info'" value="5" label="'Nuevos este mes'" />
+                </div>
+                <div class="col-12 col-sm-6 col-md-4 col-lg col-xl">
+                        <KpiCard icon="'fa-birthday-cake'" color="'warning'" value="3" label="'Cumpleaños Próximos'" />
+                </div>
+                <div class="col-12 col-sm-6 col-md-4 col-lg col-xl">
+                        <KpiCard icon="'fa-file-text'" color="'secondary'" value="7" label="'Contratos por Vencer'" />
+                </div>
+                <div class="col-12 col-sm-6 col-md-4 col-lg col-xl">
+                        <KpiCard icon="'fa-building'" color="'dark'" value="4" label="'Áreas Activas'" />
+                </div>
+            </div>
+        </div>
+    </t>
+</templates>
