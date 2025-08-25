@@ -24,7 +24,7 @@ export class KpisGrid extends Component {
             totalEmployees: { value: 0, series: [], labels: [], dates: [] }, // ✅ Agregamos dates para los clicks
             activeEmployees: { value: 0 },
             inactiveEmployees: { value: 0 },
-            newThisMonth: { value: 0 },
+            newThisMonth: { value: 0, startDate: null, endDate: null }, // ✅ Agregamos fechas del mes
             upcomingBirthdays: { value: 0 },
             expiringContracts: { value: 0 },
             isLoading: true,
@@ -212,9 +212,38 @@ export class KpisGrid extends Component {
 
     async calculateNewThisMonth() {
         try {
-            // ✅ TODO: Implementar lógica para empleados nuevos este mes
-            this.state.newThisMonth.value = 0; // Temporal
-            console.log(`📊 KPI Nuevos este Mes: 0 (temporal)`);
+            // ✅ Obtener el primer y último día del mes actual
+            const today = new Date();
+            const year = today.getFullYear();
+            const month = today.getMonth(); // 0-indexed (Enero = 0)
+            
+            // Primer día del mes
+            const firstDay = new Date(year, month, 1);
+            const firstDayStr = firstDay.toISOString().slice(0, 10) + " 00:00:00";
+            
+            // Último día del mes
+            const lastDay = new Date(year, month + 1, 0); // Día 0 del siguiente mes = último día del mes actual
+            const lastDayStr = lastDay.toISOString().slice(0, 10) + " 23:59:59";
+            
+            // ✅ Contar empleados creados este mes
+            const domain = [
+                ["create_date", ">=", firstDayStr],
+                ["create_date", "<=", lastDayStr]
+            ];
+            
+            const count = await this.orm.searchCount(
+                "hr.employee", 
+                domain,
+                { context: { active_test: false } } // Incluir activos e inactivos
+            );
+            
+            this.state.newThisMonth.value = count;
+            
+            // ✅ Guardar las fechas para la navegación
+            this.state.newThisMonth.startDate = firstDayStr;
+            this.state.newThisMonth.endDate = lastDayStr;
+            
+            console.log(`📊 KPI Nuevos este Mes: ${count} (${firstDayStr} a ${lastDayStr})`);
         } catch (error) {
             console.error("❌ KpisGrid HR: Error calculando Nuevos este Mes:", error);
             this.state.newThisMonth.value = 0;
@@ -333,8 +362,40 @@ export class KpisGrid extends Component {
 
     async viewNewThisMonth() {
         try {
-            // ✅ TODO: Implementar navegación para nuevos este mes
-            console.log("🚀 Navegando a Nuevos este Mes (pendiente implementar)");
+            // ✅ Verificar que tenemos las fechas del mes
+            if (!this.state.newThisMonth.startDate || !this.state.newThisMonth.endDate) {
+                console.error("❌ No se encontraron las fechas del mes actual");
+                return;
+            }
+
+            // ✅ Obtener nombre del mes actual
+            const today = new Date();
+            const monthNames = [
+                'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+                'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
+            ];
+            const currentMonth = monthNames[today.getMonth()];
+            const currentYear = today.getFullYear();
+
+            // ✅ Crear dominio para empleados del mes actual
+            const domain = [
+                ["create_date", ">=", this.state.newThisMonth.startDate],
+                ["create_date", "<=", this.state.newThisMonth.endDate]
+            ];
+
+            await this.actionService.doAction({
+                type: "ir.actions.act_window",
+                name: `🚀 Empleados Nuevos - ${currentMonth} ${currentYear}`,
+                res_model: "hr.employee",
+                domain: domain,
+                views: [[false, "kanban"], [false, "list"], [false, "form"]],
+                view_mode: "kanban,list,form",
+                context: {
+                    active_test: false, // ✅ Mostrar activos e inactivos
+                    search_default_group_by_department: 1, // ✅ Agrupar por departamento
+                    search_default_group_by_create_date: 1, // ✅ También agrupar por fecha de creación
+                }
+            });
         } catch (error) {
             console.error("❌ KpisGrid HR: Error en navegación Nuevos este Mes:", error);
         }
