@@ -25,7 +25,7 @@ export class KpisGrid extends Component {
             activeEmployees: { value: 0 },
             inactiveEmployees: { value: 0 },
             newThisMonth: { value: 0, startDate: null, endDate: null }, // ✅ Agregamos fechas del mes
-            upcomingBirthdays: { value: 0 },
+            upcomingBirthdays: { value: 0, employees: [], startDate: null, endDate: null }, // ✅ Agregamos empleados y fechas
             expiringContracts: { value: 0 },
             isLoading: true,
         });
@@ -252,9 +252,51 @@ export class KpisGrid extends Component {
 
     async calculateUpcomingBirthdays() {
         try {
-            // ✅ TODO: Implementar lógica para cumpleaños próximos
-            this.state.upcomingBirthdays.value = 0; // Temporal
-            console.log(`📊 KPI Cumpleaños Próximos: 0 (temporal)`);
+            // ✅ Obtener fecha actual y fechas para los próximos 7 días
+            const today = new Date();
+            const endDate = new Date(today);
+            endDate.setDate(today.getDate() + 7); // Próximos 7 días
+            
+            // ✅ Obtener todos los empleados activos con fecha de nacimiento
+            const employees = await this.orm.searchRead(
+                "hr.employee",
+                [
+                    ["active", "=", true],
+                    ["birthday", "!=", false] // Que tengan fecha de cumpleaños
+                ],
+                ["id", "name", "birthday"]
+            );
+
+            // ✅ Filtrar empleados que cumplan años en los próximos 7 días
+            let upcomingBirthdays = [];
+            
+            employees.forEach(employee => {
+                if (employee.birthday) {
+                    // Obtener día y mes del cumpleaños
+                    const birthday = new Date(employee.birthday);
+                    const birthdayThisYear = new Date(today.getFullYear(), birthday.getMonth(), birthday.getDate());
+                    
+                    // Si ya pasó este año, calcular para el próximo año
+                    if (birthdayThisYear < today) {
+                        birthdayThisYear.setFullYear(today.getFullYear() + 1);
+                    }
+                    
+                    // Verificar si el cumpleaños está en los próximos 7 días
+                    if (birthdayThisYear >= today && birthdayThisYear <= endDate) {
+                        upcomingBirthdays.push({
+                            ...employee,
+                            nextBirthday: birthdayThisYear
+                        });
+                    }
+                }
+            });
+
+            this.state.upcomingBirthdays.value = upcomingBirthdays.length;
+            this.state.upcomingBirthdays.employees = upcomingBirthdays; // ✅ Guardar empleados para navegación
+            this.state.upcomingBirthdays.startDate = today.toISOString().slice(0, 10);
+            this.state.upcomingBirthdays.endDate = endDate.toISOString().slice(0, 10);
+            
+            console.log(`📊 KPI Cumpleaños Próximos: ${upcomingBirthdays.length} empleados en próximos 7 días`);
         } catch (error) {
             console.error("❌ KpisGrid HR: Error calculando Cumpleaños Próximos:", error);
             this.state.upcomingBirthdays.value = 0;
@@ -403,8 +445,55 @@ export class KpisGrid extends Component {
 
     async viewUpcomingBirthdays() {
         try {
-            // ✅ TODO: Implementar navegación para cumpleaños próximos
-            console.log("🎂 Navegando a Cumpleaños Próximos (pendiente implementar)");
+            // ✅ Verificar que tenemos empleados con cumpleaños próximos
+            if (!this.state.upcomingBirthdays.employees || this.state.upcomingBirthdays.employees.length === 0) {
+                // ✅ Si no hay empleados específicos, crear filtro por fechas de cumpleaños
+                const today = new Date();
+                const endDate = new Date(today);
+                endDate.setDate(today.getDate() + 7);
+
+                // ✅ Crear dominio más general para empleados activos con cumpleaños
+                const domain = [
+                    ["active", "=", true],
+                    ["birthday", "!=", false]
+                ];
+
+                await this.actionService.doAction({
+                    type: "ir.actions.act_window",
+                    name: "🎂 Empleados con Cumpleaños Próximos (7 días)",
+                    res_model: "hr.employee",
+                    domain: domain,
+                    views: [[false, "kanban"], [false, "list"], [false, "form"]],
+                    view_mode: "kanban,list,form",
+                    context: {
+                        search_default_group_by_department: 1,
+                        search_default_group_by_birthday: 1, // ✅ Agrupar por cumpleaños si existe
+                    }
+                });
+                return;
+            }
+
+            // ✅ Obtener IDs de empleados con cumpleaños próximos
+            const employeeIds = this.state.upcomingBirthdays.employees.map(emp => emp.id);
+
+            // ✅ Crear dominio con los IDs específicos
+            const domain = [
+                ["id", "in", employeeIds]
+            ];
+
+            await this.actionService.doAction({
+                type: "ir.actions.act_window",
+                name: `🎂 Cumpleaños Próximos (${this.state.upcomingBirthdays.value} empleados)`,
+                res_model: "hr.employee",
+                domain: domain,
+                views: [[false, "kanban"], [false, "list"], [false, "form"]],
+                view_mode: "kanban,list,form",
+                context: {
+                    search_default_group_by_department: 1,
+                    // ✅ Filtros personalizados para vista de cumpleaños
+                    default_view_kanban: 1,
+                }
+            });
         } catch (error) {
             console.error("❌ KpisGrid HR: Error en navegación Cumpleaños Próximos:", error);
         }
