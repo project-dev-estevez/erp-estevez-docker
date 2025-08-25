@@ -8,7 +8,7 @@
                 onmouseout="this.classList.replace('shadow-lg', 'shadow-sm'); this.style.transform='translateY(0) scale(1)'"
                 style="transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);">
                 
-                <div class="card-body d-flex flex-column justify-content-center p-4 position-relative">
+                <div class="card-body d-flex flex-column justify-content-center p-3 position-relative" style="min-height: 140px;">
                     <!-- Loading state -->
                     <div t-if="props.isLoading" class="d-flex justify-content-center align-items-center h-100">
                         <div class="spinner-border text-primary" role="status">
@@ -18,18 +18,18 @@
                     
                     <!-- Content -->
                     <div t-else="" class="d-flex flex-column align-items-center">
-                        <!-- Valor principal grande -->
-                        <div class="display-3 fw-bold text-primary mb-2 lh-1">
+                        <!-- Valor principal - tamaño similar al original -->
+                        <div class="display-4 fw-bold text-primary mb-2 lh-1">
                             <t t-esc="props.value"/>
                         </div>
                         
                         <!-- Título principal -->
-                        <h6 class="text-muted fw-medium text-uppercase ls-1 mb-3 opacity-75">
+                        <h6 class="text-muted fw-medium text-uppercase mb-3 opacity-75" style="font-size: 0.75rem; letter-spacing: 0.5px;">
                             <t t-esc="props.label"/>
                         </h6>
                         
-                        <!-- Gráfica sparkline -->
-                        <div t-ref="chart" style="width:100%; min-height:80px;"></div>
+                        <!-- Gráfica sparkline - ajustada al espacio disponible -->
+                        <div t-ref="chart" style="width:100%; min-height:60px; max-height:70px;"></div>
                     </div>
                 </div>
                 

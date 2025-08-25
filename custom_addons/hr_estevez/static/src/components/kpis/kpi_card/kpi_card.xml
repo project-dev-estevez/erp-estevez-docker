@@ -10,7 +10,7 @@
                 onmouseout="this.classList.replace('shadow-lg', 'shadow-sm'); this.style.transform='translateY(0) scale(1)'"
                 style="transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);">
                 
-                <div class="card-body d-flex flex-column justify-content-center p-4 position-relative">
+                <div class="card-body d-flex flex-column justify-content-center p-3 position-relative" style="min-height: 140px;">
                     <!-- Loading state -->
                     <div t-if="props.isLoading" class="d-flex justify-content-center align-items-center h-100">
                         <div class="spinner-border text-primary" role="status">
@@ -19,24 +19,19 @@
                     </div>
                     
                     <!-- Content -->
-                    <div t-else="">
-                        <!-- Icono principal (para KPIs de empleados usaremos iconos predeterminados) -->
-                        <div class="mb-2">
-                            <i class="fa fa-users fs-3 text-primary"></i>
-                        </div>
-                        
-                        <!-- Valor principal grande -->
-                        <div class="display-3 fw-bold text-primary mb-2 lh-1">
+                    <div t-else="" class="text-center">
+                        <!-- Valor principal - aprovechando el espacio disponible -->
+                        <div class="display-4 fw-bold text-primary mb-2 lh-1">
                             <t t-esc="props.value"/>
                         </div>
                         
                         <!-- Valor secundario (si está habilitado) -->
-                        <div t-if="props.showSecondaryValue" class="small text-success mb-2">
+                        <div t-if="props.showSecondaryValue" class="text-success mb-2">
                             + <t t-esc="props.secondaryValue"/>
                         </div>
                         
                         <!-- Título principal -->
-                        <h6 class="text-muted fw-medium text-uppercase ls-1 mb-0 opacity-75">
+                        <h6 class="text-muted fw-medium text-uppercase mb-0 opacity-75" style="font-size: 0.75rem; letter-spacing: 0.5px;">
                             <t t-esc="props.name"/>
                         </h6>
                     </div>

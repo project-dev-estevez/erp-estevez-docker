@@ -51,7 +51,7 @@ export class KpiChartCard extends Component {
         const options = {
             chart: {
                 type: "area",
-                height: 80,
+                height: 65, // ✅ Altura ajustada para aprovechar mejor el espacio
                 sparkline: { enabled: true }, // ✅ VOLVER: Habilitar sparkline para gráfica limpia
                 toolbar: { show: false },
                 events: {
@@ -71,8 +71,16 @@ export class KpiChartCard extends Component {
                     }
                 }
             },
-            stroke: { curve: "smooth", width: 2 },
-            fill: { opacity: 0.5 },
+            stroke: { curve: "smooth", width: 2 }, // ✅ Mantener línea fina
+            fill: { 
+                type: 'gradient',
+                gradient: {
+                    shadeIntensity: 1,
+                    opacityFrom: 0.3, // ✅ Más transparente para espacio reducido
+                    opacityTo: 0.1,
+                    stops: [0, 100]
+                }
+            },
             series: [{
                 name: "Empleados",
                 data: this.props.series || [0, 0, 0, 0, 0, 0, 0]
@@ -101,15 +109,15 @@ export class KpiChartCard extends Component {
                         : `Día ${dataPointIndex + 1}`;
                     
                     return `<div class="custom-tooltip" style="
-                        background: rgba(0, 0, 0, 0.8); 
+                        background: rgba(0, 0, 0, 0.85); 
                         color: white; 
-                        padding: 8px 12px; 
-                        border-radius: 6px; 
-                        font-size: 12px;
-                        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                        padding: 6px 10px; 
+                        border-radius: 4px; 
+                        font-size: 11px;
+                        box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+                        white-space: nowrap;
                     ">
-                        <strong>${dayName}</strong><br/>
-                        Empleados: <strong>${value}</strong>
+                        <strong>${dayName}</strong> - ${value} empleados
                     </div>`;
                 }
             }
