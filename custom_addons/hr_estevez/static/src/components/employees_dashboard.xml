@@ -23,7 +23,11 @@
                     <div class="row">
                         <div class="col-lg-6 m-0 p-0">
                             <div class="shadow-sm border m-2 p-4 bg-white">
-                                <ChartRendererApex config="chartsDummy[0].config" type="chartsDummy[0].type" />
+                                <DepartmentDistributionChart 
+                                    startDate="state.startDate"
+                                    endDate="state.endDate"
+                                    height="350"
+                                />
                                 <h6 class="mt-3 text-center text-muted">Distribución por Departamento</h6>
                             </div>
                         </div>

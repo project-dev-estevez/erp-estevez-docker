@@ -6,10 +6,17 @@ import { DashboardHeader } from "./dashboard_header/dashboard_header.js";
 import { KpisGrid } from "./kpis/kpis_grid.js";
 import { ChartRendererApex } from "./chart_renderer_apex/chart_renderer_apex.js";
 import { chartsDummy } from "./chart_renderer_apex/charts_dummy.js";
+// ✅ NUEVO: Importar gráfico de distribución por departamento
+import { DepartmentDistributionChart } from "./charts/department_distribution_chart/department_distribution_chart.js";
 
 export class EmployeesDashboard extends Component {
     static template = "hr_estevez.EmployeesDashboard";
-    static components = { DashboardHeader, KpisGrid, ChartRendererApex };
+    static components = { 
+        DashboardHeader, 
+        KpisGrid, 
+        ChartRendererApex, 
+        DepartmentDistributionChart // ✅ NUEVO: Agregar componente
+    };
 
     setup() {
         this.orm = useService("orm");
