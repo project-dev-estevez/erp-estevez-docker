@@ -26,7 +26,7 @@ export class KpisGrid extends Component {
             inactiveEmployees: { value: 0 },
             newThisMonth: { value: 0, startDate: null, endDate: null }, // ✅ Agregamos fechas del mes
             upcomingBirthdays: { value: 0, employees: [], startDate: null, endDate: null }, // ✅ Agregamos empleados y fechas
-            expiringContracts: { value: 0 },
+            expiringContracts: { value: 0, contracts: [], startDate: null, endDate: null }, // ✅ Agregamos contratos y fechas
             isLoading: true,
         });
 
@@ -305,9 +305,39 @@ export class KpisGrid extends Component {
 
     async calculateExpiringContracts() {
         try {
-            // ✅ TODO: Implementar lógica para contratos por vencer
-            this.state.expiringContracts.value = 0; // Temporal
-            console.log(`📊 KPI Contratos por Vencer: 0 (temporal)`);
+            // ✅ Obtener fecha actual y fecha límite (próximos 30 días)
+            const today = new Date();
+            const endDate = new Date(today);
+            endDate.setDate(today.getDate() + 30); // Próximos 30 días
+
+            const todayStr = today.toISOString().slice(0, 10);
+            const endDateStr = endDate.toISOString().slice(0, 10);
+            
+            // ✅ Buscar contratos activos que vencen en los próximos 30 días
+            const expiringContracts = await this.orm.searchRead(
+                "hr.contract",
+                [
+                    ["state", "=", "open"], // Solo contratos activos
+                    ["date_end", "!=", false], // Que tengan fecha de fin
+                    ["date_end", ">=", todayStr], // Que no hayan vencido aún
+                    ["date_end", "<=", endDateStr] // Que venzan en los próximos 30 días
+                ],
+                ["id", "name", "employee_id", "date_end", "state"]
+            );
+
+            this.state.expiringContracts.value = expiringContracts.length;
+            this.state.expiringContracts.contracts = expiringContracts; // ✅ Guardar contratos para navegación
+            this.state.expiringContracts.startDate = todayStr;
+            this.state.expiringContracts.endDate = endDateStr;
+            
+            console.log(`📊 KPI Contratos por Vencer: ${expiringContracts.length} contratos en próximos 30 días`);
+            
+            // ✅ Log detallado para debug
+            if (expiringContracts.length > 0) {
+                console.log("📄 Contratos que vencen:", expiringContracts.map(c => 
+                    `${c.employee_id[1]} - Vence: ${c.date_end}`
+                ));
+            }
         } catch (error) {
             console.error("❌ KpisGrid HR: Error calculando Contratos por Vencer:", error);
             this.state.expiringContracts.value = 0;
@@ -501,8 +531,60 @@ export class KpisGrid extends Component {
 
     async viewExpiringContracts() {
         try {
-            // ✅ TODO: Implementar navegación para contratos por vencer
-            console.log("📄 Navegando a Contratos por Vencer (pendiente implementar)");
+            // ✅ Verificar que tenemos contratos por vencer
+            if (!this.state.expiringContracts.contracts || this.state.expiringContracts.contracts.length === 0) {
+                // ✅ Si no hay contratos específicos, crear filtro general
+                const today = new Date();
+                const endDate = new Date(today);
+                endDate.setDate(today.getDate() + 30);
+
+                const todayStr = today.toISOString().slice(0, 10);
+                const endDateStr = endDate.toISOString().slice(0, 10);
+
+                // ✅ Crear dominio general para contratos activos con fecha de fin
+                const domain = [
+                    ["state", "=", "open"],
+                    ["date_end", "!=", false],
+                    ["date_end", ">=", todayStr]
+                ];
+
+                await this.actionService.doAction({
+                    type: "ir.actions.act_window",
+                    name: "📄 Contratos Activos con Fecha de Fin",
+                    res_model: "hr.contract",
+                    domain: domain,
+                    views: [[false, "list"], [false, "form"]],
+                    view_mode: "list,form",
+                    context: {
+                        search_default_group_by_employee: 1, // ✅ Agrupar por empleado
+                        search_default_group_by_date_end: 1, // ✅ Agrupar por fecha de fin
+                    }
+                });
+                return;
+            }
+
+            // ✅ Obtener IDs de contratos que vencen próximamente
+            const contractIds = this.state.expiringContracts.contracts.map(contract => contract.id);
+
+            // ✅ Crear dominio con los IDs específicos
+            const domain = [
+                ["id", "in", contractIds]
+            ];
+
+            await this.actionService.doAction({
+                type: "ir.actions.act_window",
+                name: `📄 Contratos por Vencer (${this.state.expiringContracts.value} contratos - próximos 30 días)`,
+                res_model: "hr.contract",
+                domain: domain,
+                views: [[false, "list"], [false, "form"]],
+                view_mode: "list,form",
+                context: {
+                    search_default_group_by_date_end: 1, // ✅ Agrupar por fecha de vencimiento
+                    search_default_filter_expiring: 1, // ✅ Filtro por vencimiento si existe
+                    // ✅ Ordenar por fecha de vencimiento
+                    orderby: "date_end asc"
+                }
+            });
         } catch (error) {
             console.error("❌ KpisGrid HR: Error en navegación Contratos por Vencer:", error);
         }
