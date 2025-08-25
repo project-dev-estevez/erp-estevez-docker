@@ -27,6 +27,7 @@ export class KpisGrid extends Component {
             newThisMonth: { value: 0, startDate: null, endDate: null }, // ✅ Agregamos fechas del mes
             upcomingBirthdays: { value: 0, employees: [], startDate: null, endDate: null }, // ✅ Agregamos empleados y fechas
             expiringContracts: { value: 0, contracts: [], startDate: null, endDate: null }, // ✅ Agregamos contratos y fechas
+            expiredContracts: { value: 0, contracts: [], startDate: null, endDate: null }, // ✅ NUEVO: Contratos vencidos
             isLoading: true,
         });
 
@@ -106,6 +107,14 @@ export class KpisGrid extends Component {
                 showSecondaryValue: false,
                 showChart: false,
                 onClick: () => this.viewExpiringContracts()
+            },
+            {
+                name: "Contratos Vencidos",
+                value: this.state.expiredContracts.value,
+                secondaryValue: 0,
+                showSecondaryValue: false,
+                showChart: false,
+                onClick: () => this.viewExpiredContracts()
             }
         ];
     }
@@ -122,6 +131,7 @@ export class KpisGrid extends Component {
                 this.calculateNewThisMonth(),
                 this.calculateUpcomingBirthdays(),
                 this.calculateExpiringContracts(),
+                this.calculateExpiredContracts(), // ✅ NUEVO: Contratos vencidos
             ]);
         } catch (error) {
             console.error("❌ KpisGrid HR: Error cargando datos:", error);
@@ -341,6 +351,47 @@ export class KpisGrid extends Component {
         } catch (error) {
             console.error("❌ KpisGrid HR: Error calculando Contratos por Vencer:", error);
             this.state.expiringContracts.value = 0;
+        }
+    }
+
+    async calculateExpiredContracts() {
+        try {
+            // ✅ Obtener fecha actual y fecha de inicio (últimos 90 días para contratos vencidos)
+            const today = new Date();
+            const startDate = new Date(today);
+            startDate.setDate(today.getDate() - 90); // Últimos 90 días
+
+            const todayStr = today.toISOString().slice(0, 10);
+            const startDateStr = startDate.toISOString().slice(0, 10);
+            
+            // ✅ Buscar contratos que vencieron (pueden estar en cualquier estado)
+            const expiredContracts = await this.orm.searchRead(
+                "hr.contract",
+                [
+                    ["date_end", "!=", false], // Que tengan fecha de fin
+                    ["date_end", "<", todayStr], // Que hayan vencido (fecha de fin < hoy)
+                    ["date_end", ">=", startDateStr], // Vencidos en los últimos 90 días
+                    // ✅ No filtrar por estado - pueden estar en cualquier estado
+                ],
+                ["id", "name", "employee_id", "date_end", "state"]
+            );
+
+            this.state.expiredContracts.value = expiredContracts.length;
+            this.state.expiredContracts.contracts = expiredContracts; // ✅ Guardar contratos para navegación
+            this.state.expiredContracts.startDate = startDateStr;
+            this.state.expiredContracts.endDate = todayStr;
+            
+            console.log(`📊 KPI Contratos Vencidos: ${expiredContracts.length} contratos vencidos en últimos 90 días`);
+            
+            // ✅ Log detallado para debug
+            if (expiredContracts.length > 0) {
+                console.log("❌ Contratos vencidos:", expiredContracts.map(c => 
+                    `${c.employee_id[1]} - Venció: ${c.date_end} (Estado: ${c.state})`
+                ));
+            }
+        } catch (error) {
+            console.error("❌ KpisGrid HR: Error calculando Contratos Vencidos:", error);
+            this.state.expiredContracts.value = 0;
         }
     }
 
@@ -587,6 +638,63 @@ export class KpisGrid extends Component {
             });
         } catch (error) {
             console.error("❌ KpisGrid HR: Error en navegación Contratos por Vencer:", error);
+        }
+    }
+
+    async viewExpiredContracts() {
+        try {
+            // ✅ Verificar que tenemos contratos vencidos
+            if (!this.state.expiredContracts.contracts || this.state.expiredContracts.contracts.length === 0) {
+                // ✅ Si no hay contratos específicos, crear filtro general
+                const today = new Date();
+                const todayStr = today.toISOString().slice(0, 10);
+
+                // ✅ Crear dominio general para contratos vencidos
+                const domain = [
+                    ["date_end", "!=", false],
+                    ["date_end", "<", todayStr]
+                ];
+
+                await this.actionService.doAction({
+                    type: "ir.actions.act_window",
+                    name: "❌ Contratos Vencidos (Todos)",
+                    res_model: "hr.contract",
+                    domain: domain,
+                    views: [[false, "list"], [false, "form"]],
+                    view_mode: "list,form",
+                    context: {
+                        search_default_group_by_employee: 1, // ✅ Agrupar por empleado
+                        search_default_group_by_state: 1, // ✅ Agrupar por estado
+                        orderby: "date_end desc" // ✅ Ordenar por fecha de vencimiento descendente
+                    }
+                });
+                return;
+            }
+
+            // ✅ Obtener IDs de contratos vencidos
+            const contractIds = this.state.expiredContracts.contracts.map(contract => contract.id);
+
+            // ✅ Crear dominio con los IDs específicos
+            const domain = [
+                ["id", "in", contractIds]
+            ];
+
+            await this.actionService.doAction({
+                type: "ir.actions.act_window",
+                name: `❌ Contratos Vencidos (${this.state.expiredContracts.value} contratos - últimos 90 días)`,
+                res_model: "hr.contract",
+                domain: domain,
+                views: [[false, "list"], [false, "form"]],
+                view_mode: "list,form",
+                context: {
+                    search_default_group_by_state: 1, // ✅ Agrupar por estado del contrato
+                    search_default_filter_expired: 1, // ✅ Filtro por vencidos si existe
+                    // ✅ Ordenar por fecha de vencimiento descendente (más recientes primero)
+                    orderby: "date_end desc"
+                }
+            });
+        } catch (error) {
+            console.error("❌ KpisGrid HR: Error en navegación Contratos Vencidos:", error);
         }
     }
 }
