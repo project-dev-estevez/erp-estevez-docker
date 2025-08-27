@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="hr_estevez.KpisGrid" owl="1">
+        <div class="container-fluid p-2">
+            <div class="row g-2">
+                <!-- ✅ Mostrar KPIs dinámicamente -->
+                <t t-foreach="kpis" t-as="kpi" t-key="kpi_index">
+                    <div class="col-12 col-sm-6 col-md-4 col-lg col-xl">
+                        <!-- KPI con gráfica (solo Total Empleados) -->
+                        <KpiChartCard 
+                            t-if="kpi.showChart"
+                            value="kpi.value" 
+                            label="kpi.name" 
+                            series="kpi.series"
+                            labels="kpi.labels"
+                            onClick="kpi.onClick"
+                            onPointClick="kpi.onPointClick"
+                            isLoading="state.isLoading"
+                        />
+                        <!-- KPI normal (todos los demás) -->
+                        <KpiCard 
+                            t-else=""
+                            name="kpi.name"
+                            value="kpi.value"
+                            secondaryValue="kpi.secondaryValue"
+                            showSecondaryValue="kpi.showSecondaryValue"
+                            onClick="kpi.onClick"
+                            isLoading="state.isLoading"
+                        />
+                    </div>
+                </t>
+            </div>
+        </div>
+    </t>
+</templates>

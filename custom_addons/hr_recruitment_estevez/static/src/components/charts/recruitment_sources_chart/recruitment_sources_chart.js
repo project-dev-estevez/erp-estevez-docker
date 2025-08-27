@@ -188,7 +188,7 @@ export class RecruitmentSourcesChart extends Component {
                     events: {
                         dataPointSelection: (event, chartContext, config) => {
                             const sourceData = this.state.sourcesData[config.dataPointIndex];
-                            this.openSourceRecruitmentList(sourceData.sourceId);
+                            this.openSourceRecruitmentListFromChart(sourceData.sourceId);
                         }
                     }
                 },
@@ -215,7 +215,7 @@ export class RecruitmentSourcesChart extends Component {
                     }
                 },
                 dataLabels: {
-                    enabled: true,
+                    enabled: false,
                     formatter: function(val) {
                         return Math.round(val);
                     },
@@ -290,8 +290,49 @@ export class RecruitmentSourcesChart extends Component {
         console.log("✅ RecruitmentSourcesChart: Indicadores calculados:", indicators.length);
     }
 
-    // ✅ MANTENER: Método de navegación original
+    // ✅ CORREGIDO: Método de navegación más robusto
     async openSourceRecruitmentList(sourceId) {
+        const currentProps = this.getCurrentProps();
+        let domain = [];
+        
+        // 📌 Solo filtramos por "hired" si el flag lo indica
+        domain.push(["application_status", "=", "hired"]);
+        if (currentProps.startDate) {
+            domain.push(["date_closed", ">=", currentProps.startDate]);
+        }
+        if (currentProps.endDate) {
+            domain.push(["date_closed", "<=", currentProps.endDate]);
+        }
+
+        // Filtra por source_id
+        if (sourceId) {
+            domain.push(["source_id", "=", sourceId]);
+        } else {
+            domain.push(["source_id", "=", false]);
+        }
+
+        // ✅ Obtener el nombre de la fuente para el título
+        const sourceData = this.state.sourcesData.find(s => s.sourceId === sourceId);
+        const sourceName = sourceData ? sourceData.label : "Sin fuente";
+
+        try {
+            await this.actionService.doAction({
+                type: 'ir.actions.act_window',
+                name: `Contratados - ${sourceName}`,
+                res_model: 'hr.applicant',
+                view_mode: 'list,form',
+                views: [[false, 'list'], [false, 'form']],
+                domain: domain, // ✅ Este es el filtro REAL
+                context: {
+                    search_default_application_status: 'hired'
+                },
+            });
+        } catch (error) {
+            console.error("❌ Error abriendo lista de postulaciones:", error);
+        }
+    }
+
+    async openSourceRecruitmentListFromChart(sourceId) {
         const currentProps = this.getCurrentProps();
         let domain = [];
         
@@ -301,22 +342,30 @@ export class RecruitmentSourcesChart extends Component {
         if (currentProps.endDate) {
             domain.push(["create_date", "<=", currentProps.endDate]);
         }
-    
+
         // Filtra por source_id
         if (sourceId) {
             domain.push(["source_id", "=", sourceId]);
         } else {
             domain.push(["source_id", "=", false]);
         }
-    
-        await this.actionService.doAction({
-            type: 'ir.actions.act_window',
-            name: 'Postulaciones por Fuente',
-            res_model: 'hr.applicant',
-            views: [[false, 'list'], [false, 'form']],
-            domain: domain,
-            context: { active_test: false },
-        });
+
+        // ✅ Obtener el nombre de la fuente para el título
+        const sourceData = this.state.sourcesData.find(s => s.sourceId === sourceId);
+        const sourceName = sourceData ? sourceData.label : "Sin fuente";
+
+        try {
+            await this.actionService.doAction({
+                type: 'ir.actions.act_window',
+                name: `Contratados - ${sourceName}`,
+                res_model: 'hr.applicant',
+                view_mode: 'list,form',
+                views: [[false, 'list'], [false, 'form']],
+                domain: domain,
+            });
+        } catch (error) {
+            console.error("❌ Error abriendo lista de postulaciones:", error);
+        }
     }
 
     // ✅ REFINADO: Gráfico vacío para ApexCharts (forzar limpieza)

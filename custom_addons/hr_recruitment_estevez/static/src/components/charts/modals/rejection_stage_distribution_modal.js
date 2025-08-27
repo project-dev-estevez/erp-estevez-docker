@@ -38,10 +38,10 @@ export class RejectionStageDistributionModal extends Component {
 
     _addDateRangeToDomain(domain = []) {
         if (this.props.startDate) {
-            domain.push(["refuse_date", ">=", this.props.startDate]);
+            domain.push(["create_date", ">=", this.props.startDate]);
         }
         if (this.props.endDate) {
-            domain.push(["refuse_date", "<=", this.props.endDate]);
+            domain.push(["create_date", "<=", this.props.endDate]);
         }
         return domain;
     }
@@ -70,11 +70,24 @@ export class RejectionStageDistributionModal extends Component {
                 { order: 'sequence asc' }
             );
 
-            // 3. Contar candidatos rechazados/declinados por etapa y motivo
+            // 3. Primero obtener el total de candidatos con este motivo de rechazo
+            // usando el mismo dominio que la gráfica principal
+            let baseDomain = [
+                ['application_status', '=', 'refused'],
+                ['refuse_reason_id', '=', this.props.refuseReasonId],
+                ['stage_id.sequence', '>=', primerContactoSequence]
+            ];
+            baseDomain = this._addDateRangeToDomain(baseDomain);
+
+            const totalCount = await this.orm.searchCount("hr.applicant", baseDomain, { context: { active_test: false } });
+            console.log(`📊 Total esperado para "${this.props.refuseReasonName}": ${totalCount}`);
+
+            // 4. Contar candidatos rechazados/declinados por etapa y motivo
             this.state.stages = stages;
             const stageNames = [];
             const stageCounts = [];
             const stageData = [];
+            let totalModalCount = 0;
 
             for (const stage of stages) {
                 let domain = [
@@ -83,17 +96,21 @@ export class RejectionStageDistributionModal extends Component {
                     ['application_status', '=', 'refused']
                 ];
                 domain = this._addDateRangeToDomain(domain);
-                // Incluye inactivos
+                
                 const count = await this.orm.searchCount("hr.applicant", domain, { context: { active_test: false } });
                 if (count > 0) {
                     stageNames.push(stage.name);
                     stageCounts.push(count);
-                    stageData.push({ name: stage.name, count, id: stage.id }); // Guarda el id real
+                    stageData.push({ name: stage.name, count, id: stage.id });
+                    totalModalCount += count;
+                    console.log(`📈 Etapa "${stage.name}": ${count} candidatos`);
                 }
             }
 
+            console.log(`📊 Total en modal: ${totalModalCount}, Total esperado: ${totalCount}`);
+
             this.state.stageData = stageData;
-            this.state.title = `Distribución por etapa: ${this.props.refuseReasonName}`;
+            this.state.title = `Distribución por etapa: ${this.props.refuseReasonName} (Total: ${totalModalCount})`;
 
             if (stageData.length === 0) {
                 this.state.chartConfig = null;
@@ -139,10 +156,10 @@ export class RejectionStageDistributionModal extends Component {
             ['active', 'in', [true, false]],
         ];
         if (this.props.startDate) {
-            domain.push(["refuse_date", ">=", this.props.startDate]);
+            domain.push(["create_date", ">=", this.props.startDate]);
         }
         if (this.props.endDate) {
-            domain.push(["refuse_date", "<=", this.props.endDate]);
+            domain.push(["create_date", "<=", this.props.endDate]);
         }
 
         console.log("Dominio enviado a la acción:", JSON.stringify(domain, null, 2));

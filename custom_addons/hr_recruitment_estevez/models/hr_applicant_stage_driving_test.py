@@ -1,4 +1,6 @@
-from odoo import models, fields, api
+from datetime import timedelta
+from odoo import models, fields, api, _
+from odoo.exceptions import ValidationError
 
 class HrApplicantStageDrivingTest(models.Model):
     
@@ -48,6 +50,21 @@ class HrApplicantStageDrivingTest(models.Model):
 
     license_number = fields.Char(string='Número de Licencia')
 
+    unit_number = fields.Char(string='Número de Unidad')
+
+    theoretical_exam_result = fields.Float(
+        string='Resultado Examen Teórico',
+        help='Ingrese el resultado del examen teórico (0 a 10)',
+    )
+
+    @api.constrains('theoretical_exam_result')
+    def _check_theoretical_exam_result(self):
+        for record in self:
+            if record.theoretical_exam_result is not None:
+                if record.theoretical_exam_result < 0 or record.theoretical_exam_result > 100:
+                    raise ValidationError('El resultado del examen teórico debe estar entre 0 y 100.')
+
+
     # === EVALUACIÓN PRUEBA DE MANEJO ===
     # 1. CONOCIMIENTO, INSPECCIÓN Y ADAPTACIÓN DEL VEHÍCULO (5 factores)
     fluid_levels_inspection = fields.Selection([
@@ -96,6 +113,13 @@ class HrApplicantStageDrivingTest(models.Model):
         compute='_compute_knowledge_average',
         store=True,
         digits=(3, 2)
+    )
+
+    # Suma del Aspecto 1
+    knowledge_sum = fields.Integer(
+        string='Suma Conocimiento e Inspección',
+        compute='_compute_knowledge_average',
+        store=True
     )
 
     # 2. DESTREZA Y HABILIDADES EN EL MANEJO (10 factores)
@@ -187,6 +211,13 @@ class HrApplicantStageDrivingTest(models.Model):
         digits=(3, 2)
     )
 
+    # Suma del Aspecto 2
+    skills_sum = fields.Integer(
+        string='Suma Destreza y Habilidades',
+        compute='_compute_skills_average',
+        store=True
+    )
+
     # 3. COMPORTAMIENTO DEL CONDUCTOR FRENTE AL TRÁNSITO (5 factores)
     regulation_employment = fields.Selection([
         ('1', '1 - Deficiente'),
@@ -236,10 +267,33 @@ class HrApplicantStageDrivingTest(models.Model):
         digits=(3, 2)
     )
 
+    # Suma del Aspecto 3
+    behavior_sum = fields.Integer(
+        string='Suma Comportamiento en Tránsito',
+        compute='_compute_behavior_average',
+        store=True
+    )
+
     # PROMEDIO FINAL
     final_test_average = fields.Float(
         string='Calificación Final de la Prueba',
         compute='_compute_final_test_average',
+        store=True,
+        digits=(3, 2)
+    )
+    
+    # RESULTADO EXAMEN TEÓRICO (10%)
+    theoretical_exam_result_10 = fields.Float(
+        string='Resultado Examen Teórico (10%)',
+        compute='_compute_theoretical_exam_result_10',
+        store=True,
+        digits=(3, 2)
+    )
+
+    # RESULTADO EXAMEN PRÁCTICO
+    practical_exam_result = fields.Float(
+        string='Resultado Examen Práctico (90%)',
+        compute='_compute_practical_exam_result',
         store=True,
         digits=(3, 2)
     )
@@ -265,8 +319,15 @@ class HrApplicantStageDrivingTest(models.Model):
             numeric_values = [int(factor) for factor in factors if factor]
             
             if numeric_values:
-                record.knowledge_average = sum(numeric_values) / len(numeric_values)
+                # Calcular suma
+                record.knowledge_sum = sum(numeric_values)
+                
+                # Calcular promedio con nueva fórmula: (suma_total * valor_seccion) / suma_maxima_posible
+                # Para sección 1: (suma * 10) / 25
+                # Donde 25 = 5 factores * 5 puntos máximo por factor
+                record.knowledge_average = (record.knowledge_sum * 10) / 25
             else:
+                record.knowledge_sum = 0
                 record.knowledge_average = 0.0
 
     @api.depends('ignition_maneuver', 'starting_movement', 'straight_line_advance', 'maneuver_coordination', 
@@ -291,8 +352,15 @@ class HrApplicantStageDrivingTest(models.Model):
             numeric_values = [int(factor) for factor in factors if factor]
             
             if numeric_values:
-                record.skills_average = sum(numeric_values) / len(numeric_values)
+                # Calcular suma
+                record.skills_sum = sum(numeric_values)
+                
+                # Calcular promedio con nueva fórmula: (suma * 70) / máximo posible
+                # Para sección 2: (suma * 70) / 50
+                # Donde 50 = 10 factores * 5 puntos máximo por factor
+                record.skills_average = (record.skills_sum * 70) / 50
             else:
+                record.skills_sum = 0
                 record.skills_average = 0.0
 
     @api.depends('regulation_employment', 'following_distance', 'lane_changes', 'lane_use', 'directional_handling')
@@ -310,33 +378,54 @@ class HrApplicantStageDrivingTest(models.Model):
             numeric_values = [int(factor) for factor in factors if factor]
             
             if numeric_values:
-                record.behavior_average = sum(numeric_values) / len(numeric_values)
+                # Calcular suma
+                record.behavior_sum = sum(numeric_values)
+                
+                # Calcular promedio con nueva fórmula: (suma * 20) / máximo posible
+                # Para sección 3: (suma * 20) / 25
+                # Donde 25 = 5 factores * 5 puntos máximo por factor
+                record.behavior_average = (record.behavior_sum * 20) / 25
             else:
+                record.behavior_sum = 0
                 record.behavior_average = 0.0
 
-    @api.depends('knowledge_average', 'skills_average', 'behavior_average')
+    @api.depends('theoretical_exam_result')
+    def _compute_theoretical_exam_result_10(self):
+        for record in self:
+            if record.theoretical_exam_result:
+                # Calcular el 10% del resultado teórico
+                record.theoretical_exam_result_10 = (record.theoretical_exam_result * 10) / 100
+            else:
+                record.theoretical_exam_result_10 = 0.0
+
+    @api.depends('theoretical_exam_result_10', 'practical_exam_result')
     def _compute_final_test_average(self):
         for record in self:
-            averages = [
-                record.knowledge_average,
-                record.skills_average,
-                record.behavior_average
-            ]
+            # La calificación final es la suma del examen teórico (10%) + examen práctico (90%)
+            theoretical_score_10 = record.theoretical_exam_result_10
+            practical_score = record.practical_exam_result
             
-            # Filtrar solo los que tienen valor mayor a 0
-            valid_averages = [avg for avg in averages if avg > 0]
+            # Suma: teórico (10%) + práctico (90%)
+            record.final_test_average = theoretical_score_10 + practical_score
+
+    @api.depends('knowledge_average', 'skills_average', 'behavior_average')
+    def _compute_practical_exam_result(self):
+        for record in self:
+            # Calcular la suma de los promedios de cada sección
+            sum_of_averages = record.knowledge_average + record.skills_average + record.behavior_average
             
-            if valid_averages:
-                record.final_test_average = sum(valid_averages) / len(valid_averages)
+            # Aplicar la fórmula: (suma de promedios * 90) / 100
+            if sum_of_averages > 0:
+                record.practical_exam_result = (sum_of_averages * 90) / 100
             else:
-                record.final_test_average = 0.0
+                record.practical_exam_result = 0.0
 
     @api.depends('final_test_average')
     def _compute_final_test_result(self):
         for record in self:
             if record.final_test_average == 0:
                 record.final_test_result = 'not_evaluated'
-            elif record.final_test_average >= 3.0:  # 3.0 o más para aprobar
+            elif record.final_test_average >= 70.0:  # 70 puntos o más para aprobar
                 record.final_test_result = 'passed'
             else:
                 record.final_test_result = 'failed'
@@ -415,7 +504,7 @@ class HrApplicantStageDrivingTest(models.Model):
                 'params': {
                     'title': 'Acción no permitida',
                     'message': 'No puede editar la prueba de manejo en esta etapa.',
-                    'type': 'warning',
+                    'notificationType': 'warning',
                 }
             }
         
@@ -427,7 +516,7 @@ class HrApplicantStageDrivingTest(models.Model):
                 'params': {
                     'title': 'Datos Incompletos',
                     'message': 'Debe seleccionar un tipo de licencia.',
-                    'type': 'warning',
+                    'notificationType': 'warning',
                 }
             }
         
@@ -437,5 +526,165 @@ class HrApplicantStageDrivingTest(models.Model):
         
         # ✅ Descargar el PDF del reporte
         return self.env.ref('hr_recruitment_estevez.action_hr_applicant_driving_test_report').report_action(self)
+    
+    def action_send_theoretical_interview(self):
+        """
+        Envía la entrevista teórica de prueba de manejo al candidato.
+        Busca la encuesta por criterios robustos en lugar de ID directo.
+        """
+        self.ensure_one()
+        
+        # ✅ Validación: debe estar en etapa de Prueba de Manejo
+        if not self.is_driving_test:
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'title': 'Acción no disponible',
+                    'message': 'El candidato debe estar en la etapa "Prueba de Manejo" para enviar la entrevista teórica.',
+                    'notificationType': 'warning',
+                }
+            }
+        
+        # ✅ Validación: debe tener email
+        if not self.email_from:
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'title': 'Email requerido',
+                    'message': 'El candidato debe tener un email registrado para enviar la entrevista.',
+                    'notificationType': 'warning',
+                }
+            }
+        
+        # ✅ Buscar la encuesta usando criterios robustos (no ID directo)
+        theoretical_survey = self.env['survey.survey'].search([
+            ('title', 'ilike', 'EVALUACIÓN TEÓRICA PRUEBA DE MANEJO'),
+            ('survey_type', '=', 'recruitment'),
+            ('active', '=', True)
+        ], limit=1)
+        
+        if not theoretical_survey:
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'title': 'Encuesta no encontrada',
+                    'message': 'No se encontró la "Evaluación Teórica Prueba de Manejo" activa.',
+                    'notificationType': 'danger',
+                }
+            }
+        
+        # ✅ Validar la encuesta antes de enviar
+        try:
+            theoretical_survey.check_validity()
+        except Exception as validation_error:
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'title': 'Error de validación',
+                    'message': f'La encuesta no es válida: {str(validation_error)}',
+                    'notificationType': 'danger',
+                }
+            }
+        
+        try:
+            # ✅ Crear/obtener partner si no existe
+            if not self.partner_id:
+                if not self.partner_name:
+                    return {
+                        'type': 'ir.actions.client',
+                        'tag': 'display_notification',
+                        'params': {
+                            'title': 'Nombre requerido',
+                            'message': 'El candidato debe tener un nombre registrado.',
+                            'notificationType': 'warning',
+                        }
+                    }
+                
+                self.partner_id = self.env['res.partner'].sudo().create({
+                    'is_company': False,
+                    'name': self.partner_name,
+                    'email': self.email_from,
+                    'phone': self.partner_phone,
+                    'mobile': self.partner_phone
+                })
+            
+            # ✅ Crear la invitación directamente (sin modal)
+            user_input = theoretical_survey._create_answer(
+                partner=self.partner_id,
+                email=self.email_from,
+                check_attempts=False  # Permitir múltiples intentos
+            )
+            
+            # ✅ Vincular con el candidato
+            user_input.write({
+                'applicant_id': self.id,
+            })
+            
+            # ✅ Enviar la invitación por email usando el template estándar
+            template = self.env.ref('survey.mail_template_user_input_invite', raise_if_not_found=False)
+            if template:
+                email_values = {
+                    'email_to': self.email_from,
+                    'subject': f'Evaluación Teórica - {theoretical_survey.title}',
+                }
+                template.send_mail(user_input.id, email_values=email_values, force_send=True)
+            else:
+                # Fallback: crear email simple si no hay template
+                survey_url = f"/survey/start/{theoretical_survey.access_token}/{user_input.access_token}"
+                mail_values = {
+                    'subject': f'Evaluación Teórica - {theoretical_survey.title}',
+                    'body_html': f'''
+                    <p>Estimado/a {self.partner_name},</p>
+                    <p>Se le ha asignado una evaluación teórica como parte del proceso de selección.</p>
+                    <p><strong>Enlace de acceso:</strong> <a href="{survey_url}" target="_blank">Hacer la evaluación</a></p>
+                    <p><strong>Tiempo límite:</strong> {theoretical_survey.time_limit} minutos</p>
+                    <p>Saludos cordiales,<br/>Equipo de Reclutamiento</p>
+                    ''',
+                    'email_to': self.email_from,
+                    'email_from': self.env.user.email or 'noreply@company.com',
+                }
+                mail = self.env['mail.mail'].create(mail_values)
+                mail.send()
+            
+            # ✅ Registrar en el chatter del candidato
+            survey_url = f"/survey/start/{theoretical_survey.access_token}/{user_input.access_token}"
+            self.message_post(
+                body=f"""
+                <p>✅ <strong>Entrevista Teórica Enviada</strong></p>
+                <ul>
+                    <li><strong>Encuesta:</strong> {theoretical_survey.title}</li>
+                    <li><strong>Email:</strong> {self.email_from}</li>
+                    <li><strong>Fecha de envío:</strong> {fields.Datetime.now().strftime('%Y-%m-%d %H:%M:%S')}</li>
+                    <li><strong>Enlace:</strong> <a href="{survey_url}" target="_blank">Acceder a la entrevista</a></li>
+                </ul>
+                """,
+                subject="Entrevista Teórica Enviada"
+            )
+            
+            # ✅ Notificación de éxito
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'title': '✅ Entrevista enviada exitosamente',
+                    'message': f'La evaluación teórica ha sido enviada a {self.email_from}',
+                    'notificationType': 'success',
+                }
+            }
+            
+        except Exception as e:
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'title': 'Error al enviar',
+                    'message': f'Ocurrió un error al enviar la entrevista: {str(e)}',
+                    'notificationType': 'danger',
+                }
+            }
     
     

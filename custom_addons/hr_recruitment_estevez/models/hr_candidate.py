@@ -14,6 +14,11 @@ class HrCandidate(models.Model):
         string = 'Puesto de Trabajo'
     )
 
+    job_id = fields.Many2one(
+        'hr.job',
+        string = 'Puesto de Trabajo'
+    )
+
     source_id = fields.Many2one(
         'utm.source',
         string='Fuente de Reclutamiento'

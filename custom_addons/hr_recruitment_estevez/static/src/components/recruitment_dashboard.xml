@@ -35,7 +35,7 @@
                                 <RecruitmentSourcesChart startDate="state.startDate"
                                                          endDate="state.endDate"
                                                          title="'Fuentes de Reclutamiento + Efectivas'"
-                                                         height="437"
+                                                         height="417"
                                                          onMounted.bind="onRecruitmentSourcesMounted"/>
                             </div>
                         </div>
@@ -74,7 +74,7 @@
                                 <!-- ✅ NUEVO COMPONENTE -->
                                 <RequisitionStatsChart startDate="state.startDate"
                                                        endDate="state.endDate"
-                                                       title="'Indicadores de Requisición'"
+                                                       title="'Indicadores de Requisición de Personal'"
                                                        height="400"
                                                        onMounted.bind="onRequisitionStatsMounted"/>
                             </div>

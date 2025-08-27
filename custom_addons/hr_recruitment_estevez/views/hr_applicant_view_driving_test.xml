@@ -16,6 +16,15 @@
                         Para editar, el candidato debe estar en la etapa "Prueba de Manejo".
                     </div>
 
+                    <!-- ✅ Botón para enviar entrevista teórica -->
+                    <div class="text-center mb-3" invisible="not is_driving_test">
+                        <button name="action_send_theoretical_interview" 
+                                string="📝 Enviar Entrevista Teórica" 
+                                type="object" 
+                                class="btn btn-success"
+                                help="Envía la evaluación teórica de prueba de manejo al candidato"/>
+                    </div>
+
                     <group string="Información del Evaluador">
                         <group>
                             <field name="evaluator_id" readonly="not is_driving_test_editable"/>
@@ -27,6 +36,7 @@
                         <group>
                             <field name="license_type" readonly="not is_driving_test_editable"/>
                             <field name="license_number" readonly="not is_driving_test_editable"/>
+                            <field name="unit_number" readonly="not is_driving_test_editable"/>
                         </group>
                         <group>
                             <!-- ✅ Campo dinámico que se muestra cuando se selecciona un tipo -->
@@ -93,6 +103,10 @@
 
                     <!-- ✅ RESULTADO FINAL -->
                     <group string="Resultado Final de la Evaluación">
+                        <group>
+                            <field name="theoretical_exam_result" readonly="not is_driving_test_editable"/>
+                            <field name="practical_exam_result" readonly="1" widget="float" />
+                        </group>
                         <group>
                             <field name="final_test_average" readonly="1" widget="float" />
                             <field name="final_test_result" readonly="1" />

@@ -171,7 +171,7 @@ class HrApplicant(models.Model):
     source_id = fields.Many2one(
         'utm.source',        
         required = True,
-        string='Fuente de reclutamiento',
+        string='Fuente de reclutamiento',        
         help='Fuente de reclutamiento',
         ondelete='restrict'       
     )
@@ -202,6 +202,7 @@ class HrApplicant(models.Model):
     first_name = fields.Char(string="Nombre(s)", required=True)    
     last_name = fields.Char(string="Apellido Paterno", required=True)
     mother_last_name = fields.Char(string="Apellido Materno", required=True)
+
         
 
     @api.onchange('zoonosis')
@@ -384,7 +385,7 @@ class HrApplicant(models.Model):
         if self.candidate_id:            
             self.phone = self.candidate_id.partner_phone            
             self.source_id = self.candidate_id.source_id.id            
-            self.job_id = self.candidate_id.job_ids.id           
+            self.job_id = self.candidate_id.job_id.id           
 
 
     def action_open_whatsapp(self):
@@ -479,13 +480,33 @@ class HrApplicant(models.Model):
         if not self.candidate_id:
             raise UserError(_("No hay candidato asociado para crear el empleado."))
         
+        # Obtener el objeto candidato
+        candidate = self.candidate_id
+
+        
+        # Registrar todos los campos del candidato (excepto binarios)
+        candidate_data = candidate.read()[0]
+        _logger.info("Campos completos del Candidato:")
+        for field, value in candidate_data.items():
+            if not isinstance(value, bytes) and field not in ['image_1920', 'certificate']:
+                _logger.info(f"  {field}: {value}")
+        
+        # Registrar información del aplicante para referencia
+        _logger.info("==== DATOS DEL APPLICANT ====")
+        _logger.info(f"Applicant ID: {self.id}")
+        _logger.info(f"Nombre: {self.first_name or ''} {self.last_name or ''} {self.mother_last_name or ''}")
+        
         # Llamar al método original para crear el empleado
-        action = self.candidate_id.create_employee_from_candidate()
+        action = candidate.create_employee_from_candidate()
         employee = self.env['hr.employee'].browse(action.get('res_id'))
         
-        # Reescribir explícitamente el nombre del empleado usando los campos ya separados
-        full_name = " ".join(filter(None, [self.first_name, self.last_name, self.mother_last_name])).strip()        
-       
+        first_name = candidate.first_name or self.first_name or ''
+        last_name = candidate.last_name or self.last_name or ''
+        mother_last_name = candidate.mother_last_name or self.mother_last_name or ''
+
+        # Construye el nombre completo
+        full_name = f"{first_name} {last_name} {mother_last_name}".strip()
+
         # Obtener valores desde el puesto (si existe)
         job = self.job_id
         direction_id = job.direction_id.id if job and job.direction_id else False
@@ -498,23 +519,36 @@ class HrApplicant(models.Model):
             'direction_id': direction_id,
             'department_id': department_id,
             'area_id': area_id,
-            'work_email': self.department_id.company_id.email or self.email_from,  # Para tener un correo válido por defecto
-            'work_phone': self.department_id.company_id.phone,                        
-            'project': self.project_id.name            
+            'work_email': self.department_id.company_id.email or self.email_from or candidate.email,
+            'work_phone': self.department_id.company_id.phone or self.partner_phone or candidate.phone,                        
+            'project': self.project_id.name,
+            'name': full_name,
+            'names': first_name,
+            'last_name': last_name,
+            'mother_last_name': mother_last_name      
         }
+        
+        # Registrar los valores que se escribirán en el empleado
+        _logger.info("==== VALORES PARA EL EMPLEADO ====")
+        for key, value in employee_write_vals.items():
+            _logger.info(f"  {key}: {value}")
+        
+        # Aplicar cambios al empleado
+        employee.write(employee_write_vals)
+        
+         # Transferir etiquetas/categorías (sin duplicados)
+        for appl_cat in self.categ_ids:
+            emp_cat = self.env['hr.employee.category'].search(
+                [('name', '=ilike', appl_cat.name.strip())], limit=1
+            )
+            if not emp_cat:
+                emp_cat = self.env['hr.employee.category'].create({
+                    'name': appl_cat.name.strip()
+                })
+            if emp_cat.id not in employee.category_ids.ids:
+                employee.write({'category_ids': [(4, emp_cat.id)]})
 
-        # Si se tienen nombres separados, se reescriben también
-        if full_name:
-            employee_write_vals.update({
-                'name': full_name,
-                'first_name': self.first_name or False,
-                'last_name': self.last_name or False,
-                'mother_last_name': self.mother_last_name or False,
-            })  
-
-        employee.write(employee_write_vals)       
-
-        # Transferir documentos asociados al applicant al empleado
+        # Transferir attachments
         attachments = self.env['ir.attachment'].search([
             ('res_model', '=', 'hr.applicant'),
             ('res_id', '=', self.id)
@@ -525,4 +559,30 @@ class HrApplicant(models.Model):
                 'res_id': employee.id,
             })
 
+        # Logging para diagnóstico (opcional)
+        _logger.info(
+            "Empleado creado: names=%s last_name=%s mother_last_name=%s",
+            employee.name, employee.names, employee.last_name, employee.mother_last_name
+        )
+
         return action
+
+    def action_save(self):
+        self.ensure_one()
+
+        _logger.info("Mostrando vista lista + efecto rainbow_man")
+
+        return {
+            'effect': { 
+                'fadeout': 'slow',
+                'message': '¡Postulación registrada exitosamente!',
+                'type': 'rainbow_man',
+            },
+            'type': 'ir.actions.act_window',
+            'res_model': self._name, 
+            'view_mode': 'list',
+            'target': 'current',
+            
+        }
+
+    

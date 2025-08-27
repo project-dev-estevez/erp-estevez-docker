@@ -68,7 +68,8 @@
     ],
     'assets': {
         'web.assets_backend': [
-            'hr_estevez/static/src/css/custom_styles.css',
+            'hr_estevez/static/src/components/**/*.js',
+            'hr_estevez/static/src/components/**/*.xml',
         ],
     },
 }

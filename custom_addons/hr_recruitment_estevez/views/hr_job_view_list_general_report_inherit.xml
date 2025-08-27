@@ -5,15 +5,15 @@
     <field name="model">hr.job</field>
     <field name="arch" type="xml">
       <list string="Vacantes Ofertadas" default_order="name asc">
-        <field name="name" string="Vacante"/>
-        <field name="area_id" string="Área" optional="show"/>
-        <field name="department_id" string="Departamento" optional="show"/>
-        <field name="no_of_recruitment" string="Objetivo" on_change="1" optional="show"/>
-        <field name="all_application_count" string="Total Postulaciones" optional="show"/>
-        <field name="in_process_applicant_count" string="En Proceso" optional="show"/>
-        <field name="no_of_hired_employee" string="Contratados" optional="show"/>
-        <field name="refused_applicant_count" string="Rechazados" optional="show"/>
-        <field name="is_published" string="Publicado"/>
+        <field name="name" string="Vacante" width="280"/>
+        <field name="area_id" string="Área" optional="show" width="200"/>
+        <field name="department_id" string="Departamento" optional="show" width="230"/>
+        <field name="no_of_recruitment" string="Objetivo" on_change="1" optional="show" width="150"/>
+        <field name="all_application_count" string="Total Postulaciones" optional="show" width="150"/>
+        <field name="in_process_applicant_count" string="En Proceso" optional="show" width="150"/>
+        <field name="no_of_hired_employee" string="Contratados" optional="show" width="150"/>
+        <field name="refused_applicant_count" string="Rechazados" optional="show" width="150"/>
+        <!--field name="is_published" string="Publicado"/-->
       </list>
     </field>
   </record>

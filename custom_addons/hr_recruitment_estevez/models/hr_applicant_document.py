@@ -3,7 +3,7 @@ import logging
 from odoo.exceptions import UserError
 _logger = logging.getLogger(__name__)
 
-class HrApplicantDocument(models.TransientModel):
+class HrApplicantDocument(models.Model):
     _name = 'hr.applicant.document'
     _description = 'Documentos requeridos para el aplicante'
 

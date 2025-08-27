@@ -9,7 +9,7 @@ class HRCandidate(models.Model):
 
     first_name = fields.Char(string='Nombre(s)', required=True)
     last_name = fields.Char(string='Apellido paterno', required=True)
-    mother_last_name = fields.Char(string='Apellido materno', required=True)
+    mother_last_name = fields.Char(string='Apellido materno')   
 
     @api.onchange('first_name', 'last_name', 'mother_last_name')
     def _onchange_fill_partner_name(self):
@@ -39,33 +39,25 @@ class HRCandidate(models.Model):
 
 
     def action_save(self):
-        # Aquí puedes agregar cualquier lógica adicional antes de guardar
-        self.ensure_one()        
-        _logger.info("Candidato registrado con éxito")
-        # Crear acción de retorno
-        action = {
-            'type': 'ir.actions.act_window',
-            'res_model': self._name,
-            'res_id': self.id,
-            'views': [(False, 'form')],
-            'target': 'current',
-        }
-        
+        self.ensure_one()
+
+        _logger.info("Mostrando vista lista + efecto rainbow_man")
+
         return {
-        'effect': {
-            'type': 'rainbow_man',
-            'message': '¡Candidato registrado exitosamente!',
-            'fadeout': 'slow',
-            'next': {
-                'type': 'ir.actions.act_window',
-                'res_model': self._name,
-                'view_mode': 'list',      # Cambiado a vista de tabla
-                'views': [(False, 'list')],
-                'target': 'current'                       
-                
-            }
+            'effect': {  # Aquí se incluye el efecto
+                'fadeout': 'slow',
+                'message': '¡Candidato registrado exitosamente!',
+                'type': 'rainbow_man',
+            },
+            'type': 'ir.actions.act_window',
+            'res_model': self._name,  # o el modelo que quieras mostrar
+            'view_mode': 'list',
+            'target': 'current',
+            
         }
-    }
+
+
+
 
 
 

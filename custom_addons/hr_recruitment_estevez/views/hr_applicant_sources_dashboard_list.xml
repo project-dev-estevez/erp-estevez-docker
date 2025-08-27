@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ✅ Vista de lista personalizada -->
+    <record id="view_hr_applicant_sources_dashboard_list" model="ir.ui.view">
+        <field name="name">hr.applicant.sources.dashboard.list</field>
+        <field name="model">hr.applicant</field>
+        <field name="arch" type="xml">
+            <list string="Postulaciones por Fuente" create="false" edit="false" 
+                  default_order="create_date desc">
+                <field name="candidate_id" string="Postulante"/>
+                <field name="create_date" string="Aplicó el"/>
+                <field name="job_id" string="Puesto de trabajo"/>
+                <field name="categ_ids" string="Etiquetas" widget="many2many_tags"/>
+                <field name="stage_id" string="Etapa"/>
+                <field name="priority" string="Evaluación" widget="priority"/>
+                <field name="user_id" string="Reclutador" widget="many2one_avatar_user"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- ✅ Acción de ventana personalizada -->
+    <record id="action_hr_applicant_sources_dashboard" model="ir.actions.act_window">
+        <field name="name">Postulaciones por Fuente</field>
+        <field name="res_model">hr.applicant</field>
+        <field name="view_mode">list,form</field>
+        <field name="view_id" ref="view_hr_applicant_sources_dashboard_list"/>
+    </record>
+</odoo>

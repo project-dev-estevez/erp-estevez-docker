@@ -138,8 +138,23 @@ class HrRequisition(models.Model):
     publication_status = fields.Char(        
         compute='_compute_publication_status',
         store=False,
-        search=True
-    )    
+        search='_search_publication_status'
+    )        
+
+    def _search_publication_status(self, operator, value):
+        if operator not in ('=', '!=', 'ilike', 'not ilike', 'in', 'not in'):
+            return []
+
+        status_mapping = {
+            'Por Abrir': [('state', '!=', 'approved')],  # Coincide con tu _compute
+            'Abierta': [('state', '=', 'approved'), ('is_published', '=', True)],
+            'Cerrada': [('state', '=', 'approved'), ('is_published', '=', False)],
+        }
+
+        if value in status_mapping:
+            return status_mapping[value]
+
+        return []
 
     @api.constrains('wizard_step', 'job_type', '')
 
@@ -154,7 +169,7 @@ class HrRequisition(models.Model):
             if record.state != 'approved':
                 record.publication_status = 'Por Abrir'            
             else:
-                record.publication_status = 'Abierta' if record.is_published else 'Por Abrir'
+                record.publication_status = 'Abierta' if record.is_published else 'Cerrada'
 
     # Acciones de estado
     def action_approve(self):
@@ -340,33 +355,22 @@ class HrRequisition(models.Model):
         return record
     
     def action_save(self):
-        # Aquí puedes agregar cualquier lógica adicional antes de guardar
         self.ensure_one()
-        self.write({'state': self.state})  # Esto guarda el registro
-        _logger.info("Requisición guardada con éxito")
-        # Crear acción de retorno
-        action = {
-            'type': 'ir.actions.act_window',
-            'res_model': self._name,
-            'res_id': self.id,
-            'views': [(False, 'form')],
-            'target': 'current',
-        }
-        
+
+        _logger.info("Mostrando vista lista + efecto rainbow_man")
+
         return {
-        'effect': {
-            'type': 'rainbow_man',
-            'message': '¡Requisición completada exitosamente!',
-            'fadeout': 'slow',
-            'next': {
-                'type': 'ir.actions.act_window',
-                'res_model': self._name,
-                'res_id': self.id,
-                'views': [(False, 'form')],
-                'target': 'current',
-            }
+            'effect': { 
+                'fadeout': 'slow',
+                'message': '¡Requisición registrada exitosamente!',
+                'type': 'rainbow_man',
+            },
+            'type': 'ir.actions.act_window',
+            'res_model': self._name, 
+            'view_mode': 'list',
+            'target': 'current',
+            
         }
-    }
     
     def action_previous(self):
         steps = {
