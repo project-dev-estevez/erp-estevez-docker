@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <t t-name="hr_attendance_controls_adv.ViewRenderer" owl="1">
+        <div class="o_geofence_container h-100">
+            <div id="olmap_widget" class="olmap_widget" style="width: 100%; height: 100%;" t-ref="mapContainer"></div>
+        </div>
+    </t>
+
+</templates>

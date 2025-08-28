@@ -1,0 +1,17 @@
+.o_geofence_draw_container{
+    width: 100%;
+    min-height: 450px;
+    height: calc(100vh - 400px);
+    overflow: hidden;
+}
+.o_field_geofence_drawing {
+    display: block;
+}
+.ol-clear {
+    top: 72px;
+    left: .5em;
+}
+.ol-draw{
+    top: 94px;
+    left: .5em;
+}

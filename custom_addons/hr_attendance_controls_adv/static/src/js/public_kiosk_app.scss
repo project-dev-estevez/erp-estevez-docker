@@ -1,0 +1,177 @@
+.o_hr_attendance_kiosk_mode_container{
+    overflow-y: scroll !important;
+    
+    .o_hr_attendance_kiosk_backdrop{
+        height: calc(100vh + 150px) !important;
+    }
+}
+
+
+.attendance_controls_public {
+    min-width: 360px !important;
+    display: table;
+    position: relative;
+    font-size: 16px;
+
+    .glocation_container{
+        margin-top: 10px;
+        .glocation_toggle{
+            width: 100%;
+            right: 20px;
+            color: #555555;
+            cursor: pointer;
+            border-top: 1px dashed #adb5bd;
+            border-bottom: 1px dashed #adb5bd;    
+            padding: 5px 5px 5px 5px;
+            background-color: #9e8b921f;
+        }
+        .glocation_toggle::before{
+            position: absolute;
+            right: 10px;
+        }
+        .glocation_view{
+            font-size: 14px;
+            width: 100%;
+            height: 45px;
+            padding-top: 3px;
+            position: relative;
+            text-align: center;
+        }   
+    }
+
+    .geofence_container{
+        margin-top: 10px;
+        .geofence_toggle{
+            width: 100%;
+            right: 20px;
+            color: #555555;
+            cursor: pointer;
+            border-top: 1px dashed #adb5bd;
+            border-bottom: 1px dashed #adb5bd;    
+            padding: 5px 5px 5px 5px;
+            background-color: #9e8b921f;
+        }
+        .geofence_toggle::before{
+            position: absolute;
+            right: 10px;
+        }
+        .geofence_view{
+            width: 100%;
+            min-width: 300px;
+            height: 250px;
+            padding-top: 3px;
+            position: relative;
+            text-align: center;
+        }   
+    }
+
+    .geoipaddress_container{
+        margin-top: 10px;
+        .geoipaddress_toggle{
+            width: 100%;
+            right: 20px;
+            color: #555555;
+            cursor: pointer;
+            border-top: 1px dashed #adb5bd;
+            border-bottom: 1px dashed #adb5bd;    
+            padding: 5px 5px 5px 5px;
+            background-color: #9e8b921f;
+        }
+        .geoipaddress_toggle::before{
+            position: absolute;
+            right: 10px;
+        }
+        .geoipaddress_view{
+            font-size: 14px;
+            width: 100%;
+            height: 30px;
+            padding-top: 3px;
+            position: relative;
+            text-align: center;
+        }  
+    }
+}
+
+/* Medium screens (≤1024px) */
+@media (max-width: 1024px) {
+    .attendance_controls_public {
+        min-width: 300px !important;
+    }
+}
+
+/* Small screens (≤768px) */
+@media (max-width: 768px) {
+    .attendance_controls_public {
+        min-width: 300px !important;
+    }
+}
+
+/* Extra small screens (≤480px) */
+@media (max-width: 480px) {
+    .attendance_controls_public {
+        min-width: 300px !important;
+    }
+}
+
+.o_mobile_barcode {
+    top: 0% !important;
+}
+
+.o_hr_attendance_install_btn {
+    top: 0% !important;
+}
+
+.o_hr_attendance_install_btn {
+    height: 40px !important;
+    width: 80px !important;
+}
+
+.o_hr_kiosk_mode_controls_main {
+    margin-left: 120px; /* Default for large screens */
+}
+
+/* Medium screens (e.g., tablets) */
+@media (max-width: 1024px) {
+    .o_hr_kiosk_mode_controls_main {
+        margin-left: auto;
+    }
+}
+
+/* Small screens (e.g., phones) */
+@media (max-width: 768px) {
+    .o_hr_kiosk_mode_controls_main {
+        margin-left: auto;
+    }
+}
+
+/* Extra small screens (optional) */
+@media (max-width: 480px) {
+    .o_hr_kiosk_mode_controls_main {
+        margin-left: auto;
+    }
+}
+
+.o_hr_kiosk_mode_controls_inner {
+    margin-top: 0px;
+}
+
+/* Medium screens (e.g., tablets) */
+@media (max-width: 1024px) {
+    .o_hr_kiosk_mode_controls_inner {
+        margin-top: 160px;
+    }
+}
+
+/* Small screens (e.g., phones) */
+@media (max-width: 768px) {
+    .o_hr_kiosk_mode_controls_inner {
+        margin-top: 160px;
+    }
+}
+
+/* Extra small screens (optional) */
+@media (max-width: 480px) {
+    .o_hr_kiosk_mode_controls_inner {
+        margin-top: 160px;
+    }
+}

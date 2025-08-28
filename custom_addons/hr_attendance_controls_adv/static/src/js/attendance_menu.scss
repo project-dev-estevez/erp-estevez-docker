@@ -1,0 +1,109 @@
+.o-dropdown--menu.dropdown-menu.d-block.p-2.pb-3 {
+    overflow: hidden;
+    max-height: unset !important;
+}
+
+
+.attendance_controls {
+    min-width: 350px !important;
+    
+    .reason_container{
+        margin-top: 10px;
+        .reason_toggle{
+            width: 100%;
+            right: 20px;
+            color: #555555;
+            cursor: pointer;
+            border-top: 1px dashed #adb5bd;
+            border-bottom: 1px dashed #adb5bd;    
+            padding: 5px 5px 5px 5px;
+            background-color: #9e8b921f;
+        }
+        .reason_toggle::before{
+            position: absolute;
+            right: 10px;
+        }
+        .reason_view{
+            width: 100%;
+            height: 30px;
+            padding-top: 3px;
+            position: relative;
+            text-align: center;
+        }  
+    }
+    .glocation_container{
+        margin-top: 10px;
+        .glocation_toggle{
+            width: 100%;
+            right: 20px;
+            color: #555555;
+            cursor: pointer;
+            border-top: 1px dashed #adb5bd;
+            border-bottom: 1px dashed #adb5bd;    
+            padding: 5px 5px 5px 5px;
+            background-color: #9e8b921f;
+        }
+        .glocation_toggle::before{
+            position: absolute;
+            right: 10px;
+        }
+        .glocation_view{
+            width: 100%;
+            height: 30px;
+            padding-top: 3px;
+            position: relative;
+            text-align: center;
+        }   
+    }
+
+    .geofence_container{
+        margin-top: 10px;
+        .geofence_toggle{
+            width: 100%;
+            right: 20px;
+            color: #555555;
+            cursor: pointer;
+            border-top: 1px dashed #adb5bd;
+            border-bottom: 1px dashed #adb5bd;    
+            padding: 5px 5px 5px 5px;
+            background-color: #9e8b921f;
+        }
+        .geofence_toggle::before{
+            position: absolute;
+            right: 10px;
+        }
+        .geofence_view{
+            width: 100%;
+            min-width: 300px;
+            height: 250px;
+            padding-top: 3px;
+            position: relative;
+            text-align: center;
+        }   
+    }
+
+    .geoipaddress_container{
+        margin-top: 10px;
+        .geoipaddress_toggle{
+            width: 100%;
+            right: 20px;
+            color: #555555;
+            cursor: pointer;
+            border-top: 1px dashed #adb5bd;
+            border-bottom: 1px dashed #adb5bd;    
+            padding: 5px 5px 5px 5px;
+            background-color: #9e8b921f;
+        }
+        .geoipaddress_toggle::before{
+            position: absolute;
+            right: 10px;
+        }
+        .geoipaddress_view{
+            width: 100%;
+            height: 30px;
+            padding-top: 3px;
+            position: relative;
+            text-align: center;
+        }  
+    }
+}
