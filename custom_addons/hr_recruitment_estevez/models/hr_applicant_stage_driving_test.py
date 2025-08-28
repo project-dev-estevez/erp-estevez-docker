@@ -1,4 +1,5 @@
-from odoo import models, fields, api
+from datetime import timedelta
+from odoo import models, fields, api, _
 from odoo.exceptions import ValidationError
 
 class HrApplicantStageDrivingTest(models.Model):
@@ -503,7 +504,7 @@ class HrApplicantStageDrivingTest(models.Model):
                 'params': {
                     'title': 'Acción no permitida',
                     'message': 'No puede editar la prueba de manejo en esta etapa.',
-                    'type': 'warning',
+                    'notificationType': 'warning',
                 }
             }
         
@@ -515,7 +516,7 @@ class HrApplicantStageDrivingTest(models.Model):
                 'params': {
                     'title': 'Datos Incompletos',
                     'message': 'Debe seleccionar un tipo de licencia.',
-                    'type': 'warning',
+                    'notificationType': 'warning',
                 }
             }
         
@@ -525,5 +526,165 @@ class HrApplicantStageDrivingTest(models.Model):
         
         # ✅ Descargar el PDF del reporte
         return self.env.ref('hr_recruitment_estevez.action_hr_applicant_driving_test_report').report_action(self)
+    
+    def action_send_theoretical_interview(self):
+        """
+        Envía la entrevista teórica de prueba de manejo al candidato.
+        Busca la encuesta por criterios robustos en lugar de ID directo.
+        """
+        self.ensure_one()
+        
+        # ✅ Validación: debe estar en etapa de Prueba de Manejo
+        if not self.is_driving_test:
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'title': 'Acción no disponible',
+                    'message': 'El candidato debe estar en la etapa "Prueba de Manejo" para enviar la entrevista teórica.',
+                    'notificationType': 'warning',
+                }
+            }
+        
+        # ✅ Validación: debe tener email
+        if not self.email_from:
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'title': 'Email requerido',
+                    'message': 'El candidato debe tener un email registrado para enviar la entrevista.',
+                    'notificationType': 'warning',
+                }
+            }
+        
+        # ✅ Buscar la encuesta usando criterios robustos (no ID directo)
+        theoretical_survey = self.env['survey.survey'].search([
+            ('title', 'ilike', 'EVALUACIÓN TEÓRICA PRUEBA DE MANEJO'),
+            ('survey_type', '=', 'recruitment'),
+            ('active', '=', True)
+        ], limit=1)
+        
+        if not theoretical_survey:
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'title': 'Encuesta no encontrada',
+                    'message': 'No se encontró la "Evaluación Teórica Prueba de Manejo" activa.',
+                    'notificationType': 'danger',
+                }
+            }
+        
+        # ✅ Validar la encuesta antes de enviar
+        try:
+            theoretical_survey.check_validity()
+        except Exception as validation_error:
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'title': 'Error de validación',
+                    'message': f'La encuesta no es válida: {str(validation_error)}',
+                    'notificationType': 'danger',
+                }
+            }
+        
+        try:
+            # ✅ Crear/obtener partner si no existe
+            if not self.partner_id:
+                if not self.partner_name:
+                    return {
+                        'type': 'ir.actions.client',
+                        'tag': 'display_notification',
+                        'params': {
+                            'title': 'Nombre requerido',
+                            'message': 'El candidato debe tener un nombre registrado.',
+                            'notificationType': 'warning',
+                        }
+                    }
+                
+                self.partner_id = self.env['res.partner'].sudo().create({
+                    'is_company': False,
+                    'name': self.partner_name,
+                    'email': self.email_from,
+                    'phone': self.partner_phone,
+                    'mobile': self.partner_phone
+                })
+            
+            # ✅ Crear la invitación directamente (sin modal)
+            user_input = theoretical_survey._create_answer(
+                partner=self.partner_id,
+                email=self.email_from,
+                check_attempts=False  # Permitir múltiples intentos
+            )
+            
+            # ✅ Vincular con el candidato
+            user_input.write({
+                'applicant_id': self.id,
+            })
+            
+            # ✅ Enviar la invitación por email usando el template estándar
+            template = self.env.ref('survey.mail_template_user_input_invite', raise_if_not_found=False)
+            if template:
+                email_values = {
+                    'email_to': self.email_from,
+                    'subject': f'Evaluación Teórica - {theoretical_survey.title}',
+                }
+                template.send_mail(user_input.id, email_values=email_values, force_send=True)
+            else:
+                # Fallback: crear email simple si no hay template
+                survey_url = f"/survey/start/{theoretical_survey.access_token}/{user_input.access_token}"
+                mail_values = {
+                    'subject': f'Evaluación Teórica - {theoretical_survey.title}',
+                    'body_html': f'''
+                    <p>Estimado/a {self.partner_name},</p>
+                    <p>Se le ha asignado una evaluación teórica como parte del proceso de selección.</p>
+                    <p><strong>Enlace de acceso:</strong> <a href="{survey_url}" target="_blank">Hacer la evaluación</a></p>
+                    <p><strong>Tiempo límite:</strong> {theoretical_survey.time_limit} minutos</p>
+                    <p>Saludos cordiales,<br/>Equipo de Reclutamiento</p>
+                    ''',
+                    'email_to': self.email_from,
+                    'email_from': self.env.user.email or 'noreply@company.com',
+                }
+                mail = self.env['mail.mail'].create(mail_values)
+                mail.send()
+            
+            # ✅ Registrar en el chatter del candidato
+            survey_url = f"/survey/start/{theoretical_survey.access_token}/{user_input.access_token}"
+            self.message_post(
+                body=f"""
+                <p>✅ <strong>Entrevista Teórica Enviada</strong></p>
+                <ul>
+                    <li><strong>Encuesta:</strong> {theoretical_survey.title}</li>
+                    <li><strong>Email:</strong> {self.email_from}</li>
+                    <li><strong>Fecha de envío:</strong> {fields.Datetime.now().strftime('%Y-%m-%d %H:%M:%S')}</li>
+                    <li><strong>Enlace:</strong> <a href="{survey_url}" target="_blank">Acceder a la entrevista</a></li>
+                </ul>
+                """,
+                subject="Entrevista Teórica Enviada"
+            )
+            
+            # ✅ Notificación de éxito
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'title': '✅ Entrevista enviada exitosamente',
+                    'message': f'La evaluación teórica ha sido enviada a {self.email_from}',
+                    'notificationType': 'success',
+                }
+            }
+            
+        except Exception as e:
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'title': 'Error al enviar',
+                    'message': f'Ocurrió un error al enviar la entrevista: {str(e)}',
+                    'notificationType': 'danger',
+                }
+            }
     
     

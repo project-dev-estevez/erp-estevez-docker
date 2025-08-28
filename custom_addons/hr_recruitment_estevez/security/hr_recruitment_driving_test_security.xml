@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Definición del nuevo grupo -->
+    <record id="group_driving_test_supervisor" model="res.groups">
+        <field name="name">Supervisor: Pruebas de Manejo</field>
+        <field name="category_id" ref="base.module_category_human_resources_recruitment"/>
+        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+    </record>
+
+    <!-- Añadir grupo al menú principal de Reclutamiento -->
+    <record id="hr_recruitment.menu_hr_recruitment_root" model="ir.ui.menu">
+        <field name="groups_id" eval="[(4, ref('hr_recruitment_estevez.group_driving_test_supervisor'))]"/>
+    </record>
+
+    <!-- Regla de acceso: solo ver postulaciones en etapa "Prueba de Manejo" -->
+    <record id="rule_applicant_driving_test_only" model="ir.rule">
+        <field name="name">Applicants - Driving Test Only</field>
+        <field name="model_id" ref="hr_recruitment.model_hr_applicant"/>
+        <field name="groups" eval="[(4, ref('hr_recruitment_estevez.group_driving_test_supervisor'))]"/>
+        <!-- Filtra por nombre de la etapa -->
+        <field name="domain_force">[('stage_id.name', '=', 'Prueba de Manejo')]</field>
+    </record>
+
+</odoo>
