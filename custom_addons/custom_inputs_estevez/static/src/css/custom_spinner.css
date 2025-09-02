@@ -14,10 +14,12 @@
   height: 80px;
   background: url('/custom_inputs_estevez/static/src/img/icon.png') no-repeat center center;
   background-size: contain;
-  animation: spin 1.5s linear infinite;
+  animation: spin-pause 1.5s ease-in-out infinite;
 }
 
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+@keyframes spin-pause {
+  0%   { transform: rotate(0deg); }
+  20%  { transform: rotate(360deg); } /* giro rápido */
+  60%  { transform: rotate(0deg); }   /* vuelve a inicial */
+  100% { transform: rotate(0deg); }   /* se queda quieto */
 }
