@@ -10,6 +10,7 @@
     'version': '1.0',
     'depends': ['hr', 'website_slides'],
     'data': [
+        'report/course_certificate_report.xml',
         'views/hr_employee_views.xml',
     ],
     'installable': True,

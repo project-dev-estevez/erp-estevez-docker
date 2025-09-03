@@ -15,6 +15,7 @@
                             <field name="description" string="Descripción" width="450"/>  
                             <field name="channel_type" string="Tipo" width="200"/>   
                             <field name="modalidad" string="Modalidad" width="200"/>                           
+                            <button name="generate_course_certificate" string="Generar Certificado" type="object" class="btn-primary"/>
                         </list>
                     </field>
                 </page>
