@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>   
+
+<menuitem 
+        id="catalogos"
+        name="Catálogos"
+        parent="website_slides.website_slides_menu_root" 
+        action="action_states"
+        sequence="200"/>  
+    <menuitem 
+        id="states"
+        name="Estados"
+        parent="custom_training_extension.catalogos" 
+        action="action_states"
+        sequence="1"/>  
+
+    <menuitem 
+        id="municipality"
+        name="Municipios"
+        parent="custom_training_extension.catalogos" 
+        action="action_municipality"
+        sequence="2"/>
+
+   <menuitem 
+        id="courses"
+        name="Cursos"
+        parent="custom_training_extension.catalogos" 
+        action="action_courses"
+        sequence="2"/>   
+    
+</odoo>
+

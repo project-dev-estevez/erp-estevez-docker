@@ -10,7 +10,10 @@
     'version': '1.0',
     'depends': ['hr', 'website_slides'],
     'data': [
+        'security/ir.model.access.csv',
+        'report/course_certificate_report.xml',
         'views/hr_employee_views.xml',
+        'views/certificate_wizard_view.xml',
     ],
     'installable': True,
     'application': False,

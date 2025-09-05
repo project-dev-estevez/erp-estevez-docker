@@ -11,10 +11,12 @@
                                         
                     <field name="course_ids">
                         <list>
-                            <field name="name" string="Nombre del Curso" width="350"/>  
-                            <field name="description" string="Descripción" width="450"/>  
+                            <field name="name" string="Nombre del Curso" width="250"/>                              
                             <field name="channel_type" string="Tipo" width="200"/>   
-                            <field name="modalidad" string="Modalidad" width="200"/>                           
+                            <field name="modalidad" string="Modalidad" width="200"/>  
+                            <field name="write_date" string="Fecha de Inicio" width="200"/>
+                            <field name="completion" string="Porcentaje Completado" width="200"/>                           
+                            <button name="generate_course_certificate" string="Generar Certificado" type="object" class="btn-primary"/>
                         </list>
                     </field>
                 </page>
