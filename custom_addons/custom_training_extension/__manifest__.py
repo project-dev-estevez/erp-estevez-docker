@@ -6,8 +6,7 @@
     'author': 'Ruth Rivera',
     'depends': ['base', 'hr', 'website_slides'],
     'data': [
-        'security/ir.model.access.csv',
-        'data/estados.csv',        
+        'security/ir.model.access.csv',        
         'views/hr_state_views.xml',
         'views/hr_municipality_views.xml',
         'views/hr_occupation_views.xml',
