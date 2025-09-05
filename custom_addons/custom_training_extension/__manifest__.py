@@ -10,7 +10,6 @@
         'views/hr_state_views.xml',
         'views/hr_municipality_views.xml',
         'views/hr_occupation_views.xml',
-        'views/hr_employee_views.xml',
         'views/hr_employee_course_views.xml',
         'views/hr_courses_views.xml',
         'views/hr_thematics_views.xml',
