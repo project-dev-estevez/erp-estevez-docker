@@ -3,6 +3,7 @@ import logging
 from odoo import api, models, fields, _
 from odoo.exceptions import UserError
 from datetime import date, timedelta, datetime
+from dateutil.relativedelta import relativedelta
 import re
 import requests
 
@@ -75,27 +76,6 @@ class HrEmployee(models.Model):
     memorandum_ids = fields.One2many('hr.memorandum', 'employee_id', string='Actas Administrativas')
     loan_ids = fields.One2many('hr.loan', 'employee_id', string='Préstamos y Anticipos')
 
-    years_of_service = fields.Float(
-        string="Años de Servicio",
-        compute="_compute_years_of_service",
-        store=False
-    )
-    entitled_days = fields.Float(
-        string="Con Derecho a",
-        compute="_compute_vacation_days",
-        store=False
-    )
-    vacation_days_taken = fields.Float(
-        string="Días de Vacaciones Disfrutados",
-        compute="_compute_vacation_days_taken",
-        store=False
-    )
-    vacation_days_available = fields.Float(
-        string="Días de Vacaciones Disponibles",
-        compute="_compute_vacation_days_available",
-        store=False
-    )
-
     vacation_period_ids = fields.One2many(
         'hr.vacation.period', 'employee_id', string="Periodos de Vacaciones"
     )
@@ -129,56 +109,15 @@ class HrEmployee(models.Model):
         domain=[('category_type', '=', 'consumable')]
     )
 
-    @api.depends('contract_ids.date_start', 'contract_ids.date_end', 'years_of_service')
-    def generate_vacation_periods(self):
-        for employee in self:
-            # Eliminar periodos existentes
-            employee.vacation_period_ids.unlink()
+    employment_start_date = fields.Date(string='Fecha de Ingreso', tracking=True)
 
-            # Verificar si hay contratos
-            if not employee.contract_ids:
-                continue
+    years_of_service = fields.Float(compute='_compute_years_of_service', string='Años de servicio', store=True)
+    entitled_days = fields.Float(compute='_compute_entitled_days', string='Con derecho a', store=True)
+    vacation_days_taken = fields.Float(compute='_compute_days_taken', string='Días de vacaciones disfrutados', store=True)
+    vacation_days_available = fields.Float(compute='_compute_days_available', string='Días vacaciones disponibles', store=True)
+    vacation_period_ids = fields.One2many('hr.vacation.period', 'employee_id')
 
-            # Buscar el contrato con la fecha de inicio más antigua
-            base_contract = min(employee.contract_ids, key=lambda c: c.date_start)
-
-            # Usar la fecha de inicio del contrato base
-            current_start_date = base_contract.date_start
-            current_end_date = base_contract.date_end or date.today()
-
-            # Generar periodos de vacaciones desde la fecha de inicio hasta la fecha actual
-            while current_start_date <= current_end_date:
-                # Calcular el fin del periodo basado en el año calendario
-                year_end = current_start_date.replace(year=current_start_date.year + 1) - timedelta(days=1)
-                if year_end > current_end_date:
-                    year_end = current_end_date
-
-                # Calcular años de servicio
-                years_of_service = current_start_date.year - base_contract.date_start.year
-
-                # Calcular días de vacaciones según los años de servicio
-                entitled_days_full_year = 12 + (years_of_service * 2) if years_of_service < 5 else 22
-
-                # Si es el último período, calcular proporcionalmente los días de vacaciones
-                if year_end == current_end_date:
-                    days_in_year = (year_end - current_start_date).days + 1
-                    entitled_days = (entitled_days_full_year / 365) * days_in_year
-                else:
-                    entitled_days = entitled_days_full_year
-
-                days_taken = 0  # Inicialmente 0
-
-                # Crear el periodo de vacaciones
-                self.env['hr.vacation.period'].create({
-                    'employee_id': employee.id,
-                    'year_start': current_start_date,
-                    'year_end': year_end,
-                    'entitled_days': round(entitled_days, 2),  # Redondear a 2 decimales
-                    'days_taken': days_taken,
-                })
-
-                # Avanzar al siguiente año
-                current_start_date = current_start_date.replace(year=current_start_date.year + 1)
+    leave_ids = fields.One2many('hr.leave', 'period_id')
 
     def _create_vacation_period(self, employee, start_date, end_date):
         # Calcular el inicio y fin del periodo basado en años calendario
@@ -202,79 +141,50 @@ class HrEmployee(models.Model):
             # Avanzar al siguiente año
             year_start = year_start.replace(year=year_start.year + 1)
 
-    @api.depends('contract_ids.date_start', 'contract_ids.date_end', 'contract_ids.state')
+    @api.depends('employment_start_date')
     def _compute_years_of_service(self):
-        for employee in self:
-            total_days = 0
-            today = date.today()
-
-            # Iterar sobre todos los contratos del empleado
-            for contract in employee.contract_ids:
-                # Considerar solo contratos en estado 'open' o 'close'
-                if contract.date_start:
-                    # Si el contrato tiene fecha de fin, usarla; de lo contrario, usar la fecha actual
-                    end_date = contract.date_end or today
-                    total_days += (end_date - contract.date_start).days
-
-            # Convertir días totales en años decimales
-            employee.years_of_service = round(total_days / 365.0, 2)
+        today = fields.Date.today()
+        for record in self:
+            if record.employment_start_date:
+                delta = today - record.employment_start_date
+                record.years_of_service = delta.days / 365.0
+            else:
+                record.years_of_service = 0
 
     @api.depends('years_of_service')
-    def _compute_vacation_days(self):
-        for employee in self:
-            years = int(employee.years_of_service)  # Convertir años de servicio a entero
-            entitled_days = 0
+    def _compute_entitled_days(self):
+        for record in self:
+            years = int(record.years_of_service)
+            if years < 1:
+                record.entitled_days = 0
+            elif years == 1:
+                record.entitled_days = 12
+            elif years == 2:
+                record.entitled_days = 14
+            elif years == 3:
+                record.entitled_days = 16
+            elif years == 4:
+                record.entitled_days = 18
+            elif years == 5:
+                record.entitled_days = 20
+            else:
+                # Años adicionales: +2 días por cada 5 años después del 5to
+                additional_years = years - 5
+                additional_days = (additional_years // 5) * 2
+                record.entitled_days = 20 + additional_days
 
-            # Calcular días de vacaciones acumulativos según los años laborados
-            if years >= 1:
-                for i in range(1, years + 1):
-                    if i == 1:
-                        entitled_days += 12
-                    elif i == 2:
-                        entitled_days += 14
-                    elif i == 3:
-                        entitled_days += 16
-                    elif i == 4:
-                        entitled_days += 18
-                    elif i == 5:
-                        entitled_days += 20
-                    elif 6 <= i <= 10:
-                        entitled_days += 22
-                    elif 11 <= i <= 15:
-                        entitled_days += 24
-                    elif 16 <= i <= 20:
-                        entitled_days += 26
-                    elif 21 <= i <= 25:
-                        entitled_days += 28
-                    elif 26 <= i <= 30:
-                        entitled_days += 30
-                    elif 31 <= i <= 50:
-                        entitled_days += 32
-
-            # Asignar los días calculados al campo
-            employee.entitled_days = entitled_days
-
-    @api.depends('entitled_days')
-    def _compute_vacation_days_taken(self):
-        for employee in self:
-            # Inicializar el campo con 0
-            employee.vacation_days_taken = 0
-
-            # Obtener los días de vacaciones aprobados para el empleado
-            leaves = self.env['hr.leave'].search([
-                ('employee_id', '=', employee.id),
-                ('state', '=', 'validate')  # Solo considerar vacaciones aprobadas
-            ])
-
-            # Sumar los días de vacaciones aprobados
-            if leaves:
-                employee.vacation_days_taken = sum(leaves.mapped('number_of_days'))
+    @api.depends('vacation_period_ids.days_taken')  # Mantener esta dependencia
+    def _compute_days_taken(self):
+        for record in self:
+            # Suma directa sin dependencia cruzada
+            record.vacation_days_taken = sum(
+                period.days_taken for period in record.vacation_period_ids
+            )
 
     @api.depends('entitled_days', 'vacation_days_taken')
-    def _compute_vacation_days_available(self):
-        for employee in self:
-            # Calcular los días disponibles
-            employee.vacation_days_available = employee.entitled_days - employee.vacation_days_taken
+    def _compute_days_available(self):
+        for record in self:
+            record.vacation_days_available = record.entitled_days - record.vacation_days_taken
 
     def action_open_memorandum_form(self):
         return {
@@ -417,17 +327,18 @@ class HrEmployee(models.Model):
         # Construir nombre completo
         if 'names' in vals or 'last_name' in vals or 'mother_last_name' in vals:
             names = vals.get('names', '').strip()
-            vals['name'] = f"{names} {vals.get('last_name', '')} {vals.get('mother_last_name', '')}".strip()
+            last_name = vals.get('last_name', '').strip()
+            mother_last_name = vals.get('mother_last_name', '').strip()
+            vals['name'] = f"{names} {last_name} {mother_last_name}".strip()
         
         # Crear empleado
         employee = super(HrEmployee, self).create(vals)
         
-        # Lógica de dirección
-        if 'direction_id' in vals and vals['direction_id']:
-            direction = self.env['hr.direction'].browse(vals['direction_id'])
-            direction.director_id = employee.id
+        # Generar períodos de vacaciones si hay fecha de ingreso
+        if vals.get('employment_start_date'):
+            employee.generate_vacation_periods()
         
-        # Sincronizar con CodeIgniter (sin bloquear en caso de error)
+        # Sincronizar con CodeIgniter
         try:
             _logger.info("Intentando sincronizar con CodeIgniter")
             self._sync_codeigniter(employee, 'create')
@@ -437,34 +348,42 @@ class HrEmployee(models.Model):
         return employee
 
     def write(self, vals):
-       
+        # Construir nombre completo si cambian los componentes
         if 'name' not in vals and ('names' in vals or 'last_name' in vals or 'mother_last_name' in vals):
-            # Obtener valores de forma segura (convertir a string)
-            names_val = str(vals.get('names', self.names)) if vals.get('names', self.names) is not False else ''
-            last_name_val = str(vals.get('last_name', self.last_name)) if vals.get('last_name', self.last_name) is not False else ''
-            mother_last_name_val = str(vals.get('mother_last_name', self.mother_last_name)) if vals.get('mother_last_name', self.mother_last_name) is not False else ''
-            
-            # Construir nombre completo
-            full_name = f"{names_val} {last_name_val} {mother_last_name_val}".strip()
-            
-        vals['name'] = self.name
+            names_val = vals.get('names', self.names) or ''
+            last_name_val = vals.get('last_name', self.last_name) or ''
+            mother_last_name_val = vals.get('mother_last_name', self.mother_last_name) or ''
+            vals['name'] = f"{names_val} {last_name_val} {mother_last_name_val}".strip()
         
-        # Resto de tu lógica para direction_id...
-        for record in self:
-            if 'direction_id' in vals:
-                if record.direction_id:
-                    old_direction = self.env['hr.direction'].browse(record.direction_id.id)
-                    old_direction.director_id = False
+        # Regenerar períodos solo si cambia la fecha de ingreso Y no hay días tomados
+        if 'employment_start_date' in vals:
+            for employee in self:
+                # Si se está estableciendo una fecha de ingreso vacía, eliminar períodos existentes
+                if not vals['employment_start_date']:
+                    employee.vacation_period_ids.unlink()
+                    continue
+                    
+                # Verificar si hay días tomados antes de regenerar
+                if any(period.days_taken > 0 for period in employee.vacation_period_ids):
+                    raise UserError("No se puede cambiar la fecha de ingreso porque hay días de vacaciones ya tomados. Elimine manualmente los periodos existentes primero.")
+                
+                # Eliminar periodos existentes
+                employee.vacation_period_ids.unlink()
 
-                if vals['direction_id']:
-                    new_direction = self.env['hr.direction'].browse(vals['direction_id'])
-                    new_direction.director_id = record.id
-
+        # Llamar al write original
         res = super().write(vals)
         
+        # Generar nuevos períodos después de guardar
+        if 'employment_start_date' in vals:
+            for employee in self:
+                if employee.employment_start_date:
+                    employee.generate_vacation_periods()
+        
+        # Sincronizar con CodeIgniter después de guardar
         try:
-            _logger.info(f"Iniciando sincronización de actualización para {self.name}")
-            self._sync_codeigniter(self, 'update')
+            for employee in self:
+                _logger.info(f"Iniciando sincronización de actualización para {employee.name}")
+                employee._sync_codeigniter(employee, 'update')
         except Exception as e:
             _logger.error(f"Error en sincronización de actualización: {str(e)}")
 
@@ -633,4 +552,178 @@ class HrEmployee(models.Model):
             'view_mode': 'list',
             'target': 'current',
             
+        }
+    
+    def _sync_codeigniter_archive(self):
+        """Sincroniza el archivado del empleado con CodeIgniter"""
+        api_url = self.env['ir.config_parameter'].get_param('codeigniter.api_url')
+        api_token = self.env['ir.config_parameter'].get_param('codeigniter.api_token')
+        
+        if not api_url or not api_token:
+            _logger.error("Configuración de API para CodeIgniter faltante")
+            return False
+
+        # Preparar payload
+        payload = {
+            'action': 'archive',
+            'odoo_id': self.id,
+        }
+
+        try:
+            endpoint = f"{api_url}/empleados/{self.id}/archive"
+            headers = {
+                'Authorization': f'Bearer {api_token}',
+                'Content-Type': 'application/json'
+            }
+            
+            response = requests.post(
+                endpoint,
+                json=payload,
+                headers=headers,
+                timeout=30,
+                verify=False
+            )
+            
+            _logger.info(f"Respuesta CI para archivado: {response.status_code} - {response.text}")
+            
+            if response.status_code == 200:
+                return True
+            else:
+                _logger.error(f"Error CI: {response.status_code} - {response.text}")
+                return False
+                    
+        except Exception as e:
+            _logger.error(f"Error de conexión con CodeIgniter: {str(e)}")
+            return False
+
+    def _sync_codeigniter_unarchive(self):
+        """Sincroniza la reactivación del empleado con CodeIgniter"""
+        api_url = self.env['ir.config_parameter'].get_param('codeigniter.api_url')
+        api_token = self.env['ir.config_parameter'].get_param('codeigniter.api_token')
+        
+        if not api_url or not api_token:
+            _logger.error("Configuración de API para CodeIgniter faltante")
+            return False
+
+        payload = {
+            'action': 'unarchive',
+            'odoo_id': self.id,
+        }
+
+        try:
+            endpoint = f"{api_url}/empleados/{self.id}/unarchive"
+            headers = {
+                'Authorization': f'Bearer {api_token}',
+                'Content-Type': 'application/json'
+            }
+            
+            response = requests.post(
+                endpoint,
+                json=payload,
+                headers=headers,
+                timeout=30,
+                verify=False
+            )
+            
+            _logger.info(f"Respuesta CI para reactivación: {response.status_code} - {response.text}")
+            
+            if response.status_code == 200:
+                return True
+            else:
+                _logger.error(f"Error CI: {response.status_code} - {response.text}")
+                return False
+                    
+        except Exception as e:
+            _logger.error(f"Error de conexión con CodeIgniter: {str(e)}")
+            return False
+
+    # Sobrescribir métodos estándar para manejar archivado/desarchivado directo
+    def action_archive(self):
+        res = super(HrEmployee, self).action_archive()
+        for employee in self:
+            try:
+                employee._sync_codeigniter_archive()
+            except Exception as e:
+                _logger.error(f"Error en sincronización de baja directa: {str(e)}")
+        return res
+
+    def action_unarchive(self):
+        res = super(HrEmployee, self).action_unarchive()
+        for employee in self:
+            try:
+                employee._sync_codeigniter_unarchive()
+            except Exception as e:
+                _logger.error(f"Error en sincronización de reactivación directa: {str(e)}")
+        return res
+
+    # Método para generar periodos de vacaciones automáticamente    
+    def generate_vacation_periods(self):
+        _logger.info(f"Generating vacation periods for employees: {self.ids}")
+        
+        employees_without_date = self.filtered(lambda e: not e.employment_start_date)
+        if employees_without_date:
+            raise UserError(
+                "Los siguientes empleados no tienen fecha de ingreso configurada: %s" %
+                ", ".join(employees_without_date.mapped('name'))
+            )
+        
+        for employee in self:
+            # Eliminar periodos existentes
+            employee.vacation_period_ids.unlink()
+            
+            start_date = employee.employment_start_date
+            today = fields.Date.today()
+            periods = []
+            year_count = 1
+            
+            while start_date < today:
+                year_end = start_date + relativedelta(years=1, days=-1)
+                
+                # Asegurar que no exceda la fecha actual
+                if year_end > today:
+                    year_end = today
+                    
+                # Calcular días según ley mexicana actual
+                if year_count == 1:
+                    entitled = 12
+                elif year_count == 2:
+                    entitled = 14
+                elif year_count == 3:
+                    entitled = 16
+                elif year_count == 4:
+                    entitled = 18
+                elif year_count == 5:
+                    entitled = 20
+                else:
+                    # Años adicionales: +2 días por cada 5 años después del 5to
+                    additional_years = year_count - 5
+                    additional_days = (additional_years // 5) * 2
+                    entitled = 20 + additional_days
+                    
+                periods.append({
+                    'employee_id': employee.id,
+                    'year_start': start_date,
+                    'year_end': year_end,
+                    'entitled_days': entitled,
+                })
+                
+                start_date = year_end + relativedelta(days=1)
+                year_count += 1
+                
+                # Prevenir bucles infinitos
+                if year_count > 50:
+                    break
+            
+            if periods:
+                self.env['hr.vacation.period'].create(periods)
+                
+        # Mostrar mensaje de confirmación
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': 'Periodos generados',
+                'message': f'Se han generado {len(periods)} periodos vacacionales',
+                'sticky': False,
+            }
         }

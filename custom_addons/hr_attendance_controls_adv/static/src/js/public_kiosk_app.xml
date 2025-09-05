@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<template>
+
+
+    <t t-inherit="hr_attendance.public_kiosk_app" t-inherit-mode="extension">
+        <xpath expr="//CardLayout//div[hasclass('o_hr_kiosk_mode_main')]" position="inside">       
+            <div class="o_hr_kiosk_mode_controls_main">
+                <div class="btn btn-light btn-lg p-2 rounded-3 o_hr_kiosk_mode_controls_inner" t-if="this.state.show_geolocation or this.state.show_geofence or this.state.show_ipaddress">
+                    <div class="attendance_controls_public">
+                        <div t-attf-class="glocation_container mb8 {{ this.state.show_geolocation ? '' : 'd-none' }}" id="glocation_container" t-ref="glocation_container">
+                            <i t-attf-class="fa fa-1x fa-angle-double-down glocation_toggle ms-auto" id="glocation_toggle" t-on-click="onToggleGeolocation" t-ref="glocation_toggle">
+                                Geo Location
+                            </i>
+                            <div t-attf-class="glocation_view d-none" t-ref="glocation_view" >
+                                <span>Lattitude:  <t t-esc="state.latitude"/></span><br/>
+                                <span>Longitude: <t t-esc="state.longitude"/></span>
+                            </div>
+                        </div>
+                        <div t-attf-class="geofence_container mb8 {{ this.state.show_geofence ? '' : 'd-none' }}" id="geofence_container" t-ref="geofence_container">
+                            <i t-attf-class="fa fa-1x fa-angle-double-down geofence_toggle" id="geofence_toggle" t-on-click="onTogglegeofence" t-ref="geofence_toggle">
+                                Map Location
+                            </i>
+                            <div t-attf-class="geofence_view d-none" t-ref="geofence_view"></div>
+                        </div>
+
+                        <div t-attf-class="geoipaddress_container mb8 {{ this.state.show_ipaddress ? '' : 'd-none' }}" id="geoipaddress_container" t-ref="geoipaddress_container">
+                            <i t-attf-class="fa fa-1x fa-angle-double-down geoipaddress_toggle" id="geoipaddress_toggle"  t-on-click="onToggleGeoipaddress" t-ref="geoipaddress_toggle">
+                                IP Address (Public)
+                            </i>
+                            <div t-attf-class="geoipaddress_view d-none" t-ref="geoipaddress_view">
+                                <span> IP: <t t-esc="state.ipaddress"/></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </xpath>
+        <xpath expr="//CardLayout//div[hasclass('o_hr_kiosk_mode_bottom')]" position="inside">       
+            <t t-if="this.state.hr_attendance_face_recognition_k and this.state.active_display === 'main'">
+                <button t-attf-class="btn btn-light btn-lg rounded-3 {{ this.state.show_recognition ? '' : 'd-none' }}" t-att-disabled="this.state.disabel_recognition" t-on-click="onClickRecongintion">
+                    <t t-if="!this.state.disabel_recognition"> <i class="fa fa-user-o me-2"></i> </t>
+                    <t t-if="this.state.disabel_recognition"> <i class="fa fa-circle-o-notch fa-spin spinner me-2"></i> </t>
+                    <span >Scan Your Face</span>
+                </button>
+            </t>
+        </xpath>
+    </t>
+</template>

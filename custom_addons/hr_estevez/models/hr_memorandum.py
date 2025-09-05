@@ -1,6 +1,8 @@
-from odoo import models, fields
+from odoo import models, fields, api
 from datetime import datetime, timedelta
 import logging
+import json
+import requests
 
 _logger = logging.getLogger(__name__)
 
@@ -72,4 +74,79 @@ class HrMemorandum(models.Model):
         # Formatear la fecha manualmente
         formatted_date = f"las {time_str} hrs del día {adjusted_date.day} de {month_name_spanish} del {adjusted_date.year}"
         return formatted_date
+    
+    def _sync_codeigniter(self, operation='create'):
+        """Sincroniza el memorandum con CodeIgniter"""
+        api_url = self.env['ir.config_parameter'].get_param('codeigniter.api_url')
+        api_token = self.env['ir.config_parameter'].get_param('codeigniter.api_token')
         
+        if not api_url or not api_token:
+            _logger.error("Configuración de API para CodeIgniter faltante")
+            return False
+
+        # Preparar payload
+        employee = self.employee_id
+        payload = {
+            'odoo_id': self.id,
+            'employee_odoo_id': employee.id,
+            'date': self.date.isoformat() if self.date else None,
+            'description': self.description or '',
+            'fraction': self.fraction or '',
+            'article': self.article or '',
+            'administrative_type': self.administrative_type or '',
+            'operation': operation,
+        }
+
+        try:
+            # Determinar endpoint y método HTTP
+            endpoint = f"{api_url}/memorandums"
+            if operation == 'update' and self.ci_id:
+                endpoint = f"{endpoint}/{self.ci_id}"
+                http_method = requests.put
+            else:
+                http_method = requests.post
+            
+            # Enviar solicitud
+            headers = {
+                'Authorization': f'Bearer {api_token}',
+                'Content-Type': 'application/json'
+            }
+            
+            response = http_method(
+                endpoint,
+                json=payload,
+                headers=headers,
+                timeout=30,
+                verify=False
+            )
+            
+            _logger.info(f"Respuesta CI para memorandum: {response.status_code} - {response.text}")
+            
+            if response.status_code in (200, 201):
+                response_data = response.json()
+                self.write({
+                    'synced_to_ci': True,
+                    'ci_id': response_data.get('id', False)
+                })
+                return True
+            else:
+                _logger.error(f"Error CI: {response.status_code} - {response.text}")
+                return False
+                        
+        except Exception as e:
+            _logger.error(f"Error de conexión con CodeIgniter: {str(e)}")
+            return False
+
+    @api.model
+    def create(self, vals):
+        record = super(HrMemorandum, self).create(vals)
+        # Sincronizar después de crear
+        record._sync_codeigniter('create')
+        return record
+
+    def write(self, vals):
+        res = super(HrMemorandum, self).write(vals)
+        # Sincronizar después de actualizar
+        for record in self:
+            record._sync_codeigniter('update')
+        return res

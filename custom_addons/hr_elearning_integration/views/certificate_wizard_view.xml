@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_certificate_wizard_form" model="ir.ui.view">
+        <field name="name">certificate.wizard.form</field>
+        <field name="model">certificate.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Generar Certificado de Curso">
+                <group>
+                    <field name="course_id"/>
+                </group>
+                <group>
+                    <group>
+                        <field name="certificate_type"/>
+                        <field name="start_date"/>
+                        <field name="folio"/>
+                        <field name="instructor"/>
+                    </group>
+                    <group>
+                        <field name="end_date"/>
+                        <field name="hours"/>
+                        <field name="employer"/>
+                        <field name="workers_rep"/>
+                    </group>
+                </group>
+                <footer>
+                    <button string="Generar Certificado" type="object" name="action_generate_certificate" class="btn-primary"/>
+                    <button string="Cancelar" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_certificate_wizard" model="ir.actions.act_window">
+        <field name="name">Generar Certificado</field>
+        <field name="res_model">certificate.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_certificate_wizard_form"/>
+        <field name="target">new</field>
+        <field name="context">{}</field>
+    </record>
+</odoo>

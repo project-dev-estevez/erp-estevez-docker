@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="hr_res_users_view_form_profile_inherit" model="ir.ui.view">
+        <field name="name">hr.res.users.view.form.profile.inherit.profile.estevez</field>
+        <field name="model">res.users</field>
+        <field name="inherit_id" ref="hr_attendance.hr_user_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='action_open_last_month_attendances']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="hr_res_users_view_form_profile_inherit_readonly" model="ir.ui.view">
+        <field name="name">hr.res.users.view.form.profile.inherit.readonly</field>
+        <field name="model">res.users</field>
+        <field name="inherit_id" ref="hr.hr_user_view_form"/>
+        <field name="arch" type="xml">
+
+            <!-- Datos principales -->
+            <xpath expr="//field[@name='job_title']" position="attributes">
+                <attribute name="readonly">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='employee_parent_id']" position="attributes">
+                <attribute name="readonly">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='coach_id']" position="attributes">
+                <attribute name="readonly">1</attribute>
+            </xpath>
+
+            <!-- Contacto laboral -->
+            <xpath expr="//field[@name='mobile_phone']" position="attributes">
+                <attribute name="readonly">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='work_phone']" position="attributes">
+                <attribute name="readonly">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='work_email']" position="attributes">
+                <attribute name="readonly">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='work_location_id']" position="attributes">
+                <attribute name="readonly">1</attribute>
+            </xpath>
+
+            <!-- Organización -->
+            <xpath expr="//field[@name='company_id']" position="attributes">
+                <attribute name="readonly">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='department_id']" position="attributes">
+                <attribute name="readonly">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='attendance_manager_id']" position="attributes">
+                <attribute name="readonly">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='leave_manager_id']" position="attributes">
+                <attribute name="readonly">1</attribute>
+            </xpath>
+
+            <!-- Dirección laboral -->
+            <xpath expr="//field[@name='address_id']" position="attributes">
+                <attribute name="readonly">1</attribute>
+            </xpath>
+
+        </field>
+    </record>
+</odoo>

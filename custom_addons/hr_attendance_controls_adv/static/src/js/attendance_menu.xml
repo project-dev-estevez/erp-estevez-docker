@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<template>
+    <t t-inherit="hr_attendance.attendance_menu" t-inherit-mode="extension">
+        <xpath expr="//Dropdown" position="attributes">
+            <attribute name="onOpened.bind">onOpenedContent</attribute>
+        </xpath>
+        <xpath expr="//Dropdown//t[@t-set-slot='content']//div[hasclass('o_att_menu_container')]" position="before">
+            <div t-if="this.state.show_check_inout_button === false" class="o_att_menu_container_spinner text-center">
+                <i class="fa fa-circle-o-notch fa-spin spinner"></i>
+            </div>
+        </xpath>
+        <xpath expr="//Dropdown//t[@t-set-slot='content']//div[hasclass('o_att_menu_container')]" position="attributes">
+            <attribute name="t-if">this.state.show_check_inout_button</attribute>
+        </xpath>
+        <xpath expr="//Dropdown//t[@t-set-slot='content']//div/button[@t-if='this.isFirstAttendance']" position="after">
+            <div class="attendance_controls">
+                <div t-attf-class="reason_container mb8 {{ this.state.show_reason ? '' : 'd-none' }}" id="reason_container" t-ref="reason_container">
+                    <i t-attf-class="fa fa-1x fa-angle-double-down reason_toggle" id="reason_toggle" t-on-click="onToggleReason" t-ref="reason_toggle">
+                        Reason
+                    </i>
+                    <div t-attf-class="reason_view d-none" t-ref="reason_view">
+                        <input type="text" name="reasons" id="oe_attendance_reasons" list="reasons_list" class="o_input mt8 oe_attendance_reasons" 
+                            placeholder="Select / Enter your Reason here." autocomplete="off" t-ref="reasons_inut"/>
+                        <datalist id="reasons_list">
+                            <t t-foreach="reasons" t-as="reason" t-key="reason.id">
+                                <t t-if="reason.attendance_state != employee.attendance_state or reason.attendance_state == False">
+                                    <option t-att-value="reason.name"/>                     
+                                </t>
+                            </t>
+                        </datalist>
+                    </div>
+                </div>
+
+                <div t-attf-class="glocation_container mb8 {{ this.state.show_geolocation ? '' : 'd-none' }}" id="glocation_container" t-ref="glocation_container">
+                    <i t-attf-class="fa fa-1x fa-angle-double-down glocation_toggle" id="glocation_toggle" t-on-click="onToggleGeolocation" t-ref="glocation_toggle">
+                        Geo Location
+                    </i>
+                    <div t-attf-class="glocation_view d-none" t-ref="glocation_view" >
+                        <span>Lattitude:  <t t-esc="state.latitude"/></span>
+                        <span>, Longitude: <t t-esc="state.longitude"/></span>
+                    </div>
+                </div>
+                
+
+                <div t-attf-class="geofence_container mb8 {{ this.state.show_geofence ? '' : 'd-none' }}" id="geofence_container" t-ref="geofence_container">
+                    <i t-attf-class="fa fa-1x fa-angle-double-down geofence_toggle" id="geofence_toggle" t-on-click="onTogglegeofence" t-ref="geofence_toggle">
+                        Map Location
+                    </i>
+                    <div t-attf-class="geofence_view d-none" t-ref="geofence_view"></div>
+                </div>
+
+                <div t-attf-class="geoipaddress_container mb8 {{ this.state.show_ipaddress ? '' : 'd-none' }}" id="geoipaddress_container" t-ref="geoipaddress_container">
+                    <i t-attf-class="fa fa-1x fa-angle-double-down geoipaddress_toggle" id="geoipaddress_toggle"  t-on-click="onToggleGeoipaddress" t-ref="geoipaddress_toggle">
+                        IP Address (Public)
+                    </i>
+                    <div t-attf-class="geoipaddress_view d-none" t-ref="geoipaddress_view">
+                        <span> IP: <t t-esc="state.ipaddress"/></span>
+                    </div>
+                </div>
+            </div>
+        </xpath>
+    </t>
+</template>

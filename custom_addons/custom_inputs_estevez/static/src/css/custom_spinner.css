@@ -1,0 +1,25 @@
+/* Custom Spinner Overlay */
+.custom-global-spinner {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  z-index: 9999;
+  background: rgba(255, 255, 255, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.custom-global-spinner .loader {
+  width: 80px;
+  height: 80px;
+  background: url('/custom_inputs_estevez/static/src/img/icon.png') no-repeat center center;
+  background-size: contain;
+  animation: spin-pause 1.5s ease-in-out infinite;
+}
+
+@keyframes spin-pause {
+  0%   { transform: rotate(0deg); }
+  20%  { transform: rotate(360deg); } /* giro rápido */
+  60%  { transform: rotate(0deg); }   /* vuelve a inicial */
+  100% { transform: rotate(0deg); }   /* se queda quieto */
+}

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+  <data>
+    <record id="view_vacation_period_tree" model="ir.ui.view">
+      <field name="name">hr.vacation.period.tree</field>
+      <field name="model">hr.vacation.period</field>
+      <field name="arch" type="xml">
+        <tree>
+          <field name="period"/>
+          <field name="year_start"/>
+          <field name="year_end"/>
+          <field name="entitled_days"/>
+          <field name="days_taken"/>
+          <field name="days_remaining"/>
+        </tree>
+      </field>
+    </record>
+  </data>
+</odoo>
