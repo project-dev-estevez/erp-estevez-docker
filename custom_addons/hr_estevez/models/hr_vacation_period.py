@@ -1,5 +1,8 @@
 from odoo import models, fields, api
 from odoo.exceptions import UserError
+import logging
+
+_logger = logging.getLogger(__name__)
 
 class HrVacationPeriod(models.Model):
     _name = 'hr.vacation.period'
@@ -35,7 +38,10 @@ class HrVacationPeriod(models.Model):
 
     @api.depends('leave_ids', 'leave_ids.state', 'leave_ids.number_of_days', 'allocation_ids', 'allocation_ids.days')
     def _compute_days_taken(self):
+        _logger.info("=== CALCULANDO DÍAS TOMADOS ===")
         for period in self:
+            _logger.info(f"Calculando período: {period.display_name}")
+            
             # Días de solicitudes directas aprobadas
             direct_days = sum(period.leave_ids.filtered(
                 lambda l: l.state == 'validate'
@@ -47,8 +53,11 @@ class HrVacationPeriod(models.Model):
             ).mapped('days'))
             
             period.days_taken = direct_days + allocation_days
+            _logger.info(f"Período {period.id}: Días directos: {direct_days}, Días de asignaciones: {allocation_days}, Total: {period.days_taken}")
 
     @api.depends('entitled_days', 'days_taken')
     def _compute_days_remaining(self):
+        _logger.info("=== CALCULANDO DÍAS RESTANTES ===")
         for record in self:
             record.days_remaining = record.entitled_days - record.days_taken
+            _logger.info(f"Período {record.id}: Días derecho: {record.entitled_days}, Días tomados: {record.days_taken}, Días restantes: {record.days_remaining}")

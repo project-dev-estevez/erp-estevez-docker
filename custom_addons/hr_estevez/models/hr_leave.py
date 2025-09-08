@@ -13,21 +13,33 @@ class HrLeave(models.Model):
 
     def _distribute_vacation_days(self):
         """Distribuye los días de vacaciones entre los períodos disponibles"""
-        HrVacationAllocation = self.env['hr.vacation.allocation']
+        _logger.info("=== INICIANDO DISTRIBUCIÓN DE DÍAS ===")
         
         for leave in self:
+            _logger.info(f"Procesando solicitud ID: {leave.id}, Empleado: {leave.employee_id.name}, Días: {leave.number_of_days}")
+            
             if not (leave.holiday_status_id.is_vacation and 
-                   leave.employee_id and 
-                   leave.number_of_days > 0):
+                leave.employee_id and 
+                leave.number_of_days > 0):
+                _logger.info("No cumple condiciones, saltando")
                 continue
                 
+            # Verificar si el tipo de ausencia está marcado como vacación
+            _logger.info(f"Tipo de ausencia: {leave.holiday_status_id.name}, Es vacación: {leave.holiday_status_id.is_vacation}")
+            
             # Eliminar asignaciones existentes para esta solicitud
-            leave.allocation_ids.unlink()
+            if leave.allocation_ids:
+                _logger.info(f"Eliminando {len(leave.allocation_ids)} asignaciones existentes")
+                leave.allocation_ids.unlink()
             
             # Obtener períodos ordenados por antigüedad (más antiguo primero)
             periods = self.env['hr.vacation.period'].search([
                 ('employee_id', '=', leave.employee_id.id)
             ], order='year_start asc')
+            
+            _logger.info(f"Períodos encontrados: {len(periods)}")
+            for i, period in enumerate(periods):
+                _logger.info(f"Período {i+1}: {period.display_name}")
             
             days_remaining = leave.number_of_days
             allocation_vals = []
@@ -39,7 +51,10 @@ class HrLeave(models.Model):
                 # Calcular días disponibles en este período
                 available_days = period.days_remaining
                 
+                _logger.info(f"Período {period.id}: Días disponibles: {available_days}, Días por asignar: {days_remaining}")
+                
                 if available_days <= 0:
+                    _logger.info(f"Período {period.id} sin días disponibles, saltando")
                     continue
                 
                 # Calcular cuántos días tomar de este período
@@ -52,13 +67,26 @@ class HrLeave(models.Model):
                         'days': days_to_take,
                     })
                     days_remaining -= days_to_take
+                    _logger.info(f"Asignando {days_to_take} días al período {period.id}")
             
             if days_remaining > 0:
-                raise UserError(f"No hay suficientes días disponibles. Faltan {days_remaining} días.")
+                error_msg = f"No hay suficientes días disponibles. Faltan {days_remaining} días."
+                _logger.error(error_msg)
+                raise UserError(error_msg)
             
             # Crear las asignaciones
             if allocation_vals:
-                HrVacationAllocation.create(allocation_vals)
+                _logger.info(f"Creando {len(allocation_vals)} asignaciones")
+                try:
+                    self.env['hr.vacation.allocation'].create(allocation_vals)
+                    _logger.info("Asignaciones creadas exitosamente")
+                except Exception as e:
+                    _logger.error(f"Error al crear asignaciones: {str(e)}")
+                    raise
+            else:
+                _logger.warning("No se crearon asignaciones")
+            
+            _logger.info("DISTRIBUCIÓN COMPLETADA")
 
     def action_approve(self):
         """Sobrescribir la aprobación para distribuir días automáticamente"""

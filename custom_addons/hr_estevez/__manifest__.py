@@ -62,6 +62,7 @@
         'views/hr_employee_reactivate_wizard_views.xml',
         'views/hr_employee_history_views.xml',
         'views/hr_leave.xml',
+        'views/hr_leave_type_views.xml',
     ],
     # only loaded in demonstration mode
     'demo': [
