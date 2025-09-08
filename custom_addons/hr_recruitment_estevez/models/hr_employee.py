@@ -22,20 +22,24 @@ class HrEmployee(models.Model):
             rec.name = full_name.strip()
 
     def _compute_full_name(self):
-        return ' '.join(filter(None, [
-            self.first_name,            
-            self.last_name,
-            self.mother_last_name,
-        ])).strip()
+        # Filtrar campos None y strings vacíos, excluyendo "Sin especificar"
+        name_parts = []
+        for field_value in [self.first_name, self.last_name, self.mother_last_name]:
+            if field_value and field_value != "Sin especificar":
+                name_parts.append(field_value)
+        return ' '.join(name_parts).strip()
 
     @api.model
     def create(self, vals):
-        if not vals.get('name'):
-            vals['name'] = ' '.join(filter(None, [
-                vals.get('first_name'),                
-                vals.get('last_name'),
-                vals.get('mother_last_name'),
-            ])).strip()
+        # Solo usar valores reales, no los placeholder
+        name_parts = []
+        for field in ['first_name', 'last_name', 'mother_last_name']:
+            if vals.get(field) and vals[field] != "Sin especificar":
+                name_parts.append(vals[field])
+        
+        if name_parts and not vals.get('name'):
+            vals['name'] = ' '.join(name_parts).strip()
+        
         return super().create(vals)
 
     def write(self, vals):
