@@ -30,20 +30,12 @@ class HrEmployee(models.Model):
 
     @api.model
     def create(self, vals):
-        # Asegurar que todos los campos requeridos tengan valor
-        required_fields = ['first_name', 'last_name', 'mother_last_name']
-        for field in required_fields:
-            if field not in vals or not vals[field]:
-                vals[field] = "Sin especificar"  # Valor por defecto
-        
-        # Generar el nombre completo
         if not vals.get('name'):
             vals['name'] = ' '.join(filter(None, [
-                vals.get('first_name'),            
+                vals.get('first_name'),                
                 vals.get('last_name'),
                 vals.get('mother_last_name'),
             ])).strip()
-        
         return super().create(vals)
 
     def write(self, vals):
