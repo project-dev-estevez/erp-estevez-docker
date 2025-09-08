@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_hr_employee_course_list" model="ir.ui.view">
+        <field name="name">hr.employee.course.list</field>
+        <field name="model">hr.employee.course</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="employee_id"/>
+                <field name="course_id"/>
+                <field name="date_completed"/>
+                <field name="score"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_hr_employee_course_form" model="ir.ui.view">
+        <field name="name">hr.employee.course.form</field>
+        <field name="model">hr.employee.course</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="employee_id"/>
+                        <field name="course_id"/>
+                        <field name="date_completed"/>
+                        <field name="score"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_hr_employee_course_pivot" model="ir.ui.view">
+        <field name="name">hr.employee.course.pivot</field>
+        <field name="model">hr.employee.course</field>
+        <field name="arch" type="xml">
+            <pivot>
+                <field name="employee_id"/>
+                <field name="course_id"/>
+                <field name="date_completed" type="row"/>
+                <field name="score" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+</odoo>

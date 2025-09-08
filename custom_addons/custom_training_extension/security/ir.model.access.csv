@@ -1,0 +1,6 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_hr_state,access_hr_state,model_hr_state,,1,1,1,1
+access_hr_municipality,access_hr_municipality,model_hr_municipality,,1,1,1,1
+access_hr_occupation,access_hr_occupation,model_hr_occupation,,1,1,1,1
+access_hr_employee_course,access_hr_employee_course,model_hr_employee_course,,1,1,1,1
+access_hr_courses,access_hr_courses,model_hr_courses,,1,1,1,1
