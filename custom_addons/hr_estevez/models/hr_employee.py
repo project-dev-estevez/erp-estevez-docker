@@ -20,7 +20,7 @@ class HrEmployee(models.Model):
 
     # Primera Columna en la Vista de Empleados
     names = fields.Char(string='Nombres')
-    last_name = fields.Char(string='Apellido Paterno', required=False)
+    last_name = fields.Char(string='Apellido Paterno')
     mother_last_name = fields.Char(string='Apellido Materno')
     employee_number = fields.Char(string='Número de Empleado')
     project = fields.Char(string='Proyecto')
