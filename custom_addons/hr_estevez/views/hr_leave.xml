@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+<record id="view_hr_leave_form_inherit" model="ir.ui.view">
+    <field name="name">hr.leave.form.inherit</field>
+    <field name="model">hr.leave</field>
+    <field name="inherit_id" ref="hr_holidays.hr_leave_view_form"/>
+    <field name="arch" type="xml">
+        <xpath expr="//field[@name='employee_id']" position="after">
+            <field name="period_id" readonly="1"/>
+        </xpath>
+        <xpath expr="//field[@name='number_of_days']" position="after">
+            <field name="allocation_ids" readonly="1">
+                <list>
+                    <field name="period_id"/>
+                    <field name="days"/>
+                </list>
+            </field>
+        </xpath>
+    </field>
+</record>
+</odoo>

@@ -484,12 +484,6 @@ class HrApplicant(models.Model):
         candidate = self.candidate_id
 
         
-        # Registrar todos los campos del candidato (excepto binarios)
-        candidate_data = candidate.read()[0]
-        _logger.info("Campos completos del Candidato:")
-        for field, value in candidate_data.items():
-            if not isinstance(value, bytes) and field not in ['image_1920', 'certificate']:
-                _logger.info(f"  {field}: {value}")
         
         # Registrar información del aplicante para referencia
         _logger.info("==== DATOS DEL APPLICANT ====")
