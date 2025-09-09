@@ -17,8 +17,8 @@ class SlideChannel(models.Model):
         'res.users',
         string="Instructor",
         domain=[                        
-            ('employee_id.employee_number', '=', '1010'),
-            ('employee_id.employee_number', '=', '1011')
+            ('employee_id.employee_number', '=', '11437'),
+            ('employee_id.employee_number', '=', '300008')
         ],
         help="Seleccione el Instructor"
     )
