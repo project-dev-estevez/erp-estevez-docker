@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <record id="action_ocupaciones" model="ir.actions.act_window">
+    <record id="action_tematicas" model="ir.actions.act_window">
         <field name="name">Información</field>
-        <field name="res_model">hr.occupation</field>
+        <field name="res_model">hr.tematicas</field>
         <field name="view_mode">list</field>
     </record>
     
-    <record id="view_hr_ocupaciones_list" model="ir.ui.view">
-        <field name="name">hr.occupation.list</field>
-        <field name="model">hr.occupation</field>
+    <record id="view_hr_tematicas_list" model="ir.ui.view">
+        <field name="name">hr.tematicas.list</field>
+        <field name="model">hr.tematicas</field>
         <field name="arch" type="xml">
             <list>
                 <field name="code"/>
@@ -17,9 +17,9 @@
         </field>
     </record>
 
-    <record id="view_hr_occupation_form" model="ir.ui.view">
-        <field name="name">hr.occupation.form</field>
-        <field name="model">hr.occupation</field>
+    <record id="view_hr_tematicas_form" model="ir.ui.view">
+        <field name="name">hr.tematicas.form</field>
+        <field name="model">hr.tematicas</field>
         <field name="arch" type="xml">
             <form>
                 <sheet>

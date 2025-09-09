@@ -6,4 +6,8 @@ class HrMunicipality(models.Model):
 
     code = fields.Char(string="Clave Municipio", required=True)
     name = fields.Char(string="Nombre Municipio", required=True)
-    state_id = fields.Many2one('hr.state', string="Estado", required=True)
+    estado_id = fields.Many2one(
+        comodel_name='custom_training_extension.estado',
+        string='Estado',        
+        ondelete='restrict'
+    )
