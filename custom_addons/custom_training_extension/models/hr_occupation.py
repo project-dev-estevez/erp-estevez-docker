@@ -1,7 +1,7 @@
 from odoo import models, fields
 
-class HrOcupaciones(models.Model):
-    _name = 'hr.ocupaciones'
+class HrOccupation(models.Model):
+    _name = 'hr.occupation'
     _description = 'Catálogo de Ocupaciones'
 
     code = fields.Char(string="Clave Ocupación", required=True)
