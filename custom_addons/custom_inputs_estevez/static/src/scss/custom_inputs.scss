@@ -110,3 +110,11 @@
 
 /* Eliminar estilos para listas/tree views */
 /* .o_list_view input... se eliminan para aplicar solo en form views */
+
+// Para no aplicar los estilos en los campos premium
+.o_form_view .no-premium-input {
+  all: unset !important;
+  font-size: 16px !important;
+  color: #222 !important;
+  /* Otros estilos que quieras aplicar */
+}
