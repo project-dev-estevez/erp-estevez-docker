@@ -13,3 +13,5 @@ access_hr_estudios,access_hr_estudios,model_hr_estudios,,1,1,1,1
 access_hr_probatorio,access_hr_probatorio,model_hr_probatorio,,1,1,1,1
 access_hr_institucion,access_hr_institucion,model_hr_institucion,,1,1,1,1
 access_hr_occupation,access_hr_occupation,model_hr_occupation,,1,1,1,1
+access_hr_certificados,access_hr_certificados,model_hr_certificados,,1,1,1,1
+access_hr_instructores,access_hr_instructores,model_hr_instructores,,1,1,1,1

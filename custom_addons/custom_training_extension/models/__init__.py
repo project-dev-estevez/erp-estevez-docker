@@ -13,3 +13,5 @@ from . import hr_estudios
 from . import hr_probatorio
 from . import hr_institucion
 from . import hr_occupation
+from . import hr_certificados
+from . import hr_instructores
