@@ -13,7 +13,7 @@
                         <field name="certificate_type"/>
                         <field name="start_date"/>
                         <field name="folio"/>
-                        <field name="instructor"/>
+                        <!-- <field name="instructor"/> -->
                     </group>
                     <group>
                         <field name="end_date"/>

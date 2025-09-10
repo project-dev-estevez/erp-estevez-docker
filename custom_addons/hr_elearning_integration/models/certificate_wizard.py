@@ -13,7 +13,7 @@ class CertificateWizard(models.TransientModel):
     end_date = fields.Date(string='Fecha de Término')
     folio = fields.Char(string='Folio')
     hours = fields.Float(string='Horas del Curso')
-    instructor = fields.Char(string='Instructor')
+    # instructor = fields.Char(string='Instructor')  # Removido
     employer = fields.Char(string='Patrón/Representante')
     workers_rep = fields.Char(string='Representante de Trabajadores')
 
@@ -24,7 +24,7 @@ class CertificateWizard(models.TransientModel):
         course = self.env['slide.channel'].browse(active_id)
         res['course_id'] = course.id
         res['hours'] = course.duration if hasattr(course, 'duration') else 0.0
-        res['instructor'] = course.instructor if hasattr(course, 'instructor') else 'Instructor'
+    # res['instructor'] = course.instructor if hasattr(course, 'instructor') else 'Instructor'  # Removido
         res['employer'] = course.employer if hasattr(course, 'employer') else 'Patrón'
         res['workers_rep'] = course.workers_rep if hasattr(course, 'workers_rep') else 'Representante'
         return res
