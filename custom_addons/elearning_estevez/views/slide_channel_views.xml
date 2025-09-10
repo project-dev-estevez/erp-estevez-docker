@@ -17,7 +17,7 @@
                         <group>
                             <field name="representante_patron" widget="many2one"/>
                             <field name="representante_trabajadores" widget="many2one"/>
-                            <!-- instructor removido -->
+                            <field name="instructor" widget="many2one"/>
                         </group>
                     </div>
                 </div>
