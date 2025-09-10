@@ -13,15 +13,6 @@ class SlideChannel(models.Model):
         help="Seleccione el representante del patrón"
     )
 
-    instructor = fields.Many2one(
-        'res.users',
-        string="Instructor",
-        domain=[                        
-            ('employee_id.employee_number', '=', '11437'),
-            ('employee_id.employee_number', '=', '300008')
-        ],
-        help="Seleccione el Instructor"
-    )
     
     representante_trabajadores = fields.Many2one(
         'res.users',
