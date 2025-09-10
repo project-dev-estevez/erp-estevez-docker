@@ -3,217 +3,121 @@
     <template id="report_course_certificate_document">
         <t t-call="web.html_container">
             <t t-foreach="docs" t-as="doc">
-                <t t-call="web.external_layout">
-                    <div class="page">
-
-                        <!-- ENCABEZADO -->
-                        <div class="row align-items-center">
-                            <div class="col text-center text-purple">
-                                <div class="fw-bold fs-5 mb-0">FORMATO DC-3</div>
-                                <div class="fw-bold fs-6 mt-1">CONSTANCIA DE COMPETENCIAS O DE HABILIDADES LABORALES</div>
-                            </div>
-                        </div>
-
-                        <div class="container my-2">
-
-                            <!-- DATOS DEL TRABAJADOR -->
-                            <table class="table table-borderless border-dark align-middle small mb-2">
-                                <thead>
-                                    <tr>
-                                        <th colspan="2" class="fw-bold text-center text-secondary">DATOS DEL TRABAJADOR</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <!-- Nombre y Folio -->
-                                    <tr>
-                                        <td class="w-75">
-                                            <strong>Nombre (Apellido paterno, materno y nombre(s))</strong>
-                                            <div class="mt-1 p-1 border-bottom"></div>
-                                        </td>
-                                        <td class="w-25 text-end">
-                                            <strong>Folio:</strong>
-                                            <span class="d-inline-block border border-dark px-2 py-0 fw-bold ms-1"></span>
-                                        </td>
-                                    </tr>
-
-                                    <!-- CURP y Ocupación -->
-                                    <tr>
-                                        <td class="w-60">
-                                            <strong>Clave Única de Registro de Población</strong>
-                                            <div class="d-flex flex-wrap gap-1 mt-1">
-                                                <!-- 16 casillas -->
-                                                <span class="border border-dark d-inline-block" style="width:18px; height:18px;"></span>
-                                                <span class="border border-dark d-inline-block" style="width:18px; height:18px;"></span>
-                                                <span class="border border-dark d-inline-block" style="width:18px; height:18px;"></span>
-                                                <span class="border border-dark d-inline-block" style="width:18px; height:18px;"></span>
-                                                <span class="border border-dark d-inline-block" style="width:18px; height:18px;"></span>
-                                                <span class="border border-dark d-inline-block" style="width:18px; height:18px;"></span>
-                                                <span class="border border-dark d-inline-block" style="width:18px; height:18px;"></span>
-                                                <span class="border border-dark d-inline-block" style="width:18px; height:18px;"></span>
-                                                <span class="border border-dark d-inline-block" style="width:18px; height:18px;"></span>
-                                                <span class="border border-dark d-inline-block" style="width:18px; height:18px;"></span>
-                                                <span class="border border-dark d-inline-block" style="width:18px; height:18px;"></span>
-                                                <span class="border border-dark d-inline-block" style="width:18px; height:18px;"></span>
-                                                <span class="border border-dark d-inline-block" style="width:18px; height:18px;"></span>
-                                                <span class="border border-dark d-inline-block" style="width:18px; height:18px;"></span>
-                                                <span class="border border-dark d-inline-block" style="width:18px; height:18px;"></span>
-                                                <span class="border border-dark d-inline-block" style="width:18px; height:18px;"></span>
-                                            </div>
-                                        </td>
-                                        <td class="w-40">
-                                            <strong>Ocupación específica (Catálogo Nacional de Ocupaciones)</strong>
-                                            <div class="mt-1 p-1 border-bottom"></div>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-
-                            <!-- DATOS DE LA EMPRESA -->
-                            <table class="table table-borderless border-dark small mb-2">
-                                <thead>
-                                    <tr>
-                                        <th colspan="2" class="fw-bold text-center text-secondary">DATOS DE LA EMPRESA</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <!-- Nombre -->
-                                    <tr>
-                                        <td colspan="2">
-                                            <div><b>Nombre o razón social</b> (En caso de persona física, anotar apellido paterno, apellido materno y nombre(s))</div>
-                                            <div class="mt-1 p-1 border-bottom"></div>
-                                        </td>
-                                    </tr>
-                                    <!-- RFC y Registro patronal -->
-                                    <tr>
-                                        <td class="w-50">
-                                            <b>Registro Federal de Contribuyentes con homoclave (SHCP)</b>
-                                            <div class="d-flex flex-wrap gap-1 mt-1">
-                                                <!-- 13 casillas -->
-                                                <span class="border border-dark d-inline-block" style="width:18px; height:18px;"></span>
-                                                <span class="border border-dark d-inline-block" style="width:18px; height:18px;"></span>
-                                                <span class="border border-dark d-inline-block" style="width:18px; height:18px;"></span>
-                                                <span class="border border-dark d-inline-block" style="width:18px; height:18px;"></span>
-                                                <span class="border border-dark d-inline-block" style="width:18px; height:18px;"></span>
-                                                <span class="border border-dark d-inline-block" style="width:18px; height:18px;"></span>
-                                                <span class="border border-dark d-inline-block" style="width:18px; height:18px;"></span>
-                                                <span class="border border-dark d-inline-block" style="width:18px; height:18px;"></span>
-                                                <span class="border border-dark d-inline-block" style="width:18px; height:18px;"></span>
-                                                <span class="border border-dark d-inline-block" style="width:18px; height:18px;"></span>
-                                                <span class="border border-dark d-inline-block" style="width:18px; height:18px;"></span>
-                                                <span class="border border-dark d-inline-block" style="width:18px; height:18px;"></span>
-                                                <span class="border border-dark d-inline-block" style="width:18px; height:18px;"></span>
-                                            </div>
-                                        </td>
-                                        <td class="w-50">
-                                            <b>Registro patronal ante el I.M.S.S.</b>
-                                            <div class="d-flex flex-wrap gap-1 mt-1">
-                                                <!-- 11 casillas -->
-                                                <span class="border border-dark d-inline-block" style="width:18px; height:18px;"></span>
-                                                <span class="border border-dark d-inline-block" style="width:18px; height:18px;"></span>
-                                                <span class="border border-dark d-inline-block" style="width:18px; height:18px;"></span>
-                                                <span class="border border-dark d-inline-block" style="width:18px; height:18px;"></span>
-                                                <span class="border border-dark d-inline-block" style="width:18px; height:18px;"></span>
-                                                <span class="border border-dark d-inline-block" style="width:18px; height:18px;"></span>
-                                                <span class="border border-dark d-inline-block" style="width:18px; height:18px;"></span>
-                                                <span class="border border-dark d-inline-block" style="width:18px; height:18px;"></span>
-                                                <span class="border border-dark d-inline-block" style="width:18px; height:18px;"></span>
-                                                <span class="border border-dark d-inline-block" style="width:18px; height:18px;"></span>
-                                                <span class="border border-dark d-inline-block" style="width:18px; height:18px;"></span>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    <!-- Actividad -->
-                                    <tr>
-                                        <td colspan="2">
-                                            <b>Actividad o giro principal:</b>
-                                            <div class="mt-1 p-1 border-bottom"></div>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-
-                            <!-- PROGRAMA DE CAPACITACIÓN -->
-                            <table class="table table-borderless small mb-1">
-                                <thead>
-                                    <tr>
-                                        <th colspan="12" class="fw-bold text-center text-secondary">
-                                            DATOS DEL PROGRAMA DE CAPACITACIÓN, ADIESTRAMIENTO Y PRODUCTIVIDAD
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <!-- Nombre del curso -->
-                                    <tr>
-                                        <td colspan="12"><b>Nombre del curso</b></td>
-                                    </tr>
-                                    <tr>
-                                        <td colspan="12">DC3 Inducción a la Seguridad e Higiene</td>
-                                    </tr>
-
-                                    <!-- Duración y periodo -->
-                                    <tr>
-                                        <td rowspan="2" colspan="2"><b>Duración en horas</b><br/>8 horas</td>
-                                        <td rowspan="2" colspan="2"><b>Periodo de ejecución</b></td>
-                                        <td colspan="4" class="text-center"><b>Año</b></td>
-                                        <td colspan="2" class="text-center"><b>Mes</b></td>
-                                        <td colspan="2" class="text-center"><b>Día</b></td>
-                                    </tr>
-                                    <tr>
-                                        <td class="text-center">2</td>
-                                        <td class="text-center">0</td>
-                                        <td class="text-center">2</td>
-                                        <td class="text-center">5</td>
-                                        <td class="text-center">0</td>
-                                        <td class="text-center">8</td>
-                                        <td class="text-center">0</td>
-                                        <td class="text-center">8</td>
-                                    </tr>
-
-                                    <!-- Área temática -->
-                                    <tr>
-                                        <td colspan="12"><b>Área temática del curso:</b> 006</td>
-                                    </tr>
-
-                                    <!-- Agente capacitador -->
-                                    <tr>
-                                        <td colspan="12"><b>Agente Capacitador (Externo o Interno según corresponda):</b><br/>
-                                            Estevez Jor Servicios, S.A de C.V. Reg. STPS: ESE-111012-E79-0013
-                                        </td>
-                                    </tr>
-
-                                    <!-- Texto legal -->
-                                    <tr>
-                                        <td colspan="12" class="text-center small">
-                                            Los datos se asientan en esta constancia bajo protesta de decir verdad,
-                                            apercibidos de la responsabilidad en que incurre todo aquel que no se conduce con verdad.
-                                        </td>
-                                    </tr>
-
-                                    <!-- Firmas -->
-                                    <tr>
-                                        <td colspan="4" class="text-center p-2">
-                                            <div class="border-top w-75 mx-auto mb-1 mt-4"></div>
-                                            Capacitador<br/>
-                                            <span class="small">Nombre y firma</span>
-                                        </td>
-                                        <td colspan="4" class="text-center p-2">
-                                            <div class="border-top w-75 mx-auto mb-1 mt-4"></div>
-                                            Patrón o representante<br/>
-                                            <span class="small">Nombre y firma</span>
-                                        </td>
-                                        <td colspan="4" class="text-center p-2">
-                                            <div class="border-top w-75 mx-auto mb-1 mt-4"></div>
-                                            Representante de los trabajadores<br/>
-                                            <span class="small">Nombre y firma</span>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-
+                <div style="padding-top: -300px;">
+                    <!-- ENCABEZADO -->
+                    <div style="display: flex; align-items: center; justify-content: center;">
+                        <div style="text-align: center; color: #000;">
+                            <div style="font-weight: bold; font-size: 1.25rem; margin-bottom: 0;">FORMATO DC-3</div>
+                            <div style="font-weight: bold; font-size: 1.1rem; margin-top: 0.25rem;">CONSTANCIA DE COMPETENCIAS O DE HABILIDADES LABORALES</div>
                         </div>
                     </div>
 
-                </t>
+                    <!-- DATOS DEL TRABAJADOR -->
+                    <table style="width:100%; border-collapse:collapse; margin-top:24px; margin-bottom:16px;">
+                        <tr style="height:50px;">
+                            <th colspan="2" style="background-color:#000; color:#fff; text-align:center; padding:8px; font-weight:bold; border:1px solid #000;">
+                                DATOS DEL TRABAJADOR
+                            </th>
+                        </tr>
+                        <tr>
+                            <td colspan="2" style="height:48px; padding:6px 8px 0 8px; border:1px solid #000; border-top:none; vertical-align:top;">
+                                <span style="font-size:13px; color:#000; font-weight:normal; text-align:left; display:block;">Nombre (Anotar apellido paterno, apellido materno y nombre (s))</span>
+                            </td>
+                        </tr>
+                        <tr style="height:55px;">
+                            <!-- Columna 1 -->
+                            <td style="border:1px solid #000; padding:4px 8px; vertical-align:top; text-align:left;">
+                                <div style="font-size:13px; color:#000; margin-bottom:4px;">Clave Unica de Registro de Poblacion</div>
+                                <div style="display:flex; gap:2px;">
+                                    <!-- 17 casillas -->
+                                    <div style="display:flex; align-items:flex-end; width:100%; height:10px;">
+                                        <span style="flex:1; border-left:1px solid #000; border-bottom:2px solid #000; height:28px; display:inline-block; margin-left:26px;"></span>
+                                        <span style="flex:1; border-left:1px solid #000; border-bottom:1px solid #000; height:28px; display:inline-block; margin-left:26px;"></span>
+                                        <span style="flex:1; border-left:1px solid #000; border-bottom:1px solid #000; height:28px; display:inline-block; margin-left:26px;"></span>
+                                        <span style="flex:1; border-left:1px solid #000; border-bottom:1px solid #000; height:28px; display:inline-block; margin-left:26px;"></span>
+                                        <span style="flex:1; border-left:1px solid #000; border-bottom:1px solid #000; height:28px; display:inline-block; margin-left:26px;"></span>
+                                        <span style="flex:1; border-left:1px solid #000; border-bottom:1px solid #000; height:28px; display:inline-block; margin-left:26px;"></span>
+                                        <span style="flex:1; border-left:1px solid #000; border-bottom:1px solid #000; height:28px; display:inline-block; margin-left:26px;"></span>
+                                        <span style="flex:1; border-left:1px solid #000; border-bottom:1px solid #000; height:28px; display:inline-block; margin-left:26px;"></span>
+                                        <span style="flex:1; border-left:1px solid #000; border-bottom:1px solid #000; height:28px; display:inline-block; margin-left:26px;"></span>
+                                        <span style="flex:1; border-left:1px solid #000; border-bottom:1px solid #000; height:28px; display:inline-block; margin-left:26px;"></span>
+                                        <span style="flex:1; border-left:1px solid #000; border-bottom:1px solid #000; height:28px; display:inline-block; margin-left:26px;"></span>
+                                        <span style="flex:1; border-left:1px solid #000; border-bottom:1px solid #000; height:28px; display:inline-block; margin-left:40px;"></span>
+                                        <span style="flex:1; border-left:1px solid #000; border-bottom:1px solid #000; height:28px; display:inline-block; margin-left:26px;"></span>
+                                        <span style="flex:1; border-left:1px solid #000; border-bottom:1px solid #000; height:28px; display:inline-block; margin-left:26px;"></span>
+                                        <span style="flex:1; border-left:1px solid #000; border-bottom:1px solid #000; height:28px; display:inline-block; margin-left:26px;"></span>
+                                    </div>
+                                </div>
+                            </td>
+
+                            <!-- Columna 2 -->
+                            <td style="border:1px solid #000; padding:4px 8px; vertical-align:top; text-align:left;">
+                                <span style="font-size:13px; color:#000; display:block;">Ocupacion especifica (Catalogo Nacional de Ocupaciones)</span>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td colspan="2" style="height:48px; padding:6px 8px 0 8px; border:1px solid #000; border-top:none; vertical-align:top;">
+                                <span style="font-size:13px; color:#000; font-weight:normal; text-align:left; display:block;">Puesto*</span>
+                            </td>
+                        </tr>
+
+                    </table>
+
+                    <!-- DATOS DE LA EMPRESA -->
+                    <table style="width:100%; border-collapse:collapse; margin-top:24px; margin-bottom:16px;">
+                        <tr style="height:50px;">
+                            <th colspan="2" style="background-color:#000; color:#fff; text-align:center; padding:8px; font-weight:bold; border:1px solid #000;">
+                                DATOS DE LA EMPRESA
+                            </th>
+                        </tr>
+                        <tr>
+                            <td colspan="2" style="height:48px; padding:6px 8px 0 8px; border:1px solid #000; border-top:none; vertical-align:top;">
+                                <span style="font-size:13px; color:#000; font-weight:normal; text-align:left; display:block;">
+                                    Nombre o razOn social (En caso de persona fisica, anotar apellido paterno, apellido materno y nombre(s))
+                                </span>
+                            </td>
+                        </tr>
+                        <tr style="height:55px;">
+                            <!-- Columna 1 -->
+                            <td style="border:1px solid #000; padding:4px 8px; vertical-align:top; text-align:left;">
+                                <div style="font-size:13px; color:#000; margin-bottom:4px;">Clave Unica de Registro de Poblacion</div>
+                                <div style="display:flex; gap:2px;">
+                                    <!-- 17 casillas -->
+                                    <div style="display:flex; align-items:flex-end; width:100%; height:10px;">
+                                        <span style="flex:1; border-left:1px solid #000; border-bottom:2px solid #000; height:28px; display:inline-block; margin-left:26px;"></span>
+                                        <span style="flex:1; border-left:1px solid #000; border-bottom:1px solid #000; height:28px; display:inline-block; margin-left:26px;"></span>
+                                        <span style="flex:1; border-left:1px solid #000; border-bottom:1px solid #000; height:28px; display:inline-block; margin-left:26px;"></span>
+                                        <span style="flex:1; border-left:1px solid #000; border-bottom:1px solid #000; height:28px; display:inline-block; margin-left:26px;"></span>
+                                        <span style="flex:1; border-left:1px solid #000; border-bottom:1px solid #000; height:28px; display:inline-block; margin-left:26px;"></span>
+                                        <span style="flex:1; border-left:1px solid #000; border-bottom:1px solid #000; height:28px; display:inline-block; margin-left:26px;"></span>
+                                        <span style="flex:1; border-left:1px solid #000; border-bottom:1px solid #000; height:28px; display:inline-block; margin-left:26px;"></span>
+                                        <span style="flex:1; border-left:1px solid #000; border-bottom:1px solid #000; height:28px; display:inline-block; margin-left:26px;"></span>
+                                        <span style="flex:1; border-left:1px solid #000; border-bottom:1px solid #000; height:28px; display:inline-block; margin-left:26px;"></span>
+                                        <span style="flex:1; border-left:1px solid #000; border-bottom:1px solid #000; height:28px; display:inline-block; margin-left:26px;"></span>
+                                        <span style="flex:1; border-left:1px solid #000; border-bottom:1px solid #000; height:28px; display:inline-block; margin-left:26px;"></span>
+                                        <span style="flex:1; border-left:1px solid #000; border-bottom:1px solid #000; height:28px; display:inline-block; margin-left:40px;"></span>
+                                        <span style="flex:1; border-left:1px solid #000; border-bottom:1px solid #000; height:28px; display:inline-block; margin-left:26px;"></span>
+                                        <span style="flex:1; border-left:1px solid #000; border-bottom:1px solid #000; height:28px; display:inline-block; margin-left:26px;"></span>
+                                        <span style="flex:1; border-left:1px solid #000; border-bottom:1px solid #000; height:28px; display:inline-block; margin-left:26px;"></span>
+                                    </div>
+                                </div>
+                            </td>
+
+                            <!-- Columna 2 -->
+                            <td style="border:1px solid #000; padding:4px 8px; vertical-align:top; text-align:left;">
+                                <span style="font-size:13px; color:#000; display:block;">Ocupacion especifica (Catalogo Nacional de Ocupaciones)</span>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td colspan="2" style="height:48px; padding:6px 8px 0 8px; border:1px solid #000; border-top:none; vertical-align:top;">
+                                <span style="font-size:13px; color:#000; font-weight:normal; text-align:left; display:block;">Puesto*</span>
+                            </td>
+                        </tr>
+
+                    </table>
+                </div>
             </t>
         </t>
     </template>
