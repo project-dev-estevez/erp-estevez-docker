@@ -9,7 +9,6 @@
     'author': 'Estevez.Jor',
     'depends': ['hr', 'hr_holidays'],
     'data': [
-        'security/ir.model.access.csv',
         'views/hr_incapacity_views.xml',
         'views/hr_employee_views.xml',
     ],
