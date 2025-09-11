@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_employee_form_inherit" model="ir.ui.view">
+        <field name="name">hr.employee.form.inherit.incapacity</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr.view_employee_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='personal_information']" position="after">
+                <page string="Incapacidades">
+                    <button name="action_view_incapacity" type="object" string="Nueva Incapacidad" class="oe_highlight" icon="fa-plus"/>
+                    
+                    <field name="incapacity_ids">
+                        <list>
+                            <field name="name" string="Folio"/>
+                            <field name="incident_date" string="Fecha Incidente"/>
+                            <field name="start_date" string="Fecha Inicio"/>
+                            <field name="end_date" string="Fecha Fin"/>
+                            <field name="days" string="Días"/>
+                            <field name="incapacity_type_id" string="Tipo"/>
+                            <field name="state" string="Estado"/>
+                        </list>
+                    </field>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>

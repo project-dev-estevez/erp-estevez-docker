@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Definir grupos de seguridad -->
+    <record id="group_hr_incapacity_user" model="res.groups">
+        <field name="name">Usuario de Incapacidades</field>
+        <field name="category_id" ref="base.module_category_human_resources"/>
+        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+    </record>
+
+    <record id="group_hr_incapacity_manager" model="res.groups">
+        <field name="name">Manager de Incapacidades</field>
+        <field name="category_id" ref="base.module_category_human_resources"/>
+        <field name="implied_ids" eval="[(4, ref('group_hr_incapacity_user'))]"/>
+    </record>
+
+    <!-- Reglas de acceso para el modelo hr.incapacity -->
+    <record id="hr_incapacity_user_rule" model="ir.rule">
+        <field name="name">Usuario de Incapacidades: Ver sus propias incapacidades</field>
+        <field name="model_id" ref="model_hr_incapacity"/>
+        <field name="domain_force">['|', ('employee_id.user_id', '=', user.id), ('employee_id', '=', False)]</field>
+        <field name="groups" eval="[(4, ref('group_hr_incapacity_user'))]"/>
+    </record>
+
+    <record id="hr_incapacity_manager_rule" model="ir.rule">
+        <field name="name">Manager de Incapacidades: Ver todas las incapacidades</field>
+        <field name="model_id" ref="model_hr_incapacity"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('group_hr_incapacity_manager'))]"/>
+    </record>
+
+    <!-- Reglas de acceso para el modelo hr.incapacity.type -->
+    <record id="hr_incapacity_type_user_rule" model="ir.rule">
+        <field name="name">Usuario: Ver todos los tipos de incapacidad</field>
+        <field name="model_id" ref="model_hr_incapacity_type"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+    </record>
+</odoo>
