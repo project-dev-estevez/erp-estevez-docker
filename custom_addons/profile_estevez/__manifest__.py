@@ -4,7 +4,7 @@
     'category': 'Custom',
     'summary': 'Personalizaciones del perfil de usuario',
     'author': 'Tu Nombre',
-    'depends': ['hr', 'hr_attendance'],
+    'depends': ['base', 'hr', 'hr_attendance', 'project', 'hr_skills'],
     'data': [
         'views/hr_res_users_view_form_profile_inherit.xml',
     ],

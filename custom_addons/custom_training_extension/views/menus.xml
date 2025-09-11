@@ -1,12 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>   
 
-<menuitem 
+    <menuitem 
+        id="carga"
+        name="Carga Masiva"
+        parent="website_slides.website_slides_menu_report" 
+        action="action_states"
+        sequence="200"/>  
+    <menuitem 
         id="catalogos"
         name="Catálogos"
         parent="website_slides.website_slides_menu_root" 
         action="action_states"
-        sequence="200"/>  
+        sequence="200"/>
+
     <menuitem 
         id="states"
         name="Estados"
@@ -26,7 +33,86 @@
         name="Cursos"
         parent="custom_training_extension.catalogos" 
         action="action_courses"
-        sequence="2"/>   
+        sequence="2"/> 
+
+    <menuitem 
+        id="establecimientos"
+        name="Establecimientos"
+        parent="custom_training_extension.catalogos" 
+        action="action_establecimientos"
+        sequence="3"/>  
+
+    <menuitem 
+        id="tematicas"
+        name="Area temática"
+        parent="custom_training_extension.catalogos" 
+        action="action_tematicas"
+        sequence="3"/> 
+
+    <menuitem 
+        id="agentes"
+        name="Tipo agente"
+        parent="custom_training_extension.catalogos" 
+        action="action_agentes"
+        sequence="4"/>
+
+    <menuitem 
+        id="modalidad"
+        name="Modalidad"
+        parent="custom_training_extension.catalogos" 
+        action="action_modalidad"
+        sequence="4"/>   
+
+    <menuitem 
+        id="capacitacion"
+        name="Capacitacion"
+        parent="custom_training_extension.catalogos" 
+        action="action_capacitacion"
+        sequence="5"/> 
+
+    <menuitem 
+        id="estudios"
+        name="Nivel de Estudios"
+        parent="custom_training_extension.catalogos" 
+        action="action_estudios"
+        sequence="5"/> 
+
+    <menuitem 
+        id="probatorio"
+        name="Documento probatorio"
+        parent="custom_training_extension.catalogos" 
+        action="action_probatorio"
+        sequence="6"/> 
+
+    <menuitem 
+        id="institucion"
+        name="Institución"
+        parent="custom_training_extension.catalogos" 
+        action="action_institucion"
+        sequence="6"/>  
+
+    <menuitem 
+        id="ocupcacion"
+        name="Ocupaciones"
+        parent="custom_training_extension.catalogos" 
+        action="action_ocupaciones"
+        sequence="6"/>
+
+    <menuitem 
+        id="certificados"
+        name="Certificados"
+        parent="custom_training_extension.catalogos" 
+        action="action_certificados"
+        sequence="7"/>  
+
+    <menuitem 
+        id="instructores"
+        name="Instructores"
+        parent="custom_training_extension.catalogos" 
+        action="action_instructores"
+        sequence="7"/>  
+
+   
     
 </odoo>
 

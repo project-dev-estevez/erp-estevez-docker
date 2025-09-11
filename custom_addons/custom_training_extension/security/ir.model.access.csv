@@ -4,3 +4,14 @@ access_hr_municipality,access_hr_municipality,model_hr_municipality,,1,1,1,1
 access_hr_occupation,access_hr_occupation,model_hr_occupation,,1,1,1,1
 access_hr_employee_course,access_hr_employee_course,model_hr_employee_course,,1,1,1,1
 access_hr_courses,access_hr_courses,model_hr_courses,,1,1,1,1
+access_hr_establecimientos,access_hr_establecimientos,model_hr_establecimientos,,1,1,1,1
+access_hr_tematicas,access_hr_tematicas,model_hr_tematicas,,1,1,1,1
+access_hr_agente,access_hr_agente,model_hr_agente,,1,1,1,1
+access_hr_modalidad,access_hr_modalidad,model_hr_modalidad,,1,1,1,1
+access_hr_capacitacion,access_hr_capacitacion,model_hr_capacitacion,,1,1,1,1
+access_hr_estudios,access_hr_estudios,model_hr_estudios,,1,1,1,1
+access_hr_probatorio,access_hr_probatorio,model_hr_probatorio,,1,1,1,1
+access_hr_institucion,access_hr_institucion,model_hr_institucion,,1,1,1,1
+access_hr_occupation,access_hr_occupation,model_hr_occupation,,1,1,1,1
+access_hr_certificados,access_hr_certificados,model_hr_certificados,,1,1,1,1
+access_hr_instructores,access_hr_instructores,model_hr_instructores,,1,1,1,1

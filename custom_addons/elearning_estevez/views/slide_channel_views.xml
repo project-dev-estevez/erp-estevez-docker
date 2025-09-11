@@ -17,9 +17,13 @@
                         <group>
                             <field name="representante_patron" widget="many2one"/>
                             <field name="representante_trabajadores" widget="many2one"/>
+                            <field name="instructor" widget="many2one"/>
                         </group>
                     </div>
                 </div>
+            </xpath>
+            <xpath expr="//field[@name='user_id']" position="replace">
+            <field name="user_id" invisible="1"/>
             </xpath>
         </field>
     </record>

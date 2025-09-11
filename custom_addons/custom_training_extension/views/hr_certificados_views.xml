@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_certificados" model="ir.actions.act_window">
+        <field name="name">Información</field>
+        <field name="res_model">hr.certificados</field>
+        <field name="view_mode">list</field>
+    </record>
+    
+    <record id="view_hr_certificados_list" model="ir.ui.view">
+        <field name="name">hr.certificados.list</field>
+        <field name="model">hr.certificados</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="code"/>
+                <field name="description"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_hr_certificados_form" model="ir.ui.view">
+        <field name="name">hr.certificados.form</field>
+        <field name="model">hr.certificados</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="code"/>
+                        <field name="description"/>
+                    </group>
+                    <button type="object"
+                        string="Guardar"
+                        class="btn-primary"
+                        icon="fa-save"
+                        name="action_save"/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+
+</odoo>

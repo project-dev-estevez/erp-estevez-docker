@@ -5,4 +5,4 @@ class HrOccupation(models.Model):
     _description = 'Catálogo de Ocupaciones'
 
     code = fields.Char(string="Clave Ocupación", required=True)
-    name = fields.Char(string="Nombre Ocupación", required=True)
+    description = fields.Char(string="Descripción", required=True)
