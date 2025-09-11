@@ -48,7 +48,7 @@
                     </group>
                 </group>
             </xpath>
-            <!-- Agregar botones inteligentes WhatsApp y Documentos al toolbar -->
+            <!-- Agregar botones inteligentes Documentos al toolbar -->
             <!-- <xpath expr="//div[@name='button_box']/button[last()]" position="after">
                 <button name="action_open_employee_documents" class="oe_stat_button" icon="fa-file-text-o" type="object" string="Documentos"/>
             </xpath> -->
@@ -75,5 +75,35 @@
             </xpath>
         </field>
     </record> -->
+
+    <!-- Ocultar la página de Devices en el perfil de usuario -->
+    <record id="hr_res_users_view_form_profile_inherit_hide_devices" model="ir.ui.view">
+        <field name="name">hr.res.users.view.form.profile.inherit.hide.devices.estevez</field>
+        <field name="model">res.users</field>
+        <field name="inherit_id" ref="base.view_users_form_simple_modif"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='page_devices']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Hacer readonly la página de Skills/Resume en el perfil de usuario -->
+    <record id="hr_res_users_view_form_profile_inherit_readonly_skills" model="ir.ui.view">
+        <field name="name">hr.res.users.view.form.profile.inherit.readonly.skills.estevez</field>
+        <field name="model">res.users</field>
+        <field name="inherit_id" ref="hr_skills.res_users_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='skills_resume']" position="attributes">
+                <attribute name="readonly">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='resume_line_ids']" position="attributes">
+                <attribute name="readonly">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='employee_skill_ids']" position="attributes">
+                <attribute name="readonly">1</attribute>
+            </xpath>
+        </field>
+    </record>
 
 </odoo>
