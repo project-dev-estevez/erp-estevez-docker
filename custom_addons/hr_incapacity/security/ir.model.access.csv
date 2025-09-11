@@ -1,7 +1,2 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_hr_incapacity_type,hr.incapacity.type,model_hr_incapacity_type,,1,1,1,1
-access_hr_incapacity,hr.incapacity,model_hr_incapacity,,1,1,1,1
-access_hr_incapacity_type_user,hr.incapacity.type,model_hr_incapacity_type,base.group_user,1,0,0,0
-access_hr_incapacity_type_manager,hr.incapacity.type,model_hr_incapacity_type,group_hr_incapacity_manager,1,1,1,1
-access_hr_incapacity_user,hr.incapacity,model_hr_incapacity,group_hr_incapacity_user,1,1,1,0
-access_hr_incapacity_manager,hr.incapacity,model_hr_incapacity,group_hr_incapacity_manager,1,1,1,1
+access_hr_incapacity_user,access_hr_incapacity_user,model_hr_incapacity,base.group_user,1,1,1,1
