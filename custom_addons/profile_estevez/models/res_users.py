@@ -13,6 +13,18 @@ class ResUsers(models.Model):
         compute='_compute_employee_number_display',
         store=False
     )
+    area_id = fields.Many2one(
+        'hr.area',
+        string='Área',
+        compute='_compute_employee_area',
+        store=False
+    )
+    direction_id = fields.Many2one(
+        'hr.direction',
+        string='Dirección',
+        compute='_compute_employee_direction',
+        store=False
+    )
 
     @api.depends('employee_id')
     def _compute_employee_project_name(self):
@@ -29,3 +41,19 @@ class ResUsers(models.Model):
             if user.employee_id and hasattr(user.employee_id, 'employee_number'):
                 number = user.employee_id.employee_number or ''
             user.employee_number_display = number
+
+    @api.depends('employee_id')
+    def _compute_employee_area(self):
+        for user in self:
+            area = False
+            if user.employee_id and hasattr(user.employee_id, 'area_id'):
+                area = user.employee_id.area_id
+            user.area_id = area
+
+    @api.depends('employee_id')
+    def _compute_employee_direction(self):
+        for user in self:
+            direction = False
+            if user.employee_id and hasattr(user.employee_id, 'direction_id'):
+                direction = user.employee_id.direction_id
+            user.direction_id = direction
