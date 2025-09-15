@@ -19,6 +19,12 @@
             ('include', 'web._assets_bootstrap_frontend'),
             "auth_estevez/static/fonts/poppins.css",
             "auth_estevez/static/src/scss/login.scss",
+            "auth_estevez/static/src/css/password_toggle.css",
+            "auth_estevez/static/src/js/password_toggle_simple.js",
+        ],
+        "web.assets_backend": [
+            "auth_estevez/static/src/css/password_toggle.css",
+            "auth_estevez/static/src/js/password_toggle_simple.js",
         ],
     },
     "application": False,

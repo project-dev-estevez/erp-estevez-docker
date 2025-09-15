@@ -75,7 +75,8 @@
                             string="Descargar Documentos"
                             type="object"
                             class="oe_highlight"
-                            icon="fa-download"/>
+                            icon="fa-download"
+                            invisible="not ir_attachment_count"/>
                 </xpath>
 
                 <!-- Eliminar el grupo managers de su ubicación actual -->

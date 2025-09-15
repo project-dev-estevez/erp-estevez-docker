@@ -118,6 +118,18 @@ class HrEmployee(models.Model):
 
     leave_ids = fields.One2many('hr.leave', 'period_id')
 
+    ir_attachment_count = fields.Integer(
+        string="Cantidad de Documentos",
+        compute="_compute_ir_attachment_count"
+    )
+
+    def _compute_ir_attachment_count(self):
+        for employee in self:
+            employee.ir_attachment_count = self.env['ir.attachment'].search_count([
+                ('res_model', '=', 'hr.employee'),
+                ('res_id', '=', employee.id)
+            ])
+
     def _create_vacation_period(self, employee, start_date, end_date):
         # Calcular el inicio y fin del periodo basado en años calendario
         year_start = start_date
