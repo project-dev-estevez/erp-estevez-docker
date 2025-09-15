@@ -115,7 +115,6 @@ class HrEmployee(models.Model):
     entitled_days = fields.Float(compute='_compute_entitled_days', string='Con derecho a', store=True)
     vacation_days_taken = fields.Float(compute='_compute_days_taken', string='Días de vacaciones disfrutados', store=True)
     vacation_days_available = fields.Float(compute='_compute_days_available', string='Días vacaciones disponibles', store=True)
-    vacation_period_ids = fields.One2many('hr.vacation.period', 'employee_id')
 
     leave_ids = fields.One2many('hr.leave', 'period_id')
 
