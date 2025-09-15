@@ -58,7 +58,9 @@
         'views/hr_contract_views.xml',
         'views/hr_memorandum_views.xml',
         'views/hr_loan_views.xml',
-        'views/hr_employee_archive_wizard_views.xml',
+    'views/hr_employee_documents_kanban.xml',
+    'views/view_attachment_form_custom.xml',
+        # ... otros archivos de vista ...
         'views/hr_employee_reactivate_wizard_views.xml',
         'views/hr_employee_history_views.xml',
         'views/hr_leave.xml',
