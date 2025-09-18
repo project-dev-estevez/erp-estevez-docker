@@ -21,8 +21,6 @@ class HrEmployee(models.Model):
             'domain': [('employee_id', '=', self.id)],
             'context': {
                 'default_employee_id': self.id,
-                'search_default_employee_id': self.id
             },
             'target': 'new',
         }
-    
