@@ -455,15 +455,18 @@ class HrEmployee(models.Model):
             
 
     def action_open_employee_documents(self):
+        self.ensure_one()
+        self.env['hr.employee.document'].search([('employee_id', '=', self.id)]).unlink()
+        self.env['hr.employee.document'].create_required_documents(self.id)
         return {
             'name': _('Documentos del Empleado'),
-            'view_type': 'form',
-            'view_mode': 'kanban,list,form',
-            'res_model': 'ir.attachment',
-            'view_id': False,
+            'view_mode': 'kanban',
+            'res_model': 'hr.employee.document',
             'type': 'ir.actions.act_window',
-            'domain': [('res_model', '=', 'hr.employee'), ('res_id', '=', self.id)],
-            'context': {'default_res_model': 'hr.employee', 'default_res_id': self.id, 'create': True, 'edit': True},
+            'target': 'new',
+            'context': {'create': False},
+            'domain': [('employee_id', '=', self.id)],
+            'views': [(self.env.ref('hr_estevez.view_hr_employee_documents_kanban').id, 'kanban')],
         }
 
     def action_download_employee_documents(self):

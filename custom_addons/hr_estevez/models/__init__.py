@@ -15,3 +15,4 @@ from . import hr_employee_history
 from . import hr_leave
 from . import hr_leave_type
 from . import hr_vacation_allocation
+from . import hr_employee_document
