@@ -20,6 +20,47 @@ class HrVacationPeriod(models.Model):
     leave_ids = fields.One2many('hr.leave', 'period_id')
     allocation_ids = fields.One2many('hr.vacation.allocation', 'period_id', string="Asignaciones")
 
+    leave_holiday_status_ids = fields.Many2many(
+        'hr.leave.type',
+        compute='_compute_leave_info',
+        string="Tipos de Ausencia"
+    )
+
+    leave_request_dates = fields.Char(
+        compute='_compute_leave_info',
+        string="Fechas de Solicitud"
+    )
+
+    leave_durations = fields.Char(
+        compute='_compute_leave_info',
+        string="Duración de Solicitudes"
+    )
+
+    leave_states = fields.Char(
+        compute='_compute_leave_info',
+        string="Estados de Solicitudes"
+    )
+
+    @api.depends('leave_ids')
+    def _compute_leave_info(self):
+        for period in self:
+            # Recopilar información de las solicitudes
+            statuses = []
+            dates = []
+            durations = []
+            states = []
+            
+            for leave in period.leave_ids:
+                statuses.append(leave.holiday_status_id.name or '')
+                dates.append(f"{leave.request_date_from} a {leave.request_date_to}")
+                durations.append(str(leave.number_of_days))
+                states.append(leave.state)
+            
+            period.leave_holiday_status_ids = [(6, 0, [l.holiday_status_id.id for l in period.leave_ids])]
+            period.leave_request_dates = "\n".join(dates)
+            period.leave_durations = "\n".join(durations)
+            period.leave_states = "\n".join(states)
+
     @api.depends('period', 'entitled_days', 'days_remaining')
     def _compute_display_name(self):
         for record in self:
