@@ -13,19 +13,19 @@ class HrEmployee(models.Model):
     _inherit = 'hr.employee'
 
     #Campo para seleccionar el estado del catálogo
-    state_id = fields.Many2one('hr.state', string="Estado")    
+    state_id = fields.Many2one('hr.state', string="Estado", ondelete='set null')    
     state_key = fields.Char(compute='_compute_state_key', store=True)
 
-    municipality_id = fields.Many2one('hr.municipality', string="Municipio")
+    municipality_id = fields.Many2one('hr.municipality', string="Municipio", ondelete='set null')
     municipality_key = fields.Char(compute='_compute_municipality_key', store=True)
 
-    occupation_id = fields.Many2one('hr.occupation', string="Ocupaciones")
+    occupation_id = fields.Many2one('hr.occupation', string="Ocupaciones", ondelete='set null')
     occupation_key = fields.Char(compute='_compute_occupation_key', store=True)    
 
-    estudios_id = fields.Many2one('hr.estudios', string="Nivel de estudios")
+    estudios_id = fields.Many2one('hr.estudios', string="Nivel de estudios", ondelete='set null')
     estudios_key = fields.Char(compute='_compute_estudios_key', store=True)    
 
-    documento_id = fields.Many2one('hr.probatorio', string="Documento probatorio")
+    documento_id = fields.Many2one('hr.probatorio', string="Documento probatorio", ondelete='set null')
     documento_key = fields.Char(compute='_compute_documento_key', store=True)
 
     gender = fields.Selection([
