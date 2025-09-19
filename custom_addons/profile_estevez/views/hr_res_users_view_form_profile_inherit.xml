@@ -37,18 +37,18 @@
                         <field name="can_edit" invisible="1"/>
                         <field name="mobile_phone" widget="phone" readonly="not can_edit" invisible="1"/>
                         <field name="work_phone" widget="phone"/>
-                        <field name="work_location_id" readonly="True"/>
-                        <field name="coach_id" readonly="True"/>      
+                        <field name="work_location_id" readonly="True" options="{'no_open': True}"/>
+                        <field name="coach_id" readonly="True" options="{'no_open': True}"/>      
                     </group>
                     <group>
                         <field name="work_email" string="Correo laboral" widget="email"/>
-                        <field name="employee_parent_id" string="Jefe inmediato" readonly="True"/>
+                        <field name="employee_parent_id" string="Jefe inmediato" readonly="True" options="{'no_open': True}"/>
                         <field name="employee_project_name" string="Proyecto" readonly="True"/>
                         <field name="company_id" invisible="1"/>
                     </group>
                 </group>
             </xpath>
-            <!-- Agregar botones inteligentes WhatsApp y Documentos al toolbar -->
+            <!-- Agregar botones inteligentes Documentos al toolbar -->
             <!-- <xpath expr="//div[@name='button_box']/button[last()]" position="after">
                 <button name="action_open_employee_documents" class="oe_stat_button" icon="fa-file-text-o" type="object" string="Documentos"/>
             </xpath> -->
@@ -75,5 +75,86 @@
             </xpath>
         </field>
     </record> -->
+
+    <!-- Ocultar la página de Devices en el perfil de usuario -->
+    <record id="hr_res_users_view_form_profile_inherit_hide_devices" model="ir.ui.view">
+        <field name="name">hr.res.users.view.form.profile.inherit.hide.devices.estevez</field>
+        <field name="model">res.users</field>
+        <field name="inherit_id" ref="base.view_users_form_simple_modif"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='page_devices']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Hacer readonly la página de Skills/Resume en el perfil de usuario -->
+    <record id="hr_res_users_view_form_profile_inherit_readonly_skills" model="ir.ui.view">
+        <field name="name">hr.res.users.view.form.profile.inherit.readonly.skills.estevez</field>
+        <field name="model">res.users</field>
+        <field name="inherit_id" ref="hr_skills.res_users_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='skills_resume']" position="attributes">
+                <attribute name="readonly">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='resume_line_ids']" position="attributes">
+                <attribute name="readonly">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='employee_skill_ids']" position="attributes">
+                <attribute name="readonly">1</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Ocultar el botón de API Key en el perfil de usuario -->
+    <record id="hr_res_users_view_form_profile_inherit_hide_api_key" model="ir.ui.view">
+        <field name="name">hr.res.users.view.form.profile.inherit.hide.api.key.estevez</field>
+        <field name="model">res.users</field>
+        <field name="inherit_id" ref="base.view_users_form_simple_modif"/>
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='api_key_wizard']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Renombrar la página de información de trabajo y agregar campos adicionales -->
+    <record id="hr_res_users_view_form_profile_inherit_work_info" model="ir.ui.view">
+        <field name="name">hr.res.users.view.form.profile.inherit.work.info.estevez</field>
+        <field name="model">res.users</field>
+        <field name="inherit_id" ref="hr.res_users_view_form_profile"/>
+        <field name="arch" type="xml">
+            <!-- Renombrar la página -->
+            <xpath expr="//page[@name='public']" position="attributes">
+                <attribute name="string">Información laboral</attribute>
+            </xpath>
+            <!-- Agregar dirección antes del departamento -->
+            <xpath expr="//page[@name='public']//field[@name='department_id']" position="before">
+                <field name="direction_id" string="Dirección" readonly="True" options="{'no_open': True}"/>
+            </xpath>
+            <!-- Agregar área después del departamento -->
+            <xpath expr="//page[@name='public']//field[@name='department_id']" position="after">
+                <field name="area_id" string="Área" readonly="True" options="{'no_open': True}"/>
+            </xpath>
+            <!-- Hacer readonly todos los campos de la página public -->
+            <xpath expr="//page[@name='public']//field[@name='department_id']" position="attributes">
+                <attribute name="readonly">True</attribute>
+                <attribute name="options">{'no_open': True}</attribute>
+            </xpath>
+            <xpath expr="//page[@name='public']//field[@name='address_id']" position="attributes">
+                <attribute name="readonly">True</attribute>
+                <attribute name="options">{'no_open': True}</attribute>
+            </xpath>
+            <!-- Hacer readonly los campos de managers/aprobadores -->
+            <xpath expr="//page[@name='public']//field[@name='leave_manager_id']" position="attributes">
+                <attribute name="readonly">True</attribute>
+                <attribute name="options">{'no_open': True}</attribute>
+            </xpath>
+            <xpath expr="//page[@name='public']//field[@name='attendance_manager_id']" position="attributes">
+                <attribute name="readonly">True</attribute>
+                <attribute name="options">{'no_open': True}</attribute>
+            </xpath>
+        </field>
+    </record>
 
 </odoo>

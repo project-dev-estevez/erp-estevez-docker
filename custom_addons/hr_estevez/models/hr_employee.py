@@ -131,9 +131,20 @@ class HrEmployee(models.Model):
     entitled_days = fields.Float(compute='_compute_entitled_days', string='Con derecho a', store=True)
     vacation_days_taken = fields.Float(compute='_compute_days_taken', string='Días de vacaciones disfrutados', store=True)
     vacation_days_available = fields.Float(compute='_compute_days_available', string='Días vacaciones disponibles', store=True)
-    vacation_period_ids = fields.One2many('hr.vacation.period', 'employee_id')
 
     leave_ids = fields.One2many('hr.leave', 'period_id')
+
+    ir_attachment_count = fields.Integer(
+        string="Cantidad de Documentos",
+        compute="_compute_ir_attachment_count"
+    )
+
+    def _compute_ir_attachment_count(self):
+        for employee in self:
+            employee.ir_attachment_count = self.env['ir.attachment'].search_count([
+                ('res_model', '=', 'hr.employee'),
+                ('res_id', '=', employee.id)
+            ])
 
     def _create_vacation_period(self, employee, start_date, end_date):
         # Calcular el inicio y fin del periodo basado en años calendario
@@ -486,15 +497,18 @@ class HrEmployee(models.Model):
             
 
     def action_open_employee_documents(self):
+        self.ensure_one()
+        self.env['hr.employee.document'].search([('employee_id', '=', self.id)]).unlink()
+        self.env['hr.employee.document'].create_required_documents(self.id)
         return {
             'name': _('Documentos del Empleado'),
-            'view_type': 'form',
-            'view_mode': 'kanban,list,form',
-            'res_model': 'ir.attachment',
-            'view_id': False,
+            'view_mode': 'kanban',
+            'res_model': 'hr.employee.document',
             'type': 'ir.actions.act_window',
-            'domain': [('res_model', '=', 'hr.employee'), ('res_id', '=', self.id)],
-            'context': {'default_res_model': 'hr.employee', 'default_res_id': self.id, 'create': True, 'edit': True},
+            'target': 'new',
+            'context': {'create': False},
+            'domain': [('employee_id', '=', self.id)],
+            'views': [(self.env.ref('hr_estevez.view_hr_employee_documents_kanban').id, 'kanban')],
         }
 
     def action_download_employee_documents(self):

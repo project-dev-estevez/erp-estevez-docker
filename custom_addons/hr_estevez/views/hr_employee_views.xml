@@ -75,7 +75,8 @@
                             string="Descargar Documentos"
                             type="object"
                             class="oe_highlight"
-                            icon="fa-download"/>
+                            icon="fa-download"
+                            invisible="not ir_attachment_count"/>
                 </xpath>
 
                 <!-- Eliminar el grupo managers de su ubicación actual -->
@@ -314,6 +315,10 @@
                             </table>
                         </div>
                     </page>
+                </xpath>
+
+                <xpath expr="//notebook/page[@name='disabilities']" position="attributes">
+                    <attribute name="invisible">1</attribute>
                 </xpath>
 
                 <!-- Nueva página de Actas Administrativas -->

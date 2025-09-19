@@ -1,19 +1,55 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
   <data>
-    <record id="view_vacation_period_tree" model="ir.ui.view">
-      <field name="name">hr.vacation.period.tree</field>
-      <field name="model">hr.vacation.period</field>
-      <field name="arch" type="xml">
-        <tree>
-          <field name="period"/>
-          <field name="year_start"/>
-          <field name="year_end"/>
-          <field name="entitled_days"/>
-          <field name="days_taken"/>
-          <field name="days_remaining"/>
-        </tree>
-      </field>
-    </record>
+    <record id="view_hr_vacation_period_form" model="ir.ui.view">
+    <field name="name">hr.vacation.period.form</field>
+    <field name="model">hr.vacation.period</field>
+    <field name="arch" type="xml">
+        <form>
+            <sheet>
+                <group>
+                    <group>
+                        <field name="display_name" readonly="1"/>
+                        <field name="employee_id" readonly="1"/>
+                        <field name="period" readonly="1"/>
+                    </group>
+                    <group>
+                        <field name="year_start" readonly="1"/>
+                        <field name="year_end" readonly="1"/>
+                        <field name="entitled_days" readonly="1"/>
+                        <field name="days_taken" readonly="1"/>
+                        <field name="days_remaining" readonly="1"/>
+                    </group>
+                </group>
+                <notebook>
+                   
+                    <page string="Asignaciones" name="allocations">
+                        <field name="allocation_ids" readonly="1">
+                            <list>
+                                <field name="leave_id" string="Solicitud"/>
+                                <field name="days" string="Días Asignados"/>
+                                <field name="leave_state" string="Estado"/>
+                            </list>
+                            <form>
+                                <sheet>
+                                    <group>
+                                        <group>
+                                            <field name="leave_id" readonly="1"/>
+                                            <field name="days" readonly="1"/>
+                                        </group>
+                                        <group>
+                                            <field name="leave_state" readonly="1"/>
+                                            <field name="period_id" readonly="1"/>
+                                        </group>
+                                    </group>
+                                </sheet>
+                            </form>
+                        </field>
+                    </page>
+                </notebook>
+            </sheet>
+        </form>
+    </field>
+</record>
   </data>
 </odoo>

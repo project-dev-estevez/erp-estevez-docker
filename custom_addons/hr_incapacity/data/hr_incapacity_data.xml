@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Secuencia para incapacidades -->
+    <record id="seq_hr_incapacity" model="ir.sequence">
+        <field name="name">Secuencia de Incapacidades</field>
+        <field name="code">hr.incapacity</field>
+        <field name="prefix">INC/</field>
+        <field name="padding">4</field>
+        <field name="company_id" eval="False"/>
+    </record>
+
+    <!-- Tipo de ausencia para incapacidades -->
+    <record id="hr_leave_type_incapacity" model="hr.leave.type">
+        <field name="name">Incapacidad</field>
+        <field name="requires_allocation">no</field>
+        <field name="active">true</field>
+        <field name="company_id" eval="False"/>
+    </record>
+
+    <!-- Tipos de incapacidad -->
+    <record id="incapacity_type_1" model="hr.incapacity.type">
+        <field name="name">Enfermedad General</field>
+        <field name="code">EG</field>
+        <field name="description">Incapacidad por enfermedad general</field>
+    </record>
+
+    <record id="incapacity_type_2" model="hr.incapacity.type">
+        <field name="name">Accidente de Trabajo</field>
+        <field name="code">AT</field>
+        <field name="description">Incapacidad por accidente de trabajo</field>
+    </record>
+
+    <record id="incapacity_type_3" model="hr.incapacity.type">
+        <field name="name">Enfermedad Laboral</field>
+        <field name="code">EL</field>
+        <field name="description">Incapacidad por enfermedad laboral</field>
+    </record>
+
+    <record id="incapacity_type_4" model="hr.incapacity.type">
+        <field name="name">Maternidad</field>
+        <field name="code">MAT</field>
+        <field name="description">Incapacidad por maternidad</field>
+    </record>
+</odoo>

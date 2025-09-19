@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_hr_incapacity_list" model="ir.ui.view">
+    <field name="name">hr.incapacity.list</field>
+    <field name="model">hr.incapacity</field>
+    <field name="arch" type="xml">
+        <list>
+            <field name="name" string="Folio"/>
+            <field name="employee_id" string="Empleado"/>
+            <field name="incapacity_type_id" string="Tipo"/>
+            <field name="incident_date" string="Fecha Incidente"/>
+            <field name="start_date" string="Fecha Inicio"/>
+            <field name="end_date" string="Fecha Fin"/>
+            <field name="days" string="Días"/>
+            <field name="state" string="Estado"/>
+        </list>
+    </field>
+</record>
+<record id="view_hr_incapacity_form" model="ir.ui.view">
+    <field name="name">hr.incapacity.form</field>
+    <field name="model">hr.incapacity</field>
+    <field name="arch" type="xml">
+        <form>
+            <header>
+                <button name="action_confirm" string="Enviar para Aprobación" type="object" class="btn-primary" invisible="state != 'draft'"/>
+                <button name="action_validate" string="Aprobar" type="object" class="btn-secondary" invisible="state != 'confirm'"/>
+                <button name="action_refuse" string="Rechazar" type="object" class="btn-danger" invisible="state not in ['draft', 'confirm']"/>
+                <button name="action_draft" string="Volver a Borrador" type="object" class="btn-secondary" invisible="state != 'refuse'"/>
+                <field name="state" widget="statusbar" statusbar_visible="draft,confirm,validate,refuse"/>
+            </header>
+            <sheet>
+                <group>
+                    <group>
+                        <field name="employee_id"/>
+                        <field name="department_id"/>
+                        <field name="company_id"/>
+                    </group>
+                    <group>
+                        <field name="incapacity_type_id"/>
+                        <field name="incident_date"/>
+                        <field name="start_date"/>
+                        <field name="end_date"/>
+                        <field name="days" readonly="1"/>
+                    </group>
+                </group>
+                <group>
+                    <field name="comments"/>
+                </group>
+            </sheet>
+        </form>
+    </field>
+</record>
+</odoo>

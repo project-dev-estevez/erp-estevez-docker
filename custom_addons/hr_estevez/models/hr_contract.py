@@ -43,16 +43,32 @@ class HrContract(models.Model):
     document_file = fields.Binary(string="Archivo Adjunto", help="Adjunta un único documento relacionado con el contrato.")
     document_filename = fields.Char(string="Nombre del Archivo", compute="_compute_document_filename", store=True)
 
+    def _get_initial_state(self, vals):
+        """
+        Determina el estado inicial del contrato según la fecha de fin.
+        Si la fecha de fin ya venció, retorna 'close', si no, 'open'.
+        """
+        date_end = vals.get('date_end')
+        if date_end:
+            today = date.today()
+            # Convertir a date si viene como string
+            if isinstance(date_end, str):
+                try:
+                    date_end = datetime.strptime(date_end, "%Y-%m-%d").date()
+                except Exception:
+                    return 'open'  # Si no se puede convertir, dejar como abierto
+            if date_end <= today:
+                return 'close'
+        return 'open'
+
     def _compute_document_filename(self):
         for record in self:
             # Generar el nombre del archivo dinámicamente
             record.document_filename = f"Contrato {record.id or 'nuevo'}.pdf"
 
     def create(self, vals):
-        # Obtener el empleado del contrato que se está creando
         employee_id = vals.get('employee_id')
         if employee_id:
-            # Buscar contratos existentes del empleado en los estados 'draft', 'open', o 'close'
             existing_contracts = self.env['hr.contract'].search([
                 ('employee_id', '=', employee_id),
                 ('state', 'in', ['draft', 'open', 'close'])
@@ -61,8 +77,6 @@ class HrContract(models.Model):
                 raise exceptions.ValidationError(_(
                     "No se puede crear un nuevo contrato porque el empleado ya tiene un contrato registrado."
                 ))
-
-            # Establecer valores relacionados con el empleado
             employee = self.env['hr.employee'].browse(employee_id)
             vals['work_location'] = employee.work_location_id.name if employee.work_location_id else ''
             vals['work_direction'] = employee.direction_id.name if employee.direction_id else ''
@@ -70,10 +84,9 @@ class HrContract(models.Model):
             vals['department_id'] = employee.department_id.id if employee.department_id else False
             vals['job_id'] = employee.job_id.id if employee.job_id else False
 
-        # Establecer el estado inicial como 'open'
-        vals['state'] = 'open'
+        # Determinar el estado inicial usando función separada
+        vals['state'] = self._get_initial_state(vals)
 
-        # Si no hay conflictos, proceder con la creación del contrato
         return super(HrContract, self).create(vals)
 
     @api.depends('date_start', 'date_end')
@@ -109,7 +122,6 @@ class HrContract(models.Model):
     @api.model
     def default_get(self, fields_list):
         res = super(HrContract, self).default_get(fields_list)
-        
         # Validar si el empleado ya tiene un contrato conflictivo
         if 'employee_id' in res and res['employee_id']:
             existing_contracts = self.env['hr.contract'].search([
@@ -120,7 +132,6 @@ class HrContract(models.Model):
                 raise exceptions.ValidationError(_(
                     "El empleado ya tiene un contrato en curso. No se puede crear un nuevo contrato hasta no cerrar el actual."
                 ))
-        
         # Lógica existente para cargar valores predeterminados
         if 'employee_id' in res:
             employee = self.env['hr.employee'].browse(res['employee_id'])
@@ -129,7 +140,8 @@ class HrContract(models.Model):
             res['work_area'] = employee.area_id.name if employee.area_id else ''
             res['department_id'] = employee.department_id.id if employee.department_id else False
             res['job_id'] = employee.job_id.id if employee.job_id else False
-        
+            # Asignar fecha de ingreso por defecto
+            res['date_of_entry'] = employee.employment_start_date or False
         return res
     
     def action_save(self):
