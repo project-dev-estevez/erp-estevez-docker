@@ -12,6 +12,22 @@ _logger = logging.getLogger(__name__)
 class HrEmployee(models.Model):
     _inherit = 'hr.employee'
 
+    #Campo para seleccionar el estado del catálogo
+    state_id = fields.Many2one('hr.state', string="Estado")    
+    state_key = fields.Char(compute='_compute_state_key', store=True)
+
+    municipality_id = fields.Many2one('hr.municipality', string="Municipio")
+    municipality_key = fields.Char(compute='_compute_municipality_key', store=True)
+
+    occupation_id = fields.Many2one('hr.occupation', string="Ocupaciones")
+    occupation_key = fields.Char(compute='_compute_occupation_key', store=True)    
+
+    estudios_id = fields.Many2one('hr.estudios', string="Nivel de estudios")
+    estudios_key = fields.Char(compute='_compute_estudios_key', store=True)    
+
+    documento_id = fields.Many2one('hr.probatorio', string="Documento probatorio")
+    documento_key = fields.Char(compute='_compute_documento_key', store=True)
+
     gender = fields.Selection([
         ('male', 'Masculino'),
         ('female', 'Femenino'),
@@ -140,6 +156,32 @@ class HrEmployee(models.Model):
 
             # Avanzar al siguiente año
             year_start = year_start.replace(year=year_start.year + 1)
+
+    @api.depends('state_id')
+    def _compute_state_key(self):
+        for employee in self:            
+            employee.state_key = employee.state_id.code if employee.state_id else False            
+
+    @api.depends('municipality_id')
+    def _compute_municipality_key(self):
+        for employee in self:            
+            employee.municipality_key = employee.municipality_id.code if employee.municipality_id else False  
+
+    @api.depends('occupation_id')
+    def _compute_occupation_key(self):
+        for employee in self:            
+            employee.occupation_key = employee.occupation_id.code if employee.occupation_id else False  
+
+    @api.depends('estudios_id')
+    def _compute_estudios_key(self):
+        for employee in self:            
+            employee.estudios_key = employee.estudios_id.code if employee.estudios_id else False 
+            
+                      
+    @api.depends('documento_id')
+    def _compute_documento_key(self):
+        for employee in self:            
+            employee.documento_key = employee.documento_id.code if employee.documento_id else False 
 
     @api.depends('employment_start_date')
     def _compute_years_of_service(self):
