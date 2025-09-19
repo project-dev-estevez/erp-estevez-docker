@@ -12,7 +12,7 @@
         <field name="arch" type="xml">
             <list>
                 <field name="code"/>
-                <field name="description"/>
+                <field name="name"/>
             </list>
         </field>
     </record>
@@ -25,7 +25,7 @@
                 <sheet>
                     <group>
                         <field name="code"/>
-                        <field name="description"/>
+                        <field name="name"/>
                     </group>
                 </sheet>
             </form>

@@ -5,9 +5,13 @@ class HrMunicipality(models.Model):
     _description = 'Catálogo de Municipios'
 
     code = fields.Char(string="Clave Municipio", required=True)
-    name = fields.Char(string="Nombre Municipio", required=True)
-    estado_id = fields.Many2one(
-        comodel_name='custom_training_extension.estado',
-        string='Estado',        
-        ondelete='restrict'
+    name = fields.Char(string="Nombre Municipio", required=True)    
+
+    
+    state_id = fields.Many2one(
+        comodel_name='hr.state', 
+        string='Estado',  
+        required=True,         
+        ondelete='restrict'           
     )
+    

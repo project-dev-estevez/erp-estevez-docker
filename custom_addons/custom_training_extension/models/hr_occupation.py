@@ -5,4 +5,10 @@ class HrOccupation(models.Model):
     _description = 'Catálogo de Ocupaciones'
 
     code = fields.Char(string="Clave Ocupación", required=True)
-    description = fields.Char(string="Descripción", required=True)
+    name = fields.Char(string="Descripción", required=True)
+
+    employee_ids = fields.One2many(
+        comodel_name='hr.employee', 
+        inverse_name='occupation_id', 
+        string='Empleados'
+    )

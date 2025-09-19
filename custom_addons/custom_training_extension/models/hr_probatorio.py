@@ -5,4 +5,4 @@ class HrProbatorio(models.Model):
     _description = 'Catálogo de Documentos Probatorios'
 
     code = fields.Char(string="Clave Doc Probatorio", required=True)
-    description = fields.Char(string="Descripción", required=True)
+    name = fields.Char(string="Descripción", required=True)

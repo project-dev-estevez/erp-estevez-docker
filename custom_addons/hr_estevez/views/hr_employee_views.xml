@@ -99,7 +99,7 @@
                         <field name="project"/>
                         <field name="category_ids" widget="many2many_tags"
                                     options="{'color_field': 'color', 'no_create_edit': True}"
-                                    placeholder="Tags" groups="hr.group_hr_user"/>
+                                    placeholder="Tags" groups="hr.group_hr_user"/>                        
                     </group>
                 </xpath>
 
@@ -112,7 +112,9 @@
                         <field name="area_id" domain="[('department_id', '=', department_id)]" invisible="not department_id" options="{'no_create': True}"/>
                         <field name="job_id" domain="[('department_id', '=', department_id)]" invisible="not department_id" options="{'no_create': True}"/>
                         <field name="parent_id" string="Jefe Inmediato" options="{'no_create': True}"/>
-                        <field name="coach_id" string="Instructor" options="{'no_create': True}"/>
+                        <field name="coach_id" string="Instructor" options="{'no_create': True}"/>  
+                        <field name="occupation_id" string="Ocupación" options="{'no_create': True}"/>
+                        <field name="occupation_key" invisible="1"/> 
                         
                     </group>
                 </xpath>
@@ -195,11 +197,13 @@
                                         </div>
                                     </div>
                                     <div class="row g-1">
-                                        <div class="col p-1">
-                                            <field name="private_state_id" placeholder="Estado" options="{'no_open': True, 'no_quick_create': True}" context="{'default_country_id': private_country_id}"/>
+                                        <div class="col p-1">                                            
+                                            <field name="state_id" placeholder="Estado" options="{'no_open': True, 'no_quick_create': True}"/>
+                                            <field name="state_key" invisible="1"/>
                                         </div>
                                         <div class="col p-1">
-                                            <field name="private_city" placeholder="Municipio"/>
+                                            <field name="municipality_id" placeholder="Municipio" options="{'no_open': True, 'no_quick_create': True}"/>
+                                            <field name="municipality_key" invisible="1"/>
                                         </div>
                                     </div>
                                     <div class="row g-1">
@@ -237,6 +241,10 @@
                                 <field name="certificate"/>
                                 <field name="study_field"/>
                                 <field name="study_school"/>
+                                <field name="estudios_id"/>                                
+                                <field name="estudios_key"/>  
+                                <field name="documento_id"/> 
+                                <field name="documento_key"/> 
                             </group> 
                         </group>
 
