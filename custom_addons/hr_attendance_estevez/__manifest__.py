@@ -1,0 +1,18 @@
+# -*- coding: utf-8 -*-
+{
+    "name": "HR Attendance Estevez Custom",
+    "summary": "Personalización módulo IA asistencias (hereda hr_attendance_controls_adv)",
+    "version": "1.0.0",
+    "author": "Estevez.Jor",
+    "category": "Human Resources",
+    "depends": ["hr_attendance_controls_adv"],
+    "data": [],
+    "assets": {
+        "web.assets_backend": [
+            "hr_attendance_estevez/static/src/xml/attendance_menu_inherit.xml",
+            "hr_attendance_estevez/static/src/xml/attendance_systray_inherit.xml",
+        ],
+    },
+    "installable": True,
+    "application": False,
+}

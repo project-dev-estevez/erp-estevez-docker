@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates>
+    <!-- <t t-inherit="hr_attendance.attendance_menu" t-inherit-mode="extension" priority="20">
+        <xpath expr="//Dropdown//t[@t-set-slot='content']//div[hasclass('o_att_menu_container')]" position="replace">
+            <div t-if="this.state.show_check_inout_button" class="o_att_menu_container text-center">
+                <button type="button" class="btn btn-primary btn-lg" t-on-click="onCheckInOut">
+                    <i class="fa fa-user-check" style="margin-right:8px;"/>
+                    Registrar Asistenciaaaaa
+                </button>
+            </div>
+            <div t-if="this.state.show_check_inout_button === false" class="o_att_menu_container_spinner text-center">
+                <i class="fa fa-circle-o-notch fa-spin spinner"/>
+            </div>
+        </xpath>
+    </t> -->
+</templates>
