@@ -5,7 +5,7 @@
             <button type="button" class="btn btn-primary btn-sm o_attendance_systray_button o-dropdown dropdown-toggle dropdown" aria-expanded="false">
                 <i t-if="!this.state.checkedIn" class="fa fa-times text-danger" style="margin-right:4px;"/>
                 <i t-if="this.state.checkedIn" class="fa fa-check text-success" style="margin-right:4px;"/>
-                Asistencia
+                Asistenciaa
             </button>
         </xpath>
     </t>
