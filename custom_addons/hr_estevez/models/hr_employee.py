@@ -12,6 +12,11 @@ _logger = logging.getLogger(__name__)
 class HrEmployee(models.Model):
     _inherit = 'hr.employee'
 
+    image_1920 = fields.Image("Image", attachment=True)
+    image_1024 = fields.Image("Image 1024", attachment=True)
+    image_512 = fields.Image("Image 512", attachment=True)
+    image_256 = fields.Image("Image 256", attachment=True)
+    image_128 = fields.Image("Image 128", attachment=True)
     #Campo para seleccionar el estado del catálogo
     state_id = fields.Many2one('hr.state', string="Estado", ondelete='set null')    
     state_key = fields.Char(compute='_compute_state_key', store=True)
