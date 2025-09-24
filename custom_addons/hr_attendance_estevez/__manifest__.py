@@ -6,7 +6,9 @@
     "author": "Estevez.Jor",
     "category": "Human Resources",
     "depends": ["hr_attendance_controls_adv"],
-    "data": [],
+    "data": [
+        "views/hr_attendance_view_form_inherit.xml",
+    ],
     "assets": {
         "web.assets_backend": [
             "hr_attendance_estevez/static/src/xml/attendance_menu_inherit.xml",
