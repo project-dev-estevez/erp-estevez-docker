@@ -70,14 +70,11 @@ class HrContract(models.Model):
     def create(self, vals):
         employee_id = vals.get('employee_id')
         if employee_id:
-            existing_contracts = self.env['hr.contract'].search([
-                ('employee_id', '=', employee_id),
-                ('state', 'in', ['draft', 'open', 'close'])
+            # Contar contratos previos del empleado
+            contract_count = self.env['hr.contract'].search_count([
+                ('employee_id', '=', employee_id)
             ])
-            if existing_contracts:
-                raise exceptions.ValidationError(_(
-                    "No se puede crear un nuevo contrato porque el empleado ya tiene un contrato registrado."
-                ))
+            vals['name'] = f"Contrato {contract_count + 1}"
             employee = self.env['hr.employee'].browse(employee_id)
             vals['work_location'] = employee.work_location_id.name if employee.work_location_id else ''
             vals['work_direction'] = employee.direction_id.name if employee.direction_id else ''
@@ -148,6 +145,11 @@ class HrContract(models.Model):
                 res['bank'] = last_contract.bank
                 res['bank_account'] = last_contract.bank_account
                 res['clabe'] = last_contract.clabe
+            # Asignar nombre consecutivo
+            contract_count = self.env['hr.contract'].search_count([
+                ('employee_id', '=', employee_id)
+            ])
+            res['name'] = f"Contrato {contract_count + 1}"
             employee = self.env['hr.employee'].browse(employee_id)
             res['work_location'] = employee.work_location_id.name if employee.work_location_id else ''
             res['work_direction'] = employee.direction_id.name if employee.direction_id else ''
@@ -156,6 +158,24 @@ class HrContract(models.Model):
             res['job_id'] = employee.job_id.id if employee.job_id else False
             res['date_of_entry'] = employee.employment_start_date or False
         return res
+
+    @api.onchange('employee_id')
+    def _onchange_employee_id_copy_bank_data(self):
+        if self.employee_id:
+            last_contract = self.env['hr.contract'].search([
+                ('employee_id', '=', self.employee_id.id),
+                ('id', '!=', self.id),
+                ('state', 'in', ['draft', 'open', 'close'])
+            ], order='date_start desc', limit=1)
+            if last_contract:
+                self.bank = last_contract.bank
+                self.bank_account = last_contract.bank_account
+                self.clabe = last_contract.clabe
+            # Asignar nombre consecutivo
+            contract_count = self.env['hr.contract'].search_count([
+                ('employee_id', '=', self.employee_id.id)
+            ])
+            self.name = f"Contrato {contract_count + 1}"
     
     def action_save(self):
         """Manually save the record."""
