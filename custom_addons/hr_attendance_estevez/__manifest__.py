@@ -11,9 +11,9 @@
     ],
     "assets": {
         "web.assets_backend": [
-            "hr_attendance_estevez/static/src/xml/attendance_menu_inherit.xml",
-            "hr_attendance_estevez/static/src/xml/attendance_systray_inherit.xml",
-            "hr_attendance_estevez/static/src/js/attendance_menu_patch.js",
+            "hr_attendance_estevez/static/src/components/attendance_menu/**/*.xml",
+            "hr_attendance_estevez/static/src/components/attendance_menu/**/*.scss",
+            "hr_attendance_estevez/static/src/components/attendance_menu/**/*.js",
         ],
     },
     "installable": True,

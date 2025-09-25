@@ -5,6 +5,7 @@ import logging
 _logger = logging.getLogger(__name__)
 
 class HrContract(models.Model):
+    
     _inherit = 'hr.contract'
 
     date_of_entry = fields.Date(string='Fecha de Ingreso')
@@ -88,6 +89,19 @@ class HrContract(models.Model):
         vals['state'] = self._get_initial_state(vals)
 
         return super(HrContract, self).create(vals)
+    
+    @api.onchange('employee_id')
+    def _onchange_employee_id_copy_bank_data(self):
+        if self.employee_id:
+            last_contract = self.env['hr.contract'].search([
+                ('employee_id', '=', self.employee_id.id),
+                ('id', '!=', self.id),
+                ('state', 'in', ['draft', 'open', 'close'])
+            ], order='date_start desc', limit=1)
+            if last_contract:
+                self.bank = last_contract.bank
+                self.bank_account = last_contract.bank_account
+                self.clabe = last_contract.clabe
 
     @api.depends('date_start', 'date_end')
     def _compute_days_to_expiry(self):
@@ -122,25 +136,24 @@ class HrContract(models.Model):
     @api.model
     def default_get(self, fields_list):
         res = super(HrContract, self).default_get(fields_list)
-        # Validar si el empleado ya tiene un contrato conflictivo
-        if 'employee_id' in res and res['employee_id']:
-            existing_contracts = self.env['hr.contract'].search([
-                ('employee_id', '=', res['employee_id']),
+        # Si hay empleado, buscar el último contrato y copiar datos bancarios
+        employee_id = res.get('employee_id')
+        if employee_id:
+            # Buscar el último contrato (por fecha de inicio más reciente)
+            last_contract = self.env['hr.contract'].search([
+                ('employee_id', '=', employee_id),
                 ('state', 'in', ['draft', 'open', 'close'])
-            ])
-            if existing_contracts:
-                raise exceptions.ValidationError(_(
-                    "El empleado ya tiene un contrato en curso. No se puede crear un nuevo contrato hasta no cerrar el actual."
-                ))
-        # Lógica existente para cargar valores predeterminados
-        if 'employee_id' in res:
-            employee = self.env['hr.employee'].browse(res['employee_id'])
+            ], order='date_start desc', limit=1)
+            if last_contract:
+                res['bank'] = last_contract.bank
+                res['bank_account'] = last_contract.bank_account
+                res['clabe'] = last_contract.clabe
+            employee = self.env['hr.employee'].browse(employee_id)
             res['work_location'] = employee.work_location_id.name if employee.work_location_id else ''
             res['work_direction'] = employee.direction_id.name if employee.direction_id else ''
             res['work_area'] = employee.area_id.name if employee.area_id else ''
             res['department_id'] = employee.department_id.id if employee.department_id else False
             res['job_id'] = employee.job_id.id if employee.job_id else False
-            # Asignar fecha de ingreso por defecto
             res['date_of_entry'] = employee.employment_start_date or False
         return res
     
