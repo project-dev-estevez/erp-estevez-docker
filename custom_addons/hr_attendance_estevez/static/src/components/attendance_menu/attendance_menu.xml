@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <templates>
     <t t-inherit="hr_attendance.attendance_menu" t-inherit-mode="extension" priority="30">
-        <!-- Reemplaza el botón que contiene el icono fa-circle -->
+        
+        <!-- Reemplaza el botón del systray -->
         <xpath expr="//button[i[contains(@class, 'fa-circle')]]" position="replace">
             <button type="button"
                     class="btn btn-primary btn-sm o_attendance_systray_button o-dropdown dropdown-toggle dropdown"
@@ -18,7 +19,7 @@
                 
                 <!-- 1) Antes del primer checkin -->
                 <div t-if="this.state.currentMoment === 'before_first_checkin'"
-                     class="estevez-moment before-first d-flex flex-column align-items-start p-3 mb-3 rounded bg-light border">
+                     class="p-3 mb-3 rounded bg-light border">
                     <h5 class="mb-2 text-primary">Bienvenido 👋</h5>
                     <p class="mb-3 text-muted">
                         Todavía no has iniciado tu jornada.  
@@ -30,12 +31,42 @@
                     </button>
                 </div>
 
-                <!-- Por ahora solo el primer momento -->
-                <!-- Aquí luego agregamos in_journey y after_check_out -->
+                <!-- 2) Jornada en curso -->
+                <div t-if="this.state.currentMoment === 'in_journey'"
+                     class="p-3 mb-3 rounded bg-white border">
+                    <h5 class="mb-2 text-success">Jornada en curso</h5>
+                    <p class="mb-1">
+                        ✅ Ya ha registrado su entrada hoy!
+                    </p>
+                    <p class="mb-1 text-muted">Ubicación detectada:</p>
+                    <div class="mb-3 text-center">
+                        <div class="fw-bold fs-5">
+                            <t t-esc="state.geofence_name or '---'"/>
+                        </div>
+                        <div class="text-muted small">
+                            <t t-esc="state.geofence_description or '---'"/>
+                        </div>
+                        <div class="text-muted small">
+                            IP Pública: <t t-esc="state.ipaddress or '---'"/>
+                        </div>
+                    </div>
+                    <button t-on-click="() => this.signInOut()"
+                            class="btn btn-danger w-100">
+                        <i class="fa fa-sign-out me-1"/> Finalizar jornada
+                    </button>
+                </div>
+
+                <!-- 3) Después del checkout -->
+                <div t-if="this.state.currentMoment === 'after_check_out'"
+                     class="p-3 mb-3 rounded bg-light border">
+                    <h5 class="mb-2 text-secondary">Jornada finalizada</h5>
+                    <p class="mb-3 text-muted">
+                        Has terminado tu jornada laboral.  
+                        ¡Buen trabajo hoy! 🎉
+                    </p>
+                </div>
 
             </div>
         </xpath>
-
-
     </t>
 </templates>
