@@ -7,6 +7,8 @@
     "category": "Human Resources",
     "depends": ["hr_attendance_controls_adv"],
     "data": [
+        "security/hr_attendance_security.xml",
+        "security/ir.model.access.csv",
         "views/hr_attendance_view_form_inherit.xml",
     ],
     "assets": {

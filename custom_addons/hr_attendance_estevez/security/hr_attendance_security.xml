@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!--
+      Creamos la categoría de "Asistencias" como un subconjunto de Recursos Humanos.
+      Referenciamos directamente la categoría 'base.module_category_human_resources'
+      sin intentar sobreescribirla.
+    -->
+    <record id="module_category_hr_attendance_custom" model="ir.module.category">
+        <field name="name">Registrar Asistencia</field>
+        <field name="parent_id" ref="base.module_category_human_resources"/>
+        <field name="sequence">10</field> <!-- Puedes ajustar este valor -->
+    </record>
+
+    <!-- Grupo: Empleado Responsable de asistencia -->
+    <record id="group_hr_attendance_employee" model="res.groups">
+        <field name="name">Empleado: Responsable de asistencia</field>
+        <field name="category_id" ref="hr_attendance_estevez.module_category_hr_attendance_custom"/>
+        <field name="comment">Puede crear y modificar sus propias asistencias.</field>
+    </record>
+
+    <!-- Regla: Solo puede ver/escribir sus propias asistencias -->
+    <record id="hr_attendance_employee_own_rule" model="ir.rule">
+        <field name="name">Empleado solo puede modificar sus asistencias</field>
+        <field name="model_id" ref="hr_attendance.model_hr_attendance"/>
+        <field name="domain_force">[('employee_id.user_id', '=', user.id)]</field>
+        <field name="groups" eval="[(4, ref('hr_attendance_estevez.group_hr_attendance_employee'))]"/>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+</odoo>
