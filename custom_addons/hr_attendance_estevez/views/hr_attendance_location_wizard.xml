@@ -14,7 +14,7 @@
                     <field name="map_iframe" readonly="1"/>
 
                     <footer>
-                        <button string="Cerrar" class="btn btn-primary" special="cancel"/>
+                        <button string="Aceptar" class="btn btn-primary mx-auto d-block" special="cancel"/>
                     </footer>
                 </sheet>
             </form>
