@@ -12,6 +12,7 @@
         "views/hr_attendance_view_form_inherit.xml",
         "views/hr_attendance_list_management_inherit.xml",
         "views/hr_attendance_photo_wizard.xml",
+        "views/hr_attendance_location_wizard.xml",
     ],
     "assets": {
         "web.assets_backend": [

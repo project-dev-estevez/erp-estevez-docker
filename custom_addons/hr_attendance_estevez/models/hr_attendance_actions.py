@@ -16,15 +16,13 @@ class HrAttendance(models.Model):
         }
 
     def action_show_checkin_location(self):
-        # Aquí deberías retornar una acción que muestre el mapa con la ubicación
-        # Puedes personalizar esto con un wizard o una vista personalizada
         return {
             'type': 'ir.actions.act_window',
-            'name': 'Ubicación de Check-in',
-            'res_model': 'hr.attendance',
+            'name': 'Ubicación de Ingreso',
+            'res_model': 'hr.attendance.location.wizard',
             'view_mode': 'form',
-            'res_id': self.id,
             'target': 'new',
+            'context': {'attendance_id': self.id},
         }
 
     def action_accept_checkin(self):
