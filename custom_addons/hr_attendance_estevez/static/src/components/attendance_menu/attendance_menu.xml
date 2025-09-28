@@ -23,11 +23,13 @@
                     <h5 class="mb-2 text-primary">Bienvenido 👋</h5>
                     <p class="mb-3 text-muted">
                         Todavía no has iniciado tu jornada.  
-                        Pulsa el botón para hacer <strong>Check in</strong>.
+                        Pulsa el botón para hacer <strong>su ingreso 😉</strong>.
                     </p>
                     <button t-on-click="() => this.signInOut()"
-                            class="btn btn-success w-100">
-                        <i class="fa fa-sign-in me-1"/> Iniciar jornada
+                        t-att-disabled="this.state.buttonDisabled ? 'disabled' : false"
+                        class="btn btn-success w-100">
+                                <i class="fa fa-sign-in me-1"/> 
+                                Iniciar Jornada
                     </button>
                 </div>
 
@@ -50,8 +52,9 @@
                             IP Pública: <t t-esc="state.ipaddress or '---'"/>
                         </div>
                     </div>
-                    <button t-on-click="() => this.signInOut()"
-                            class="btn btn-danger w-100">
+            <button t-on-click="() => this.signInOut()"
+                t-att-disabled="this.state.buttonDisabled ? 'disabled' : false"
+                class="btn btn-danger w-100">
                         <i class="fa fa-sign-out me-1"/> Finalizar jornada
                     </button>
                 </div>

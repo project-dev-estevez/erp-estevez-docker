@@ -8,6 +8,7 @@ patch(ActivityMenu.prototype, {
     setup() {
         super.setup();
         this.state.currentMoment = this.state.currentMoment || 'unknown';
+            this.state.buttonDisabled = false;
         console.log("[Estevez] setup ejecutado → currentMoment inicial:", this.state.currentMoment);
     },
 
@@ -25,6 +26,22 @@ patch(ActivityMenu.prototype, {
         }
         // La geocerca y descripción ya se asignan en el estado por _findGeofenceByLocation
         console.log("[Estevez] searchReadEmployee completado →", this.state.currentMoment, this.state.geofence_name, this.state.geofence_description);
+    },
+
+    async signInOut() {
+        if (this.state.buttonDisabled) return;
+        this.state.buttonDisabled = true;
+        this.render();
+        try {
+            if (typeof super.signInOut === "function") {
+                await super.signInOut();
+            }
+        } finally {
+            setTimeout(() => {
+                this.state.buttonDisabled = false;
+                this.render();
+            }, 5000);
+        }
     },
 
     async _getGeolocation() {
