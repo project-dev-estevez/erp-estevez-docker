@@ -10,6 +10,7 @@
         "security/hr_attendance_security.xml",
         "security/ir.model.access.csv",
         "views/hr_attendance_view_form_inherit.xml",
+        "views/hr_attendance_list_management_inherit.xml",
     ],
     "assets": {
         "web.assets_backend": [

@@ -66,9 +66,10 @@
                 <!-- 3) Después del checkout -->
                 <div t-if="this.state.currentMoment === 'after_check_out'"
                      class="p-3 mb-3 rounded bg-light border">
-                    <h5 class="mb-2 text-secondary">Jornada finalizada</h5>
+                    <h5 class="mb-2 text-primary">Jornada finalizada</h5>
                     <p class="mb-3 text-muted">
-                        Has terminado tu jornada laboral.  
+                        Has terminado tu jornada laboral.
+                        <br/>
                         ¡Buen trabajo hoy! 🎉
                     </p>
                 </div>

@@ -229,6 +229,9 @@ patch(ActivityMenu.prototype, {
         } else {
             this.state.currentMoment = "unknown";
         }
+
+        console.log("state total: ", this.state);
+
         console.log("[Estevez] _updateMoment →", {
             checkedIn: this.state.checkedIn,
             isFirstAttendance: this.isFirstAttendance,
