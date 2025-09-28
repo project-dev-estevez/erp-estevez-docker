@@ -8,6 +8,30 @@
                 <field name="department_id" string="Departamento"/>
                 <field name="job_id" string="Puesto de trabajo" readonly="1"/>
             </xpath>
+            <xpath expr="//field[@name='check_in']" position="after">
+                <button name="action_show_checkin_photo"
+                        type="object"
+                        string=""
+                        icon="fa-image"
+                        class="btn btn-outline-secondary btn-sm"
+                        invisible="check_in_photo == False"/>
+                <button name="action_show_checkin_location"
+                        type="object"
+                        string=""
+                        icon="fa-map-marker"
+                        class="btn btn-outline-secondary btn-sm"
+                        invisible="check_in_latitude == False or check_in_longitude == False"/>
+                <button name="action_accept_checkin"
+                        type="object"
+                        string=""
+                        icon="fa-check"
+                        class="btn btn-success btn-sm"/>
+                <button name="action_reject_checkin"
+                        type="object"
+                        string=""
+                        icon="fa-times"
+                        class="btn btn-danger btn-sm"/>
+            </xpath>
             <xpath expr="//field[@name='overtime_hours']" position="attributes">
                 <attribute name="optional">hidden</attribute>
             </xpath>

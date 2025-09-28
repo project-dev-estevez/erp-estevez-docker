@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_hr_attendance_photo_wizard_form" model="ir.ui.view">
+        <field name="name">hr.attendance.photo.wizard.form</field>
+        <field name="model">hr.attendance.photo.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Foto de Ingreso">
+                <div style="display: flex; justify-content: center; align-items: center; width: 100%;">
+                    <field name="check_in_photo" widget="image" readonly="1" style="max-width: 350px; width: 100%; height: auto;"/>
+                </div>
+                <footer>
+                    <button string="Aceptar" class="btn btn-primary mx-auto d-block" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>
