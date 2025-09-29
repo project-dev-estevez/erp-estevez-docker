@@ -1,6 +1,7 @@
 from odoo import models, fields
 
 class HrAttendance(models.Model):
+    
     _inherit = 'hr.attendance'
 
     department_id = fields.Many2one(
@@ -17,4 +18,14 @@ class HrAttendance(models.Model):
         related='employee_id.job_id',
         store=True,
         readonly=True,
+    )
+
+    status = fields.Selection([
+        ('pending', 'Pendiente'),
+        ('approved', 'Aprobado'),
+        ('rejected', 'Rechazado')], 
+        string='Estado', 
+        default='pending', 
+        tracking=True, 
+        required=True
     )
