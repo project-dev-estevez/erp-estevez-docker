@@ -2,3 +2,6 @@ id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_hr_attendance_employee,hr.attendance.employee,hr_attendance.model_hr_attendance,group_hr_attendance_employee,1,1,1,0
 access_hr_attendance_photo_wizard,access.hr.attendance.photo.wizard,model_hr_attendance_photo_wizard,base.group_user,1,1,0,0
 access_hr_attendance_location_wizard,access.hr.attendance.location.wizard,model_hr_attendance_location_wizard,base.group_user,1,1,0,0
+access_hr_attendance_reject_wizard,access.hr.attendance.reject.wizard,model_hr_attendance_reject_wizard,base.group_user,1,1,1,0
+access_hr_attendance_approve_wizard,access.hr.attendance.approve.wizard,model_hr_attendance_approve_wizard,base.group_user,1,1,1,0
+access_hr_attendance_log_wizard,access.hr.attendance.log.wizard,model_hr_attendance_log_wizard,base.group_user,1,1,1,0

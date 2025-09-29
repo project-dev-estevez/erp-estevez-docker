@@ -1,6 +1,15 @@
 from odoo import models, fields, api
 
 class HrAttendance(models.Model):
+    def action_show_log(self):
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'Historial de mensajes',
+            'res_model': 'hr.attendance.log.wizard',
+            'view_mode': 'form',
+            'target': 'new',
+            'context': {'default_attendance_id': self.id},
+        }
     _inherit = 'hr.attendance'
 
     checkin_photo = fields.Binary(string='Foto de Check-in')
@@ -26,12 +35,16 @@ class HrAttendance(models.Model):
         }
 
     def action_accept_checkin(self):
-        # Lógica para aceptar el check-in
-        self.write({'state': 'accepted'})
-        return True
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'Aprobar Asistencia',
+            'res_model': 'hr.attendance.approve.wizard',
+            'view_mode': 'form',
+            'target': 'new',
+            'context': {'default_attendance_id': self.id},
+        }
 
     def action_reject_checkin(self):
-        # Lógica para rechazar el check-in y abrir wizard de observación
         return {
             'type': 'ir.actions.act_window',
             'name': 'Rechazar Asistencia',

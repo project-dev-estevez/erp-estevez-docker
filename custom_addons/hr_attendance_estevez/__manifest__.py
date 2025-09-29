@@ -13,6 +13,9 @@
         "views/hr_attendance_list_management_inherit.xml",
         "views/hr_attendance_photo_wizard.xml",
         "views/hr_attendance_location_wizard.xml",
+    "views/hr_attendance_reject_wizard.xml",
+    "views/hr_attendance_approve_wizard.xml",
+    "views/hr_attendance_log_wizard.xml",
     ],
     "assets": {
         "web.assets_backend": [

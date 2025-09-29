@@ -25,12 +25,19 @@
                         type="object"
                         string=""
                         icon="fa-check"
-                        class="btn btn-success btn-sm"/>
+                        class="btn btn-success btn-sm"
+                        invisible="status == 'approved'"/>
                 <button name="action_reject_checkin"
                         type="object"
                         string=""
                         icon="fa-times"
-                        class="btn btn-danger btn-sm"/>
+                        class="btn btn-danger btn-sm"
+                        invisible="status == 'rejected'"/>
+                <button name="action_show_log"
+                        type="object"
+                        string=""
+                        icon="fa-comment"
+                        class="btn btn-secondary btn-sm"/>
             </xpath>
             <xpath expr="//field[@name='overtime_hours']" position="attributes">
                 <attribute name="optional">hidden</attribute>
