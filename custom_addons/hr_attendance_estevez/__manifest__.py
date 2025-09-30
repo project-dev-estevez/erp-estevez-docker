@@ -19,9 +19,10 @@
     ],
         'assets': {
             'web.assets_backend': [
-                'hr_attendance_estevez/static/src/components/attendance_menu/**/*.xml',
-                'hr_attendance_estevez/static/src/components/attendance_menu/**/*.scss',
-                'hr_attendance_estevez/static/src/components/attendance_menu/**/*.js',
+                # Incluye los assets originales como dependencia explícita
+                'hr_attendance_estevez/static/src/components/**/*.xml',
+                'hr_attendance_estevez/static/src/components/**/*.scss',
+                'hr_attendance_estevez/static/src/components/**/*.js',
             ],
     },
     "installable": True,
