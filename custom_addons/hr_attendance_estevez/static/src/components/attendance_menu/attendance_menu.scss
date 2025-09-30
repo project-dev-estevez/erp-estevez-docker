@@ -1,0 +1,38 @@
+/* Estilo normal en escritorio */
+.o_att_menu_container.estevez-container {
+    width: 100%;
+    max-width: 380px;  /* ancho cómodo en escritorio */
+    box-sizing: border-box;
+}
+
+.estevez-map {
+    width: 100%;
+    height: 250px; /* o el alto que prefieras para desktop */
+    border: 1px solid #e0e0e0;
+    background: #f8f8f8;
+}
+
+/* Pantallas móviles */
+@media (max-width: 576px) {
+    .dropdown-menu {
+        left: 0px !important;
+        right: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 auto !important;
+        border-radius: 0 !important;
+        top: 50px !important; /* deja un margen bajo el header */
+    }
+
+    .o_att_menu_container.estevez-container {
+        width: 100% !important;
+        max-width: 100% !important;
+        padding: 1rem !important;
+
+    }
+
+    .estevez-map {
+        width: 100% !important;
+        height: 200px;
+    }
+}

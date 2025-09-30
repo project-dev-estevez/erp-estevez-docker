@@ -11,8 +11,8 @@ services:
       - ./config:/etc/odoo
       - ./custom_addons:/mnt/extra-addons
       - ./third_party_addons:/mnt/third-party-addons
-      - odoo-data:/var/lib/odoo      
-    entrypoint: "odoo -c /etc/odoo/odoo.conf -u hr_estevez,auth_estevez,menu_estevez,hr_recruitment_estevez --dev xml"
+      - odoo-data:/var/lib/odoo
+    entrypoint: "odoo -c /etc/odoo/odoo.conf -u hr_estevez,auth_estevez,menu_estevez,hr_recruitment_estevez,hr_attendance_estevez --dev xml"
 
   postgres_db:
     container_name: postgres_container

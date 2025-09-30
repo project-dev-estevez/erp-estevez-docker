@@ -1,0 +1,23 @@
+<odoo>
+    <record id="view_hr_attendance_location_wizard_form" model="ir.ui.view">
+        <field name="name">hr.attendance.location.wizard.form</field>
+        <field name="model">hr.attendance.location.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Ubicación de Ingreso" create="false" edit="false">
+                <sheet>
+                    <group>
+                        <field name="check_in_latitude" readonly="1"/>
+                        <field name="check_in_longitude" readonly="1"/>
+                    </group>
+
+                    <separator string="Mapa"/>
+                    <field name="map_iframe" readonly="1"/>
+
+                    <footer>
+                        <button string="Aceptar" class="btn btn-primary mx-auto d-block" special="cancel"/>
+                    </footer>
+                </sheet>
+            </form>
+        </field>
+    </record>
+</odoo>

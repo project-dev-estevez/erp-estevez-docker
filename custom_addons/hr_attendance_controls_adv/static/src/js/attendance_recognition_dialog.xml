@@ -2,31 +2,39 @@
 <template>
 
     <t t-name="attendance_face_recognition.AttendanceRecognitionDialog" id="AttendanceRecognitionDialog">
-        <Dialog size="'md'"  fullscreen="true" title="'Face Recognition'">
+        <Dialog size="'md'" fullscreen="true" title="'Reconocimiento Facial'">
             <t t-set-slot="header">
                 <div class="d-flex w-100">
-                    <h4>Face Recognition</h4>
+                    <h4>Reconocimiento Facial</h4>
                     <div t-on-click="onClose" type="button" class="btn-close" aria-label="Close"/>
                 </div>
             </t>
             <div class="container-fluid">
                 <div class="row">
                     <div class="col-12 controls">
-                        <fieldset class="reader-config-group">
-                            <div class="row">
-                                <div class="col-3">
-                                    <label>
-                                        <span>Select Camera</span>
+                        <fieldset class="border rounded p-3 bg-light">
+                            <div class="row align-items-center">
+                                <div class="col-md-4 text-md-end mb-2 mb-md-0">
+                                    <label class="form-label fw-semibold">
+                                        <span>Seleccionar Cámara</span>
                                     </label>
                                 </div>
-                                <div class="col-6">
-                                    <select name="video_source" class="videoSource" id="videoSource" t-ref="select">                                       
-                                    </select>
-                                </div>
-                                <div class="col-3">
+                                <div class="col-md-6">
+                                    <select name="video_source" class="form-select videoSource" id="videoSource" t-ref="select"></select>
                                 </div>
                             </div>
                         </fieldset>
+                    </div>
+                </div>
+                <!-- Mensaje de instrucción y contador de parpadeos -->
+                <div class="row mb-3">
+                    <div class="col-12 text-center">
+                        <div class="alert alert-info d-inline-block px-4 py-2 mb-2" role="alert">
+                            Por favor, parpadea <b>3 veces</b> para validar tu identidad.
+                        </div>
+                        <div class="fs-5 fw-bold text-primary">
+                            Parpadeos detectados: <span t-esc="state.blinkCount || 0"/>
+                        </div>
                     </div>
                 </div>
                 <div class="row">
@@ -38,7 +46,7 @@
                 </div>
             </div>
              <t t-set-slot="footer">
-                <button class="btn btn-secondary" t-on-click="props.close">Cancel</button>
+                <button class="btn btn-secondary" t-on-click="props.close">Cancelar</button>
             </t>
         </Dialog>
     </t>

@@ -736,7 +736,7 @@ class HrEmployee(models.Model):
         return res
 
     def action_unarchive(self):
-        res = super(HrEmployee, self).action_unarchive()
+        res = super(HrEmployee, self).action_unarchive()-
         for employee in self:
             try:
                 employee._sync_codeigniter_unarchive()

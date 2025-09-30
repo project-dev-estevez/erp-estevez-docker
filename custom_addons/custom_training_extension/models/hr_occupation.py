@@ -6,6 +6,7 @@ class HrOccupation(models.Model):
 
     code = fields.Char(string="Clave Ocupación", required=True)
     name = fields.Char(string="Descripción", required=True)
+    description = fields.Char(string="Descripción")
 
     employee_ids = fields.One2many(
         comodel_name='hr.employee', 
