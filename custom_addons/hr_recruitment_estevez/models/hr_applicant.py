@@ -480,50 +480,65 @@ class HrApplicant(models.Model):
         if not self.candidate_id:
             raise UserError(_("No hay candidato asociado para crear el empleado."))
         
+        # Obtener el objeto candidato
         candidate = self.candidate_id
 
-        # Datos del candidato
+        
+        
+        # Registrar información del aplicante para referencia
+        _logger.info("==== DATOS DEL APPLICANT ====")
+        _logger.info(f"Applicant ID: {self.id}")
+        _logger.info(f"Nombre: {self.first_name or ''} {self.last_name or ''} {self.mother_last_name or ''}")
+        
+        # Llamar al método original para crear el empleado
+        action = candidate.create_employee_from_candidate()
+        employee = self.env['hr.employee'].browse(action.get('res_id'))
+        
         first_name = candidate.first_name or self.first_name or ''
         last_name = candidate.last_name or self.last_name or ''
         mother_last_name = candidate.mother_last_name or self.mother_last_name or ''
 
-        # Validar si falta apellido paterno
-        if not last_name:
-            raise UserError(_("El apellido paterno es obligatorio para crear el empleado."))
-
-        # Construir nombre completo
+        # Construye el nombre completo
         full_name = f"{first_name} {last_name} {mother_last_name}".strip()
 
+        # Obtener valores desde el puesto (si existe)
         job = self.job_id
         direction_id = job.direction_id.id if job and job.direction_id else False
         department_id = job.department_id.id if job and job.department_id else self.department_id.id
         area_id = job.area_id.id if job and job.area_id else False
-
-        employee_vals = {
-            'name': full_name,
-            'names': first_name,
-            'last_name': last_name,
-            'mother_last_name': mother_last_name,
+            
+        employee_write_vals = {            
             'job_id': self.job_id.id,
             'job_title': self.job_id.name,
             'direction_id': direction_id,
             'department_id': department_id,
             'area_id': area_id,
             'work_email': self.department_id.company_id.email or self.email_from or candidate.email,
-            'work_phone': self.department_id.company_id.phone or self.partner_phone or candidate.phone,
+            'work_phone': self.department_id.company_id.phone or self.partner_phone or candidate.phone,                        
             'project': self.project_id.name,
+            'name': full_name,
+            'names': first_name,
+            'last_name': last_name,
+            'mother_last_name': mother_last_name      
         }
-
-        # Crear empleado directamente
-        employee = self.env['hr.employee'].create(employee_vals)
-
-        # Transferir categorías
+        
+        # Registrar los valores que se escribirán en el empleado
+        _logger.info("==== VALORES PARA EL EMPLEADO ====")
+        for key, value in employee_write_vals.items():
+            _logger.info(f"  {key}: {value}")
+        
+        # Aplicar cambios al empleado
+        employee.write(employee_write_vals)
+        
+         # Transferir etiquetas/categorías (sin duplicados)
         for appl_cat in self.categ_ids:
             emp_cat = self.env['hr.employee.category'].search(
                 [('name', '=ilike', appl_cat.name.strip())], limit=1
             )
             if not emp_cat:
-                emp_cat = self.env['hr.employee.category'].create({'name': appl_cat.name.strip()})
+                emp_cat = self.env['hr.employee.category'].create({
+                    'name': appl_cat.name.strip()
+                })
             if emp_cat.id not in employee.category_ids.ids:
                 employee.write({'category_ids': [(4, emp_cat.id)]})
 
@@ -538,18 +553,13 @@ class HrApplicant(models.Model):
                 'res_id': employee.id,
             })
 
-        # Log
+        # Logging para diagnóstico (opcional)
         _logger.info(
-            "Empleado creado manualmente: names=%s last_name=%s mother_last_name=%s",
-            employee.names, employee.last_name, employee.mother_last_name
+            "Empleado creado: names=%s last_name=%s mother_last_name=%s",
+            employee.name, employee.names, employee.last_name, employee.mother_last_name
         )
 
-        return {
-            'type': 'ir.actions.act_window',
-            'res_model': 'hr.employee',
-            'view_mode': 'form',
-            'res_id': employee.id,
-        }
+        return action
 
     def action_save(self):
         self.ensure_one()
