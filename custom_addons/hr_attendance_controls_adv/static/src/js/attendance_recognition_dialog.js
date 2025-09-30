@@ -166,7 +166,7 @@ export class AttendanceRecognitionDialog extends Component {
               const rightEAR = self.eyeAspectRatio(rightEye);
               const avgEAR = (leftEAR + rightEAR) / 2.0;
               // Umbral ajustable (prueba entre 0.18 y 0.25)
-              const BLINK_THRESHOLD = 0.28;
+              const BLINK_THRESHOLD = 0.29;
               // Log para depuración
               console.log(`[BLINK] EAR: ${avgEAR.toFixed(3)} | eyeClosed: ${self.state.eyeClosed} | blinkCount: ${self.state.blinkCount}`);
               if (avgEAR < BLINK_THRESHOLD) {
