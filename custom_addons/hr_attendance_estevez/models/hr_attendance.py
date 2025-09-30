@@ -27,19 +27,24 @@ class HrAttendance(models.Model):
         ('approved', 'Aprobado'),
         ('rejected', 'Rechazado')], 
         string='Estado', 
-        default=lambda self: self._get_default_status(),
+        default='pending',
         tracking=True, 
         required=True
     )
 
     @api.model
-    def _get_default_status(self):
-        check_in = self._context.get('default_check_in')
+    def create(self, vals):
+        check_in = vals.get('check_in')
         if check_in:
             try:
-                check_in_dt = datetime.strptime(check_in, '%Y-%m-%d %H:%M:%S')
+                if isinstance(check_in, str):
+                    check_in_dt = datetime.strptime(check_in, '%Y-%m-%d %H:%M:%S')
+                else:
+                    check_in_dt = check_in
                 if check_in_dt.hour > 8 or (check_in_dt.hour == 8 and check_in_dt.minute > 15):
-                    return 'retarded'
+                    vals['status'] = 'retarded'
+                else:
+                    vals['status'] = 'pending'
             except Exception:
-                pass
-        return 'pending'
+                vals['status'] = 'pending'
+        return super().create(vals)
