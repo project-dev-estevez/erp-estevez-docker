@@ -21,6 +21,39 @@
                         icon="fa-map-marker"
                         class="btn btn-outline-secondary btn-sm"
                         invisible="check_in_latitude == False or check_in_longitude == False"/>
+            </xpath>
+
+            <xpath expr="//field[@name='check_out']" position="after">
+                <button name="action_show_checkout_photo"
+                        type="object"
+                        string=""
+                        icon="fa-image"
+                        class="btn btn-outline-secondary btn-sm"
+                        invisible="check_out_photo == False"/>
+                <button name="action_show_checkout_location"
+                        type="object"
+                        string=""
+                        icon="fa-map-marker"
+                        class="btn btn-outline-secondary btn-sm"
+                        invisible="check_out_latitude == False or check_out_longitude == False"/>
+            </xpath>
+
+
+            <xpath expr="//field[@name='overtime_hours']" position="attributes">
+                <attribute name="optional">hidden</attribute>
+            </xpath>
+            <xpath expr="//field[@name='validated_overtime_hours']" position="attributes">
+                <attribute name="optional">hidden</attribute>
+            </xpath>
+            <xpath expr="//field[@name='worked_hours']" position="attributes">
+                <attribute name="optional">hidden</attribute>
+            </xpath>
+            <xpath expr="//field[@name='worked_hours']" position="after">
+                <field name="status" widget="badge"
+                    decoration-warning="status == 'pending'"
+                    decoration-success="status == 'approved'"
+                    decoration-danger="status == 'rejected'"/>
+
                 <button name="action_accept_checkin"
                         type="object"
                         string=""
@@ -38,21 +71,6 @@
                         string=""
                         icon="fa-comment"
                         class="btn btn-secondary btn-sm"/>
-            </xpath>
-            <xpath expr="//field[@name='overtime_hours']" position="attributes">
-                <attribute name="optional">hidden</attribute>
-            </xpath>
-            <xpath expr="//field[@name='validated_overtime_hours']" position="attributes">
-                <attribute name="optional">hidden</attribute>
-            </xpath>
-            <xpath expr="//field[@name='worked_hours']" position="attributes">
-                <attribute name="optional">hidden</attribute>
-            </xpath>
-            <xpath expr="//field[@name='worked_hours']" position="after">
-                <field name="status" widget="badge"
-                    decoration-warning="status == 'pending'"
-                    decoration-success="status == 'approved'"
-                    decoration-danger="status == 'rejected'"/>
             </xpath>
         </field>
     </record>

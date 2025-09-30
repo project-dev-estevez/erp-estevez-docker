@@ -30,6 +30,10 @@ class HrAttendanceLocationWizard(models.TransientModel):
     def default_get(self, fields_list):
         res = super().default_get(fields_list)
         attendance = self.env['hr.attendance'].browse(self.env.context.get('attendance_id'))
-        res['check_in_latitude'] = attendance.check_in_latitude
-        res['check_in_longitude'] = attendance.check_in_longitude
+        if self.env.context.get('is_checkout'):
+            res['check_in_latitude'] = attendance.check_out_latitude
+            res['check_in_longitude'] = attendance.check_out_longitude
+        else:
+            res['check_in_latitude'] = attendance.check_in_latitude
+            res['check_in_longitude'] = attendance.check_in_longitude
         return res

@@ -10,5 +10,8 @@ class HrAttendancePhotoWizard(models.TransientModel):
     def default_get(self, fields_list):
         res = super().default_get(fields_list)
         attendance = self.env['hr.attendance'].browse(self.env.context.get('attendance_id'))
-        res['check_in_photo'] = attendance.check_in_photo
+        if self.env.context.get('is_checkout'):
+            res['check_in_photo'] = attendance.check_out_photo
+        else:
+            res['check_in_photo'] = attendance.check_in_photo
         return res
