@@ -271,9 +271,11 @@ class HrEmployee(models.Model):
 
     @api.onchange('names', 'last_name', 'mother_last_name')
     def _onchange_full_name(self):
-        for rec in self:
-            logger.info("ONCHANGE: names=%r last_name=%r mother_last_name=%r", rec.names, rec.last_name, rec.mother_last_name)
-            rec.name = ' '.join(p for p in (rec.names, rec.last_name, rec.mother_last_name) if p) or False
+        for record in self:
+            names = record.names or ''
+            last_name = record.last_name or ''
+            mother_last_name = record.mother_last_name or ''
+            record.name = f"{names} {last_name} {mother_last_name}".strip()
 
     def _sync_codeigniter(self, employee, operation='create'):
         api_url = self.env['ir.config_parameter'].get_param('codeigniter.api_url')
