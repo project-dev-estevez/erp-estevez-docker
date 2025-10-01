@@ -138,39 +138,7 @@ class HrEmployee(models.Model):
         string="Cantidad de Documentos",
         compute="_compute_ir_attachment_count"
     )
-
-    time_off_in_lieu_ids = fields.One2many(
-        'hr.time.off.in.lieu', 
-        'employee_id', 
-        string="Solicitudes de Tiempo por Tiempo"
-    )
     
-    total_txt_hours_approved = fields.Float(
-        string="Total Horas TXT Aprobadas",
-        compute='_compute_total_txt_hours',
-        store=True
-    )
-    
-    total_txt_hours_pending = fields.Float(
-        string="Total Horas TXT Pendientes",
-        compute='_compute_total_txt_hours',
-        store=True
-    )
-
-    @api.depends('time_off_in_lieu_ids', 'time_off_in_lieu_ids.state', 'time_off_in_lieu_ids.hours')
-    def _compute_total_txt_hours(self):
-        for employee in self:
-            approved_hours = sum(employee.time_off_in_lieu_ids.filtered(
-                lambda x: x.state == 'approved'
-            ).mapped('hours'))
-            
-            pending_hours = sum(employee.time_off_in_lieu_ids.filtered(
-                lambda x: x.state == 'pending'
-            ).mapped('hours'))
-            
-            employee.total_txt_hours_approved = approved_hours
-            employee.total_txt_hours_pending = pending_hours
-
     def _compute_ir_attachment_count(self):
         for employee in self:
             employee.ir_attachment_count = self.env['ir.attachment'].search_count([
