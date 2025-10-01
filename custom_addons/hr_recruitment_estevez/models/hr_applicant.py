@@ -509,7 +509,7 @@ class HrApplicant(models.Model):
             'direction_id': direction_id,
             'department_id': department_id,
             'area_id': area_id,
-            'work_email': self.email_from or candidate.email or (self.department_id.company_id.email if self.department_id and self.department_id.company_id else False),
+            'work_email': self.email_from or (self.department_id.company_id.email if self.department_id and self.department_id.company_id else False),
             'work_phone': self.department_id.company_id.phone or self.partner_phone or candidate.phone,
             'project': self.project_id.name,
         }
