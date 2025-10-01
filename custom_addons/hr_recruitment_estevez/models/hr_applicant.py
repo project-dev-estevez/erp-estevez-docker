@@ -479,7 +479,7 @@ class HrApplicant(models.Model):
 
         if not self.candidate_id:
             raise UserError(_("No hay candidato asociado para crear el empleado."))
-        
+
         # Obtener el objeto candidato
         candidate = self.candidate_id
 
@@ -499,6 +499,10 @@ class HrApplicant(models.Model):
         mother_last_name = candidate.mother_last_name or self.mother_last_name or ''
 
         # Construye el nombre completo
+
+
+
+
         full_name = f"{first_name} {last_name} {mother_last_name}".strip()
 
         # Obtener valores desde el puesto (si existe)
@@ -508,6 +512,10 @@ class HrApplicant(models.Model):
         area_id = job.area_id.id if job and job.area_id else False
             
         employee_write_vals = {            
+
+
+
+
             'job_id': self.job_id.id,
             'job_title': self.job_id.name,
             'direction_id': direction_id,
