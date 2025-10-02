@@ -16,7 +16,7 @@
             <field name="rfc"/>
         </xpath>
         <xpath expr="//field[@name='partner_name']" position="attributes">
-          <attribute name="placeholder">Nombre del candidato</attribute>
+          <attribute name="placeholder">Nombre del candidato</attribute>          
         </xpath>
         <xpath expr="//field[@name='user_id']" position="attributes">
           <attribute name="string">Reclutador</attribute>
@@ -41,10 +41,7 @@
         </xpath>
          <xpath expr="//field[@name='email_from']" position="attributes">
           <attribute name="required">1</attribute>  <!-- Obligatorio -->
-        </xpath>   
-         <xpath expr="//field[@name='partner_name']" position="attributes">
-          <attribute name="readonly">1</attribute>
-        </xpath>                
+        </xpath>           
       </field>
     </record>  
   </data>
