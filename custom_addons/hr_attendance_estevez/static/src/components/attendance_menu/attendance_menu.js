@@ -29,6 +29,9 @@ patch(ActivityMenu.prototype, {
         }
         console.log("[Estevez] searchReadEmployee completado → currentMoment:", this.state.currentMoment, "lat:", this.state.latitude, "lon:", this.state.longitude);
         
+        // Verificar si ya existe un registro completo de asistencia hoy
+        await this._checkTodayAttendance();
+        
         // Actualizar momento (esto ya renderiza el mapa si es necesario)
         this._updateMoment();
 
@@ -48,6 +51,10 @@ patch(ActivityMenu.prototype, {
             if (typeof super.signInOut === "function") {
                 await super.signInOut();
             }
+            
+            // Después de hacer check-in o check-out, verificar de nuevo la asistencia del día
+            await this._checkTodayAttendance();
+            this._updateMoment();
         } finally {
             setTimeout(() => {
                 this.state.buttonDisabled = false;
@@ -94,6 +101,56 @@ patch(ActivityMenu.prototype, {
         }
         this.state.loading_geofence = false;
         return result;
+    },
+
+    async _checkTodayAttendance() {
+        // Obtener el employee_id desde this.employee (como lo hace el componente padre)
+        const employee_id = this.employee?.id;
+        if (!employee_id) {
+            console.log("[Estevez] No se encontró employee_id, employee:", this.employee);
+            this.state.hasCompletedAttendanceToday = false;
+            return;
+        }
+
+        console.log("[Estevez] Verificando asistencia para employee_id:", employee_id);
+
+        // Obtener fecha de hoy en formato YYYY-MM-DD
+        const today = new Date();
+        const todayStr = today.toISOString().split('T')[0];
+        
+        try {
+            // Buscar registros de asistencia del empleado para hoy
+            const attendances = await rpc(
+                "/web/dataset/call_kw/hr.attendance/search_read",
+                {
+                    model: "hr.attendance",
+                    method: "search_read",
+                    args: [
+                        [
+                            ["employee_id", "=", employee_id],
+                            ["check_in", ">=", todayStr + " 00:00:00"],
+                            ["check_in", "<=", todayStr + " 23:59:59"],
+                        ],
+                        ["id", "check_in", "check_out"],
+                    ],
+                    kwargs: {},
+                }
+            );
+
+            console.log("[Estevez] Registros de asistencia hoy:", attendances);
+
+            // Verificar si existe al menos un registro completo (con check_in Y check_out)
+            const hasCompleteAttendance = attendances.some(
+                (att) => att.check_in && att.check_out
+            );
+
+            this.state.hasCompletedAttendanceToday = hasCompleteAttendance;
+            
+            console.log("[Estevez] ¿Tiene asistencia completa hoy?:", hasCompleteAttendance);
+        } catch (error) {
+            console.error("[Estevez] Error verificando asistencia del día:", error);
+            this.state.hasCompletedAttendanceToday = false;
+        }
     },
 
     async _findGeofenceByLocation() {
@@ -211,11 +268,15 @@ patch(ActivityMenu.prototype, {
     },
 
     _updateMoment() {
+        // Lógica de momentos basada en estado actual y registro completo del día
         if (this.state.checkedIn) {
+            // Empleado está actualmente en el trabajo (tiene check-in activo)
             this.state.currentMoment = "in_journey";
-        } else if (!this.state.checkedIn && this.isFirstAttendance) {
+        } else if (!this.state.checkedIn && !this.state.hasCompletedAttendanceToday) {
+            // Empleado NO está checked in Y NO tiene registro completo hoy
             this.state.currentMoment = "before_first_checkin";
-        } else if (!this.state.checkedIn && !this.isFirstAttendance) {
+        } else if (!this.state.checkedIn && this.state.hasCompletedAttendanceToday) {
+            // Empleado NO está checked in pero YA completó su asistencia hoy
             this.state.currentMoment = "after_check_out";
         } else {
             this.state.currentMoment = "unknown";
@@ -225,7 +286,7 @@ patch(ActivityMenu.prototype, {
 
         console.log("[Estevez] _updateMoment →", {
             checkedIn: this.state.checkedIn,
-            isFirstAttendance: this.isFirstAttendance,
+            hasCompletedAttendanceToday: this.state.hasCompletedAttendanceToday,
             currentMoment: this.state.currentMoment,
             hasCoordinates: !!(this.state.latitude && this.state.longitude)
         });

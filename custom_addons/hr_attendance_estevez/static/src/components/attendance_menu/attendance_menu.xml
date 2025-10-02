@@ -7,8 +7,21 @@
             <button type="button"
                     class="btn btn-primary btn-sm o_attendance_systray_button o-dropdown dropdown-toggle dropdown"
                     aria-expanded="false">
-                <i t-if="!this.state.checkedIn" class="fa fa-times text-danger" style="margin-right:4px;"/>
-                <i t-if="this.state.checkedIn" class="fa fa-check text-success" style="margin-right:4px;"/>
+                <!-- Sin registro: ícono rojo X -->
+                <i t-if="this.state.currentMoment === 'before_first_checkin'" 
+                   class="fa fa-times text-danger" 
+                   style="margin-right:4px;"/>
+                
+                <!-- En curso: ícono amarillo play -->
+                <i t-if="this.state.currentMoment === 'in_journey'" 
+                   class="fa fa-play-circle text-warning" 
+                   style="margin-right:4px;"/>
+                
+                <!-- Completado: ícono verde check -->
+                <i t-if="this.state.currentMoment === 'after_check_out'" 
+                   class="fa fa-check text-success" 
+                   style="margin-right:4px;"/>
+                
                 Asistencia
             </button>
         </xpath>
@@ -66,7 +79,7 @@
                 <!-- 3) Después del checkout -->
                 <div t-if="this.state.currentMoment === 'after_check_out'"
                      class="p-3 mb-3 rounded bg-light border">
-                    <h5 class="mb-2 text-secondary">Jornada finalizada</h5>
+                    <h5 class="mb-2 text-primary">Jornada finalizada</h5>
                     <p class="mb-3 text-muted">
                         Has terminado tu jornada laboral.  
                         ¡Buen trabajo hoy! 🎉
