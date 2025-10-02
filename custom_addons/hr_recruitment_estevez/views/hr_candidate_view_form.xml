@@ -38,6 +38,12 @@
         </xpath>
         <xpath expr="//field[@name='partner_phone']" position="attributes">
           <attribute name="required">1</attribute>  <!-- Obligatorio -->
+        </xpath>
+         <xpath expr="//field[@name='email_from']" position="attributes">
+          <attribute name="required">1</attribute>  <!-- Obligatorio -->
+        </xpath>   
+         <xpath expr="//field[@name='partner_name']" position="attributes">
+          <attribute name="readonly">1</attribute>
         </xpath>                
       </field>
     </record>  
