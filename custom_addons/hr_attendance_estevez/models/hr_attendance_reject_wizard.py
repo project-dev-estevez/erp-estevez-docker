@@ -11,5 +11,5 @@ class HrAttendanceRejectWizard(models.TransientModel):
         self.ensure_one()
         attendance = self.attendance_id
         attendance.status = 'rejected'
-        attendance.message_post(body=f"Asistencia rechazada. Observación: {self.observation}")
+        attendance.message_post(body=f"Asistencia rechazada: {self.observation}")
         return {'type': 'ir.actions.act_window_close'}
