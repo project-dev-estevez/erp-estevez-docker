@@ -2,11 +2,13 @@
 import { rpc } from "@web/core/network/rpc";
 import { session } from "@web/session";
 import { patch } from "@web/core/utils/patch";
+import { useService } from "@web/core/utils/hooks";
 import { ActivityMenu } from "@hr_attendance/components/attendance_menu/attendance_menu";
 
 patch(ActivityMenu.prototype, {
     setup() {
         super.setup();
+        this.notification = useService("notification");
         this.state.currentMoment = this.state.currentMoment || "unknown";
         this.state.buttonDisabled = false;
         console.log(
@@ -45,6 +47,10 @@ patch(ActivityMenu.prototype, {
 
     async signInOut() {
         if (this.state.buttonDisabled) return;
+        
+        // Guardar el estado actual antes de hacer el registro
+        const wasCheckedIn = this.state.checkedIn;
+        
         this.state.buttonDisabled = true;
         this.render();
         try {
@@ -55,6 +61,27 @@ patch(ActivityMenu.prototype, {
             // Después de hacer check-in o check-out, verificar de nuevo la asistencia del día
             await this._checkTodayAttendance();
             this._updateMoment();
+            
+            // Mostrar notificación de éxito según la acción realizada
+            if (wasCheckedIn) {
+                // Si estaba checked in, ahora hizo check-out (salida)
+                this.notification.add("✅ ¡Salida registrada exitosamente! Que tengas un excelente día. 🎉", {
+                    type: "success",
+                    title: "Jornada Finalizada",
+                });
+            } else {
+                // Si NO estaba checked in, ahora hizo check-in (entrada)
+                this.notification.add("✅ ¡Entrada registrada exitosamente! Bienvenido a tu jornada laboral. 💼", {
+                    type: "success",
+                    title: "Jornada Iniciada",
+                });
+            }
+        } catch (error) {
+            console.error("[Estevez] Error al registrar asistencia:", error);
+            this.notification.add("❌ Hubo un error al registrar tu asistencia. Por favor, intenta de nuevo.", {
+                type: "danger",
+                title: "Error",
+            });
         } finally {
             setTimeout(() => {
                 this.state.buttonDisabled = false;
