@@ -16,23 +16,15 @@ patch(ActivityMenu.prototype, {
     },
 
     async searchReadEmployee() {
-        // Llamar siempre al original
+        // Llamar siempre al original (esto ya carga geolocalización en hr_attendance_controls_adv)
         if (typeof super.searchReadEmployee === "function") {
             await super.searchReadEmployee();
         }
         // Actualizar momento
         this._updateMoment();
 
-        // Si está en jornada o aún no ha hecho el primer checkin, obtener geolocalización
-        if (["in_journey", "before_first_checkin"].includes(this.state.currentMoment)) {
-            console.log(
-                "[Estevez] Obteniendo geolocalización para",
-                this.state.currentMoment
-            );
-            await this._getGeolocation();
-        }
-
-        // Renderizar mapa SOLO si estamos antes del primer checkin
+        // NO volver a llamar _getGeolocation aquí porque el padre ya lo hizo
+        // Solo renderizar mapa si estamos antes del primer checkin y tenemos coordenadas
         if (
             this.state.currentMoment === "before_first_checkin" &&
             this.state.latitude &&
