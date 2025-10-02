@@ -27,6 +27,10 @@ export class AttendanceRecognitionDialog extends Component {
       eyeClosed: false,
       blinkTimeout: null,
       blinkWarning: false,
+      eyeClosedFrames: 0,  // Contador de frames con ojos cerrados
+      eyeOpenFrames: 0,    // Contador de frames con ojos abiertos
+      waitingForOpenEyes: false,  // Flag para esperar que los ojos estén bien abiertos
+      earHistory: [],      // Historial de EAR para calcular baseline dinámico
     })
 
     this.faceapi = this.props.faceapi;
@@ -157,7 +161,7 @@ export class AttendanceRecognitionDialog extends Component {
           faceapi.draw.drawDetections(canvas, resizedDetections);
           faceapi.draw.drawFaceLandmarks(canvas, resizedDetections);
 
-          // 👁️ detección de parpadeo mejorada
+          // 👁️ detección de parpadeo mejorada con anti-falsas detecciones
           if (resizedDetections.landmarks) {
             const leftEye = resizedDetections.landmarks.getLeftEye();
             const rightEye = resizedDetections.landmarks.getRightEye();
@@ -165,21 +169,79 @@ export class AttendanceRecognitionDialog extends Component {
               const leftEAR = self.eyeAspectRatio(leftEye);
               const rightEAR = self.eyeAspectRatio(rightEye);
               const avgEAR = (leftEAR + rightEAR) / 2.0;
-              // Umbral ajustable (prueba entre 0.18 y 0.25)
-              const BLINK_THRESHOLD = 0.29;
-              // Log para depuración
-              console.log(`[BLINK] EAR: ${avgEAR.toFixed(3)} | eyeClosed: ${self.state.eyeClosed} | blinkCount: ${self.state.blinkCount}`);
-              if (avgEAR < BLINK_THRESHOLD) {
-                if (!self.state.eyeClosed) {
+              
+              // 🎯 CONFIGURACIÓN SIMPLIFICADA Y MÁS SENSIBLE
+              const EYE_DIFFERENCE_MAX = 0.10;        // Más permisivo con diferencia entre ojos
+              const MIN_CONSECUTIVE_CLOSED = 1;       // Reducido a 1 (parpadeos muy rápidos)
+              const MIN_CONSECUTIVE_OPEN = 2;         // Reducido a 2 (parpadeos muy rápidos)
+              
+              // Verificar que ambos ojos parpadeen de forma similar (no es movimiento de cabeza)
+              const eyeDifference = Math.abs(leftEAR - rightEAR);
+              
+              // 📊 Mantener historial de EAR para calcular baseline dinámico
+              if (!self.state.earHistory) {
+                self.state.earHistory = [];
+              }
+              
+              self.state.earHistory.push(avgEAR);
+              if (self.state.earHistory.length > 30) {
+                self.state.earHistory.shift(); // Mantener últimos 30 valores
+              }
+              
+              // Calcular baseline dinámico (promedio de los valores MÁS ALTOS = ojos bien abiertos)
+              const earBaseline = self.state.earHistory.length > 10 
+                ? self.state.earHistory.slice().sort((a, b) => b - a).slice(0, 10).reduce((a, b) => a + b) / 10
+                : 0.28; // Valor por defecto
+              
+              // 🎯 Threshold dinámico: 98% del baseline (ajustado basado en tus logs reales)
+              // Según tus logs: Baseline = 0.276, cuando parpadeas = 0.269
+              // 0.269 / 0.276 = 97.4%, entonces usamos 98% para detectar
+              // 0.276 * 0.98 = 0.270 (detectará cuando bajes a 0.269 o menos)
+              const dynamicThreshold = earBaseline * 0.98;
+              
+              // Log SIEMPRE para que puedas ver los valores
+              console.log(`[BLINK] EAR: ${avgEAR.toFixed(3)} | Baseline: ${earBaseline.toFixed(3)} | Threshold: ${dynamicThreshold.toFixed(3)} | LeftEAR: ${leftEAR.toFixed(3)} | RightEAR: ${rightEAR.toFixed(3)} | Diff: ${eyeDifference.toFixed(3)} | Closed: ${self.state.eyeClosedFrames} | Open: ${self.state.eyeOpenFrames} | Count: ${self.state.blinkCount}/3`);
+              
+              // 🎯 DETECCIÓN SIMPLIFICADA
+              const isEyesClosed = avgEAR < dynamicThreshold && eyeDifference < EYE_DIFFERENCE_MAX;
+              const isEyesOpen = avgEAR >= dynamicThreshold;
+              
+              if (isEyesClosed) {
+                // Ojos están cerrados
+                self.state.eyeClosedFrames++;
+                self.state.eyeOpenFrames = 0;
+                
+                if (self.state.eyeClosedFrames >= MIN_CONSECUTIVE_CLOSED && !self.state.eyeClosed) {
                   self.state.eyeClosed = true;
-                  // Log: ojo cerrado
-                  console.log('[BLINK] Ojo cerrado');
+                  console.log(`[BLINK] 👁️ ❌ Ojos CERRADOS detectados (EAR: ${avgEAR.toFixed(3)} < ${dynamicThreshold.toFixed(3)})`);
                 }
-              } else {
-                if (self.state.eyeClosed) {
+              } else if (isEyesOpen) {
+                // Ojos están abiertos
+                self.state.eyeOpenFrames++;
+                
+                // Si estaba cerrado y ahora abrió durante varios frames, cuenta como parpadeo
+                if (self.state.eyeClosed && self.state.eyeOpenFrames >= MIN_CONSECUTIVE_OPEN) {
                   self.state.eyeClosed = false;
+                  self.state.eyeClosedFrames = 0;
                   self.state.blinkCount = (self.state.blinkCount || 0) + 1;
                   self.state.blinkWarning = false;
+                  
+                  console.log(`[BLINK] 👁️ ✅ Ojos ABIERTOS - PARPADEO #${self.state.blinkCount} REGISTRADO!`);
+                  
+                  // 🎯 Si es el tercer parpadeo, activa el flag de espera
+                  if (self.state.blinkCount === 3) {
+                    console.log(`[BLINK] 🎉 ¡Tercer parpadeo detectado! Esperando 500ms para que abras bien los ojos...`);
+                    self.state.waitingForOpenEyes = true;
+                    
+                    // Espera 500ms para que los ojos estén bien abiertos antes de tomar la foto
+                    setTimeout(() => {
+                      self.state.waitingForOpenEyes = false;
+                      console.log(`[BLINK] ✅ ¡Listo! Ahora puedes tomar la foto con los ojos abiertos`);
+                    }, 1500);
+                  } else {
+                    console.log(`[BLINK] 🎉 Parpadeo válido detectado. Total: ${self.state.blinkCount}/3`);
+                  }
+                  
                   // Reinicia el timeout cada vez que parpadea
                   if (self.state.blinkTimeout) {
                     clearTimeout(self.state.blinkTimeout);
@@ -187,15 +249,19 @@ export class AttendanceRecognitionDialog extends Component {
                   self.state.blinkTimeout = setTimeout(() => {
                     if (self.state.blinkCount < 3) {
                       self.state.blinkWarning = true;
-                      self.state.blinkCount = 0; // Opcional: reinicia el contador
+                      self.state.blinkCount = 0; // Reinicia el contador
                     }
-                  }, 15000); // 15 segundos para parpadear
-                  console.log(`[BLINK] Parpadeo detectado. Total: ${self.state.blinkCount}`);
+                  }, 15000); // 15 segundos para completar los 3 parpadeos
+                } else if (!self.state.eyeClosed) {
+                  // Resetea contador de frames cerrados si nunca llegó al mínimo
+                  self.state.eyeClosedFrames = 0;
                 }
               }
             } else {
               // Log: landmarks no válidos
-              console.log('[BLINK] Landmarks de ojos no válidos');
+              console.log('[BLINK] ⚠️ Landmarks de ojos no válidos');
+              self.state.eyeClosedFrames = 0;
+              self.state.eyeOpenFrames = 0;
             }
           }
 
@@ -224,16 +290,19 @@ export class AttendanceRecognitionDialog extends Component {
                 drawBox.draw(canvas);
               }
 
-              // ✅ ahora exige 2 parpadeos además de reconocimiento facial
+              // ✅ ahora exige 3 parpadeos además de reconocimiento facial
+              // 🎯 Espera a que los ojos estén bien abiertos después del tercer parpadeo
               if (self.state.match_employee_id
                 && self.state.match_count.length > 2
                 && (self.state.blinkCount || 0) >= 3
+                && !self.state.waitingForOpenEyes  // ← NUEVO: Espera que termine el delay
                 && !self.state.attendanceUpdated) {
                 self.state.attendanceUpdated = true;
                 clearInterval(self.state.intervalID);
                 if (self.state.blinkTimeout) {
                   clearTimeout(self.state.blinkTimeout);
                 }
+                console.log('[BLINK] 📸 Tomando foto con los ojos abiertos...');
                 if (!self.state.intervalId) {
                   let { box } = resizedDetections.detection;
                   let region = new faceapi.Rect(box.x - 100, box.y - 100, box.width + 200, box.height + 200);
