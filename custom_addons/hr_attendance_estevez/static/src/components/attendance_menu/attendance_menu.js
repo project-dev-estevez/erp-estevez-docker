@@ -16,22 +16,21 @@ patch(ActivityMenu.prototype, {
     },
 
     async searchReadEmployee() {
+        // PRIMERO obtener geolocalización y geocerca ANTES de llamar al padre
+        console.log("[Estevez] searchReadEmployee iniciado - obteniendo geolocalización PRIMERO");
+        if (window.location.protocol === 'https:' && !this.state.latitude) {
+            await this._getGeolocation();
+            console.log("[Estevez] Geolocalización completada antes de searchReadEmployee del padre:", this.state.latitude, this.state.longitude);
+        }
+        
         // Llamar siempre al original (esto ya carga geolocalización en hr_attendance_controls_adv)
         if (typeof super.searchReadEmployee === "function") {
             await super.searchReadEmployee();
         }
-        // Actualizar momento
+        console.log("[Estevez] searchReadEmployee completado → currentMoment:", this.state.currentMoment, "lat:", this.state.latitude, "lon:", this.state.longitude);
+        
+        // Actualizar momento (esto ya renderiza el mapa si es necesario)
         this._updateMoment();
-
-        // NO volver a llamar _getGeolocation aquí porque el padre ya lo hizo
-        // Solo renderizar mapa si estamos antes del primer checkin y tenemos coordenadas
-        if (
-            this.state.currentMoment === "before_first_checkin" &&
-            this.state.latitude &&
-            this.state.longitude
-        ) {
-            setTimeout(() => this._renderBeforeCheckinMap(), 300);
-        }
 
         console.log(
             "[Estevez] searchReadEmployee completado →",
@@ -228,7 +227,16 @@ patch(ActivityMenu.prototype, {
             checkedIn: this.state.checkedIn,
             isFirstAttendance: this.isFirstAttendance,
             currentMoment: this.state.currentMoment,
+            hasCoordinates: !!(this.state.latitude && this.state.longitude)
         });
+        
+        // Renderizar mapa si estamos antes del primer checkin y tenemos coordenadas
+        if (this.state.currentMoment === "before_first_checkin" && 
+            this.state.latitude && 
+            this.state.longitude) {
+            console.log("[Estevez] Programando renderizado del mapa con coordenadas:", this.state.latitude, this.state.longitude);
+            setTimeout(() => this._renderBeforeCheckinMap(), 100);
+        }
     },
 });
 
