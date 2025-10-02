@@ -2,11 +2,13 @@
 import { rpc } from "@web/core/network/rpc";
 import { session } from "@web/session";
 import { patch } from "@web/core/utils/patch";
+import { useService } from "@web/core/utils/hooks";
 import { ActivityMenu } from "@hr_attendance/components/attendance_menu/attendance_menu";
 
 patch(ActivityMenu.prototype, {
     setup() {
         super.setup();
+        this.notification = useService("notification");
         this.state.currentMoment = this.state.currentMoment || "unknown";
         this.state.buttonDisabled = false;
         console.log(
@@ -16,30 +18,24 @@ patch(ActivityMenu.prototype, {
     },
 
     async searchReadEmployee() {
-        // Llamar siempre al original
+        // PRIMERO obtener geolocalización y geocerca ANTES de llamar al padre
+        console.log("[Estevez] searchReadEmployee iniciado - obteniendo geolocalización PRIMERO");
+        if (window.location.protocol === 'https:' && !this.state.latitude) {
+            await this._getGeolocation();
+            console.log("[Estevez] Geolocalización completada antes de searchReadEmployee del padre:", this.state.latitude, this.state.longitude);
+        }
+        
+        // Llamar siempre al original (esto ya carga geolocalización en hr_attendance_controls_adv)
         if (typeof super.searchReadEmployee === "function") {
             await super.searchReadEmployee();
         }
-        // Actualizar momento
+        console.log("[Estevez] searchReadEmployee completado → currentMoment:", this.state.currentMoment, "lat:", this.state.latitude, "lon:", this.state.longitude);
+        
+        // Verificar si ya existe un registro completo de asistencia hoy
+        await this._checkTodayAttendance();
+        
+        // Actualizar momento (esto ya renderiza el mapa si es necesario)
         this._updateMoment();
-
-        // Si está en jornada o aún no ha hecho el primer checkin, obtener geolocalización
-        if (["in_journey", "before_first_checkin"].includes(this.state.currentMoment)) {
-            console.log(
-                "[Estevez] Obteniendo geolocalización para",
-                this.state.currentMoment
-            );
-            await this._getGeolocation();
-        }
-
-        // Renderizar mapa SOLO si estamos antes del primer checkin
-        if (
-            this.state.currentMoment === "before_first_checkin" &&
-            this.state.latitude &&
-            this.state.longitude
-        ) {
-            setTimeout(() => this._renderBeforeCheckinMap(), 300);
-        }
 
         console.log(
             "[Estevez] searchReadEmployee completado →",
@@ -51,12 +47,41 @@ patch(ActivityMenu.prototype, {
 
     async signInOut() {
         if (this.state.buttonDisabled) return;
+        
+        // Guardar el estado actual antes de hacer el registro
+        const wasCheckedIn = this.state.checkedIn;
+        
         this.state.buttonDisabled = true;
         this.render();
         try {
             if (typeof super.signInOut === "function") {
                 await super.signInOut();
             }
+            
+            // Después de hacer check-in o check-out, verificar de nuevo la asistencia del día
+            await this._checkTodayAttendance();
+            this._updateMoment();
+            
+            // Mostrar notificación de éxito según la acción realizada
+            if (wasCheckedIn) {
+                // Si estaba checked in, ahora hizo check-out (salida)
+                this.notification.add("✅ ¡Salida registrada exitosamente! Que tengas un excelente día. 🎉", {
+                    type: "success",
+                    title: "Jornada Finalizada",
+                });
+            } else {
+                // Si NO estaba checked in, ahora hizo check-in (entrada)
+                this.notification.add("✅ ¡Entrada registrada exitosamente! Bienvenido a tu jornada laboral. 💼", {
+                    type: "success",
+                    title: "Jornada Iniciada",
+                });
+            }
+        } catch (error) {
+            console.error("[Estevez] Error al registrar asistencia:", error);
+            this.notification.add("❌ Hubo un error al registrar tu asistencia. Por favor, intenta de nuevo.", {
+                type: "danger",
+                title: "Error",
+            });
         } finally {
             setTimeout(() => {
                 this.state.buttonDisabled = false;
@@ -103,6 +128,56 @@ patch(ActivityMenu.prototype, {
         }
         this.state.loading_geofence = false;
         return result;
+    },
+
+    async _checkTodayAttendance() {
+        // Obtener el employee_id desde this.employee (como lo hace el componente padre)
+        const employee_id = this.employee?.id;
+        if (!employee_id) {
+            console.log("[Estevez] No se encontró employee_id, employee:", this.employee);
+            this.state.hasCompletedAttendanceToday = false;
+            return;
+        }
+
+        console.log("[Estevez] Verificando asistencia para employee_id:", employee_id);
+
+        // Obtener fecha de hoy en formato YYYY-MM-DD
+        const today = new Date();
+        const todayStr = today.toISOString().split('T')[0];
+        
+        try {
+            // Buscar registros de asistencia del empleado para hoy
+            const attendances = await rpc(
+                "/web/dataset/call_kw/hr.attendance/search_read",
+                {
+                    model: "hr.attendance",
+                    method: "search_read",
+                    args: [
+                        [
+                            ["employee_id", "=", employee_id],
+                            ["check_in", ">=", todayStr + " 00:00:00"],
+                            ["check_in", "<=", todayStr + " 23:59:59"],
+                        ],
+                        ["id", "check_in", "check_out"],
+                    ],
+                    kwargs: {},
+                }
+            );
+
+            console.log("[Estevez] Registros de asistencia hoy:", attendances);
+
+            // Verificar si existe al menos un registro completo (con check_in Y check_out)
+            const hasCompleteAttendance = attendances.some(
+                (att) => att.check_in && att.check_out
+            );
+
+            this.state.hasCompletedAttendanceToday = hasCompleteAttendance;
+            
+            console.log("[Estevez] ¿Tiene asistencia completa hoy?:", hasCompleteAttendance);
+        } catch (error) {
+            console.error("[Estevez] Error verificando asistencia del día:", error);
+            this.state.hasCompletedAttendanceToday = false;
+        }
     },
 
     async _findGeofenceByLocation() {
@@ -220,11 +295,15 @@ patch(ActivityMenu.prototype, {
     },
 
     _updateMoment() {
+        // Lógica de momentos basada en estado actual y registro completo del día
         if (this.state.checkedIn) {
+            // Empleado está actualmente en el trabajo (tiene check-in activo)
             this.state.currentMoment = "in_journey";
-        } else if (!this.state.checkedIn && this.isFirstAttendance) {
+        } else if (!this.state.checkedIn && !this.state.hasCompletedAttendanceToday) {
+            // Empleado NO está checked in Y NO tiene registro completo hoy
             this.state.currentMoment = "before_first_checkin";
-        } else if (!this.state.checkedIn && !this.isFirstAttendance) {
+        } else if (!this.state.checkedIn && this.state.hasCompletedAttendanceToday) {
+            // Empleado NO está checked in pero YA completó su asistencia hoy
             this.state.currentMoment = "after_check_out";
         } else {
             this.state.currentMoment = "unknown";
@@ -234,9 +313,18 @@ patch(ActivityMenu.prototype, {
 
         console.log("[Estevez] _updateMoment →", {
             checkedIn: this.state.checkedIn,
-            isFirstAttendance: this.isFirstAttendance,
+            hasCompletedAttendanceToday: this.state.hasCompletedAttendanceToday,
             currentMoment: this.state.currentMoment,
+            hasCoordinates: !!(this.state.latitude && this.state.longitude)
         });
+        
+        // Renderizar mapa si estamos antes del primer checkin y tenemos coordenadas
+        if (this.state.currentMoment === "before_first_checkin" && 
+            this.state.latitude && 
+            this.state.longitude) {
+            console.log("[Estevez] Programando renderizado del mapa con coordenadas:", this.state.latitude, this.state.longitude);
+            setTimeout(() => this._renderBeforeCheckinMap(), 100);
+        }
     },
 });
 

@@ -7,8 +7,21 @@
             <button type="button"
                     class="btn btn-primary btn-sm o_attendance_systray_button o-dropdown dropdown-toggle dropdown"
                     aria-expanded="false">
-                <i t-if="!this.state.checkedIn" class="fa fa-times text-danger" style="margin-right:4px;"/>
-                <i t-if="this.state.checkedIn" class="fa fa-check text-success" style="margin-right:4px;"/>
+                <!-- Sin registro: ícono rojo X -->
+                <i t-if="this.state.currentMoment === 'before_first_checkin'" 
+                   class="fa fa-times text-danger" 
+                   style="margin-right:4px;"/>
+                
+                <!-- En curso: ícono amarillo play -->
+                <i t-if="this.state.currentMoment === 'in_journey'" 
+                   class="fa fa-play-circle text-warning" 
+                   style="margin-right:4px;"/>
+                
+                <!-- Completado: ícono verde check -->
+                <i t-if="this.state.currentMoment === 'after_check_out'" 
+                   class="fa fa-check text-success" 
+                   style="margin-right:4px;"/>
+                
                 Asistencia
             </button>
         </xpath>
@@ -56,10 +69,10 @@
                             IP Pública: <t t-esc="state.ipaddress or '---'"/>
                         </div>
                     </div>
-            <button t-on-click="() => this.signInOut()"
-                t-att-disabled="this.state.buttonDisabled ? 'disabled' : false"
-                class="btn btn-danger w-100">
-                        <i class="fa fa-sign-out me-1"/> Finalizar jornada
+                    <button t-on-click="() => this.signInOut()"
+                        t-att-disabled="this.state.buttonDisabled ? 'disabled' : false"
+                        class="btn btn-danger w-100">
+                                <i class="fa fa-sign-out me-1"/> Finalizar jornada
                     </button>
                 </div>
 
@@ -68,8 +81,7 @@
                      class="p-3 mb-3 rounded bg-light border">
                     <h5 class="mb-2 text-primary">Jornada finalizada</h5>
                     <p class="mb-3 text-muted">
-                        Has terminado tu jornada laboral.
-                        <br/>
+                        Has terminado tu jornada laboral.  
                         ¡Buen trabajo hoy! 🎉
                     </p>
                 </div>

@@ -63,6 +63,9 @@ patch(ActivityMenu.prototype, {
 
         //validate button
         this.state.show_check_inout_button = false;
+        
+        // Flag para saber si los modelos ya están cargados
+        this.state.modelsLoaded = false;
 
         onWillStart(async () => {
             try {
@@ -73,6 +76,10 @@ patch(ActivityMenu.prototype, {
                 await loadJS('/hr_attendance_controls_adv/static/src/lib/ol-ext/ol-ext.js');
                 if (session.hr_attendance_geofence) {
                     await this.loadGeofences();
+                }
+                // Precarga los modelos de face-api si está habilitado
+                if (session.hr_attendance_face_recognition && window.location.protocol === 'https:') {
+                    await this._preloadFaceModels();
                 }
             } catch (error) {
                 if (!(error instanceof AssetsLoadingError)) {
@@ -348,9 +355,26 @@ patch(ActivityMenu.prototype, {
             self.reasons = reasons;
         });
     },
+    async _preloadFaceModels(){
+        var self = this;
+        try {
+            // Los modelos ya están cargados via loadJS en onWillStart
+            if (window.faceapi) {
+                await self._loadModels();
+                console.log('[HR Attendance] Modelos face-api precargados exitosamente');
+            }
+        } catch (error) {
+            console.warn('[HR Attendance] Error precargando modelos face-api:', error);
+        }
+    },
     async _initRecognition(){
         var self = this;
         if (window.location.protocol == 'https:') {
+            // Si los modelos ya están cargados, no hacer nada
+            if (self.state.modelsLoaded) {
+                return;
+            }
+            // Si no están cargados, cargarlos ahora (fallback)
             if (!("faceapi" in window)) {
                 self._loadFaceapi();
             } 
@@ -376,6 +400,10 @@ patch(ActivityMenu.prototype, {
     },
     async _loadModels() {
         var self = this;
+        // Si ya están cargados, no volver a cargar
+        if (self.state.modelsLoaded) {
+            return Promise.resolve();
+        }
         const promises = [];
         promises.push([
             faceapi.nets.tinyFaceDetector.loadFromUri('/hr_attendance_controls_adv/static/src/lib/faceapi/weights'),
@@ -385,7 +413,8 @@ patch(ActivityMenu.prototype, {
             faceapi.nets.faceExpressionNet.loadFromUri('/hr_attendance_controls_adv/static/src/lib/faceapi/weights'),
         ])
         return Promise.all(promises).then(() => {
-            self.loadLabeledImages();            
+            self.loadLabeledImages();
+            self.state.modelsLoaded = true;
             return Promise.resolve();
         });
     },

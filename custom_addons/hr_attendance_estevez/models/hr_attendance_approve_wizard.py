@@ -12,7 +12,7 @@ class HrAttendanceApproveWizard(models.TransientModel):
         attendance = self.attendance_id
         attendance.status = 'approved'
         if self.observation:
-            attendance.message_post(body=f"Asistencia aprobada. Observación: {self.observation}")
+            attendance.message_post(body=f"Asistencia aprobada: {self.observation}")
         else:
             attendance.message_post(body="Asistencia aprobada.")
         return [
