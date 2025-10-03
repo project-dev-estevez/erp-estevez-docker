@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Vista de lista personalizada para empleados -->
+    <record id="view_hr_attendance_list_employee" model="ir.ui.view">
+        <field name="name">hr.attendance.list.employee</field>
+        <field name="model">hr.attendance</field>
+        <field name="arch" type="xml">
+            <list create="false" edit="false" delete="false" export_xlsx="false">
+                <field name="employee_id" string="Empleado" widget="many2one_avatar_employee"/>
+                <field name="department_id" string="Departamento" optional="show"/>
+                <field name="job_id" string="Puesto" optional="show"/>
+                <field name="check_in" string="Entrada"/>
+                <field name="check_out" string="Salida"/>
+                <field name="status" widget="badge"
+                       decoration-info="status == 'pending'"
+                       decoration-warning="status == 'retarded'"
+                       decoration-success="status == 'approved'"
+                       decoration-danger="status == 'rejected'"/>
+                <button name="action_show_log" 
+                        type="object" 
+                        string="Ver Comentarios" 
+                        icon="fa-commenting-o"
+                        class="btn-link"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Acción de ventana para empleados - Usa vista personalizada -->
+    <record id="action_hr_attendance_employee" model="ir.actions.act_window">
+        <field name="name">Mis Asistencias</field>
+        <field name="res_model">hr.attendance</field>
+        <field name="view_mode">list</field>
+        <field name="domain">[('employee_id.user_id', '=', uid)]</field>
+        <field name="context">{'create': False, 'delete': False}</field>
+        <field name="path">attendance-employee</field>
+        <field name="view_id" ref="view_hr_attendance_list_employee"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No tienes registros de asistencia
+            </p>
+            <p>
+                Tus registros de asistencia aparecerán aquí una vez que comiences a registrar tu entrada y salida.
+            </p>
+        </field>
+    </record>
+
+    <!-- Heredar el menú raíz para agregar acceso a empleados -->
+    <record id="hr_attendance.menu_hr_attendance_root" model="ir.ui.menu">
+        <field name="groups_id" eval="[(4, ref('hr_attendance_estevez.group_hr_attendance_employee'))]"/>
+    </record>
+
+    <!-- Menú para empleados (dentro del menú raíz de Asistencias) -->
+    <menuitem id="menu_hr_attendance_employee"
+              name="Mis Asistencias"
+              parent="hr_attendance.menu_hr_attendance_root"
+              action="action_hr_attendance_employee"
+              groups="hr_attendance_estevez.group_hr_attendance_employee"
+              sequence="5"/>
+</odoo>
