@@ -6,6 +6,7 @@ from datetime import date, timedelta, datetime
 from dateutil.relativedelta import relativedelta
 import re
 import requests
+import math
 
 _logger = logging.getLogger(__name__)
 
@@ -713,71 +714,89 @@ class HrEmployee(models.Model):
     # Método para generar periodos de vacaciones automáticamente    
     def generate_vacation_periods(self):
         _logger.info(f"Generating vacation periods for employees: {self.ids}")
-        
+
         employees_without_date = self.filtered(lambda e: not e.employment_start_date)
         if employees_without_date:
             raise UserError(
                 "Los siguientes empleados no tienen fecha de ingreso configurada: %s" %
                 ", ".join(employees_without_date.mapped('name'))
             )
-        
+
+        # <-- Cambia aquí si más adelante quieres otra fecha -->
+        effective_new_law = fields.Date.from_string('2022-01-01')
+
+        total_created = 0
+
         for employee in self:
-            # Eliminar periodos existentes
+            # Borra periodos previos solo de este empleado
             employee.vacation_period_ids.unlink()
-            
+
             start_date = employee.employment_start_date
             today = fields.Date.today()
             periods = []
             year_count = 1
-            
+
             while start_date < today:
                 year_end = start_date + relativedelta(years=1, days=-1)
-                
-                # Asegurar que no exceda la fecha actual
                 if year_end > today:
                     year_end = today
-                    
-                # Calcular días según ley mexicana actual
-                if year_count == 1:
-                    entitled = 12
-                elif year_count == 2:
-                    entitled = 14
-                elif year_count == 3:
-                    entitled = 16
-                elif year_count == 4:
-                    entitled = 18
-                elif year_count == 5:
-                    entitled = 20
+
+                under_new_law = start_date >= effective_new_law
+
+                if not under_new_law:
+                    # Ley antigua
+                    if year_count == 1:
+                        entitled = 6
+                    elif year_count == 2:
+                        entitled = 8
+                    elif year_count == 3:
+                        entitled = 10
+                    elif year_count == 4:
+                        entitled = 12
+                    elif year_count == 5:
+                        entitled = 14
+                    else:
+                        entitled = 16
                 else:
-                    # Años adicionales: +2 días por cada 5 años después del 5to
-                    additional_years = year_count - 5
-                    additional_days = (additional_years // 5) * 2
-                    entitled = 20 + additional_days
-                    
+                    # Nueva ley — usamos year_count como años de servicio para la escala
+                    if year_count == 1:
+                        entitled = 12
+                    elif year_count == 2:
+                        entitled = 14
+                    elif year_count == 3:
+                        entitled = 16
+                    elif year_count == 4:
+                        entitled = 18
+                    elif year_count == 5:
+                        entitled = 20
+                    else:
+                        # A partir del año 6, +2 días por cada bloque de 5 años completos sobre los 5 primeros años
+                        additional_blocks = math.ceil((year_count - 5) / 5.0)
+                        entitled = 20 + (additional_blocks * 2)
+
                 periods.append({
                     'employee_id': employee.id,
                     'year_start': start_date,
                     'year_end': year_end,
                     'entitled_days': entitled,
                 })
-                
+
                 start_date = year_end + relativedelta(days=1)
                 year_count += 1
-                
-                # Prevenir bucles infinitos
-                if year_count > 50:
+
+                if year_count > 100:
                     break
-            
+
             if periods:
                 self.env['hr.vacation.period'].create(periods)
-                
-        # Mostrar mensaje de confirmación
+                total_created += len(periods)
+
         return {
             'type': 'ir.actions.client',
             'tag': 'display_notification',
             'params': {
                 'title': 'Periodos generados',
-                'message': f'Se han generado {len(periods)} periodos vacacionales',
+                'message': f'Se han generado {total_created} periodos vacacionales',
                 'sticky': False,
             }
         }
