@@ -32,6 +32,24 @@ class HrAttendance(models.Model):
         required=True
     )
 
+    check_in_date = fields.Date(
+        string='Fecha de Entrada',
+        compute='_compute_check_dates',
+        store=False
+    )
+
+    check_out_date = fields.Date(
+        string='Fecha de Salida',
+        compute='_compute_check_dates',
+        store=False
+    )
+
+    @api.depends('check_in', 'check_out')
+    def _compute_check_dates(self):
+        for record in self:
+            record.check_in_date = record.check_in.date() if record.check_in else False
+            record.check_out_date = record.check_out.date() if record.check_out else False
+
     @api.model
     def create(self, vals):
         check_in = vals.get('check_in')
