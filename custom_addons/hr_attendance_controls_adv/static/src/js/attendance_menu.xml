@@ -48,7 +48,6 @@
                     <div t-if="this.state.attendance_status === 'pre_work'"
                          class="p-3 mb-3 rounded bg-light border">
                         <h5 class="mb-2 text-primary">
-                            <i class="fa fa-sun-o me-2"/>
                             ¡Bienvenido! 👋
                         </h5>
                         <p class="mb-3 text-muted">
@@ -56,16 +55,18 @@
                             Pulsa el botón para hacer tu <strong>check-in</strong> 😉
                         </p>
 
+                        <div t-attf-class="geofence_container mb8 {{ this.state.show_geofence ? '' : 'd-none' }}" id="geofence_container" t-ref="geofence_container">
+                            <i t-attf-class="fa fa-1x fa-angle-double-down geofence_toggle" id="geofence_toggle" t-on-click="onTogglegeofence" t-ref="geofence_toggle">
+                                Map Location
+                            </i>
+                            <div t-attf-class="geofence_view d-none" t-ref="geofence_view"></div>
+                        </div>
+
                         <button t-on-click="() => this.signInOut()"
                                 class="btn btn-success w-100">
                             <i class="fa fa-sign-in me-2"/> 
                             Iniciar Jornada
                         </button>
-                    </div>
-
-                    <!-- 🔧 DEBUG: Mostrar estado actual -->
-                    <div class="p-2 bg-info text-white rounded small">
-                        🔍 Debug: attendance_status = <strong t-esc="this.state.attendance_status"/>
                     </div>
                     
                 </div>

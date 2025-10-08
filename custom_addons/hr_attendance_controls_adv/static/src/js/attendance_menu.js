@@ -3,8 +3,6 @@
 import { _t } from "@web/core/l10n/translation";
 import { patch } from "@web/core/utils/patch";
 import { ActivityMenu } from "@hr_attendance/components/attendance_menu/attendance_menu";
-import { deserializeDateTime } from "@web/core/l10n/dates"; //* NUEVO
-import { registry } from "@web/core/registry"; //* NUEVO
 
 import { useService } from "@web/core/utils/hooks";
 import { onWillStart, useRef } from "@odoo/owl";
@@ -16,35 +14,18 @@ import { AttendanceRecognitionDialog } from "./attendance_recognition_dialog"
 import { AttendanceWebcamDialog } from "./attendance_webcam_dialog"
 import { isIosApp } from "@web/core/browser/feature_detection";
 
-const { DateTime } = luxon; // NUEVO
-
 patch(ActivityMenu.prototype, {
+
     setup() {
         super.setup();
         this.orm = useService('orm');
         this.dialog = useService("dialog");
         this.notificationService = useService('notification');
         
-        // 🎯 PASO 2: Agregar date_formatter para formateo de tiempo
-        this.date_formatter = registry.category("formatters").get("float_time"); // NUEVO
-        
-        //reason
-        this.reasonContainerRef = useRef("reason_container");
-        this.reasonToggleRef = useRef("reason_toggle");
-        this.reasonViewRef = useRef("reason_view");
-        this.reasonInputRef = useRef("reasons_inut");
-        // gelocation
-        this.glocationContainerRef = useRef("glocation_container");
-        this.glocationToggleRef = useRef("glocation_toggle");
-        this.glocationViewRef = useRef("glocation_view");
         // geofence
         this.geofenceContainerRef = useRef("geofence_container");
         this.geofenceToggleRef = useRef("geofence_toggle");
         this.geofenceViewRef = useRef("geofence_view");
-        // geoipaddress
-        this.geoipaddressContainerRef = useRef("geoipaddress_container");
-        this.geoipaddressToggleRef = useRef("geoipaddress_toggle");
-        this.geoipaddressViewRef = useRef("geoipaddress_view");
 
         // session controls
         this.state.show_geolocation = false;
@@ -52,7 +33,6 @@ patch(ActivityMenu.prototype, {
         this.state.show_ipaddress = false;
         this.state.show_recognition = false;
         this.state.show_photo = false;
-        this.state.show_reason = false;
 
         // gelocation
         this.state.latitude = false;
@@ -65,7 +45,6 @@ patch(ActivityMenu.prototype, {
         this.state.ipaddress = false;        
 
         //temp arrays
-        this.reasons = [];
         this.labeledFaceDescriptors = [];
 
         //validate button
@@ -88,6 +67,7 @@ patch(ActivityMenu.prototype, {
             }
         });
     },
+
     async loadGeofences(){
         var self = this;
         const company_id = session.user_companies.allowed_companies[0] || session.user_companies.current_company || false;
@@ -104,12 +84,13 @@ patch(ActivityMenu.prototype, {
             self.state.geofences = records;
         }
     },
+
     async onOpenedContent(){
         this.loadControls();
         this.state.show_check_inout_button = true;
     },
     
-    async searchReadEmployee(){        
+    async searchReadEmployee(){    
         const result = await rpc("/hr_attendance/attendance_user_data");
         this.employee = result;
         console.log("Employee data:", this.employee);
@@ -119,16 +100,6 @@ patch(ActivityMenu.prototype, {
             return;
         }
 
-        this.hoursToday = this.date_formatter(
-            this.employee.hours_today
-        );
-        this.hoursPreviouslyToday = this.date_formatter(
-            this.employee.hours_previously_today
-        );
-        this.lastAttendanceWorkedHours = this.date_formatter(
-            this.employee.last_attendance_worked_hours
-        );
-        this.lastCheckIn = deserializeDateTime(this.employee.last_check_in).toLocaleString(DateTime.TIME_SIMPLE);
         this.state.checkedIn = this.employee.attendance_state === "checked_in";
         this.isFirstAttendance = this.employee.hours_previously_today === 0;
         this.state.isDisplayed = this.employee.display_systray;
@@ -139,6 +110,7 @@ patch(ActivityMenu.prototype, {
         // 🎯 PASO 7B: Log para verificar
         console.log("✅ Employee data loaded, attendance_status:", this.employee.attendance_status);
     },
+
     async loadControls(){
         if (window.location.protocol == 'https:') {
             if (session.hr_attendance_geolocation) {
@@ -185,27 +157,9 @@ patch(ActivityMenu.prototype, {
             this.state.show_photo = false;
         }
 
-        if (session.hr_attendance_reason){
-            this.state.show_reason = true;
-            await this._getReasons();
-        }else{
-            this.state.show_reason = false;
-        }
         return true;
     },
-    onToggleGeolocation(){
-        var self = this;
-        const toggleIcon = self.glocationToggleRef.el;
-        const viewElement = self.glocationViewRef.el;
-        
-        if (toggleIcon.classList.contains('fa-angle-double-down')) {
-            viewElement.classList.remove('d-none');
-            toggleIcon.classList.replace('fa-angle-double-down', 'fa-angle-double-up');
-        } else {
-            viewElement.classList.add('d-none');
-            toggleIcon.classList.replace('fa-angle-double-up', 'fa-angle-double-down');
-        }
-    },
+
     _getGeolocation() {
         return new Promise((resolve, reject) => {
             if (window.location.protocol === 'https:') {
@@ -227,6 +181,7 @@ patch(ActivityMenu.prototype, {
             }
         });
     },
+
     async onTogglegeofence(){
         var self = this;        
         const toggleIcon = self.geofenceToggleRef.el;
@@ -266,6 +221,7 @@ patch(ActivityMenu.prototype, {
             }
         }        
     },
+
     _getGeofenceMap() {
         return new Promise((resolve, reject) => {
             if (window.location.protocol === 'https:') {
@@ -321,19 +277,7 @@ patch(ActivityMenu.prototype, {
             }
         });
     },
-    onToggleGeoipaddress(){
-        var self = this;
-        const toggleIcon = self.geoipaddressToggleRef.el;
-        const viewElement = self.geoipaddressViewRef.el;
 
-        if (toggleIcon.classList.contains('fa-angle-double-down')) {
-            viewElement.classList.remove('d-none');
-            toggleIcon.classList.replace('fa-angle-double-down', 'fa-angle-double-up');
-        } else {
-            viewElement.classList.add('d-none');
-            toggleIcon.classList.replace('fa-angle-double-up', 'fa-angle-double-down');
-        }
-    },
     _getIpAddress() {
         return new Promise((resolve, reject) => {
             if (window.location.protocol === 'https:') {
@@ -362,30 +306,7 @@ patch(ActivityMenu.prototype, {
             }
         });
     },
-    onToggleReason(){
-        var self = this;
-        const toggleIcon = self.reasonToggleRef.el;
-        const viewElement = self.reasonViewRef.el;
-        
-        if (toggleIcon.classList.contains('fa-angle-double-down')) {
-            viewElement.classList.remove('d-none');
-            toggleIcon.classList.replace('fa-angle-double-down', 'fa-angle-double-up');
-        } else {
-            viewElement.classList.add('d-none');
-            toggleIcon.classList.replace('fa-angle-double-up', 'fa-angle-double-down');
-        }        
-    },
-    async _getReasons(){
-        var self = this;
-        await rpc("/web/dataset/call_kw/hr.attendance.reasons/search_read", {
-            model: "hr.attendance.reasons",
-            method: "search_read",
-            args: [[], ['id', 'name', 'attendance_state']],
-            kwargs: {},
-        }).then(function(reasons){
-            self.reasons = reasons;
-        });
-    },
+
     async _initRecognition(){
         var self = this;
         if (window.location.protocol == 'https:') {
@@ -397,6 +318,7 @@ patch(ActivityMenu.prototype, {
             }
         }
     },
+
     _loadFaceapi () {
         var self = this;
         if (!("faceapi" in window)) {
@@ -412,6 +334,7 @@ patch(ActivityMenu.prototype, {
             }(window, document, 'script'));
         }
     },
+
     async _loadModels() {
         var self = this;
         const promises = [];
@@ -427,6 +350,7 @@ patch(ActivityMenu.prototype, {
             return Promise.resolve();
         });
     },
+
     async loadLabeledImages(){
         var self = this;
         await rpc('/hr_attendance_controls_adv/loadLabeledImages/').then(async function (data) {            
@@ -445,6 +369,7 @@ patch(ActivityMenu.prototype, {
             }));
         })
     },
+
     async _validate_Geofence () {
         var self = this;
         
@@ -488,6 +413,7 @@ patch(ActivityMenu.prototype, {
             'fence_ids': fence_ids,
         };
     },
+    
     async signInOut() {
         const self = this;
         console.log("Sign in out clicked");
@@ -498,7 +424,6 @@ patch(ActivityMenu.prototype, {
     
     //     // Check if validation is required
     //     if (self.state.show_geolocation || self.state.show_geofence || self.state.show_ipaddress || self.state.show_recognition || self.state.show_photo || self.state.show_reason) {
-    //         self.state.reason = false;
     
     //         let c_latitude = self.state.latitude || 0.0000000;
     //         let c_longitude = self.state.longitude || 0.0000000;
@@ -506,7 +431,7 @@ patch(ActivityMenu.prototype, {
     //         let c_fence_is_inside = false;
     //         let c_ipaddress = self.state.ipaddress || false;
     //         let c_photo = false;
-    //         let c_reason = self.reasonInputRef.el && self.reasonInputRef.el.value || '-';
+    //         let c_reason = '-';
             
     //         // Define Promises
     //         const geolocationPromise = self.state.show_geolocation
@@ -592,14 +517,8 @@ patch(ActivityMenu.prototype, {
     //               })
     //             : Promise.resolve(true);
     
-    //         const reasonPromise = self.state.show_reason
-    //             ? (c_reason
-    //                   ? Promise.resolve(true)
-    //                   : Promise.reject("Reason not loaded, Please try again."))
-    //             : Promise.resolve(true);
-    
     //         try {
-    //             await Promise.all([geolocationPromise, geofencePromise, ipAddressPromise, photoPromise, faceRecognitionPromise, reasonPromise]);
+    //             await Promise.all([geolocationPromise, geofencePromise, ipAddressPromise, photoPromise, faceRecognitionPromise]);
     //             if (!isIosApp()) {
     //                 navigator.geolocation.getCurrentPosition(
     //                     async ({coords: {latitude, longitude}}) => {
