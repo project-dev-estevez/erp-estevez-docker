@@ -11,6 +11,7 @@
         "security/ir.model.access.csv",
         "views/hr_attendance_view_form_inherit.xml",
         "views/hr_attendance_list_management_inherit.xml",
+        "views/hr_attendance_employee_views.xml",
         "views/hr_attendance_photo_wizard.xml",
         "views/hr_attendance_location_wizard.xml",
         "views/hr_attendance_reject_wizard.xml",

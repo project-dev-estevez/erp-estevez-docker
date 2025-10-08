@@ -29,4 +29,16 @@
         <field name="perm_create" eval="True"/>
         <field name="perm_unlink" eval="False"/>
     </record>
+
+    <!-- Regla: Empleados pueden leer información básica de hr.employee -->
+    <record id="hr_employee_employee_read_rule" model="ir.rule">
+        <field name="name">Empleado puede leer información básica de empleados</field>
+        <field name="model_id" ref="hr.model_hr_employee"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('hr_attendance_estevez.group_hr_attendance_employee'))]"/>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
 </odoo>
