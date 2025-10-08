@@ -3,6 +3,8 @@
 import { _t } from "@web/core/l10n/translation";
 import { patch } from "@web/core/utils/patch";
 import { ActivityMenu } from "@hr_attendance/components/attendance_menu/attendance_menu";
+import { deserializeDateTime } from "@web/core/l10n/dates"; //* NUEVO
+import { registry } from "@web/core/registry"; //* NUEVO
 
 import { useService } from "@web/core/utils/hooks";
 import { onWillStart, useRef } from "@odoo/owl";
@@ -14,12 +16,17 @@ import { AttendanceRecognitionDialog } from "./attendance_recognition_dialog"
 import { AttendanceWebcamDialog } from "./attendance_webcam_dialog"
 import { isIosApp } from "@web/core/browser/feature_detection";
 
+const { DateTime } = luxon; // NUEVO
+
 patch(ActivityMenu.prototype, {
     setup() {
         super.setup();
         this.orm = useService('orm');
         this.dialog = useService("dialog");
         this.notificationService = useService('notification');
+        
+        // 🎯 PASO 2: Agregar date_formatter para formateo de tiempo
+        this.date_formatter = registry.category("formatters").get("float_time"); // NUEVO
         
         //reason
         this.reasonContainerRef = useRef("reason_container");
@@ -100,6 +107,37 @@ patch(ActivityMenu.prototype, {
     async onOpenedContent(){
         this.loadControls();
         this.state.show_check_inout_button = true;
+    },
+    
+    async searchReadEmployee(){        
+        const result = await rpc("/hr_attendance/attendance_user_data");
+        this.employee = result;
+        console.log("Employee data:", this.employee);
+
+        if (!this.employee.id) {
+            this.state.isDisplayed = false;
+            return;
+        }
+
+        this.hoursToday = this.date_formatter(
+            this.employee.hours_today
+        );
+        this.hoursPreviouslyToday = this.date_formatter(
+            this.employee.hours_previously_today
+        );
+        this.lastAttendanceWorkedHours = this.date_formatter(
+            this.employee.last_attendance_worked_hours
+        );
+        this.lastCheckIn = deserializeDateTime(this.employee.last_check_in).toLocaleString(DateTime.TIME_SIMPLE);
+        this.state.checkedIn = this.employee.attendance_state === "checked_in";
+        this.isFirstAttendance = this.employee.hours_previously_today === 0;
+        this.state.isDisplayed = this.employee.display_systray;
+        
+        // 🎯 PASO 7A: Agregar attendance_status al estado para usar en templates
+        this.state.attendance_status = this.employee.attendance_status;
+        
+        // 🎯 PASO 7B: Log para verificar
+        console.log("✅ Employee data loaded, attendance_status:", this.employee.attendance_status);
     },
     async loadControls(){
         if (window.location.protocol == 'https:') {

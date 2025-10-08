@@ -1,6 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <template>
     <t t-inherit="hr_attendance.attendance_menu" t-inherit-mode="extension">
+        
+        <!-- 🎯 PASO 7: Personalizar botón del systray según attendance_status -->
+        <xpath expr="//button[i[contains(@class, 'fa-circle')]]" position="replace">
+            <button type="button"
+                    class="btn btn-sm o_attendance_systray_button o-dropdown dropdown-toggle dropdown"
+                    aria-expanded="false">
+                
+                <!-- 🔴 Pre-work: Sin registro - ícono rojo X -->
+                <i t-if="this.state.attendance_status === 'pre_work'" 
+                   class="fa fa-times-circle text-danger me-1" style="margin-top: 1px;"/>
+                
+                <!-- 🟡 In-work: En jornada - ícono amarillo play -->
+                <i t-if="this.state.attendance_status === 'in_work'" 
+                   class="fa fa-play-circle text-warning me-1" style="margin-top: 1px;"/>
+                
+                <!-- 🟢 Post-work: Completado - ícono verde check -->
+                <i t-if="this.state.attendance_status === 'post_work'" 
+                   class="fa fa-check-circle text-success me-1" style="margin-top: 1px;"/>
+                
+                <!-- 🔘 Fallback: Estado desconocido - ícono original -->
+                <i t-if="!this.state.attendance_status" 
+                   class="fa fa-circle-o me-1"/>
+                
+                Asistencia
+            </button>
+        </xpath>
+        
         <!-- 🔧 AGREGAR EVENTO onOpened AL DROPDOWN -->
         <xpath expr="//Dropdown" position="attributes">
             <attribute name="onOpened.bind">onOpenedContent</attribute>
@@ -14,93 +41,33 @@
                     <i class="fa fa-circle-o-notch fa-spin spinner"></i>
                 </div>
                 
-                <!-- 📋 CONTENIDO PRINCIPAL -->
-                <div t-if="this.state.show_check_inout_button" class="o_att_menu_container d-flex flex-column gap-4">
-                    <div class="d-flex flex-column gap-3">
-                        <!-- 📊 INFORMACIÓN DE HORAS (cuando está checked in) -->
-                        <div t-if="this.state.checkedIn" class="d-flex flex-wrap gap-3">
-                            <div t-if="!this.isFirstAttendance" class="att_container flex-grow-1 flex-shrink-0">
-                                <small class="d-block text-muted">Before <t t-esc="this.lastCheckIn"/></small>
-                                <div t-esc="this.hoursPreviouslyToday" class="fs-3 text-info text-end"/>
-                            </div>
-                            <div class="att_container flex-grow-1 flex-shrink-0">
-                                <small class="d-block text-muted">Since <t t-esc="this.lastCheckIn"/></small>
-                                <div t-esc="this.lastAttendanceWorkedHours" t-attf-class="fs-3 text-info {{ !this.isFirstAttendance ? 'text-end' : '' }}"/>
-                            </div>
-                        </div>
-                        
-                        <!-- 📈 TOTAL HORAS HOY + BOTÓN PRINCIPAL -->
-                        <div t-if="!this.isFirstAttendance"
-                            class="att_container d-flex flex-column"
-                            t-att-class="this.state.checkedIn ? 'p-3 bg-100 rounded' : ''">
-                            <div class="d-flex" t-att-class="this.state.checkedIn ? 'align-items-center justify-content-between' : 'flex-column'">
-                                <small class="text-muted">Total today</small>
-                                <h2 t-esc="this.hoursToday" class="mb-0 fs-2"/>
-                            </div>
-                            <button t-on-click="() => this.signInOut()" class="flex-basis-100 mt-3" t-attf-class="btn btn-{{ this.state.checkedIn ? 'warning' : 'success' }}">
-                                <span t-if="!this.state.checkedIn">Check in</span>
-                                <span t-else="">Check out</span>
-                                <i t-attf-class="fa fa-sign-{{ this.state.checkedIn ? 'out' : 'in' }} ms-1"/>
-                            </button>
-                        </div>
+                <!-- 🎯 PASO 8: CONTENIDO BASADO EN ATTENDANCE_STATUS -->
+                <div t-if="this.state.show_check_inout_button" class="o_att_menu_container d-flex flex-column gap-3">
+                    
+                    <!-- 🌅 VISTA PRE_WORK: Antes del primer check-in -->
+                    <div t-if="this.state.attendance_status === 'pre_work'"
+                         class="p-3 mb-3 rounded bg-light border">
+                        <h5 class="mb-2 text-primary">
+                            <i class="fa fa-sun-o me-2"/>
+                            ¡Bienvenido! 👋
+                        </h5>
+                        <p class="mb-3 text-muted">
+                            Todavía no has iniciado tu jornada laboral.  
+                            Pulsa el botón para hacer tu <strong>check-in</strong> 😉
+                        </p>
+
+                        <button t-on-click="() => this.signInOut()"
+                                class="btn btn-success w-100">
+                            <i class="fa fa-sign-in me-2"/> 
+                            Iniciar Jornada
+                        </button>
+                    </div>
+
+                    <!-- 🔧 DEBUG: Mostrar estado actual -->
+                    <div class="p-2 bg-info text-white rounded small">
+                        🔍 Debug: attendance_status = <strong t-esc="this.state.attendance_status"/>
                     </div>
                     
-                    <!-- 🎯 BOTÓN PARA PRIMERA ASISTENCIA -->
-                    <button t-if="this.isFirstAttendance" t-on-click="() => this.signInOut()" t-attf-class="btn btn-{{ this.state.checkedIn ? 'warning' : 'success' }}">
-                        <span t-if="!this.state.checkedIn">Check in</span>
-                        <span t-else="">Check out</span>
-                        <i t-attf-class="fa fa-sign-{{ this.state.checkedIn ? 'out' : 'in' }} ms-1"/>
-                    </button>
-
-                    <!-- 🎛️ CONTROLES AVANZADOS -->
-                    <div class="attendance_controls">
-                        <!-- 📝 CONTROL DE MOTIVOS -->
-                        <div t-attf-class="reason_container mb8 {{ this.state.show_reason ? '' : 'd-none' }}" id="reason_container" t-ref="reason_container">
-                            <i t-attf-class="fa fa-1x fa-angle-double-down reason_toggle" id="reason_toggle" t-on-click="onToggleReason" t-ref="reason_toggle">
-                                Reason
-                            </i>
-                            <div t-attf-class="reason_view d-none" t-ref="reason_view">
-                                <input type="text" name="reasons" id="oe_attendance_reasons" list="reasons_list" class="o_input mt8 oe_attendance_reasons" 
-                                    placeholder="Select / Enter your Reason here." autocomplete="off" t-ref="reasons_inut"/>
-                                <datalist id="reasons_list">
-                                    <t t-foreach="reasons" t-as="reason" t-key="reason.id">
-                                        <t t-if="reason.attendance_state != employee.attendance_state or reason.attendance_state == False">
-                                            <option t-att-value="reason.name"/>                     
-                                        </t>
-                                    </t>
-                                </datalist>
-                            </div>
-                        </div>
-
-                        <!-- 🌍 CONTROL DE GEOLOCALIZACIÓN -->
-                        <div t-attf-class="glocation_container mb8 {{ this.state.show_geolocation ? '' : 'd-none' }}" id="glocation_container" t-ref="glocation_container">
-                            <i t-attf-class="fa fa-1x fa-angle-double-down glocation_toggle" id="glocation_toggle" t-on-click="onToggleGeolocation" t-ref="glocation_toggle">
-                                Geo Location
-                            </i>
-                            <div t-attf-class="glocation_view d-none" t-ref="glocation_view" >
-                                <span>Lattitude:  <t t-esc="state.latitude"/></span>
-                                <span>, Longitude: <t t-esc="state.longitude"/></span>
-                            </div>
-                        </div>
-                        
-                        <!-- 🗺️ CONTROL DE GEOCERCAS -->
-                        <div t-attf-class="geofence_container mb8 {{ this.state.show_geofence ? '' : 'd-none' }}" id="geofence_container" t-ref="geofence_container">
-                            <i t-attf-class="fa fa-1x fa-angle-double-down geofence_toggle" id="geofence_toggle" t-on-click="onTogglegeofence" t-ref="geofence_toggle">
-                                Map Location
-                            </i>
-                            <div t-attf-class="geofence_view d-none" t-ref="geofence_view"></div>
-                        </div>
-
-                        <!-- 🌐 CONTROL DE DIRECCIÓN IP -->
-                        <div t-attf-class="geoipaddress_container mb8 {{ this.state.show_ipaddress ? '' : 'd-none' }}" id="geoipaddress_container" t-ref="geoipaddress_container">
-                            <i t-attf-class="fa fa-1x fa-angle-double-down geoipaddress_toggle" id="geoipaddress_toggle"  t-on-click="onToggleGeoipaddress" t-ref="geoipaddress_toggle">
-                                IP Address (Public)
-                            </i>
-                            <div t-attf-class="geoipaddress_view d-none" t-ref="geoipaddress_view">
-                                <span> IP: <t t-esc="state.ipaddress"/></span>
-                            </div>
-                        </div>
-                    </div>
                 </div>
             </t>
         </xpath>
