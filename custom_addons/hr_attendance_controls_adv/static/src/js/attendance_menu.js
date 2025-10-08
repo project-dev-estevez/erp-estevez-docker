@@ -450,8 +450,13 @@ patch(ActivityMenu.prototype, {
             'fence_ids': fence_ids,
         };
     },
-    // async signInOut() {
-    //     const self = this;
+    async signInOut() {
+        const self = this;
+        console.log("Sign in out clicked");
+        
+        // 🚀 TEMPORALMENTE: Llamar al método padre para que funcione básicamente
+        await super.signInOut();
+        return;
     
     //     // Check if validation is required
     //     if (self.state.show_geolocation || self.state.show_geofence || self.state.show_ipaddress || self.state.show_recognition || self.state.show_photo || self.state.show_reason) {
@@ -668,6 +673,6 @@ patch(ActivityMenu.prototype, {
     //             await this.searchReadEmployee()
     //         }
     //     }
-    // }
+    }
 });
 export default ActivityMenu;
