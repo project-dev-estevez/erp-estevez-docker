@@ -3,7 +3,7 @@ from odoo import fields, models, api, _
 class HrEmployee(models.Model):
     _inherit = "hr.employee"
     
-    user_faces = fields.One2many("hr.employee.faces", "employee_id", "Faces")
+    user_faces = fields.One2many("hr.employee.faces", "employee_id", "Caras")
 
 class HrEmployeeFaces(models.Model):
     _name = "hr.employee.faces"
@@ -11,8 +11,8 @@ class HrEmployeeFaces(models.Model):
     _inherit = ['image.mixin']
     _order = 'id'
 
-    name = fields.Char("Name", related='employee_id.name')
-    image = fields.Binary("Images")
+    name = fields.Char("Nombre", related='employee_id.name')
+    image = fields.Binary("Imagenes")
     descriptor = fields.Text(string='Face Descriptor')
     has_descriptor = fields.Boolean(string="Has Face Descriptor",default=False, compute='_compute_has_descriptor', readonly=True, store=True)
     employee_id = fields.Many2one("hr.employee", "User", index=True, ondelete='cascade')

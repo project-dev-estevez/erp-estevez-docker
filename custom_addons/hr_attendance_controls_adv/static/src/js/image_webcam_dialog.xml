@@ -2,41 +2,76 @@
 <template>
 
     <t t-name="hr_attendance_controls_adv.ImageWebcamDialog" id="WebCamModal" >
-        <Dialog size="'md'" title="'Capture Snapshot'">
+        <Dialog size="'md'" title="'Capturar Imagen'">
             <t t-set-slot="header">
                 <div class="d-flex w-100">
-                    <h4>Capture Snapshot</h4>
-                    <div t-on-click="onClose" type="button" class="btn-close" aria-label="Close"/>
+                    <h4>Capturar Imagen</h4>
+                    <div t-on-click="onClose" type="button" class="btn-close" aria-label="Cerrar"/>
                 </div>
             </t>
             <div class="container-fluid">
                 <div class="row">
                     <div class="col-12 controls">
                         <fieldset class="reader-config-group">
-                            <div class="row">
-                                <div class="col-3">
-                                    <label>
-                                        <span>Select Camera</span>
-                                    </label>
-                                </div>
-                                <div class="col-6">
-                                    <select name="video_source" class="videoSource" id="videoSource" t-ref="select">                                       
-                                    </select>
-                                </div>
-                                <div class="col-3">
+                            <div class="row align-items-center">
+                                <div class="col-12">
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-light">
+                                            <i class="fa fa-camera text-muted"></i>
+                                        </span>
+                                        <select name="video_source" 
+                                                class="form-select videoSource shadow-sm" 
+                                                id="videoSource" 
+                                                t-ref="select"
+                                                style="border-left: none; padding-left: 0.5rem;">                                       
+                                        </select>
+                                    </div>
+                                    <small class="form-text text-muted mt-1">
+                                        <i class="fa fa-info-circle me-1"></i>
+                                        Seleccione la cámara que desea utilizar
+                                    </small>
                                 </div>
                             </div>
                         </fieldset>
                     </div>
-                    <div class="col-12 mt8" id="videoContainer">
-                        <video id="video" style="width: 100%; max-height: 100%; box-sizing: border-box;" muted="true" autoplay="false" playsinline="true" t-ref="video"/>  
-                        <canvas id="image" style="display: none;" t-ref="image"/>                                      
+                    <div class="col-12 mt-4" id="videoContainer">
+                        <div class="card shadow-sm">
+                            <div class="card-header bg-primary text-white text-center py-2">
+                                <small class="text-white">
+                                    <i class="fa fa-crosshairs me-1 text-info"></i>
+                                    Posicione su rostro en el centro de la cámara
+                                </small>
+                            </div>
+                            <div class="card-body p-3">
+                                <div class="position-relative">
+                                    <video id="video" 
+                                           class="w-100 rounded shadow-sm" 
+                                           style="max-height: 400px; object-fit: cover; background-color: #f8f9fa;" 
+                                           muted="true" 
+                                           autoplay="false" 
+                                           playsinline="true" 
+                                           t-ref="video"/>
+                                    <div class="position-absolute top-50 start-50 translate-middle" 
+                                         style="border: 2px dashed rgba(13, 110, 253, 0.5); width: 200px; height: 200px; border-radius: 50%; pointer-events: none;">
+                                    </div>
+                                </div>
+                                <canvas id="image" style="display: none;" t-ref="image"/>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
              <t t-set-slot="footer">
-                <button class="btn btn-primary" t-on-click="onClickConfirm" >Capture</button>
-                <button class="btn btn-secondary" t-on-click="props.close">Cancel</button>
+                <div class="d-flex justify-content-end gap-2">
+                    <button class="btn btn-primary px-4 shadow-sm" t-on-click="onClickConfirm">
+                        <i class="fa fa-camera me-2"></i>
+                        Capturar
+                    </button>
+                    <button class="btn btn-outline-secondary px-4" t-on-click="props.close">
+                        <i class="fa fa-times me-2"></i>
+                        Cancelar
+                    </button>
+                </div>
             </t>
         </Dialog>
     </t>
