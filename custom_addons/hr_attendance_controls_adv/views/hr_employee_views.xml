@@ -6,7 +6,7 @@
         <field name="inherit_id" ref="hr.view_employee_form"/>
         <field name="arch" type="xml">
             <xpath expr="//notebook" position="inside">
-                <page string="Face Recognition">
+                <page string="Reconocimiento Facial">
                     <field name="user_faces" 
                             class="o_website_sale_image_list" 
                             context="{'default_name': name}" 
