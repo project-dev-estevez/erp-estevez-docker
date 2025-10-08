@@ -6,11 +6,11 @@ class HrAttendanceGeofence(models.Model):
     _name = "hr.attendance.geofence"
     _description = "Attendance Geofence"
     _order = "id desc"
-    
-    name = fields.Char('Name', required=True)
-    description = fields.Char('Description')
+
+    name = fields.Char('Nombre', required=True)
+    description = fields.Char('Descripción')
     company_id = fields.Many2one(
-        'res.company', 'Company', required=True,
+        'res.company', 'Empresa', required=True,
         default=lambda s: s.env.company.id, index=True)
-    employee_ids = fields.Many2many('hr.employee', 'employee_geofence_rel', 'geofence_id', 'emp_id', string='Employees')
-    overlay_paths = fields.Text(string='Paths')
+    employee_ids = fields.Many2many('hr.employee', 'employee_geofence_rel', 'geofence_id', 'emp_id', string='Empleados')
+    overlay_paths = fields.Text(string='Rutas')

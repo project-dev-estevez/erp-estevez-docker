@@ -2,7 +2,7 @@
 <odoo>
     <menuitem 
         id="hr_attendance_settings_redefinition_menu"
-        name="Configuration"
+        name="General"
         parent="hr_attendance.menu_hr_attendance_settings"
         sequence="100"
         action="hr_attendance.action_hr_attendance_settings"
@@ -42,12 +42,12 @@
         </field>
     </record>  
 
-    <menuitem 
+    <!-- <menuitem 
         id="hr_attendance_reasons_menu" 
-        name="Reasons"
+        name="Razones de Asistencia"
         parent="hr_attendance.menu_hr_attendance_settings"
         action="action_hr_attendance_reasons"
         sequence="111"
-        groups="hr_attendance.group_hr_attendance_manager"/>
+        groups="hr_attendance.group_hr_attendance_manager"/> -->
 
 </odoo>
