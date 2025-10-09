@@ -442,7 +442,27 @@ patch(ActivityMenu.prototype, {
     
     async signInOut() {
         const self = this;
-        this.dropdown.close();
+        
+        // Cerrar dropdown de manera más robusta usando el parent
+        try {
+            // Intentar cerrar usando el dropdown heredado del parent
+            if (super.dropdown && typeof super.dropdown.close === 'function') {
+                super.dropdown.close();
+            } else if (this.dropdown && typeof this.dropdown.close === 'function') {
+                this.dropdown.close();
+            } else {
+                // Fallback: buscar el elemento dropdown en el DOM
+                const dropdownElement = document.querySelector('.o_hr_attendance_menu');
+                if (dropdownElement) {
+                    const bootstrapDropdown = dropdownElement.closest('.dropdown');
+                    if (bootstrapDropdown) {
+                        bootstrapDropdown.click();
+                    }
+                }
+            }
+        } catch (error) {
+            console.warn('Error closing dropdown:', error);
+        }
 
         // 🎯 Extraer la condición a una constante
         const hasValidationsEnabled = self.state.show_geolocation || 
