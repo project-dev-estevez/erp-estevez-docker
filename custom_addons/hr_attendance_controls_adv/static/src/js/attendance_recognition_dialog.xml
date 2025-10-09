@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <template>
-
     <t t-name="attendance_face_recognition.AttendanceRecognitionDialog" id="AttendanceRecognitionDialog">
-        <Dialog size="'md'"  fullscreen="true" title="'Reconocimiento facial'">
+        <Dialog size="'md'" fullscreen="true" title="'Reconocimiento facial'">
             <t t-set-slot="header">
                 <div class="d-flex w-100">
                     <h4>Reconocimiento facial</h4>
@@ -10,6 +9,17 @@
                 </div>
             </t>
             <div class="container-fluid">
+                <div class="row mb-2">
+                    <div class="col-12">
+                        <div class="progress" style="height: 20px; border-radius: 10px; overflow: hidden;">
+                            <div class="progress-bar bg-success" role="progressbar"
+                                style="width: 0%;" aria-valuemin="0" aria-valuemax="100"
+                                t-ref="progress"></div>
+                        </div>
+                        <small class="text-center d-block mt-1 text-muted">Por favor sonríe durante 10 segundos 😊</small>
+                    </div>
+                </div>
+
                 <div class="row">
                     <div class="col-12 controls">
                         <fieldset class="reader-config-group">
@@ -20,27 +30,25 @@
                                     </label>
                                 </div>
                                 <div class="col-6">
-                                    <select name="video_source" class="form-select videoSource" id="videoSource" t-ref="select">
-                                    </select>
-                                </div>
-                                <div class="col-3">
+                                    <select name="video_source" class="form-select videoSource" id="videoSource" t-ref="select"/>
                                 </div>
                             </div>
                         </fieldset>
                     </div>
                 </div>
+
                 <div class="row">
-                    <div class="col-12 mt8" id="videoContainer" t-ref="videoContainer" style="display: table;position: relative;">
+                    <div class="col-12 mt8" id="videoContainer" t-ref="videoContainer" style="display: table; position: relative;">
                         <video id="video" style="width: 100%; max-height: 100%; box-sizing: border-box;" muted="true" autoplay="false" playsinline="true" t-ref="video"/>  
-                        <canvas id="canvas" style="position: absolute; top: 0;  bottom: 0;  display: block; " t-ref="canvas"/>
+                        <canvas id="canvas" style="position: absolute; top: 0; bottom: 0; display: block;" t-ref="canvas"/>
                         <canvas id="image" style="display: none;" t-ref="image"/>                                      
                     </div>
                 </div>
             </div>
-             <t t-set-slot="footer">
-                <button class="btn btn-secondary" t-on-click="props.close">Cancel</button>
+
+            <t t-set-slot="footer">
+                <button class="btn btn-secondary" t-on-click="props.close">Cancelar</button>
             </t>
         </Dialog>
     </t>
-
 </template>
