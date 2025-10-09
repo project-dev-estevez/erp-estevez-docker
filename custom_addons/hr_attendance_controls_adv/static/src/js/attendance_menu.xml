@@ -52,7 +52,7 @@
                         </h5>
                         <p class="mb-3 text-muted">
                             Todavía no has iniciado tu jornada laboral.  
-                            Pulsa el botón para hacer tu <strong>check-in</strong> 😉
+                            Pulsa el botón para iniciar tu <strong>jornada</strong> 😉
                         </p>
 
                         <div t-attf-class="geofence_container mb8 {{ this.state.show_geofence ? '' : 'd-none' }}" id="geofence_container" t-ref="geofence_container">
