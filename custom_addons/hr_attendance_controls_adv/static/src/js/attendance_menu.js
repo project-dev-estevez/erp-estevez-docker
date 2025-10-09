@@ -439,10 +439,25 @@ patch(ActivityMenu.prototype, {
             }
         );
     },
+
+    closeDropdown() {
+        // 🔒 VALIDACIÓN DEFENSIVA: Usar self en lugar de this
+        try {
+            if (self.dropdown && typeof self.dropdown.close === 'function') {
+                self.dropdown.close();
+                console.log("✅ Dropdown closed successfully");
+            } else {
+                console.warn("⚠️ Dropdown service not available");
+            }
+        } catch (error) {
+            console.error("❌ Error closing dropdown:", error);
+            // No bloquear el proceso, continuar con el signInOut
+        }
+    },
     
     async signInOut() {
         const self = this;
-        this.dropdown.close();
+        self.closeDropdown(); // Cerrar el dropdown al iniciar el proceso
 
         // 🎯 Extraer la condición a una constante
         const hasValidationsEnabled = self.state.show_geolocation || 
