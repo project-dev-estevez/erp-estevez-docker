@@ -164,7 +164,7 @@ patch(ActivityMenu.prototype, {
         return new Promise((resolve, reject) => {
             if (window.location.protocol === 'https:') {
                 navigator.geolocation.getCurrentPosition(
-                    ({ coords: { latitude, longitude } }) => {
+                    async ({ coords: { latitude, longitude } }) => {
                         if (latitude && longitude) {
                             this.state = this.state || {};
                             this.state.latitude = latitude;

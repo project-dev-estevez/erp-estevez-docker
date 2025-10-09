@@ -68,6 +68,29 @@
                             Iniciar Jornada
                         </button>
                     </div>
+
+                    <!-- 🟡 VISTA IN_WORK: Jornada en curso -->
+                    <div t-if="this.state.attendance_status === 'in_work'"
+                         class="p-3 mb-3 rounded border border-warning">
+                        <h5 class="mb-2 text-warning">
+                            🟡 Jornada en curso
+                        </h5>
+                        <p class="mb-3 text-muted">
+                            ¡Ya has registrado tu entrada hoy! Tu jornada está activa.
+                        </p>
+
+                        <!-- 🌐 INFORMACIÓN DE RED -->
+                        <div t-if="this.state.ipaddress" class="mb-3 p-2 bg-light rounded text-center">
+                            <small class="text-muted">🌐 Dirección IP:</small>
+                            <div class="fw-bold text-dark" t-esc="this.state.ipaddress"/>
+                        </div>
+
+                        <button t-on-click="() => this.signInOut()"
+                                class="btn btn-danger w-100">
+                            <i class="fa fa-sign-out me-2"/> 
+                            Finalizar Jornada
+                        </button>
+                    </div>
                     
                 </div>
             </t>
