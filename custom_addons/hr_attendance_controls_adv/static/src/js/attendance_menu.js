@@ -49,6 +49,7 @@ patch(ActivityMenu.prototype, {
         this.labeledFaceDescriptors = [];
 
         //validate button
+        this.state.isReady = false;
         this.state.show_check_inout_button = false;
 
         onWillStart(async () => {
@@ -58,6 +59,7 @@ patch(ActivityMenu.prototype, {
                 await loadCSS('/hr_attendance_controls_adv/static/src/lib/ol-ext/ol-ext.css');
                 await loadJS('/hr_attendance_controls_adv/static/src/lib/ol-6.12.0/ol.js');
                 await loadJS('/hr_attendance_controls_adv/static/src/lib/ol-ext/ol-ext.js');
+                this.onOpenedContent();
             } catch (error) {
                 if (!(error instanceof AssetsLoadingError)) {
                     throw error;
@@ -160,6 +162,8 @@ patch(ActivityMenu.prototype, {
             if (session.hr_attendance_photo){
                 this.state.show_photo = true;
             }
+
+            this.state.isReady = true;
         }else{
             this.state.show_geolocation = false;
             this.state.show_geofence = false;
@@ -424,224 +428,8 @@ patch(ActivityMenu.prototype, {
             'fence_ids': fence_ids,
         };
     },
-    
-    async signInOut() {
-        const self = this;
-        
-        // 🚀 TEMPORALMENTE: Llamar al método padre para que funcione básicamente
-        // await super.signInOut();
 
-        console.log("🚀 signInOut triggered");
-    
-        // Check if validation is required
-        if (self.state.show_geolocation || self.state.show_geofence || self.state.show_ipaddress || self.state.show_recognition || self.state.show_photo || self.state.show_reason) {
-    
-            let c_latitude = self.state.latitude || 0.0000000;
-            let c_longitude = self.state.longitude || 0.0000000;
-            let c_fence_ids = [];
-            let c_fence_is_inside = false;
-            let c_ipaddress = self.state.ipaddress || false;
-            let c_photo = false;
-            let c_reason = '-';
-            
-            // Define Promises
-            const geolocationPromise = self.state.show_geolocation
-            ? (c_latitude && c_longitude
-                ? Promise.resolve(true)
-                : new Promise((resolve, reject) => {
-                    navigator.geolocation.getCurrentPosition(
-                        ({ coords: { latitude, longitude } }) => {
-                            if (latitude && longitude) {
-                                self.state.latitude = c_latitude = latitude;
-                                self.state.longitude = c_longitude = longitude;
-                                resolve({ latitude, longitude });
-                            } else {
-                                reject("Coordinates not found");
-                            }
-                        },
-                        (error) => reject("Geolocation access denied")
-                    );
-                }))
-            : Promise.resolve(true);
-                    
-            const geofencePromise = self.state.show_geofence
-                ? new Promise(async (resolve, reject) => {
-                    try {
-                        const { fence_is_inside, fence_ids } = await self._validate_Geofence();
-                        if (fence_is_inside && fence_ids.length > 0) {
-                            c_fence_ids = Object.values(fence_ids);
-                            c_fence_is_inside = fence_is_inside;
-                            resolve(true);
-                        } else {
-                            reject("You haven't entered any of the geofence zones.");
-                        }
-                    } catch (err) {
-                        console.log(err);
-                        reject(`Geofence validation error: ${err}`);
-                    }
-                  })
-                : Promise.resolve(true);
-    
-            const ipAddressPromise = self.state.show_ipaddress
-                ? (c_ipaddress
-                      ? Promise.resolve(true)
-                      : Promise.reject("IP Address not loaded, Please try again."))
-                : Promise.resolve(true);
-    
-            const photoPromise = self.state.show_photo
-                ? new Promise((resolve) => {
-                      if (!c_photo) {
-                          self.dialog.add(AttendanceWebcamDialog, {
-                              uploadWebcamImage: (rdata) => {
-                                  if (rdata.image) {
-                                      c_photo = rdata.image;
-                                      resolve(true);
-                                  } else {
-                                      reject("Photo not loaded, Please try again.");
-                                  }
-                              }
-                          });
-                      } else {
-                          resolve(true);
-                      }
-                  })
-                : Promise.resolve(true);
-    
-            const faceRecognitionPromise = self.state.show_recognition
-                ? new Promise((resolve, reject) => {
-                      if (self.labeledFaceDescriptors?.length) {
-                          self.dialog.add(AttendanceRecognitionDialog, {
-                              faceapi: faceapi,
-                              labeledFaceDescriptors: self.labeledFaceDescriptors,
-                              updateRecognitionAttendance: (rdata) => {
-                                  if (parseInt(self.employee.id) !== parseInt(rdata.employee_id)) {
-                                      reject("The detected employee does not match the logged-in employee.");
-                                  } else {
-                                      c_photo = rdata.image;
-                                      resolve(true);
-                                  }
-                              }
-                          });
-                      } else {
-                          reject("Detection Failed: Resource not found. Please add it to your user's profile.");
-                      }
-                  })
-                : Promise.resolve(true);
-    
-            try {
-                await Promise.all([geolocationPromise, geofencePromise, ipAddressPromise, photoPromise, faceRecognitionPromise]);
-                if (!isIosApp()) {
-                    navigator.geolocation.getCurrentPosition(
-                        async ({coords: {latitude, longitude}}) => {
-                            await rpc("/hr_attendance/systray_check_in_out", {
-                                latitude,
-                                longitude
-                            }).then(async function(data){
-                                if (data.attendance.id && data.attendance_state == "checked_in"){
-                                    await rpc("/web/dataset/call_kw/hr.attendance/write", {
-                                        model: "hr.attendance",
-                                        method: "write",
-                                        args: [parseInt(data.attendance.id), {
-                                            'check_in_latitude': c_latitude || latitude,
-                                            'check_in_longitude': c_longitude || longitude,
-                                            'check_in_geofence_ids': c_fence_ids,
-                                            'check_in_photo': c_photo,
-                                            'check_in_ipaddress': c_ipaddress,
-                                            'check_in_reason': c_reason,
-                                        }],
-                                        kwargs: {},
-                                    });
-                                }
-                                else if(data.attendance.id && data.attendance_state == "checked_out"){
-                                    await rpc("/web/dataset/call_kw/hr.attendance/write", {
-                                        model: "hr.attendance",
-                                        method: "write",
-                                        args: [parseInt(data.attendance.id), {
-                                            'check_out_latitude': c_latitude || latitude,
-                                            'check_out_longitude': c_longitude || longitude,
-                                            'check_out_geofence_ids': c_fence_ids,
-                                            'check_out_photo': c_photo,
-                                            'check_out_ipaddress': c_ipaddress,
-                                            'check_out_reason': c_reason,
-                                        }],
-                                        kwargs: {},
-                                    });
-                                }
-                            });
-                            await this.searchReadEmployee()
-                        },
-                        async err => {
-                            await rpc("/hr_attendance/systray_check_in_out")
-                            .then(async function(data){
-                                if (data.attendance.id && data.attendance_state == "checked_in"){
-                                    await rpc("/web/dataset/call_kw/hr.attendance/write", {
-                                        model: "hr.attendance",
-                                        method: "write",
-                                        args: [parseInt(data.attendance.id), {
-                                            'check_in_latitude': c_latitude || false,
-                                            'check_in_longitude': c_longitude || false,
-                                            'check_in_geofence_ids': c_fence_ids,
-                                            'check_in_photo': c_photo,
-                                            'check_in_ipaddress': c_ipaddress,
-                                            'check_in_reason': c_reason,
-                                        }],
-                                        kwargs: {},
-                                    });
-                                }
-                                else if(data.attendance.id && data.attendance_state == "checked_out"){
-                                    await rpc("/web/dataset/call_kw/hr.attendance/write", {
-                                        model: "hr.attendance",
-                                        method: "write",
-                                        args: [parseInt(data.attendance.id), {
-                                            'check_out_latitude': c_latitude || false,
-                                            'check_out_longitude': c_longitude || false,
-                                            'check_out_geofence_ids': c_fence_ids,
-                                            'check_out_photo': c_photo,
-                                            'check_out_ipaddress': c_ipaddress,
-                                            'check_out_reason': c_reason,
-                                        }],
-                                        kwargs: {},
-                                    });
-                                }
-                            });
-                            await this.searchReadEmployee()
-                        },
-                        {
-                            enableHighAccuracy: true,
-                        }
-                    )
-                } else {
-                    await rpc("/hr_attendance/systray_check_in_out")
-                    await this.searchReadEmployee()
-                }
-            } catch (error) {
-                console.log("Validation failed:", error);
-                self.notificationService.add(_t(error), { type: "danger" });
-            }
-        }else{
-            if (!isIosApp()) {
-                navigator.geolocation.getCurrentPosition(
-                    async ({coords: {latitude, longitude}}) => {
-                        await rpc("/hr_attendance/systray_check_in_out", {
-                            latitude,
-                            longitude
-                        })
-                        await this.searchReadEmployee()
-                    },
-                    async err => {
-                        await rpc("/hr_attendance/systray_check_in_out")
-                        await this.searchReadEmployee()
-                    },
-                    {
-                        enableHighAccuracy: true,
-                    }
-                )
-            } else {
-                await rpc("/hr_attendance/systray_check_in_out")
-                await this.searchReadEmployee()
-            }
-        }
-
+    showNotification() {
         this.notificationService.add(
             _t('Gracias por tu contribución. 🎉'), 
             { 
@@ -650,6 +438,236 @@ patch(ActivityMenu.prototype, {
                 sticky: false
             }
         );
+    },
+    
+    async signInOut() {
+        const self = this;
+        this.dropdown.close();
+
+        // 🎯 Extraer la condición a una constante
+        const hasValidationsEnabled = self.state.show_geolocation || 
+                                    self.state.show_geofence || 
+                                    self.state.show_ipaddress || 
+                                    self.state.show_recognition || 
+                                    self.state.show_photo || 
+                                    self.state.show_reason;
+
+        if (!hasValidationsEnabled) {
+            console.log("No validations enabled, proceeding with default signInOut.");
+            await super.signInOut();
+            this.showNotification();            
+            return; // ⚡ Early return
+        }
+
+        console.log("Validations enabled, proceeding with checks.");
+    
+        let c_latitude = self.state.latitude || 0.0000000;
+        let c_longitude = self.state.longitude || 0.0000000;
+        let c_fence_ids = [];
+        let c_fence_is_inside = false;
+        let c_ipaddress = self.state.ipaddress || false;
+        let c_photo = false;
+        let c_reason = '-';
+        
+        // Define Promises
+        const geolocationPromise = self.state.show_geolocation
+        ? (c_latitude && c_longitude
+            ? Promise.resolve(true)
+            : new Promise((resolve, reject) => {
+                navigator.geolocation.getCurrentPosition(
+                    ({ coords: { latitude, longitude } }) => {
+                        if (latitude && longitude) {
+                            self.state.latitude = c_latitude = latitude;
+                            self.state.longitude = c_longitude = longitude;
+                            resolve({ latitude, longitude });
+                        } else {
+                            reject("Coordinates not found");
+                        }
+                    },
+                    (error) => reject("Geolocation access denied")
+                );
+            }))
+        : Promise.resolve(true);
+                
+        const geofencePromise = self.state.show_geofence
+            ? new Promise(async (resolve, reject) => {
+                try {
+                    const { fence_is_inside, fence_ids } = await self._validate_Geofence();
+                    if (fence_is_inside && fence_ids.length > 0) {
+                        c_fence_ids = Object.values(fence_ids);
+                        c_fence_is_inside = fence_is_inside;
+                        resolve(true);
+                    } else {
+                        reject("You haven't entered any of the geofence zones.");
+                    }
+                } catch (err) {
+                    console.log(err);
+                    reject(`Geofence validation error: ${err}`);
+                }
+                })
+            : Promise.resolve(true);
+
+        const ipAddressPromise = self.state.show_ipaddress
+            ? (c_ipaddress
+                    ? Promise.resolve(true)
+                    : Promise.reject("IP Address not loaded, Please try again."))
+            : Promise.resolve(true);
+
+        const photoPromise = self.state.show_photo
+            ? new Promise((resolve) => {
+                    if (!c_photo) {
+                        self.dialog.add(AttendanceWebcamDialog, {
+                            uploadWebcamImage: (rdata) => {
+                                if (rdata.image) {
+                                    c_photo = rdata.image;
+                                    resolve(true);
+                                } else {
+                                    reject("Photo not loaded, Please try again.");
+                                }
+                            }
+                        });
+                    } else {
+                        resolve(true);
+                    }
+                })
+            : Promise.resolve(true);
+
+        const faceRecognitionPromise = self.state.show_recognition
+            ? new Promise(async (resolve, reject) => {
+                    try {
+                        // 🔄 VERIFICAR Y CARGAR: Si no hay descriptores, cargarlos
+                        if (!self.labeledFaceDescriptors?.length) {
+                            console.log("⚡ Face descriptors not loaded, loading them now...");
+                            await self._initRecognition(); // Cargar modelos y descriptores
+                            
+                            // 🔍 VERIFICAR NUEVAMENTE: Después de cargar
+                            if (!self.labeledFaceDescriptors?.length) {
+                                reject("Detection Failed: No face images found in user profile. Please add a photo to your profile.");
+                                return;
+                            }
+                            console.log("✅ Face descriptors loaded successfully!");
+                        }
+                        
+                        // ✅ PROCEDER: Con reconocimiento facial
+                        self.dialog.add(AttendanceRecognitionDialog, {
+                            faceapi: faceapi,
+                            labeledFaceDescriptors: self.labeledFaceDescriptors,
+                            updateRecognitionAttendance: (rdata) => {
+                                if (parseInt(self.employee.id) !== parseInt(rdata.employee_id)) {
+                                    reject("The detected employee does not match the logged-in employee.");
+                                } else {
+                                    c_photo = rdata.image;
+                                    resolve(true);
+                                }
+                            }
+                        });
+                    } catch (error) {
+                        console.error("❌ Face recognition error:", error);
+                        reject(`Face recognition failed: ${error.message || error}`);
+                    }
+                })
+            : Promise.resolve(true);
+
+        try {
+            console.log("Starting validation checks...");
+            await Promise.all([geolocationPromise, geofencePromise, ipAddressPromise, photoPromise, faceRecognitionPromise]);
+            if (!isIosApp()) {
+                console.log("Proceeding with signInOut after validations.");
+                navigator.geolocation.getCurrentPosition(
+                    async ({coords: {latitude, longitude}}) => {
+                        await rpc("/hr_attendance/systray_check_in_out", {
+                            latitude,
+                            longitude
+                        }).then(async function(data){
+                            if (data.attendance.id && data.attendance_state == "checked_in"){
+                                console.log("Attendance checked in:", data.attendance.id);
+                                await rpc("/web/dataset/call_kw/hr.attendance/write", {
+                                    model: "hr.attendance",
+                                    method: "write",
+                                    args: [parseInt(data.attendance.id), {
+                                        'check_in_latitude': c_latitude || latitude,
+                                        'check_in_longitude': c_longitude || longitude,
+                                        'check_in_geofence_ids': c_fence_ids,
+                                        'check_in_photo': c_photo,
+                                        'check_in_ipaddress': c_ipaddress,
+                                        'check_in_reason': c_reason,
+                                    }],
+                                    kwargs: {},
+                                });
+                            }
+                            else if(data.attendance.id && data.attendance_state == "checked_out"){
+                                console.log("Attendance checked out:", data.attendance.id);
+                                await rpc("/web/dataset/call_kw/hr.attendance/write", {
+                                    model: "hr.attendance",
+                                    method: "write",
+                                    args: [parseInt(data.attendance.id), {
+                                        'check_out_latitude': c_latitude || latitude,
+                                        'check_out_longitude': c_longitude || longitude,
+                                        'check_out_geofence_ids': c_fence_ids,
+                                        'check_out_photo': c_photo,
+                                        'check_out_ipaddress': c_ipaddress,
+                                        'check_out_reason': c_reason,
+                                    }],
+                                    kwargs: {},
+                                });
+                            }
+                        });
+                        await this.searchReadEmployee()
+                    },
+                    async err => {
+                        console.log("Geolocation access denied, proceeding without it.");
+                        await rpc("/hr_attendance/systray_check_in_out")
+                        .then(async function(data){
+                            if (data.attendance.id && data.attendance_state == "checked_in"){
+                                console.log("Attendance checked in[Error]:", data.attendance.id);
+                                await rpc("/web/dataset/call_kw/hr.attendance/write", {
+                                    model: "hr.attendance",
+                                    method: "write",
+                                    args: [parseInt(data.attendance.id), {
+                                        'check_in_latitude': c_latitude || false,
+                                        'check_in_longitude': c_longitude || false,
+                                        'check_in_geofence_ids': c_fence_ids,
+                                        'check_in_photo': c_photo,
+                                        'check_in_ipaddress': c_ipaddress,
+                                        'check_in_reason': c_reason,
+                                    }],
+                                    kwargs: {},
+                                });
+                            }
+                            else if(data.attendance.id && data.attendance_state == "checked_out"){
+                                console.log("Attendance checked out[Error]:", data.attendance.id);
+                                await rpc("/web/dataset/call_kw/hr.attendance/write", {
+                                    model: "hr.attendance",
+                                    method: "write",
+                                    args: [parseInt(data.attendance.id), {
+                                        'check_out_latitude': c_latitude || false,
+                                        'check_out_longitude': c_longitude || false,
+                                        'check_out_geofence_ids': c_fence_ids,
+                                        'check_out_photo': c_photo,
+                                        'check_out_ipaddress': c_ipaddress,
+                                        'check_out_reason': c_reason,
+                                    }],
+                                    kwargs: {},
+                                });
+                            }
+                        });
+                        await this.searchReadEmployee()
+                    },
+                    {
+                        enableHighAccuracy: true,
+                    }
+                )
+            } else {
+                console.log("iOS App detected, proceeding with signInOut without geolocation.");
+                await rpc("/hr_attendance/systray_check_in_out")
+                await this.searchReadEmployee()
+            }
+        } catch (error) {
+            console.log("Validation failed:", error);
+            self.notificationService.add(_t(error), { type: "danger" });
+        }
+
+        this.showNotification();
     }
 });
 export default ActivityMenu;

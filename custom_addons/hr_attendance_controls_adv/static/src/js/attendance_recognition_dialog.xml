@@ -14,13 +14,13 @@
                     <div class="col-12 controls">
                         <fieldset class="reader-config-group">
                             <div class="row">
-                                <div class="col-3">
-                                    <label>
+                                <div class="col-3 d-flex align-items-center">
+                                    <label class="form-label mb-0">
                                         <span>Seleccionar Cámara</span>
                                     </label>
                                 </div>
                                 <div class="col-6">
-                                    <select name="video_source" class="videoSource" id="videoSource" t-ref="select">                                       
+                                    <select name="video_source" class="form-select videoSource" id="videoSource" t-ref="select">
                                     </select>
                                 </div>
                                 <div class="col-3">

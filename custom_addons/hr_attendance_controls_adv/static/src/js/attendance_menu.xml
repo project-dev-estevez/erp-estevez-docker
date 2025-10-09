@@ -4,7 +4,8 @@
         
         <!-- 🎯 PASO 7: Personalizar botón del systray según attendance_status -->
         <xpath expr="//button[i[contains(@class, 'fa-circle')]]" position="replace">
-            <button type="button"
+            <button t-if="this.state.isReady"
+                    type="button"
                     class="btn btn-sm o_attendance_systray_button o-dropdown dropdown-toggle dropdown"
                     aria-expanded="false">
                 
@@ -25,6 +26,15 @@
                    class="fa fa-circle-o me-1"/>
                 
                 Asistencia
+            </button>
+
+            <button t-if="!this.state.isReady"
+                type="button"
+                class="btn btn-sm o_attendance_systray_button o-dropdown dropdown-toggle dropdown"
+                aria-expanded="false"
+                disabled="true">
+                <i class="fa fa-circle-o-notch fa-spin me-1"/>
+                Cargando...
             </button>
         </xpath>
         
