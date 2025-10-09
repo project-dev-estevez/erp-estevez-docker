@@ -13,10 +13,11 @@ class HrEmployee(models.Model):
 
     @api.depends('attendance_ids.check_in', 'attendance_ids.check_out')
     def _compute_attendance_status(self):
-        today = fields.Date.today()
         for employee in self:
+            today = fields.Date.context_today(employee)
             attendances_today = employee.attendance_ids.filtered(
-                lambda a: a.check_in and a.check_in.date() == today
+                lambda a: a.check_in and
+                fields.Datetime.context_timestamp(employee, a.check_in).date() == today
             )
             if not attendances_today:
                 employee.attendance_status = 'pre_work'
