@@ -2,10 +2,10 @@
 <template>
 
     <t t-name="attendance_face_recognition.AttendanceRecognitionDialog" id="AttendanceRecognitionDialog">
-        <Dialog size="'md'"  fullscreen="true" title="'Face Recognition'">
+        <Dialog size="'md'"  fullscreen="true" title="'Reconocimiento facial'">
             <t t-set-slot="header">
                 <div class="d-flex w-100">
-                    <h4>Face Recognition</h4>
+                    <h4>Reconocimiento facial</h4>
                     <div t-on-click="onClose" type="button" class="btn-close" aria-label="Close"/>
                 </div>
             </t>
@@ -16,7 +16,7 @@
                             <div class="row">
                                 <div class="col-3">
                                     <label>
-                                        <span>Select Camera</span>
+                                        <span>Seleccionar Cámara</span>
                                     </label>
                                 </div>
                                 <div class="col-6">
