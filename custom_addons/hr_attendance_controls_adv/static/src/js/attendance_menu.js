@@ -41,6 +41,7 @@ patch(ActivityMenu.prototype, {
         this.state.olmap = false;
         this.state.fence_is_inside = false;
         this.state.fence_ids = [];
+        this.state.geofences = [];  // 📍 Inicializar array de geocercas
         //ipaddress
         this.state.ipaddress = false;        
 
@@ -57,9 +58,6 @@ patch(ActivityMenu.prototype, {
                 await loadCSS('/hr_attendance_controls_adv/static/src/lib/ol-ext/ol-ext.css');
                 await loadJS('/hr_attendance_controls_adv/static/src/lib/ol-6.12.0/ol.js');
                 await loadJS('/hr_attendance_controls_adv/static/src/lib/ol-ext/ol-ext.js');
-                if (session.hr_attendance_geofence) {
-                    await this.loadGeofences();
-                }
             } catch (error) {
                 if (!(error instanceof AssetsLoadingError)) {
                     throw error;
@@ -70,19 +68,31 @@ patch(ActivityMenu.prototype, {
 
     async loadGeofences(){
         var self = this;
+
+        // ⚠️ VALIDACIÓN: Si no hay empleado aún, intentar obtenerlo
+        if (!self.employee || !self.employee.id) {
+            try {
+                await self.searchReadEmployee();
+            } catch (error) {
+                return;
+            }
+        }
+        
         const company_id = session.user_companies.allowed_companies[0] || session.user_companies.current_company || false;
         if (!company_id) {
             return;
         }
-    
+
         const records = await self.orm.call('hr.attendance.geofence', "search_read", [
             [['company_id', '=', company_id], ['employee_ids', 'in', self.employee.id]],
-            ['id', 'name', 'overlay_paths']
+            ['id', 'name', 'overlay_paths', 'description']
         ], {});
 
-        if(records){
-            self.state.geofences = records;
-        }
+        // 🔒 ASEGURAR: Siempre mantener como array, incluso si records es null/undefined
+        self.state.geofences = records || [];
+
+        console.log("📍 Geofences loaded for employee ID", self.employee.id, ":", records);
+        console.log("📊 Total geofences found:", self.state.geofences.length);
     },
 
     async onOpenedContent(){
@@ -125,6 +135,7 @@ patch(ActivityMenu.prototype, {
             if (session.hr_attendance_geofence) {
                 this.state.show_geofence = true;
                 try {
+                    await this.loadGeofences();
                     await this._getGeofenceMap();
                 } catch (error) {
                     console.log("Geofence map error:", error);
@@ -236,7 +247,7 @@ patch(ActivityMenu.prototype, {
                                 const olmapDiv = this.geofenceViewRef?.el;
     
                                 if (olmapDiv) {
-                                    olmapDiv.style.width = "350px";
+                                    olmapDiv.style.width = "100%";
                                     olmapDiv.style.height = "200px";
                                 }
     
@@ -420,6 +431,14 @@ patch(ActivityMenu.prototype, {
         
         // 🚀 TEMPORALMENTE: Llamar al método padre para que funcione básicamente
         await super.signInOut();
+        this.notificationService.add(
+            _t('Gracias por tu contribución. 🎉'), 
+            { 
+                type: "success",
+                title: _t("¡Excelente!"),
+                sticky: false
+            }
+        );
         return;
     
     //     // Check if validation is required

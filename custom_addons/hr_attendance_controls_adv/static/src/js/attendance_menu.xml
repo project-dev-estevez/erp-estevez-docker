@@ -79,10 +79,18 @@
                             ¡Ya has registrado tu entrada hoy! Tu jornada está activa.
                         </p>
 
-                        <!-- 🌐 INFORMACIÓN DE RED -->
-                        <div t-if="this.state.ipaddress" class="mb-3 p-2 bg-light rounded text-center">
-                            <small class="text-muted">🌐 Dirección IP:</small>
-                            <div class="fw-bold text-dark" t-esc="this.state.ipaddress"/>
+                        <!-- 🗺️ INFORMACIÓN DE GEOCERCAS -->
+                        <div t-if="this.state.geofences and this.state.geofences.length" class="mb-3 p-2 bg-light rounded text-center">
+                            <small>🗺️ Ubicaciones Permitidas:</small>
+                            <ul class="list-unstyled">
+                                <t t-foreach="this.state.geofences" t-as="geofence" t-key="geofence.id">
+                                    <li class="fw-bold text-dark">
+                                        <span t-esc="geofence.name"/>
+                                        <span t-if="geofence.description" class="text-muted"> - <t t-esc="geofence.description"/></span>
+                                    </li>
+                                </t>
+                            </ul>
+                            <small t-if="this.state.ipaddress" class="text-muted">IP: <t t-esc="this.state.ipaddress"/> </small>
                         </div>
 
                         <button t-on-click="() => this.signInOut()"
@@ -90,6 +98,32 @@
                             <i class="fa fa-sign-out me-2"/> 
                             Finalizar Jornada
                         </button>
+                    </div>
+
+                    <!-- 🟢 VISTA POST_WORK: Jornada completada -->
+                    <div t-if="this.state.attendance_status === 'post_work'"
+                         class="p-3 mb-3 rounded border border-success bg-light">
+                        <h5 class="mb-2 text-success text-center">
+                            🎉 ¡Jornada Completada!
+                        </h5>
+                        <p class="mb-3 text-center text-muted">
+                            Has completado exitosamente tu jornada laboral de hoy. <br/>
+                            <strong>¡Excelente trabajo!</strong> 💪
+                        </p>
+
+                        <!-- 💬 MENSAJE MOTIVACIONAL -->
+                        <div class="alert alert-success text-center mb-3">
+                            <strong>¡Nos vemos!</strong><br/>
+                            <small>Que tengas un excelente resto del día 😊</small>
+                        </div>
+
+                        <!-- 🔄 BOTÓN DE NUEVA JORNADA (opcional, para casos especiales) -->
+                        <div class="text-center">
+                            <small class="text-muted">
+                                <i class="fa fa-info-circle me-1"/>
+                                Si necesitas registrar una nueva entrada, contacta a tu supervisor
+                            </small>
+                        </div>
                     </div>
                     
                 </div>
