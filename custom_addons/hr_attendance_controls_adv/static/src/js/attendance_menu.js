@@ -427,7 +427,6 @@ patch(ActivityMenu.prototype, {
     
     async signInOut() {
         const self = this;
-        console.log("Sign in out clicked");
         
         // 🚀 TEMPORALMENTE: Llamar al método padre para que funcione básicamente
         await super.signInOut();
