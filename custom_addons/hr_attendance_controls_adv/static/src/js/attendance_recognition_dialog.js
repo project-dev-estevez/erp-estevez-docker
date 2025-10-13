@@ -6,36 +6,36 @@ import { onMounted, useState, useRef, Component } from "@odoo/owl";
 import { useService } from "@web/core/utils/hooks";
 
 export class AttendanceRecognitionDialog extends Component {
+
     setup() {
-        this.title = _t("Face Recognition");
 
-        this.videoRef = useRef("video");
-        this.imageRef = useRef("image");
-        this.canvasRef = useRef("canvas");
-        this.selectRef = useRef("select");
-        this.progressRef = useRef("progress");
+      this.notificationService = useService('notification');
 
-        this.notificationService = useService('notification');
+      this.videoRef = useRef("video");
+      this.imageRef = useRef("image");
+      this.canvasRef = useRef("canvas");
+      this.selectRef = useRef("select");
+      this.progressRef = useRef("progress");
 
-        this.state = useState({
-          videoElwidth: 0,
-          videoElheight: 0,
-          intervalID: false,
-          match_employee_id : false,
-          match_count : [],
-          attendanceUpdated: false,
-          smileTime: 0,
-          smiling: false,
-          progressPercent: 0,
-          smilePhaseCompleted: false,
-        });
+      this.state = useState({
+        videoElwidth: 0,
+        videoElheight: 0,
+        intervalID: false,
+        match_employee_id : false,
+        match_count : [],
+        attendanceUpdated: false,
+        smileTime: 0,
+        smiling: false,
+        progressPercent: 0,
+        smilePhaseCompleted: false,
+      });
 
-        this.faceapi = this.props.faceapi;
-        this.descriptors = this.props.labeledFaceDescriptors;
+      this.faceapi = this.props.faceapi;
+      this.descriptors = this.props.labeledFaceDescriptors;
 
-        onMounted(async () => {
-            await this.loadWebcam();            
-        });  
+      onMounted(async () => {
+          await this.loadWebcam();            
+      });  
     }
 
     loadWebcam(){
