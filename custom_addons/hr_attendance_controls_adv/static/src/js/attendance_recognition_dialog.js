@@ -1,9 +1,9 @@
 /** @odoo-module **/
 
-import { _t } from "@web/core/l10n/translation";
 import { Dialog } from "@web/core/dialog/dialog";
 import { onMounted, useState, useRef, Component } from "@odoo/owl";
 import { useService } from "@web/core/utils/hooks";
+import { FACE_DETECTION_CONFIG, FACE_DETECTION_MESSAGES } from "./attendance_recognition_config";
 
 export class AttendanceRecognitionDialog extends Component {
 
@@ -39,76 +39,76 @@ export class AttendanceRecognitionDialog extends Component {
     }
 
     loadWebcam(){
-        var self = this;
-        if (navigator.mediaDevices) {            
-            var videoElement = this.videoRef.el;
-            var imageElement = this.imageRef.el;
-            var videoSelect =this.selectRef.el;
-            const selectors = [videoSelect];
+      var self = this;
 
-            startStream();
-            videoSelect.onchange = startStream;
-            navigator.mediaDevices.enumerateDevices().then(gotDevices).catch(handleError);
+      if (!navigator.mediaDevices) {
+        this.notificationService.add( FACE_DETECTION_MESSAGES.HTTPS_WARNING, { type: "danger" } );
+        return;
+      }
 
-            function startStream() {
-                if (window.stream) {
-                  window.stream.getTracks().forEach(track => track.stop());
-                }
-                const videoSource = videoSelect.value;
-                const constraints = {
-                  video: {deviceId: videoSource ? {exact: videoSource} : undefined}
-                };
-                navigator.mediaDevices.getUserMedia(constraints)
-                  .then(gotStream)
-                  .then(gotDevices)
-                  .catch(handleError);
+      var videoElement = this.videoRef.el;
+      var imageElement = this.imageRef.el;
+      var videoSelect =this.selectRef.el;
+      const selectors = [videoSelect];
+
+      startStream();
+      videoSelect.onchange = startStream;
+      navigator.mediaDevices.enumerateDevices().then(gotDevices).catch(handleError);
+
+      function startStream() {
+          if (window.stream) {
+            window.stream.getTracks().forEach(track => track.stop());
+          }
+          const videoSource = videoSelect.value;
+          const constraints = {
+            video: {deviceId: videoSource ? {exact: videoSource} : undefined}
+          };
+          navigator.mediaDevices.getUserMedia(constraints)
+            .then(gotStream)
+            .then(gotDevices)
+            .catch(handleError);
+      }
+
+      function gotStream(stream) {
+          window.stream = stream;
+          videoElement.srcObject = stream;
+          videoElement.onloadedmetadata = function(e) {
+              videoElement.play().then(function(){
+                self.onLoadStream();
+              });
+              self.state.videoEl = videoElement;
+              self.state.imageEl = imageElement;
+              self.state.videoElwidth = videoElement.offsetWidth;
+              self.state.videoElheight = videoElement.offsetHeight;
+          };
+          return navigator.mediaDevices.enumerateDevices();
+      }
+
+      function gotDevices(deviceInfos) {
+          const values = selectors.map(select => select.value);
+          selectors.forEach(select => {
+            while (select.firstChild) select.removeChild(select.firstChild);
+          });
+          for (let i = 0; i !== deviceInfos.length; ++i) {
+            const deviceInfo = deviceInfos[i];
+            const option = document.createElement('option');
+            option.value = deviceInfo.deviceId;
+            if (deviceInfo.kind === 'videoinput') {
+              option.text = deviceInfo.label || `camera ${videoSelect.length + 1}`;
+              videoSelect.appendChild(option);
             }
-
-            function gotStream(stream) {
-                window.stream = stream;
-                videoElement.srcObject = stream;
-                videoElement.onloadedmetadata = function(e) {
-                    videoElement.play().then(function(){
-                      self.onLoadStream();
-                    });
-                    self.state.videoEl = videoElement;
-                    self.state.imageEl = imageElement;
-                    self.state.videoElwidth = videoElement.offsetWidth;
-                    self.state.videoElheight = videoElement.offsetHeight;
-                };
-                return navigator.mediaDevices.enumerateDevices();
+          }
+          selectors.forEach((select, selectorIndex) => {
+            if (Array.prototype.slice.call(select.childNodes).some(n => n.value === values[selectorIndex])) {
+              select.value = values[selectorIndex];
             }
+          });
+      }
+      
+      function handleError(error) {
+          console.log('navigator.MediaDevices.getUserMedia error: ', error.message, error.name);
+      } 
 
-            function gotDevices(deviceInfos) {
-                const values = selectors.map(select => select.value);
-                selectors.forEach(select => {
-                  while (select.firstChild) select.removeChild(select.firstChild);
-                });
-                for (let i = 0; i !== deviceInfos.length; ++i) {
-                  const deviceInfo = deviceInfos[i];
-                  const option = document.createElement('option');
-                  option.value = deviceInfo.deviceId;
-                  if (deviceInfo.kind === 'videoinput') {
-                    option.text = deviceInfo.label || `camera ${videoSelect.length + 1}`;
-                    videoSelect.appendChild(option);
-                  }
-                }
-                selectors.forEach((select, selectorIndex) => {
-                  if (Array.prototype.slice.call(select.childNodes).some(n => n.value === values[selectorIndex])) {
-                    select.value = values[selectorIndex];
-                  }
-                });
-            }
-            
-            function handleError(error) {
-                console.log('navigator.MediaDevices.getUserMedia error: ', error.message, error.name);
-            }               
-        }
-        else{
-            this.notificationService.add(
-              _t("https Failed: Warning! WEBCAM MAY ONLY WORKS WITH HTTPS CONNECTIONS. So your Odoo instance must be configured in https mode."), 
-              { type: "danger" });
-        }
     }
 
     onLoadStream(){
@@ -136,26 +136,29 @@ export class AttendanceRecognitionDialog extends Component {
 
           if (detections && detections.expressions) {
               const happyScore = detections.expressions.happy || 0;
-              if (happyScore > 0.6) {
+              if (happyScore > FACE_DETECTION_CONFIG.SMILE.HAPPINESS_THRESHOLD) {
                   self.state.smiling = true;
-                  self.state.smileTime += 0.2; // cada 200ms
+                  self.state.smileTime += FACE_DETECTION_CONFIG.SMILE.TIME_INCREMENT; // cada 200ms
               } else {
                   self.state.smiling = false;
                   self.state.smileTime = 0;
               }
 
-              self.state.progressPercent = Math.min((self.state.smileTime / 10) * 100, 100);
+              self.state.progressPercent = Math.min(
+                (self.state.smileTime / FACE_DETECTION_CONFIG.SMILE.REQUIRED_DURATION) * 100, 
+                100
+              );
               if (self.progressRef.el)
                 self.progressRef.el.style.width = `${self.state.progressPercent}%`;
 
-              if (self.state.smileTime >= 10 && !self.state.smilePhaseCompleted) {
+              if (self.state.smileTime >= FACE_DETECTION_CONFIG.SMILE.REQUIRED_DURATION && !self.state.smilePhaseCompleted) {
                   self.state.smilePhaseCompleted = true;
                   clearInterval(self.state.intervalID);
-                  self.notificationService.add(_t("¡Excelente! Sonrisa detectada correctamente 😁"), {type: "success"});
-                  setTimeout(() => self.FaceDetector(video, canvas), 1000);
+                  self.notificationService.add( FACE_DETECTION_MESSAGES.SMILE_SUCCESS, {type: "success"} );
+                  setTimeout(() => self.FaceDetector(video, canvas), FACE_DETECTION_CONFIG.UI.SMILE_COMPLETION_DELAY);
               }
           }
-      }, 200);
+      }, FACE_DETECTION_CONFIG.SMILE.DETECTION_INTERVAL);
     }
 
     async FaceDetector(video, canvas) {
@@ -163,11 +166,11 @@ export class AttendanceRecognitionDialog extends Component {
       var image =  self.state.imageEl;
 
       if (!video || !this.isFaceDetectionModelLoaded() || self.descriptors.length === 0) {
-          return setTimeout(() => this.FaceDetector(video, canvas), 500);
+          return setTimeout(() => this.FaceDetector(video, canvas), FACE_DETECTION_CONFIG.RECOGNITION.RETRY_DELAY);
       }
 
       var options = new self.faceapi.TinyFaceDetectorOptions();
-      var maxDescriptorDistance = 0.45;
+      var maxDescriptorDistance = FACE_DETECTION_CONFIG.RECOGNITION.MAX_DESCRIPTOR_DISTANCE;
 
       var displaySize = { 
         width : self.state.videoElwidth,
@@ -188,7 +191,7 @@ export class AttendanceRecognitionDialog extends Component {
 
                 var faceMatcher = new faceapi.FaceMatcher(self.descriptors, maxDescriptorDistance);
                 const result = faceMatcher.findBestMatch(resizedDetections.descriptor);
-                if (result && result._label != 'unknown' && result._distance < 0.5) {
+                if (result && result._label != 'unknown' && result._distance < FACE_DETECTION_CONFIG.RECOGNITION.MAX_MATCH_DISTANCE) {
                     self.state.match_count.push(result._label);
 
                     var employee = result._label.split(',');
@@ -201,11 +204,12 @@ export class AttendanceRecognitionDialog extends Component {
                         drawBox.draw(canvas);
                     }
 
-                    if (self.state.match_employee_id && self.state.match_count.length > 2 && !self.state.attendanceUpdated) {
+                    if (self.state.match_employee_id && self.state.match_count.length > FACE_DETECTION_CONFIG.RECOGNITION.MIN_MATCH_COUNT && !self.state.attendanceUpdated) {
                         self.state.attendanceUpdated = true; 
                         clearInterval(self.state.intervalID);
                         let { box } = resizedDetections.detection;
-                        let region = new faceapi.Rect(box.x-100, box.y-100, box.width+200, box.height+200);
+                        const padding = FACE_DETECTION_CONFIG.IMAGE_CAPTURE.FACE_PADDING;
+                        let region = new faceapi.Rect(box.x-padding, box.y-padding, box.width+(padding*2), box.height+(padding*2));
                         let faces = await faceapi.extractFaces(video, [region]);
 
                         if (faces.length > 0) {
@@ -217,7 +221,7 @@ export class AttendanceRecognitionDialog extends Component {
                     }
                 }
             }
-        }, 200);
+        }, FACE_DETECTION_CONFIG.RECOGNITION.DETECTION_INTERVAL);
       } 
       catch (e) { console.error(e); }
     }
