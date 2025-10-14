@@ -16,7 +16,7 @@
                                 style="width: 0%;" aria-valuemin="0" aria-valuemax="100"
                                 t-ref="progress"></div>
                         </div>
-                        <small class="text-center d-block mt-1 text-muted">Por favor sonríe durante 10 segundos 😊</small>
+                        <small class="text-center d-block mt-1 text-muted">Por favor sonríe durante 5 segundos 😊</small>
                     </div>
                 </div>
 

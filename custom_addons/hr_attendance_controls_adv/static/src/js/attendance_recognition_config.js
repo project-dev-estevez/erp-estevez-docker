@@ -6,17 +6,21 @@ export const FACE_DETECTION_CONFIG = {
     SMILE: {
         HAPPINESS_THRESHOLD: 0.6,        // Umbral mínimo de felicidad (0-1)
         TIME_INCREMENT: 0.2,             // Incremento por detección (segundos)
-        REQUIRED_DURATION: 10,           // Duración total requerida (segundos)
+        REQUIRED_DURATION: 5,            // Duración total requerida (segundos) - CAMBIADO A 5s
         DETECTION_INTERVAL: 200,         // Intervalo entre detecciones (ms)
     },
     
     // Configuración de reconocimiento facial
     RECOGNITION: {
-        MAX_DESCRIPTOR_DISTANCE: 0.45,   // Distancia máxima para descriptores
-        MAX_MATCH_DISTANCE: 0.5,         // Distancia máxima para matches válidos
-        MIN_MATCH_COUNT: 2,              // Mínimo de matches consecutivos
-        DETECTION_INTERVAL: 200,         // Intervalo entre detecciones (ms)
-        RETRY_DELAY: 500,                // Delay para reintentos (ms)
+        MAX_DESCRIPTOR_DISTANCE: 0.45,          // Distancia máxima para descriptores
+        MAX_MATCH_DISTANCE: 0.5,                // Distancia máxima para matches válidos
+        MIN_MATCH_COUNT: 2,                     // Mínimo de matches consecutivos
+        DETECTION_INTERVAL: 200,                // Intervalo entre detecciones (ms)
+        RETRY_DELAY: 500,                       // Delay para reintentos (ms)
+        INITIAL_DISTANCE: 0.45,                 // Distancia para reconocimiento inicial
+        SMILE_VALIDATION_DISTANCE: 0.5,         // Distancia para validar sonrisa
+        FINAL_VALIDATION_DISTANCE: 0.5,         // Distancia para validación final
+        INITIAL_TIMEOUT: 10000,                 // Timeout para reconocimiento inicial (ms)
     },
     
     // Configuración de captura de imagen
@@ -39,13 +43,14 @@ export const FACE_DETECTION_MESSAGES = {
     HTTPS_WARNING: "Error HTTPS: ¡La cámara web solo funciona con conexiones HTTPS! Tu instancia de Odoo debe estar configurada en modo HTTPS.",
     WEBCAM_ERROR: "Error de cámara web: ",
     FACE_RECOGNITION_START: "Iniciando reconocimiento facial...",
+    INITIAL_RECOGNITION_TIMEOUT: "⏰ Tiempo agotado: No se pudo identificar ningún empleado registrado. Por favor, asegúrese de estar bien iluminado y frente a la cámara.",
     NO_EMPLOYEE_DETECTED: "No se detectó ningún empleado registrado",
 };
 
-// 🎭 FASES DEL PROCESO (para futuras mejoras)
+// 🎭 FASES DEL PROCESO DE SEGURIDAD
 export const DETECTION_PHASES = {
-    INITIALIZING: 'initializing',
-    SMILE_DETECTION: 'smile_detection',
-    FACE_RECOGNITION: 'face_recognition',
-    COMPLETED: 'completed',
+    INITIAL_RECOGNITION: 'initial_recognition',
+    SMILE_VALIDATION: 'smile_validation', 
+    FINAL_RECOGNITION: 'final_recognition',
+    COMPLETED: 'completed'
 };
