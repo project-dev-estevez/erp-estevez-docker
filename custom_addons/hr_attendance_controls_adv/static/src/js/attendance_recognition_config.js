@@ -8,6 +8,7 @@ export const FACE_DETECTION_CONFIG = {
         TIME_INCREMENT: 0.2,             // Incremento por detección (segundos)
         REQUIRED_DURATION: 5,            // Duración total requerida (segundos) - CAMBIADO A 5s
         DETECTION_INTERVAL: 200,         // Intervalo entre detecciones (ms)
+        MOBILE_DETECTION_INTERVAL: 400,  // Intervalo más largo para móviles (ms)
     },
     
     // Configuración de reconocimiento facial
@@ -16,11 +17,12 @@ export const FACE_DETECTION_CONFIG = {
         MAX_MATCH_DISTANCE: 0.5,                // Distancia máxima para matches válidos
         MIN_MATCH_COUNT: 2,                     // Mínimo de matches consecutivos
         DETECTION_INTERVAL: 200,                // Intervalo entre detecciones (ms)
+        MOBILE_DETECTION_INTERVAL: 400,         // Intervalo más largo para móviles (ms)
         RETRY_DELAY: 500,                       // Delay para reintentos (ms)
         INITIAL_DISTANCE: 0.45,                 // Distancia para reconocimiento inicial
         SMILE_VALIDATION_DISTANCE: 0.5,         // Distancia para validar sonrisa
         FINAL_VALIDATION_DISTANCE: 0.5,         // Distancia para validación final
-        INITIAL_TIMEOUT: 10000,                 // Timeout para reconocimiento inicial (ms)
+        INITIAL_TIMEOUT: 15000,                 // Timeout para reconocimiento inicial (ms) - Aumentado para móviles
     },
     
     // Configuración de captura de imagen

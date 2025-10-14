@@ -46,6 +46,11 @@ export class AttendanceRecognitionDialog extends Component {
     loadWebcam(){
       var self = this;
 
+      // 📱 Detectar si es dispositivo móvil
+      const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+      self.isMobile = isMobile;
+      console.log(`📱 Device type: ${isMobile ? 'Mobile' : 'Desktop'}`);
+
       if (!navigator.mediaDevices) {
         this.notificationService.add( FACE_DETECTION_MESSAGES.HTTPS_WARNING, { type: "danger" } );
         return;
@@ -65,9 +70,20 @@ export class AttendanceRecognitionDialog extends Component {
             window.stream.getTracks().forEach(track => track.stop());
           }
           const videoSource = videoSelect.value;
+          
+          // 📱 Configuración optimizada para móviles
           const constraints = {
-            video: {deviceId: videoSource ? {exact: videoSource} : undefined}
+            video: {
+              deviceId: videoSource ? {exact: videoSource} : undefined,
+              width: { ideal: 640, max: 1280 },
+              height: { ideal: 480, max: 720 },
+              frameRate: { ideal: 15, max: 30 },
+              facingMode: videoSource ? undefined : "user" // Cámara frontal por defecto en móviles
+            }
           };
+          
+          console.log('📱 Starting camera with mobile-optimized constraints:', constraints);
+          
           navigator.mediaDevices.getUserMedia(constraints)
             .then(gotStream)
             .then(gotDevices)
@@ -166,8 +182,9 @@ export class AttendanceRecognitionDialog extends Component {
             this.state.initialRecognitionCount = 0;
         }
 
-        // Continuar con el reconocimiento inicial
-        setTimeout(() => this.initialRecognition(), 500);
+        // Continuar con el reconocimiento inicial (interval más largo para móviles)
+        const retryInterval = this.isMobile ? 800 : 500;
+        setTimeout(() => this.initialRecognition(), retryInterval);
     }
 
     _handleInitialRecognitionTimeout() {
@@ -276,7 +293,7 @@ export class AttendanceRecognitionDialog extends Component {
                   setTimeout(() => self.FaceDetector(), FACE_DETECTION_CONFIG.UI.SMILE_COMPLETION_DELAY);
               }
           }
-      }, FACE_DETECTION_CONFIG.SMILE.DETECTION_INTERVAL);
+      }, self.isMobile ? FACE_DETECTION_CONFIG.SMILE.MOBILE_DETECTION_INTERVAL : FACE_DETECTION_CONFIG.SMILE.DETECTION_INTERVAL);
     }
 
     _resetToInitialRecognition() {
@@ -423,7 +440,7 @@ export class AttendanceRecognitionDialog extends Component {
                     console.log('❌ Reconocimiento final fallido, continuando...');
                 }
             }
-        }, FACE_DETECTION_CONFIG.RECOGNITION.DETECTION_INTERVAL);
+        }, self.isMobile ? FACE_DETECTION_CONFIG.RECOGNITION.MOBILE_DETECTION_INTERVAL : FACE_DETECTION_CONFIG.RECOGNITION.DETECTION_INTERVAL);
       } 
       catch (e) { console.error(e); }
     }
