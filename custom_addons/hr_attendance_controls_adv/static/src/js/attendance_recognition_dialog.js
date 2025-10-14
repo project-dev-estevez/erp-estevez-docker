@@ -158,10 +158,10 @@ export class AttendanceRecognitionDialog extends Component {
 
         if (bestMatch.distance <= FACE_DETECTION_CONFIG.RECOGNITION.INITIAL_DISTANCE) {
             this.state.initialRecognitionCount++;
-            console.log(`✅ Reconocimiento inicial ${this.state.initialRecognitionCount}/3: ${bestMatch.labeledDescriptor.label} (distancia: ${bestMatch.distance.toFixed(3)})`);
+            console.log(`✅ Reconocimiento inicial ${this.state.initialRecognitionCount}/1: ${bestMatch.labeledDescriptor.label} (distancia: ${bestMatch.distance.toFixed(3)})`);
             
-            if (this.state.initialRecognitionCount >= 3) {
-                console.log('🎯 ¡Empleado autorizado! Pasando a fase de sonrisa...');
+            if (this.state.initialRecognitionCount >= 1) {
+                console.log('🎯 ¡Empleado autorizado inmediatamente! Pasando a fase de sonrisa...');
                 
                 // Limpiar timer de timeout ya que se identificó exitosamente
                 if (this.state.initialRecognitionTimer) {

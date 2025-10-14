@@ -22,7 +22,7 @@ export const FACE_DETECTION_CONFIG = {
         INITIAL_DISTANCE: 0.45,                 // Distancia para reconocimiento inicial
         SMILE_VALIDATION_DISTANCE: 0.5,         // Distancia para validar sonrisa
         FINAL_VALIDATION_DISTANCE: 0.5,         // Distancia para validación final
-        INITIAL_TIMEOUT: 15000,                 // Timeout para reconocimiento inicial (ms) - Aumentado para móviles
+        INITIAL_TIMEOUT: 10000,                  // Timeout para reconocimiento inicial (ms) - Reducido a 10s
     },
     
     // Configuración de captura de imagen
@@ -45,7 +45,7 @@ export const FACE_DETECTION_MESSAGES = {
     HTTPS_WARNING: "Error HTTPS: ¡La cámara web solo funciona con conexiones HTTPS! Tu instancia de Odoo debe estar configurada en modo HTTPS.",
     WEBCAM_ERROR: "Error de cámara web: ",
     FACE_RECOGNITION_START: "Iniciando reconocimiento facial...",
-    INITIAL_RECOGNITION_TIMEOUT: "⏰ Tiempo agotado: No se pudo identificar ningún empleado registrado. Por favor, asegúrese de estar bien iluminado y frente a la cámara.",
+    INITIAL_RECOGNITION_TIMEOUT: "⏰ Tiempo agotado (8 segundos): No se pudo identificar ningún empleado registrado. Por favor, asegúrese de estar bien iluminado y frente a la cámara.",
     NO_EMPLOYEE_DETECTED: "No se detectó ningún empleado registrado",
 };
 
