@@ -157,8 +157,21 @@ export class AttendanceRecognitionDialog extends Component {
         }, { distance: Infinity });
 
         if (bestMatch.distance <= FACE_DETECTION_CONFIG.RECOGNITION.INITIAL_DISTANCE) {
+            // 🔐 VALIDACIÓN CRÍTICA: Solo autorizar al empleado logueado
+            const detectedEmployeeId = bestMatch.labeledDescriptor.label.split(',')[0];
+            
+            if (this.props.currentEmployeeId && detectedEmployeeId !== this.props.currentEmployeeId) {
+                console.log(`🚫 Empleado no autorizado detectado. Logueado: ${this.props.currentEmployeeId}, Detectado: ${detectedEmployeeId}`);
+                this.notificationService.add(
+                    `Acceso denegado: Este sistema solo puede ser usado por el empleado logueado.`, 
+                    { type: "danger" }
+                );
+                this.onClose();
+                return;
+            }
+            
             this.state.initialRecognitionCount++;
-            console.log(`✅ Reconocimiento inicial ${this.state.initialRecognitionCount}/1: ${bestMatch.labeledDescriptor.label} (distancia: ${bestMatch.distance.toFixed(3)})`);
+            console.log(`✅ Reconocimiento inicial ${this.state.initialRecognitionCount}/1: ${bestMatch.labeledDescriptor.label} (distancia: ${bestMatch.distance.toFixed(3)}) - EMPLEADO AUTORIZADO`);
             
             if (this.state.initialRecognitionCount >= 1) {
                 console.log('🎯 ¡Empleado autorizado inmediatamente! Pasando a fase de sonrisa...');
@@ -481,5 +494,6 @@ AttendanceRecognitionDialog.defaultProps = {};
 AttendanceRecognitionDialog.props = {
   faceapi: false,
   labeledFaceDescriptors : [],
+  currentEmployeeId: { type: String, optional: true }, // ID del empleado logueado
   close: Function,
 };

@@ -572,6 +572,7 @@ patch(ActivityMenu.prototype, {
                         self.dialog.add(AttendanceRecognitionDialog, {
                             faceapi: faceapi,
                             labeledFaceDescriptors: self.labeledFaceDescriptors,
+                            currentEmployeeId: self.employee.id.toString(), // 🔐 Pasar ID del empleado logueado
                             updateRecognitionAttendance: (rdata) => {
                                 if (parseInt(self.employee.id) !== parseInt(rdata.employee_id)) {
                                     reject("The detected employee does not match the logged-in employee.");
