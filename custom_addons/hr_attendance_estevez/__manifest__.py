@@ -22,7 +22,7 @@
         'assets': {
             'web.assets_backend': [
                 # Incluye los assets originales como dependencia explícita
-                # 'hr_attendance_estevez/static/src/components/**/*.xml',
+                'hr_attendance_estevez/static/src/scss/**/*.scss',
                 # 'hr_attendance_estevez/static/src/components/**/*.scss',
                 # 'hr_attendance_estevez/static/src/components/**/*.js',
             ],

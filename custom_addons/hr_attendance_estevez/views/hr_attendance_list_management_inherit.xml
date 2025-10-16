@@ -23,7 +23,10 @@
                         invisible="check_in_latitude == False or check_in_longitude == False"/>
             </xpath>
 
-            <xpath expr="//field[@name='check_out']" position="after">
+            <xpath expr="//field[@name='check_out']" position="replace">
+
+                <field name="check_out"/>
+
                 <button name="action_show_checkout_photo"
                         type="object"
                         string=""
