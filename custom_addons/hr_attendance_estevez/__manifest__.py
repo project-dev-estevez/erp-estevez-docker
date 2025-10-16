@@ -9,6 +9,7 @@
     "data": [
         "security/hr_attendance_security.xml",
         "security/ir.model.access.csv",
+        "data/ir_cron_data.xml",  # 🕚 Cronjob para cerrar asistencias automáticamente
         "views/hr_attendance_view_form_inherit.xml",
         "views/hr_attendance_list_management_inherit.xml",
         "views/hr_attendance_employee_views.xml",

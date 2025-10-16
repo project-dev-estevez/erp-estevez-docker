@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="ir_cron_auto_close_attendances" model="ir.cron">
+        <field name="name">HR Attendance: Auto Close Open Attendances at 11:58 PM Mexico Time</field>
+        <field name="model_id" ref="hr_attendance.model_hr_attendance"/>
+        <field name="state">code</field>
+        <field name="code">model.auto_close_open_attendances()</field>
+        <field name="active" eval="True"/>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="nextcall" eval="(datetime.now() + timedelta(days=1)).replace(hour=4, minute=58, second=0).strftime('%Y-%m-%d %H:%M:%S')" />
+    </record>
+
+</odoo>
