@@ -5,7 +5,7 @@
     "version": "1.0.0",
     "author": "Estevez.Jor",
     "category": "Human Resources",
-    "depends": ["hr_attendance_controls_adv"],
+    "depends": ["hr_attendance", "hr_attendance_controls_adv"],
     "data": [
         "security/hr_attendance_security.xml",
         "security/ir.model.access.csv",

@@ -25,6 +25,11 @@
         </field>
     </record>
 
+    <!-- Hereda la accion original y remueve los filtros por default -->
+    <record id="hr_attendance.hr_attendance_action" model="ir.actions.act_window">
+        <field name="context">{}</field>
+    </record>
+
     <!-- Acción de ventana para empleados - Usa vista personalizada -->
     <record id="action_hr_attendance_employee" model="ir.actions.act_window">
         <field name="name">Mis Asistencias</field>
