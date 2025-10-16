@@ -1,6 +1,7 @@
 from odoo import models, fields, api
-from datetime import datetime, timezone, timedelta as td
+from datetime import datetime
 import logging
+import pytz
         
 _logger = logging.getLogger(__name__)
 
@@ -26,7 +27,7 @@ class HrAttendance(models.Model):
 
     status = fields.Selection([
         ('pending', 'Pendiente'),
-        ('retarded', 'Retardado'),
+        ('retarded', 'Retardo'),
         ('approved', 'Aprobado'),
         ('rejected', 'Rechazado')], 
         string='Estado', 
@@ -53,6 +54,24 @@ class HrAttendance(models.Model):
         default=False,
         tracking=True
     )
+
+    check_out_display = fields.Char(string='Salida', compute='_compute_check_out_display')
+
+    @api.depends('check_out', 'is_auto_closed')
+    def _compute_check_out_display(self):
+        for record in self:
+            if record.is_auto_closed and not record.check_out:
+                record.check_out_display = 'No Registró'
+            elif record.check_out:
+                # Obtener zona horaria del usuario actual o México por defecto
+                user_tz = self.env.user.tz or 'America/Mexico_City'
+                tz = pytz.timezone(user_tz)
+                
+                # Convertir de UTC a la zona horaria del usuario
+                check_out_local = pytz.utc.localize(record.check_out).astimezone(tz)
+                record.check_out_display = check_out_local.strftime('%d-%m-%Y %H:%M:%S')
+            else:
+                record.check_out_display = ''
 
     @api.depends('check_in', 'check_out')
     def _compute_check_dates(self):

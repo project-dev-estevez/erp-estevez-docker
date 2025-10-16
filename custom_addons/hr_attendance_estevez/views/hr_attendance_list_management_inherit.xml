@@ -24,9 +24,13 @@
             </xpath>
 
             <xpath expr="//field[@name='check_out']" position="replace">
+                <field name="is_auto_closed" column_invisible="1"/>
+                <field name="check_out_display" 
+                       string="Salida"
+                       decoration-warning="is_auto_closed == True and not check_out"/>
+            </xpath>
 
-                <field name="check_out"/>
-
+            <xpath expr="//field[@name='check_out_display']" position="after">
                 <button name="action_show_checkout_photo"
                         type="object"
                         string=""
