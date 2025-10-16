@@ -6,7 +6,7 @@ export const FACE_DETECTION_CONFIG = {
     SMILE: {
         HAPPINESS_THRESHOLD: 0.6,        // Umbral mínimo de felicidad (0-1)
         TIME_INCREMENT: 0.2,             // Incremento por detección (segundos)
-        REQUIRED_DURATION: 5,            // Duración total requerida (segundos) - CAMBIADO A 5s
+        REQUIRED_DURATION: 2,            // Duración total requerida (segundos) - CAMBIADO A 2s ⚡
         DETECTION_INTERVAL: 200,         // Intervalo entre detecciones (ms)
         MOBILE_DETECTION_INTERVAL: 400,  // Intervalo más largo para móviles (ms)
     },

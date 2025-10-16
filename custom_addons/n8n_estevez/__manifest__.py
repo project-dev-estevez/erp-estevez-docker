@@ -8,7 +8,7 @@
     'data': [],
     'assets': {
         'web.assets_backend': [
-            '/n8n_estevez/static/src/js/n8n_chat.js',
+            # '/n8n_estevez/static/src/js/n8n_chat.js',
         ],
     },
     'installable': True,
