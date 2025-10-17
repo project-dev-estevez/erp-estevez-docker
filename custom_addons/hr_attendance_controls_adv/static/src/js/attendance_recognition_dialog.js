@@ -161,7 +161,7 @@ export class AttendanceRecognitionDialog extends Component {
 
         if (
             this.state.matchedEmployeeId &&
-            this.state.matchCount.length > 2 &&
+            this.state.matchCount.length > 1 &&
             !this.state.attendanceUpdated
         ) {
             this.state.attendanceUpdated = true;
