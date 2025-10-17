@@ -1,252 +1,243 @@
 /** @odoo-module **/
 
-import { _t } from "@web/core/l10n/translation";
 import { Dialog } from "@web/core/dialog/dialog";
-import { onMounted, useState, useRef, Component } from "@odoo/owl";
+import { onMounted, useState, useRef, Component, onWillUnmount } from "@odoo/owl";
 import { useService } from "@web/core/utils/hooks";
 
 export class AttendanceRecognitionDialog extends Component {
     setup() {
-
+        // Refs
         this.videoRef = useRef("video");
         this.imageRef = useRef("image");
         this.canvasRef = useRef("canvas");
         this.selectRef = useRef("select");
 
-        this.notificationService = useService('notification');
+        // Services
+        this.notificationService = useService("notification");
 
+        // State
         this.state = useState({
-          videoElwidth: 0,
-          videoElheight: 0,
-          intervalID: false,
-          match_employee_id : false,
-          match_count : [],
-          attendanceUpdated: false,
-        })
+            videoWidth: 0,
+            videoHeight: 0,
+            intervalId: null,
+            matchedEmployeeId: null,
+            matchCount: [],
+            attendanceUpdated: false,
+        });
 
+        // Props
         this.faceapi = this.props.faceapi;
         this.descriptors = this.props.labeledFaceDescriptors;
 
+        // Lifecycle
         onMounted(async () => {
-            await this.loadWebcam();            
-        });  
+            await this.initWebcam();
+        });
+
+        onWillUnmount(() => this.cleanUp());
     }
-    loadWebcam(){
-        var self = this;
-        if (navigator.mediaDevices) {            
-            var videoElement = this.videoRef.el;
-            var imageElement = this.imageRef.el;
-            var videoSelect =this.selectRef.el;
-            const selectors = [videoSelect]
 
-            startStream();
-
-            videoSelect.onchange = startStream;
-            navigator.mediaDevices.enumerateDevices().then(gotDevices).catch(handleError);
-
-            function startStream() {
-                if (window.stream) {
-                  window.stream.getTracks().forEach(track => {
-                    track.stop();
-                  });
-                }
-                const videoSource = videoSelect.value;
-                const constraints = {
-                  video: {deviceId: videoSource ? {exact: videoSource} : undefined}
-                };
-                navigator.mediaDevices.getUserMedia(constraints).then(gotStream).then(gotDevices).catch(handleError);
-            }
-
-            function gotStream(stream) {
-                window.stream = stream; // make stream available to console
-                videoElement.srcObject = stream;
-                // Refresh button list in case labels have become available
-                videoElement.onloadedmetadata = function(e) {
-                    videoElement.play().then(function(){
-                      self.onLoadStream();
-                    });
-                    self.state.videoEl = videoElement;
-                    self.state.imageEl = imageElement;
-                    self.state.videoElwidth = videoElement.offsetWidth;
-                    self.state.videoElheight = videoElement.offsetHeight;
-                };
-                return navigator.mediaDevices.enumerateDevices();
-            }
-
-            function gotDevices(deviceInfos) {
-                // Handles being called several times to update labels. Preserve values.
-                const values = selectors.map(select => select.value);
-                selectors.forEach(select => {
-                  while (select.firstChild) {
-                    select.removeChild(select.firstChild);
-                  }
-                });
-                for (let i = 0; i !== deviceInfos.length; ++i) {
-                  const deviceInfo = deviceInfos[i];
-                  const option = document.createElement('option');
-                  option.value = deviceInfo.deviceId;
-                  if (deviceInfo.kind === 'videoinput') {
-                    option.text = deviceInfo.label || `camera ${videoSelect.length + 1}`;
-                    videoSelect.appendChild(option);
-                  } 
-                  else {
-                    // console.log('Some other kind of source/device: ', deviceInfo);
-                  }
-                }
-                selectors.forEach((select, selectorIndex) => {
-                  if (Array.prototype.slice.call(select.childNodes).some(n => n.value === values[selectorIndex])) {
-                    select.value = values[selectorIndex];
-                  }
-                });
-            }
-            
-            function handleError(error) {
-                console.log('navigator.MediaDevices.getUserMedia error: ', error.message, error.name);
-            }               
+    // =======================
+    // 🎥 Webcam initialization
+    // =======================
+    async initWebcam() {
+        if (!navigator.mediaDevices) {
+            this.showHttpsError();
+            return;
         }
-        else{
-            this.notificationService.add(
-              _t("https Failed: Warning! WEBCAM MAY ONLY WORKS WITH HTTPS CONNECTIONS. So your Odoo instance must be configured in https mode."), 
-              { type: "danger" });
+
+        try {
+            const videoSelect = this.selectRef.el;
+            const devices = await navigator.mediaDevices.enumerateDevices();
+            this.populateDeviceList(devices, videoSelect);
+
+            videoSelect.onchange = () => this.startStream(videoSelect.value);
+            await this.startStream(videoSelect.value);
+        } catch (error) {
+            console.error("Error inicializando webcam:", error);
+            this.notify("No se pudo acceder a la cámara: " + error.message, "danger");
         }
     }
-    onLoadStream(){
-      var self = this;
-      if (self.state.intervalID) {
-          clearInterval(self.state.intervalID);
-      }
-      var video = self.state.videoEl;
-      var canvas =self.canvasRef.el;
-      self.FaceDetector(video, canvas);        
+
+    async startStream(deviceId) {
+        this.stopStream();
+
+        const constraints = {
+            video: deviceId ? { deviceId: { exact: deviceId } } : true,
+        };
+
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia(constraints);
+            const video = this.videoRef.el;
+            video.srcObject = stream;
+            window.stream = stream;
+
+            video.onloadedmetadata = async () => {
+                await video.play();
+                this.state.videoWidth = video.offsetWidth;
+                this.state.videoHeight = video.offsetHeight;
+                this.onVideoReady(video);
+            };
+        } catch (error) {
+            this.notify("Error al iniciar la cámara: " + error.message, "danger");
+        }
     }
-    async FaceDetector(video, canvas) {
-      var self = this;
-      var image =  self.state.imageEl;
 
-      if (video && video.paused || video && video.ended || !this.isFaceDetectionModelLoaded() || self.descriptors.length === 0) {
-          return setTimeout(() => this.FaceDetector())
-      }
+    populateDeviceList(devices, selectElement) {
+        const previousValue = selectElement.value;
+        selectElement.innerHTML = "";
 
-      var options = this.getFaceDetectorOptions();
-      var useTinyModel = true;
-      var maxDescriptorDistance = 0.45;
+        devices
+            .filter(d => d.kind === "videoinput")
+            .forEach((device, index) => {
+                const option = document.createElement("option");
+                option.value = device.deviceId;
+                option.text = device.label || `Cámara ${index + 1}`;
+                selectElement.appendChild(option);
+            });
 
-      var displaySize = { 
-        width : self.state.videoElwidth,
-        height : self.state.videoElheight,
-      };
+        // Restaurar selección previa si aplica
+        if ([...selectElement.options].some(opt => opt.value === previousValue)) {
+            selectElement.value = previousValue;
+        }
+    }
 
-      try {
-        self.faceapi.matchDimensions(canvas, displaySize);
-        self.state.intervalID = setInterval(async () => {          
-            canvas.getContext("2d").clearRect(0, 0, canvas.width, canvas.height);
-            const detections = await self.faceapi.detectSingleFace(video, options)
+    // =======================
+    // 🤖 Face detection logic
+    // =======================
+    async onVideoReady(video) {
+        const canvas = this.canvasRef.el;
+        await this.waitForModelsToLoad();
+        this.startFaceDetection(video, canvas);
+    }
+
+    async waitForModelsToLoad() {
+        while (!this.isFaceDetectionModelLoaded() || this.descriptors.length === 0) {
+            console.log("⏳ Esperando carga de modelos...");
+            await new Promise(resolve => setTimeout(resolve, 500));
+        }
+    }
+
+    startFaceDetection(video, canvas) {
+        this.clearInterval();
+        const displaySize = { width: this.state.videoWidth, height: this.state.videoHeight };
+        this.faceapi.matchDimensions(canvas, displaySize);
+
+        this.state.intervalId = setInterval(async () => {
+            const ctx = canvas.getContext("2d");
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            const detections = await this.faceapi
+                .detectSingleFace(video, this.getFaceDetectorOptions())
                 .withFaceLandmarks()
                 .withFaceDescriptor();
-            if (detections) {
-                if(displaySize.width == 0 || displaySize.height == 0){
-                    clearInterval(self.state.intervalID);
-                    return
-                }                
-                const resizedDetections = faceapi.resizeResults(detections, displaySize);
-                faceapi.draw.drawDetections(canvas, resizedDetections)
-                faceapi.draw.drawFaceLandmarks(canvas, resizedDetections)
 
-                if (resizedDetections && Object.keys(resizedDetections).length > 0) {
-                    var faceMatcher = new faceapi.FaceMatcher(self.descriptors, maxDescriptorDistance);
-                    if (!faceMatcher || typeof faceMatcher === 'undefined' || faceMatcher === null){
-                      return;
-                    }
-                    const result = faceMatcher.findBestMatch(resizedDetections.descriptor);
-                    if (result && result._label != 'unknown' && result._distance < 0.5) {
-                        if (self.state.match_count.lenght != 'undefined') {
-                            self.state.match_count.push(result._label);
-                        } else if (self.match_count.includes(result._label)) {
-                            self.state.match_count.push(result._label);
-                        } else {
-                            self.state.match_count = [];
-                        }
+            if (!detections) return;
 
-                        var employee = result._label.split(',');
-                        self.state.match_employee_id = employee[0];
-                        var label = employee[1];
+            const resized = faceapi.resizeResults(detections, displaySize);
+            faceapi.draw.drawDetections(canvas, resized);
+            faceapi.draw.drawFaceLandmarks(canvas, resized);
 
-                        if (label) {
-                            const box = resizedDetections.detection.box;
-                            const drawBox = new faceapi.draw.DrawBox(box, { label: label.toString() });
-                            drawBox.draw(canvas);
-                        }
-
-                        if (self.state.match_employee_id && self.state.match_count.length > 2 && !self.state.attendanceUpdated) {
-                            self.state.attendanceUpdated = true; 
-                            clearInterval(self.state.intervalID);
-                            if (!self.state.intervalId) {
-                                let { box } = resizedDetections.detection;
-                                let region = new faceapi.Rect(box.x-100, box.y-100, box.width+200, box.height+200);
-                                let faces = await faceapi.extractFaces(video, [region]);
-
-                                if (faces.length > 0) {
-                                    let faceCanvas = faces && faces[0];
-                                    let faceBase64 = faceCanvas.toDataURL("image/jpeg");
-                                    faceBase64 = faceBase64.replace(/^data:image\/(png|jpg|jpeg);base64,/, "");
-                                    self.updateAttendance(self.state.match_employee_id, faceBase64);
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+            this.handleFaceMatch(resized, video, canvas);
         }, 200);
-      } 
-      catch (e) {}
     }
-    onClose() {
-      var self = this;
-      if (window.stream) {
-        window.stream.getTracks().forEach(track => {
-          track.stop();
-        });
-      }
-      if (self.state.intervalID) {
-        clearInterval(self.state.intervalID);
-      }
-      self.props.close && self.props.close();
-    }
-    async updateAttendance(employee_id, image){
-        if (!employee_id || !image){
-          return;
+
+    async handleFaceMatch(detection, video, canvas) {
+        const maxDistance = 0.45;
+        const matcher = new faceapi.FaceMatcher(this.descriptors, maxDistance);
+        const result = matcher.findBestMatch(detection.descriptor);
+
+        if (!result || result.label === "unknown" || result.distance >= 0.5) return;
+
+        const [employeeId, label] = result.label.split(",");
+        this.state.matchedEmployeeId = employeeId;
+
+        if (label) {
+            const box = detection.detection.box;
+            new faceapi.draw.DrawBox(box, { label }).draw(canvas);
         }
-        
-        this.props.updateRecognitionAttendance({
-          'employee_id': employee_id,
-          'image': image,
-        });
+
+        this.state.matchCount.push(result.label);
+
+        if (
+            this.state.matchedEmployeeId &&
+            this.state.matchCount.length > 2 &&
+            !this.state.attendanceUpdated
+        ) {
+            this.state.attendanceUpdated = true;
+            this.clearInterval();
+            await this.captureAndUpdateAttendance(video, detection, employeeId);
+        }
+    }
+
+    async captureAndUpdateAttendance(video, detection, employeeId) {
+        const { box } = detection.detection;
+        const region = new faceapi.Rect(box.x - 100, box.y - 100, box.width + 200, box.height + 200);
+        const [face] = await faceapi.extractFaces(video, [region]);
+        if (!face) return;
+
+        let faceBase64 = face.toDataURL("image/jpeg");
+        faceBase64 = faceBase64.replace(/^data:image\/(png|jpg|jpeg);base64,/, "");
+        this.updateAttendance(employeeId, faceBase64);
+    }
+
+    // =======================
+    // 🧹 Utility methods
+    // =======================
+    clearInterval() {
+        if (this.state.intervalId) clearInterval(this.state.intervalId);
+    }
+
+    stopStream() {
         if (window.stream) {
-            window.stream.getTracks().forEach(track => {
-                track.stop();
-            });
+            window.stream.getTracks().forEach(track => track.stop());
         }
+    }
+
+    cleanUp() {
+        this.clearInterval();
+        this.stopStream();
+    }
+
+    notify(message, type = "info") {
+        this.notificationService.add(message, { type });
+    }
+
+    showHttpsError() {
+        this.notify(
+            "Error HTTPS: La cámara web solo funciona con conexiones HTTPS. Tu instancia de Odoo debe estar configurada en modo HTTPS.",
+            "danger"
+        );
+    }
+
+    async updateAttendance(employeeId, image) {
+        if (!employeeId || !image) return;
+        this.props.updateRecognitionAttendance({ employee_id: employeeId, image });
+        this.cleanUp();
         this.props.close();
     }
+
+    // =======================
+    // ⚙️ FaceAPI helpers
+    // =======================
     getFaceDetectorOptions() {
-      let inputSize = 384; // by 32, common sizes are 128, 160, 224, 320, 416, 512, 608,
-      let scoreThreshold = 0.5;
-      return new self.faceapi.TinyFaceDetectorOptions(); // {inputSize, scoreThreshold }
+        return new this.faceapi.TinyFaceDetectorOptions({ inputSize: 384, scoreThreshold: 0.5 });
     }
 
     getCurrentFaceDetectionNet() {
-      return self.faceapi.nets.tinyFaceDetector;
+        return this.faceapi.nets.tinyFaceDetector;
     }
 
     isFaceDetectionModelLoaded() {
-      return !!this.getCurrentFaceDetectionNet().params
+        return !!this.getCurrentFaceDetectionNet().params;
     }
 }
+
 AttendanceRecognitionDialog.components = { Dialog };
 AttendanceRecognitionDialog.template = "attendance_face_recognition.AttendanceRecognitionDialog";
-AttendanceRecognitionDialog.defaultProps = {};
 AttendanceRecognitionDialog.props = {
-  faceapi: false,
-  labeledFaceDescriptors : [],
-  close: Function,
-}
+    faceapi: false,
+    labeledFaceDescriptors: [],
+    close: Function,
+};
+AttendanceRecognitionDialog.defaultProps = {};
