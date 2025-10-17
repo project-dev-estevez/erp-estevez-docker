@@ -68,6 +68,17 @@ patch(ActivityMenu.prototype, {
         });
     },
 
+    async loadDeviceInfo() {
+        try {
+
+            console.log("Navigator: ", navigator);
+
+        } catch (error) {
+            console.warn("No se pudo obtener información del dispositivo:", error);
+            this.state.deviceInfo = { error: error.message };
+        }
+    },
+
     async loadGeofences(){
         var self = this;
 
@@ -125,6 +136,7 @@ patch(ActivityMenu.prototype, {
 
     async loadControls(){
         if (window.location.protocol == 'https:') {
+            await this.loadDeviceInfo();
             if (session.hr_attendance_geolocation) {
                 this.state.show_geolocation = true;
                 try {
@@ -575,8 +587,9 @@ patch(ActivityMenu.prototype, {
                             currentEmployeeId: self.employee.id.toString(), // 🔐 Pasar ID del empleado logueado
                             updateRecognitionAttendance: (rdata) => {
                                 if (parseInt(self.employee.id) !== parseInt(rdata.employee_id)) {
-                                    reject("The detected employee does not match the logged-in employee.");
+                                    reject("El empleado reconocido no coincide con el usuario actual.");
                                 } else {
+                                    this.showNotification();
                                     c_photo = rdata.image;
                                     resolve(true);
                                 }
@@ -687,8 +700,6 @@ patch(ActivityMenu.prototype, {
             console.log("Validation failed:", error);
             self.notificationService.add(_t(error), { type: "danger" });
         }
-
-        this.showNotification();
     }
 });
 export default ActivityMenu;
