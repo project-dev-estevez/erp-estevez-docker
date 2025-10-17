@@ -6,8 +6,10 @@
             <form string="Ubicación de Ingreso" create="false" edit="false">
                 <sheet>
                     <group>
-                        <field name="check_in_latitude" readonly="1"/>
-                        <field name="check_in_longitude" readonly="1"/>
+                        <field name="geofence_name"/>
+                        <field name="geofence_description"/>
+                        <field name="check_in_latitude" readonly="1" invisible="1"/>
+                        <field name="check_in_longitude" readonly="1" invisible="1"/>
                     </group>
 
                     <separator string="Mapa"/>
