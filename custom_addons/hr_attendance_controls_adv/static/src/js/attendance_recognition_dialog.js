@@ -171,14 +171,23 @@ export class AttendanceRecognitionDialog extends Component {
     }
 
     async captureAndUpdateAttendance(video, detection, employeeId) {
-        const { box } = detection.detection;
-        const region = new faceapi.Rect(box.x - 100, box.y - 100, box.width + 200, box.height + 200);
-        const [face] = await faceapi.extractFaces(video, [region]);
-        if (!face) return;
+      if (!video) return;
 
-        let faceBase64 = face.toDataURL("image/jpeg");
-        faceBase64 = faceBase64.replace(/^data:image\/(png|jpg|jpeg);base64,/, "");
-        this.updateAttendance(employeeId, faceBase64);
+      // Crear un canvas temporal del mismo tamaño que el video
+      const canvas = document.createElement("canvas");
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+
+      // Dibujar el frame actual del video en el canvas
+      const ctx = canvas.getContext("2d");
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+      // Convertir el frame completo en base64
+      let fullImageBase64 = canvas.toDataURL("image/jpeg");
+      fullImageBase64 = fullImageBase64.replace(/^data:image\/(png|jpg|jpeg);base64,/, "");
+
+      // Actualizar la asistencia con la imagen completa
+      await this.updateAttendance(employeeId, fullImageBase64);
     }
 
     // =======================
