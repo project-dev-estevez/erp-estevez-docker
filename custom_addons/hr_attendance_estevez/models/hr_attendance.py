@@ -57,6 +57,50 @@ class HrAttendance(models.Model):
 
     check_out_display = fields.Char(string='Salida', compute='_compute_check_out_display')
 
+    check_in_map_html = fields.Html(
+        string='Mapa de Entrada',
+        compute='_compute_check_in_map_html',
+        sanitize=False
+    )
+    
+    check_out_map_html = fields.Html(
+        string='Mapa de Salida',
+        compute='_compute_check_out_map_html',
+        sanitize=False
+    )
+
+    @api.depends('in_latitude', 'in_longitude')
+    def _compute_check_in_map_html(self):
+        for record in self:
+            if record.in_latitude and record.in_longitude:
+                lat, lng = record.in_latitude, record.in_longitude
+                url = f"https://maps.google.com/maps?q={lat},{lng}&hl=es&z=16&output=embed"
+                record.check_in_map_html = f"""
+                    <div style="width: 100%; height: 360px; overflow: hidden;">
+                        <iframe width="100%" height="360px" frameborder="0" style="border:0; display:block;"
+                                src="{url}"
+                                allowfullscreen></iframe>
+                    </div>
+                """
+            else:
+                record.check_in_map_html = "<p style='text-align:center; color:#999; width:100%; height:360px; display:flex; align-items:center; justify-content:center; border:1px dashed #ccc; margin:0;'>Sin ubicación GPS</p>"
+
+    @api.depends('out_latitude', 'out_longitude')
+    def _compute_check_out_map_html(self):
+        for record in self:
+            if record.out_latitude and record.out_longitude:
+                lat, lng = record.out_latitude, record.out_longitude
+                url = f"https://maps.google.com/maps?q={lat},{lng}&hl=es&z=16&output=embed"
+                record.check_out_map_html = f"""
+                    <div style="width: 100%; height: 360px; overflow: hidden;">
+                        <iframe width="100%" height="360px" frameborder="0" style="border:0; display:block;"
+                                src="{url}"
+                                allowfullscreen></iframe>
+                    </div>
+                """
+            else:
+                record.check_out_map_html = "<p style='text-align:center; color:#999; width:100%; height:360px; display:flex; align-items:center; justify-content:center; border:1px dashed #ccc; margin:0;'>Sin ubicación GPS</p>"
+    
     @api.depends('check_out', 'is_auto_closed')
     def _compute_check_out_display(self):
         for record in self:

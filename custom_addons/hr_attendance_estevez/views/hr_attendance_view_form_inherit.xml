@@ -5,15 +5,121 @@
         <field name="model">hr.attendance</field>
         <field name="inherit_id" ref="hr_attendance.hr_attendance_view_form"/>
         <field name="arch" type="xml">
+            
+            <!-- Reemplazar el header -->
             <xpath expr="//header" position="replace">
                 <header>
                     <field name="status" widget="statusbar" options="{'clickable': '1'}"/>
                 </header>
             </xpath>
-            <xpath expr="//field[@name='employee_id']" position="attributes">
-                <attribute name="readonly">1</attribute>
+
+            <!-- Reemplazar TODO el group dentro de sheet -->
+            <xpath expr="//sheet/group" position="replace">
+                <group>
+                    <!-- Información del empleado y tiempos -->
+                    <group colspan="2">
+                        <group col="1">
+                            <field name="employee_id" widget="many2one_avatar_user" readonly="1"/>
+                            <field name="check_in" string="Entrada" options="{'rounding': 0}"/>
+                            <field name="check_out" string="Salida" options="{'rounding': 0}" placeholder="Trabajando actualmente"/>
+                        </group>
+                        <group col="2">
+                            <field name="worked_hours" string="Tiempo trabajado" widget="float_time"/>
+                            <field name="overtime_hours" widget="float_time" string="Horas extras trabajadas" invisible="overtime_hours == validated_overtime_hours"/>
+                            <label for="validated_overtime_hours" string="Horas extras"/>
+                            <div class="o_row">
+                                <field
+                                    name="validated_overtime_hours"
+                                    class="o_hr_narrow_field-4"
+                                    widget="float_time"
+                                    nolabel="1"
+                                    readonly="overtime_status == 'refused'"/>
+                                <button class="oe_stat_button" string="Aprobar" 
+                                        invisible="overtime_status not in ['to_approve', 'refused'] or no_validated_overtime_hours" 
+                                        name="action_approve_overtime" icon="fa-check" type="object"/>
+                                <button class="oe_stat_button" string="Rechazar" 
+                                        invisible="overtime_status not in ['to_approve', 'approved'] or no_validated_overtime_hours" 
+                                        name="action_refuse_overtime" icon="fa-times" type="object"/>
+                            </div>
+                        </group>
+                    </group>
+
+                    <!-- Separador Check In -->
+                    <separator string="Entrada"/>
+                    
+                    <!-- Sección Check In -->
+                    <group name="check_in_group" colspan="2">
+                        <group>
+                            <field name="check_in_ipaddress"/>
+                            <field name="in_browser"/>
+                            <field name="check_in_geofence_ids" string="Geocercas" widget="many2many_tags" readonly="1"/>
+                            <label for="in_latitude" string="Coordenadas GPS"/>
+                            <div>
+                                <div class="o_row">
+                                    <span>
+                                        <field name="in_latitude"/>
+                                    </span>,
+                                    <span>
+                                        <field name="in_longitude" nolabel="1"/>
+                                    </span>
+                                </div>
+                                <button
+                                    name="action_in_attendance_maps"
+                                    type="object"
+                                    class="btn btn-link ps-0 pt-0 pb-2"
+                                    icon="oi-arrow-right"
+                                    string="Mapa Completo"
+                                    colspan="2"/>
+                            </div>
+                            <div class="text-center">
+                                <field name="check_in_photo" widget="image" nolabel="1" options="{'size': [200, 200]}"/>
+                            </div>
+                        </group>
+                        
+                        <group>
+                            <field name="check_in_map_html" nolabel="1" readonly="1"/>
+                        </group>
+                    </group>
+
+                    <!-- Separador Check Out -->
+                    <separator string="Salida" name="check_out_separator" invisible="not check_out"/>
+                    
+                    <!-- Sección Check Out -->
+                    <group colspan="2" name="check_out_group" invisible="not check_out">
+                        <group>
+                            <field name="check_out_ipaddress"/>
+                            <field name="out_browser" string="Browser"/>
+                            <field name="check_out_geofence_ids" string="Geocercas" widget="many2many_tags" readonly="1"/>
+                            <label for="out_latitude" string="Coordenadas GPS"/>
+                            <div>
+                                <div class="o_row">
+                                    <span>
+                                        <field name="out_latitude"/>
+                                    </span>,
+                                    <span>
+                                        <field name="out_longitude" nolabel="1"/>
+                                    </span>
+                                </div>
+                                <button
+                                    name="action_out_attendance_maps"
+                                    type="object"
+                                    class="btn btn-link ps-0 pt-0 pb-2"
+                                    icon="oi-arrow-right"
+                                    string="Mapa Completo"
+                                    colspan="2"/>
+                            </div>
+                            <div class="text-center">
+                                <field name="check_out_photo" widget="image" nolabel="1" options="{'size': [200, 200]}"/>
+                            </div>
+                        </group>
+                        
+                        <group>
+                            <field name="check_out_map_html" nolabel="1" readonly="1"/>
+                        </group>
+                    </group>
+                </group>
             </xpath>
+            
         </field>
     </record>
-
 </odoo>
