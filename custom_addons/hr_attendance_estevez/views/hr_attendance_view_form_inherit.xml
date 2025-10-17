@@ -10,6 +10,8 @@
             <xpath expr="//header" position="replace">
                 <header>
                     <field name="status" widget="statusbar" options="{'clickable': '1'}"/>
+                    <field name="overtime_status" invisible="1" readonly="1"/>
+                    <field name="overtime_status" invisible="1" readonly="1"/>
                 </header>
             </xpath>
 
