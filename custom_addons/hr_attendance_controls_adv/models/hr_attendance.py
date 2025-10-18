@@ -27,6 +27,28 @@ class HrAttendance(models.Model):
     
     check_in_reason = fields.Char("Check In Reason")
     check_out_reason = fields.Char("Check Out Reason")
+
+    # Check-in device info
+    is_checkin_mobile = fields.Boolean(
+        string='Check-in desde móvil',
+        default=False,
+        help='Indica si el check-in se realizó desde un dispositivo móvil'
+    )
+    checkin_device = fields.Char(
+        string='Dispositivo Check-in',
+        help='Plataforma del dispositivo usado en check-in (Android, iOS, Windows, etc.)'
+    )
+    
+    # Check-out device info
+    is_checkout_mobile = fields.Boolean(
+        string='Check-out desde móvil',
+        default=False,
+        help='Indica si el check-out se realizó desde un dispositivo móvil'
+    )
+    checkout_device = fields.Char(
+        string='Dispositivo Check-out',
+        help='Plataforma del dispositivo usado en check-out (Android, iOS, Windows, etc.)'
+    )
     
     @api.depends('check_in_latitude','check_in_longitude')
     def _compute_check_in_location_url(self):

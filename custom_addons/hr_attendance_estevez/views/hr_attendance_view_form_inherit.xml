@@ -40,6 +40,7 @@
                     <group name="check_in_group" colspan="2">
                         <group>
                             <field name="check_in_ipaddress" string="IP de Entrada"/>
+                            <field name="checkin_device" string="Dispositivo" readonly="1"/>
                             <field name="in_browser" string="Navegador"/>
                             <field name="check_in_geofence_ids" string="Geocercas" widget="many2many_tags" readonly="1"/>
                             <label for="in_latitude" string="Coordenadas GPS"/>
@@ -77,6 +78,7 @@
                     <group colspan="2" name="check_out_group" invisible="not check_out">
                         <group>
                             <field name="check_out_ipaddress" string="IP de Salida"/>
+                            <field name="checkout_device" string="Dispositivo" readonly="1"/>
                             <field name="out_browser" string="Navegador"/>
                             <field name="check_out_geofence_ids" string="Geocercas" widget="many2many_tags" readonly="1"/>
                             <label for="out_latitude" string="Coordenadas GPS"/>

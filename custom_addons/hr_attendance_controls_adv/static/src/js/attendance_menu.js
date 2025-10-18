@@ -52,6 +52,11 @@ patch(ActivityMenu.prototype, {
         this.state.isReady = false;
         this.state.show_check_inout_button = false;
 
+        this.state.deviceInfo = {
+            isMobile: false,
+            platform: "Desconocido",
+        };
+
         onWillStart(async () => {
             try {
                 await loadJS('/hr_attendance_controls_adv/static/src/lib/faceapi/source/face-api.js');
@@ -69,14 +74,17 @@ patch(ActivityMenu.prototype, {
     },
 
     async loadDeviceInfo() {
-        try {
+        const userAgentData = navigator.userAgentData;
 
-            console.log("Navigator: ", navigator);
+        if (!userAgentData) return;
 
-        } catch (error) {
-            console.warn("No se pudo obtener información del dispositivo:", error);
-            this.state.deviceInfo = { error: error.message };
-        }
+        const isMobile = userAgentData.mobile || false;
+        const platform = userAgentData.platform || "Desconocido";
+
+        this.state.deviceInfo = {
+            isMobile,
+            platform
+        };
     },
 
     async loadGeofences(){
@@ -500,6 +508,10 @@ patch(ActivityMenu.prototype, {
         let c_ipaddress = self.state.ipaddress || false;
         let c_photo = false;
         let c_reason = '-';
+
+        // 📱 Agregar variables para device info
+        let c_is_mobile = self.state.deviceInfo?.isMobile || false;
+        let c_device = self.state.deviceInfo?.platform || 'Unknown';
         
         // Define Promises
         const geolocationPromise = self.state.show_geolocation
@@ -625,6 +637,8 @@ patch(ActivityMenu.prototype, {
                                         'check_in_photo': c_photo,
                                         'check_in_ipaddress': c_ipaddress,
                                         'check_in_reason': c_reason,
+                                        'is_checkin_mobile': c_is_mobile,
+                                        'checkin_device': c_device,
                                     }],
                                     kwargs: {},
                                 });
@@ -641,6 +655,8 @@ patch(ActivityMenu.prototype, {
                                         'check_out_photo': c_photo,
                                         'check_out_ipaddress': c_ipaddress,
                                         'check_out_reason': c_reason,
+                                        'is_checkout_mobile': c_is_mobile,
+                                        'checkout_device': c_device,
                                     }],
                                     kwargs: {},
                                 });
@@ -664,6 +680,8 @@ patch(ActivityMenu.prototype, {
                                         'check_in_photo': c_photo,
                                         'check_in_ipaddress': c_ipaddress,
                                         'check_in_reason': c_reason,
+                                        'is_checkin_mobile': c_is_mobile,
+                                        'checkin_device': c_device,
                                     }],
                                     kwargs: {},
                                 });
@@ -680,6 +698,8 @@ patch(ActivityMenu.prototype, {
                                         'check_out_photo': c_photo,
                                         'check_out_ipaddress': c_ipaddress,
                                         'check_out_reason': c_reason,
+                                        'is_checkout_mobile': c_is_mobile,
+                                        'checkout_device': c_device,
                                     }],
                                     kwargs: {},
                                 });
