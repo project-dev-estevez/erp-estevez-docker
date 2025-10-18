@@ -26,9 +26,14 @@
         </field>
     </record>
 
-    <!-- Hereda la accion original y remueve los filtros por default -->
-    <record id="hr_attendance.hr_attendance_action" model="ir.actions.act_window">
-        <field name="context">{}</field>
+    <!-- Vista de búsqueda minimalista - Completamente vacía para ocultar la barra de búsqueda -->
+    <record id="view_hr_attendance_search_employee_minimal" model="ir.ui.view">
+        <field name="name">hr.attendance.search.employee.minimal</field>
+        <field name="model">hr.attendance</field>
+        <field name="priority">1000</field>
+        <field name="arch" type="xml">
+            <search string="Buscar Asistencias" searchpanel="false"/>
+        </field>
     </record>
 
     <!-- Acción de ventana para empleados - Usa vista personalizada -->
@@ -37,12 +42,16 @@
         <field name="res_model">hr.attendance</field>
         <field name="view_mode">list</field>
         <field name="domain">[('employee_id.user_id', '=', uid)]</field>
-        <field name="context">{
-            'create': False, 
-            'delete': False,
-            'search_disable_custom_filters': True,
-            'searchpanel_enable': False
-        }</field>
+        <field name="search_view_id" ref="view_hr_attendance_search_employee_minimal"/>
+        <field name="context">
+            {
+                'create': False, 
+                'delete': False,
+                'search_disable_custom_filters': True,
+                'searchpanel_enable': False,
+                'search_bar': False
+            }
+        </field>
         <field name="path">attendance-employee</field>
         <field name="view_id" ref="view_hr_attendance_list_employee"/>
         <field name="help" type="html">

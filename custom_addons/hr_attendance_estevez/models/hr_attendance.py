@@ -1,7 +1,7 @@
 from odoo import models, fields, api
 from datetime import datetime
 import logging
-import pytz
+import pytz # pyright: ignore[reportMissingModuleSource]
         
 _logger = logging.getLogger(__name__)
 
