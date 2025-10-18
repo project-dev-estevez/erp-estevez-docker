@@ -4,6 +4,12 @@
         <field name="model">hr.attendance</field>
         <field name="inherit_id" ref="hr_attendance.view_attendance_tree"/>
         <field name="arch" type="xml">
+
+            <!-- Ocultar botón Create -->
+            <xpath expr="//list" position="attributes">
+                <attribute name="create">false</attribute>
+            </xpath>
+
             <xpath expr="//field[@name='employee_id']" position="after">
                 <field name="department_id" string="Departamento"/>
                 <field name="job_id" string="Puesto de trabajo" readonly="1"/>
