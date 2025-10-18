@@ -68,7 +68,7 @@ class HrAttendance(models.Model):
     def action_show_log(self):
         return {
             'type': 'ir.actions.act_window',
-            'name': 'Historial de mensajes',
+            'name': 'Historial de Comentarios',
             'res_model': 'hr.attendance.log.wizard',
             'view_mode': 'form',
             'target': 'new',

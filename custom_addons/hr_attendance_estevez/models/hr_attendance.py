@@ -69,6 +69,35 @@ class HrAttendance(models.Model):
         sanitize=False
     )
 
+    has_admin_comments = fields.Boolean(
+        string='Tiene comentarios del administrador',
+        compute='_compute_has_admin_comments',
+        store=False
+    )
+
+    @api.depends('message_ids', 'message_ids.body', 'message_ids.is_internal')
+    def _compute_has_admin_comments(self):
+        """
+        Verifica si hay comentarios manuales del administrador.
+        Excluye mensajes internos del sistema.
+        """
+        for record in self:
+            # Filtrar mensajes que cumplan con estas condiciones:
+            # 1. Tienen body (contenido)
+            # 2. NO son internos (is_internal = False)
+            # 3. Son de tipo notification o comment
+            # 4. Tienen autor
+            admin_messages = record.message_ids.filtered(
+                lambda m: 
+                    m.body and 
+                    m.body.strip() not in ['', '<p><br></p>', '<p></p>', '<br>', '<br/>'] and
+                    not m.is_internal and  # 🔑 CLAVE: Excluir mensajes internos
+                    m.message_type in ['notification', 'comment'] and
+                    m.author_id
+            )
+            
+            record.has_admin_comments = len(admin_messages) > 0
+
     @api.depends('in_latitude', 'in_longitude')
     def _compute_check_in_map_html(self):
         for record in self:

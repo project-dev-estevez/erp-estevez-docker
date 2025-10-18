@@ -4,16 +4,11 @@
         <field name="name">hr.attendance.log.wizard.form</field>
         <field name="model">hr.attendance.log.wizard</field>
         <field name="arch" type="xml">
-            <form string="Historial de mensajes">
+            <form string="Historial de comentarios">
                 <field name="attendance_id" invisible="1"/>
-
-                <!-- Sección para agregar nuevo mensaje -->
-                <group string="Agregar Nuevo Mensaje">
-                    <field name="new_message" placeholder="Escribe tu mensaje aquí..." nolabel="1" widget="text"/>
-                </group>
                 
                 <!-- Sección de mensajes existentes -->
-                <group string="Historial de Mensajes">
+                <group>
                     <field name="message_ids" readonly="1" editable="false" nolabel="1">
                         <list create="false" edit="false" delete="false" open="false" no_open="1">
                             <field name="create_date" string="Fecha"/>
@@ -22,9 +17,14 @@
                         </list>
                     </field>
                 </group>
+
+                <!-- Sección para agregar nuevo comentario -->
+                <group string="Agregar Nuevo Comentario">
+                    <field name="new_message" placeholder="Escribe tu comentario aquí..." nolabel="1" widget="text"/>
+                </group>
                 
                 <footer>
-                    <button string="Agregar Mensaje" type="object" name="action_add_message" 
+                    <button string="Agregar Comentario" type="object" name="action_add_message" 
                             class="btn btn-primary"
                             readonly="not new_message"/>
                     <button string="Cerrar" special="cancel" class="btn btn-secondary"/>

@@ -20,7 +20,8 @@
                         type="object" 
                         string="Ver Comentarios" 
                         icon="fa-commenting-o"
-                        class="btn-link"/>
+                        class="btn-link"
+                        invisible="not has_admin_comments"/>
             </list>
         </field>
     </record>
