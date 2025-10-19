@@ -28,10 +28,15 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-12 mt8" id="videoContainer" t-ref="videoContainer" style="display: table;position: relative;">
-                        <video id="video" style="width: 100%; max-height: 100%; box-sizing: border-box;" muted="true" autoplay="false" playsinline="true" t-ref="video"/>  
-                        <canvas id="canvas" style="position: absolute; top: 0;  bottom: 0;  display: block; " t-ref="canvas"/>
-                        <canvas id="image" style="display: none;" t-ref="image"/>                                      
+                    <div class="col-12 mt8" id="videoContainer" t-ref="videoContainer"
+                        style="height: 50vh; min-height: 250px; display: flex; align-items: center; justify-content: center; position: relative;">
+                        <video id="video"
+                            style="width: 100%; height: 100%; object-fit: cover; background: #000;"
+                            muted="true" autoplay="false" playsinline="true" t-ref="video"/>
+                        <canvas id="canvas"
+                                style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: block;"
+                                t-ref="canvas"/>
+                        <canvas id="image" style="display: none;" t-ref="image"/>
                     </div>
                 </div>
             </div>
