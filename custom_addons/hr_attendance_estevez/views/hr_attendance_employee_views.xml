@@ -16,6 +16,10 @@
                        decoration-warning="status == 'retarded'"
                        decoration-success="status == 'approved'"
                        decoration-danger="status == 'rejected'"/>
+
+                <!-- Campo invisible para la condición del botón -->
+                <field name="has_admin_comments" column_invisible="1"/>
+                
                 <button name="action_show_log" 
                         type="object" 
                         string="Ver Comentarios" 
@@ -26,13 +30,16 @@
         </field>
     </record>
 
-    <!-- Vista de búsqueda minimalista - Completamente vacía para ocultar la barra de búsqueda -->
+    <!-- Vista de búsqueda minimalista - Sin searchpanel -->
     <record id="view_hr_attendance_search_employee_minimal" model="ir.ui.view">
         <field name="name">hr.attendance.search.employee.minimal</field>
         <field name="model">hr.attendance</field>
         <field name="priority">1000</field>
         <field name="arch" type="xml">
-            <search string="Buscar Asistencias" searchpanel="false"/>
+            <search>
+                <!-- Al menos un campo de búsqueda para que sea válida -->
+                <field name="employee_id"/>
+            </search>
         </field>
     </record>
 
