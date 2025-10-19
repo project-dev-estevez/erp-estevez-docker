@@ -88,4 +88,37 @@
             </xpath>
         </field>
     </record>
+
+    <record id="hr_attendance_view_filter" model="ir.ui.view">
+        <field name="name">hr.attendance.search.inherit</field>
+        <field name="model">hr.attendance</field>
+        <field name="inherit_id" ref="hr_attendance.hr_attendance_view_filter"/>
+        <field name="arch" type="xml">
+
+            <!-- Filtro por rango de fechas -->
+            <xpath expr="//filter[@name='check_in_filter']" position="replace">
+                <filter string="Hoy" name="today" domain="[('check_in', '&gt;=', (context_today()).strftime('%%Y-%%m-%%d 00:00:00')), ('check_in', '&lt;=', (context_today()).strftime('%%Y-%%m-%%d 23:59:59'))]" help="Asistencias de hoy"/>
+                <filter string="Ayer" name="yesterday" domain="[('check_in', '&gt;=', (context_today() - datetime.timedelta(days=1)).strftime('%%Y-%%m-%%d 00:00:00')), ('check_in', '&lt;=', (context_today() - datetime.timedelta(days=1)).strftime('%%Y-%%m-%%d 23:59:59'))]" help="Asistencias de ayer"/>
+                <filter string="Antier" name="before_yesterday" domain="[('check_in', '&gt;=', (context_today() - datetime.timedelta(days=2)).strftime('%%Y-%%m-%%d 00:00:00')), ('check_in', '&lt;=', (context_today() - datetime.timedelta(days=2)).strftime('%%Y-%%m-%%d 23:59:59'))]" help="Asistencias de antier"/>
+                <filter string="Fecha" name="check_in_filter" date="check_in"/>
+            </xpath>
+
+            <!-- Filtros por estado -->
+            <xpath expr="//filter[@name='myattendances']" position="before">
+                <field name="status"/>
+                <filter name="filter_status_pending"
+                        string="Pendiente"
+                        domain="[('status', '=', 'pending')]"/>
+                <filter name="filter_status_retarded"
+                        string="Retardo"
+                        domain="[('status', '=', 'retarded')]"/>
+                <filter name="filter_status_approved"
+                        string="Aprobado"
+                        domain="[('status', '=', 'approved')]"/>
+                <filter name="filter_status_rejected"
+                        string="Rechazado"
+                        domain="[('status', '=', 'rejected')]"/>
+            </xpath>
+        </field>
+    </record>
 </odoo>
