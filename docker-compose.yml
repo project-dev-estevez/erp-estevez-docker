@@ -1,6 +1,9 @@
 services:
   odoo:
     container_name: odoo_container
+    build:
+      context: .
+      dockerfile: Dockerfile
     image: odoo:18.0
     depends_on:
       - postgres_db
