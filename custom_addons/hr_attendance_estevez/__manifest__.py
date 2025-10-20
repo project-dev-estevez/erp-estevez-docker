@@ -4,8 +4,11 @@
     "summary": "Personalización módulo IA asistencias (hereda hr_attendance_controls_adv)",
     "version": "1.0.0",
     "author": "Estevez.Jor",
+    "website": "https://www.estevezjor.mx",
+    "company": "Estevez.Jor",
+    "maintainer": "Estevez.Jor",
     "category": "Human Resources",
-    "depends": ["hr_attendance", "hr_attendance_controls_adv"],
+    "depends": ["hr_holidays", "hr", "hr_attendance", "hr_attendance_controls_adv"],
     "data": [
         "security/hr_attendance_security.xml",
         "security/ir.model.access.csv",
@@ -18,15 +21,26 @@
         "views/hr_attendance_reject_wizard.xml",
         "views/hr_attendance_approve_wizard.xml",
         "views/hr_attendance_log_wizard.xml",
+
+        # Dashboard
+        "views/hr_leave_type_views.xml",
+        "views/advance_hr_attendance_dashboard_menus.xml",
+        "views/res_config_settings_views.xml",
+        "report/hr_attendance_reports.xml",
+        "report/hr_attendance_templates.xml",
     ],
-        'assets': {
-            'web.assets_backend': [
-                # Incluye los assets originales como dependencia explícita
-                'hr_attendance_estevez/static/src/scss/**/*.scss',
-                # 'hr_attendance_estevez/static/src/components/**/*.scss',
-                # 'hr_attendance_estevez/static/src/components/**/*.js',
-            ],
+    'assets': {
+        "web.assets_backend": [
+            "hr_attendance_estevez/static/src/xml/attendance_dashboard_templates.xml",
+            "hr_attendance_estevez/static/src/js/attendance_dashboard.js",
+            "hr_attendance_estevez/static/src/scss/attendance_dashboard.scss",
+        ],
     },
+    "external_dependencies": {
+        "python": ["pandas"],
+    },
+    "license": "AGPL-3",
     "installable": True,
+    "auto_install": False,
     "application": False,
 }
