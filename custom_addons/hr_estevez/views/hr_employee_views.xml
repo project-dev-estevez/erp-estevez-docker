@@ -4,7 +4,7 @@
         <record id="view_employee_search_inherit" model="ir.ui.view">
             <field name="name">hr.employee.search.inherit</field>
             <field name="model">hr.employee</field>
-            <field name="inherit_id" ref="hr.view_employee_filter"/> <!-- Asegúrate de que esta referencia sea correcta -->
+            <field name="inherit_id" ref="hr.view_employee_filter"/>
             <field name="arch" type="xml">                
                 <filter name="inactive" position="attributes">
                     <attribute name="string">Bajas</attribute>
@@ -17,19 +17,18 @@
             <field name="inherit_id" ref="hr.view_employee_form"/>
             <field name="arch" type="xml">                                                                                              
                 <xpath expr="//page[@name='hr_settings']//group[@name='active_group']/div[@class='o_row'][field[@name='user_id']]" position="after">            
-    <label for="barcode"/>
-    <div class="o_row">
-        <field name="barcode" groups="hr.group_hr_user" string="Número de Empleado"/>
-        <button string="Generate" class="btn btn-link" type="object" name="generate_random_barcode" invisible="barcode" groups="hr.group_hr_user"/>
-        <!--button name="243" string="Print Badge" class="btn btn-link" type="action" invisible="not barcode" groups="hr.group_hr_user"/-->
-    </div>
-</xpath>
+                    <label for="barcode"/>
+                    <div class="o_row">
+                        <field name="barcode" groups="hr.group_hr_user" string="Número de Empleado"/>
+                        <button string="Generate" class="btn btn-link" type="object" name="generate_random_barcode" invisible="barcode" groups="hr.group_hr_user"/>
+                        <!--button name="243" string="Print Badge" class="btn btn-link" type="action" invisible="not barcode" groups="hr.group_hr_user"/-->
+                    </div>
+                </xpath>
                 <xpath expr="//page[@name='hr_settings']//group[@name='identification_group']" position="replace"/>                                               
                 <xpath expr="//div[@name='button_box']/button[last()]" position="after">
                     <button name="action_open_whatsapp" class="oe_stat_button" icon="fa-whatsapp" type="object" string="WhatsApp" invisible="not (work_phone or private_phone)"/>
                     <button name="action_open_employee_documents" class="oe_stat_button" icon="fa-file-text-o" type="object" string="Documentos" />
-                </xpath>
-            
+                </xpath>            
                 <!-- Botones del Header -->
                 <xpath expr="//header" position="inside">
                     <button name="action_archive_employee"
@@ -90,6 +89,8 @@
                 <xpath expr="//notebook/page[@name='hr_settings']" position="inside">
                     <group name="managers" string="Aprobadores" class="hide-group-if-empty" invisible="1"/>
                 </xpath>
+
+                <xpath expr="//group[@name='application_group']" position="replace"/>
 
                 <!-- Nombres, Apellidos, # empleado, Proyecto y Etiquetas -->
                 <xpath expr="//group/group[field[@name='work_email']]" position="replace">
