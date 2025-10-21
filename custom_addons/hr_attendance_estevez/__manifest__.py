@@ -8,7 +8,7 @@
     "company": "Estevez.Jor",
     "maintainer": "Estevez.Jor",
     "category": "Human Resources",
-    "depends": ["hr_holidays", "hr", "hr_attendance", "hr_attendance_controls_adv"],
+    "depends": ["base", "report_xlsx", "hr", "hr_holidays", "hr_attendance", "hr_attendance_controls_adv"],
     "data": [
         "security/hr_attendance_security.xml",
         "security/ir.model.access.csv",
@@ -28,6 +28,11 @@
         "views/res_config_settings_views.xml",
         "report/hr_attendance_reports.xml",
         "report/hr_attendance_templates.xml",
+
+        # Wizards Reports
+        'views/wizards/payroll_report_wizard_views.xml',
+        'views/wizards/attendance_report_wizard_views.xml',
+        'views/reports/report_actions.xml',
     ],
     'assets': {
         "web.assets_backend": [
