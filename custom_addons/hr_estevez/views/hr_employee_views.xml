@@ -108,7 +108,7 @@
                 <!-- Compañia, Dirección, Departamento, Area, Puesto de Trabajo, Jefe Inmediato -->
                 <xpath expr="//group/group[field[@name='department_id']]" position="replace">
                     <group>
-                        <field name="company_id" string="Compañia" readonly="1" invisible="not direction_id"/>
+                        <field name="company_id" widget="many2one" options="{'no_create': True, 'no_create_edit': True}"/>
                         <field name="direction_id" options="{'no_create': True}"/>
                         <field name="department_id" domain="[('direction_id', '=', direction_id)]" invisible="not direction_id" options="{'no_create': True}"/>
                         <field name="area_id" domain="[('department_id', '=', department_id)]" invisible="not department_id" options="{'no_create': True}"/>
