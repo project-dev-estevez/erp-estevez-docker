@@ -150,11 +150,8 @@
                 <attribute name="readonly">True</attribute>
                 <attribute name="options">{'no_open': True}</attribute>
             </xpath>
-            <xpath expr="//page[@name='public']//field[@name='attendance_manager_id']" position="attributes">
-                <attribute name="readonly">True</attribute>
-                <attribute name="options">{'no_open': True}</attribute>
-            </xpath>
-        </field>
+            <xpath expr="//page[@name='public']//field[@name='attendance_manager_id']" position="replace"/>
+            </field>
     </record>
 
 </odoo>

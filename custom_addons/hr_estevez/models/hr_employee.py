@@ -169,6 +169,38 @@ class HrEmployee(models.Model):
             # Avanzar al siguiente año
             year_start = year_start.replace(year=year_start.year + 1)
 
+    @api.model
+    def create(self, vals):
+    
+        if 'employee_number' in vals and vals['employee_number'] and not vals.get('barcode'):
+            vals['barcode'] = vals['employee_number']
+        elif 'barcode' in vals and vals['barcode'] and not vals.get('employee_number'):
+            vals['employee_number'] = vals['barcode']
+        return super().create(vals)
+
+    def write(self, vals):
+        
+        
+        # Si se actualiza barcode, sincronizar con employee_number
+        if 'barcode' in vals and vals['barcode']:
+            vals['employee_number'] = vals['barcode']
+        
+        # Si se actualiza employee_number, sincronizar con barcode  
+        elif 'employee_number' in vals and vals['employee_number']:
+            vals['barcode'] = vals['employee_number']
+            
+        return super().write(vals)
+
+    def generate_random_barcode(self):
+        
+        for employee in self:
+            # Llamar al método original para generar el barcode
+            super(HrEmployee, employee).generate_random_barcode()
+            
+            # Sincronizar employee_number con el barcode generado
+            if employee.barcode and not employee.employee_number:
+                employee.employee_number = employee.barcode
+
     @api.depends('state_id')
     def _compute_state_key(self):
         for employee in self:            
