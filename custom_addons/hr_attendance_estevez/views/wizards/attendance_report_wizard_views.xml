@@ -6,11 +6,13 @@
             <form string="Generar reporte de asistencias">
                 <sheet>
                     <group>
+                        <field name="date_start"/>
+                        <field name="date_end"/>
                         <field name="company_id"/>
-                        <field name="payment_type"/>
+                        <field name="department_id"/>
                     </group>
                     <footer>
-                        <button name="action_generate_report" type="object" string="Generar Excel" class="btn-primary"/>
+                        <button name="action_generate_report" type="object" string="Generar Reporte" class="btn-primary"/>
                         <button string="Cancelar" class="btn-secondary" special="cancel"/>
                     </footer>
                 </sheet>

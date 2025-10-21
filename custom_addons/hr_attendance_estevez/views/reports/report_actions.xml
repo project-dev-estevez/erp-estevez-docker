@@ -4,16 +4,16 @@
         <field name="name">Reporte Nómina XLSX</field>
         <field name="model">payroll.report.wizard</field>
         <field name="report_type">xlsx</field>
-        <field name="report_name">asistencias.report_payroll_xlsx</field>
-        <field name="report_file">asistencias.report_payroll_xlsx</field>
+        <field name="report_name">hr_attendance_estevez.report_payroll_xlsx</field>
+        <field name="report_file">hr_attendance_estevez.report_payroll_xlsx</field>
     </record>
 
     <record id="report_attendance_xlsx" model="ir.actions.report">
         <field name="name">Reporte Asistencias XLSX</field>
         <field name="model">attendance.report.wizard</field>
         <field name="report_type">xlsx</field>
-        <field name="report_name">asistencias.report_attendance_xlsx</field>
-        <field name="report_file">asistencias.report_attendance_xlsx</field>
+        <field name="report_name">hr_attendance_estevez.report_attendance_xlsx</field>
+        <field name="report_file">hr_attendance_estevez.report_attendance_xlsx</field>
     </record>
 
     <!-- Menus para los wizards de reportes -->
