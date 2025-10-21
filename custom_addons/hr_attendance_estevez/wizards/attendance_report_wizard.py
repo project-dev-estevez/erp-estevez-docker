@@ -1,4 +1,4 @@
-from odoo import models, fields
+from odoo import models, fields, _
 
 
 from datetime import date, timedelta
@@ -28,4 +28,7 @@ class AttendanceReportWizard(models.TransientModel):
             'company_id': self.company_id.id if self.company_id else False,
             'department_id': self.department_id.id if self.department_id else False,
         }
-        return self.env.ref('hr_attendance_estevez.report_attendance_xlsx').report_action(self, data=data)
+        report_action = self.env.ref('hr_attendance_estevez.report_attendance_xlsx').report_action(self, data=data)
+        report_action['close_on_report_download'] = True
+        report_action['type'] = 'ir.actions.report'
+        return report_action
