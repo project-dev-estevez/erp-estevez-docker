@@ -580,6 +580,10 @@
                     </page>
                 </xpath>
 
+               <xpath expr="//page[@name='public']//group[1]/group/field[@name='work_location_id']" position="after">
+                    <field name="patron" string="Patrón" widget="selection"/>
+                    <field name="establecimiento" string="Establecimiento" widget="selection"/>
+                </xpath>
             </field>
         </record>
 
