@@ -90,7 +90,7 @@
                     <group name="managers" string="Aprobadores" class="hide-group-if-empty" invisible="1"/>
                 </xpath>
 
-                
+                <xpath expr="//group[@name='application_group']" position="replace"/>
 
                 <!-- Nombres, Apellidos, # empleado, Proyecto y Etiquetas -->
                 <xpath expr="//group/group[field[@name='work_email']]" position="replace">
