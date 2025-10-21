@@ -43,7 +43,8 @@ class HrEmployee(models.Model):
     project = fields.Char(string='Proyecto')
 
     # Segunda Columna en la Vista de Empleados 
-    company_id = fields.Many2one('res.company', string='Company', compute='_compute_company', store=True, readonly=True)
+    #company_id = fields.Many2one('res.company', string='Company', compute='_compute_company', store=True, readonly=True)
+    company_id = fields.Many2one('res.company', string='Compañía', default=lambda self: self.env.company)
     direction_id = fields.Many2one('hr.direction', string='Dirección')
     area_id = fields.Many2one('hr.area', string='Área')
 
