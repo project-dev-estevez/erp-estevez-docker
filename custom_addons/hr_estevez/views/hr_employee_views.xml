@@ -97,7 +97,7 @@
                         <field name="names"/>
                         <field name="last_name"/>
                         <field name="mother_last_name"/>
-                        <field name="employee_number" readonly="1"/>
+                        <field name="employee_number"/>
                         <field name="project"/>
                         <field name="category_ids" widget="many2many_tags"
                                     options="{'color_field': 'color', 'no_create_edit': True}"
@@ -244,9 +244,9 @@
                                 <field name="study_field"/>
                                 <field name="study_school"/>
                                 <field name="estudios_id"/>                                
-                                <field name="estudios_key"/>  
+                                <field name="estudios_key" invisible="1"/> 
                                 <field name="documento_id"/> 
-                                <field name="documento_key"/> 
+                                <field name="documento_key" invisible="1"/> 
                             </group> 
                         </group>
 
@@ -267,9 +267,9 @@
                                 <field name="emergency_phone" class="o_force_ltr" string="Teléfono del Primer Contacto"/>
 
                                 <!-- Segundo contacto -->
-                                <field name="emergency_contact_2" string="Segundo Contacto"/>
-                                <field name="emergency_contact_relationship_2" string="Parentesco del Segundo Contacto"/>
-                                <field name="emergency_phone_2" class="o_force_ltr" string="Teléfono del Segundo Contacto"/>
+                                <field name="emergency_contact_2" string="Segundo Contacto" invisible="1"/>
+                                <field name="emergency_contact_relationship_2" string="Parentesco del Segundo Contacto" invisible="1"/>
+                                <field name="emergency_phone_2" class="o_force_ltr" string="Teléfono del Segundo Contacto" invisible="1"/>
                             </group>
 
                             <group string="Situación Familiar">
@@ -580,10 +580,27 @@
                     </page>
                 </xpath>
 
-               <xpath expr="//page[@name='public']//group[1]/group/field[@name='work_location_id']" position="after">
+               <!-- Reemplazar el grupo UBICACIÓN actual por uno que incluya ambos grupos en la misma fila -->
+        <xpath expr="//page[@name='public']/group[1]" position="replace">            
+            <group string="Ubicación">                
+                <group>            
+                    <field name="employment_start_date"/>
+                    <field name="address_id" context="{'show_address': 1}" options="{'highlight_first_line': True, 'no_edit': True, 'no_create': True, 'no_open': True}" domain="[('is_company', '=', True)]"/>
+                    <field name="work_location_id" string="Ubicación Laboral" context="{'default_address_id': address_id}" placeholder="e.g. Building 2, Remote, etc."/>
                     <field name="patron" string="Patrón" widget="selection"/>
-                    <field name="establecimiento" string="Establecimiento" widget="selection"/>
-                </xpath>
+                    <field name="establecimiento" string="Establecimiento" widget="selection"/>                
+                </group>                
+            </group>            
+            <group string="Información Bancaria">                
+                <group>            
+                    <field name="bank_id" string="Banco" options="{'no_create': True, 'no_create_edit': True}"/>
+                    <!-- Puedes agregar más campos bancarios aquí si los necesitas -->                
+                </group>            
+            </group>        
+        </xpath>
+      
+
+
             </field>
         </record>
 

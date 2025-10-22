@@ -80,6 +80,8 @@ class HrEmployee(models.Model):
         ('vigiliner', 'Vigiliner')                
     ], string='Patrón')
 
+    bank_id = fields.Many2one('res.bank', string='Banco')
+
 
     rfc = fields.Char(string='RFC')
     curp = fields.Char(string='CURP')
