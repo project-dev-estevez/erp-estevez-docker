@@ -81,6 +81,16 @@ class HrEmployee(models.Model):
     ], string='Patrón')
 
     bank_id = fields.Many2one('res.bank', string='Banco')
+    clabe = fields.Char(
+        string='CLABE',
+        size=18,
+        help='CLABE interbancaria de 18 dígitos'
+    )
+    
+    account_number = fields.Char(
+        string='Número de Cuenta',
+        help='Número de cuenta bancaria'
+    )
 
 
     rfc = fields.Char(string='RFC')

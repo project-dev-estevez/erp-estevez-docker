@@ -112,9 +112,10 @@
                         <field name="direction_id" options="{'no_create': True}"/>
                         <field name="department_id" domain="[('direction_id', '=', direction_id)]" invisible="not direction_id" options="{'no_create': True}"/>
                         <field name="area_id" domain="[('department_id', '=', department_id)]" invisible="not department_id" options="{'no_create': True}"/>
-                        <field name="job_id" domain="[('department_id', '=', department_id)]" invisible="not department_id" options="{'no_create': True}"/>
+                        <!--field name="job_id" domain="[('department_id', '=', department_id)]" invisible="not department_id" options="{'no_create': True}"/-->
+                        <field name="job_id" domain="['|', ('name', 'ilike', 'Becario'), ('direction_id', '=', direction_id)]" options="{'no_create': True}" context="{'default_direction_id': direction_id}"/>
                         <field name="parent_id" string="Jefe Inmediato" options="{'no_create': True}"/>
-                        <field name="coach_id" string="Instructor" options="{'no_create': True}"/>  
+                        <field name="coach_id" string="Instructor" options="{'no_create': True}" invisible="1"/>  
                         <field name="occupation_id" string="Ocupación" options="{'no_create': True}"/>
                         <field name="occupation_key" invisible="1"/> 
                         
@@ -594,7 +595,9 @@
             <group string="Información Bancaria">                
                 <group>            
                     <field name="bank_id" string="Banco" options="{'no_create': True, 'no_create_edit': True}"/>
-                    <!-- Puedes agregar más campos bancarios aquí si los necesitas -->                
+                    <field name="clabe" string="CLABE" placeholder="18 dígitos"        
+       required="bank_id"/>
+    <field name="account_number" string="Número de Cuenta"/>          
                 </group>            
             </group>        
         </xpath>
