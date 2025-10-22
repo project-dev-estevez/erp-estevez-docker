@@ -8,7 +8,7 @@ class AttendanceReportXlsx(models.AbstractModel):
 
     def generate_xlsx_report(self, workbook, data, objects):
         helper = self.env['hr_attendance_estevez.report_helper']
-        rows = helper.hello_world_rows(self.env, tipo='attendance')
+        rows = helper.get_report_rows(self.env, report_type='attendance')
 
         sheet = workbook.add_worksheet('Asistencias - Hola')
         bold = workbook.add_format({'bold': True})

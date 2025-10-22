@@ -20,7 +20,7 @@ class PayrollReportWizard(models.TransientModel):
     date_start = fields.Date(string='Fecha inicial', required=True, default=_default_date_start)
     date_end = fields.Date(string='Fecha final', required=True, default=_default_date_end)
     company_id = fields.Many2one('res.company', string='Empresa', required=False)
-    department_id = fields.Many2one('hr.department', string='Departamento (opcional)', required=False)
+    department_id = fields.Many2one('hr.department', string='Departamento', required=False)
 
     def action_generate_report(self):
         data = {

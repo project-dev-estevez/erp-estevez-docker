@@ -8,13 +8,11 @@ class PayrollReportXlsx(models.AbstractModel):
     _description = 'Reporte Excel de Nómina (Hola Mundo)'
 
     def generate_xlsx_report(self, workbook, data, objects):
-        # data contiene los filtros que pasó el wizard
         helper = self.env['hr_attendance_estevez.report_helper']
-        rows = helper.hello_world_rows(self.env, tipo='payroll')
+        rows = helper.get_report_rows(self.env, report_type='payroll')
 
         sheet = workbook.add_worksheet('Nómina - Hola')
         bold = workbook.add_format({'bold': True})
-        # Escribir filas simples
         for r_idx, row in enumerate(rows):
             for c_idx, cell in enumerate(row):
                 fmt = bold if r_idx == 0 else None
