@@ -9,7 +9,7 @@ class PayrollReportXlsx(models.AbstractModel):
 
     def generate_xlsx_report(self, workbook, data, objects):
         helper = self.env['hr_attendance_estevez.report_helper']
-        rows = helper.get_report_rows(self.env, report_type='payroll')
+        rows = helper.get_report_rows(self.env, report_type='payroll', filters=data)
 
         sheet = workbook.add_worksheet('Nómina - Hola')
         bold = workbook.add_format({'bold': True})
