@@ -18,11 +18,42 @@ class ReportHelper(models.AbstractModel):
             return []
 
     def _get_attendance_report_rows(self, env, filters):
-        # Aquí puedes usar los filtros si lo necesitas
-        return [
-            ['Empleado', 'Check-In', 'Check-Out', 'Duración', 'TipoPago'],
-            ['Juan Pérez', '2025-10-20 08:00', '2025-10-20 17:00', 9, 'Mensual'],
+        header = [
+            'No. empleado',
+            'Nombre',
+            'Fecha y hora Entrada',
+            'Fecha y hora Salida',
+            'Tipo',
+            'Empresa',
+            'Tipo Pago',
         ]
+        rows = [header]
+
+        domain = []
+        if filters.get('date_start'):
+            domain.append(('check_in', '>=', filters['date_start']))
+        if filters.get('date_end'):
+            domain.append(('check_in', '<=', filters['date_end']))
+        if filters.get('company_id'):
+            domain.append(('employee_id.company_id', '=', filters['company_id']))
+        if filters.get('department_id'):
+            domain.append(('employee_id.department_id', '=', filters['department_id']))
+        if filters.get('payment_type'):
+            domain.append(('employee_id.payment_type', '=', filters['payment_type']))
+
+        attendances = env['hr.attendance'].search(domain)
+        for att in attendances:
+            emp = att.employee_id
+            rows.append([
+                emp.employee_number if hasattr(emp, 'employee_number') else '',
+                emp.name,
+                att.check_in if hasattr(att, 'check_in') else '',
+                att.check_out if hasattr(att, 'check_out') else '',
+                emp.job_id.name if emp.job_id else '',
+                emp.company_id.name if emp.company_id else '',
+                emp.contract_id.structure_type_id.name if hasattr(emp, 'contract_id') and emp.contract_id and hasattr(emp.contract_id, 'structure_type_id') and emp.contract_id.structure_type_id else '',
+            ])
+        return rows
 
     def _get_payroll_report_rows(self, env, filters):
         header = [
