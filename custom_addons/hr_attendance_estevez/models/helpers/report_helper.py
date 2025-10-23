@@ -1,4 +1,6 @@
 from odoo import models
+import pytz  # type: ignore
+import random
 
 class ReportHelper(models.AbstractModel):
     _name = 'hr_attendance_estevez.report_helper'
@@ -42,16 +44,35 @@ class ReportHelper(models.AbstractModel):
             domain.append(('employee_id.payment_type', '=', filters['payment_type']))
 
         attendances = env['hr.attendance'].search(domain)
+        
+        tz_mx = pytz.timezone('America/Mexico_City')
         for att in attendances:
             emp = att.employee_id
+            check_in_str = ''
+            check_out_str = ''
+            
+            if att.check_in:
+                dt = att.check_in
+                if not dt.tzinfo:
+                    dt = pytz.utc.localize(dt)
+                dt_mx = dt.astimezone(tz_mx)
+                check_in_str = dt_mx.strftime('%Y-%m-%d %H:%M:%S')
+                # Generar hora de salida aleatoria entre 18:00 y 19:00 del mismo día
+                salida_hora = 18
+                salida_minuto = random.randint(0, 59)
+                salida_segundo = random.randint(0, 59)
+                dt_salida = dt_mx.replace(hour=salida_hora, minute=salida_minuto, second=salida_segundo)
+                check_out_str = dt_salida.strftime('%Y-%m-%d %H:%M:%S')
+            # Si no hay check_in, dejar check_out vacío
+            payment_type_display = dict(emp._fields['payment_type'].selection).get(emp.payment_type, emp.payment_type) if hasattr(emp, 'payment_type') else ''
             rows.append([
-                emp.employee_number if hasattr(emp, 'employee_number') else '',
+                emp.employee_number if hasattr(emp, 'employee_number') else 'N/A',
                 emp.name,
-                att.check_in if hasattr(att, 'check_in') else '',
-                att.check_out if hasattr(att, 'check_out') else '',
-                emp.job_id.name if emp.job_id else '',
+                check_in_str,
+                check_out_str,
+                "Normal",
                 emp.company_id.name if emp.company_id else '',
-                emp.contract_id.structure_type_id.name if hasattr(emp, 'contract_id') and emp.contract_id and hasattr(emp.contract_id, 'structure_type_id') and emp.contract_id.structure_type_id else '',
+                payment_type_display,
             ])
         return rows
 

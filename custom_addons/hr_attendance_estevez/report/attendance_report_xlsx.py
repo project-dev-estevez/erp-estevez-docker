@@ -12,6 +12,10 @@ class AttendanceReportXlsx(models.AbstractModel):
 
         sheet = workbook.add_worksheet('Asistencias - Hola')
         bold = workbook.add_format({'bold': True})
+
+        for col in range(len(rows[0])):
+            sheet.set_column(col, col, 25)
+            
         for r_idx, row in enumerate(rows):
             for c_idx, cell in enumerate(row):
                 fmt = bold if r_idx == 0 else None
