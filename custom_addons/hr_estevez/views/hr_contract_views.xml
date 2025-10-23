@@ -49,9 +49,9 @@
                     <field name="date_start" string="Fecha Inicio de Contrato"/>
                     <field name="date_end" string="Fecha Fin de Contrato"/>
                     <field name="days_to_expiry"/>
-                    <field name="bank"/>
-                    <field name="bank_account"/>
-                    <field name="clabe"/>
+                    <field name="bank" invisible="1"/>
+                    <field name="bank_account" invisible="1"/>
+                    <field name="clabe" invisible="1"/>
                 </group>
             </xpath>
 
