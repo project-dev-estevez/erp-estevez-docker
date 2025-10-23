@@ -1,6 +1,6 @@
 from odoo import models
 import pytz  # type: ignore
-import pandas as pd
+import pandas as pd # type: ignore
 import random
 from datetime import datetime, timedelta, date
 
@@ -94,8 +94,8 @@ class ReportHelper(models.AbstractModel):
             'Permisos',
             'Faltas'
         ]
-        rows = [header]
 
+        # --- NUEVO: columnas dinámicas por día ---
         date_start = filters.get('date_start')
         date_end = filters.get('date_end')
         if isinstance(date_start, str):
@@ -103,6 +103,12 @@ class ReportHelper(models.AbstractModel):
         if isinstance(date_end, str):
             date_end = datetime.strptime(date_end, '%Y-%m-%d')
 
+        date_columns = [d.strftime('%d/%m') for d in pd.date_range(date_start, date_end, freq='D')]
+        header.extend(date_columns)
+
+        rows = [header]
+
+        # ---- Parte original de tu código (resumen de nómina) ----
         domain_att = []
         if filters.get('company_id'):
             domain_att.append(('employee_id.company_id', '=', filters['company_id']))
@@ -113,20 +119,18 @@ class ReportHelper(models.AbstractModel):
         if filters.get('date_end'):
             domain_att.append(('check_in', '<=', date_end))
 
-        # Obtener todos los empleados
         employees = env['hr.employee'].search([])
         df_emp = pd.DataFrame([{
             'id': emp.id,
             'numero': getattr(emp, 'employee_number', 'N/A'),
             'nombre': emp.name,
-            'fecha_ingreso': emp.employment_start_date if hasattr(emp, 'employment_start_date') else None,
+            'fecha_ingreso': getattr(emp, 'employment_start_date', None),
             'empresa': emp.company_id.name if emp.company_id else '',
             'departamento': emp.department_id.name if emp.department_id else '',
             'puesto': emp.job_id.name if emp.job_id else '',
             'tipo_pago': dict(emp._fields['payment_type'].selection).get(emp.payment_type, emp.payment_type) if hasattr(emp, 'payment_type') else 'N/A',
         } for emp in employees])
 
-        # Obtener todas las asistencias en el rango
         attendances = env['hr.attendance'].search(domain_att)
         df_att = pd.DataFrame([{
             'employee_id': att.employee_id.id,
@@ -135,11 +139,7 @@ class ReportHelper(models.AbstractModel):
 
         if not df_att.empty:
             df_att['check_in'] = pd.to_datetime(df_att['check_in'])
-            # Retardos: después de las 08:10
-            df_att['retardo'] = (df_att['check_in'].dt.hour > 8) | (
-                (df_att['check_in'].dt.hour == 8) & (df_att['check_in'].dt.minute > 10)
-            )
-            # Asistencias y retardos agrupados
+            df_att['retardo'] = (df_att['check_in'].dt.hour > 8) | ((df_att['check_in'].dt.hour == 8) & (df_att['check_in'].dt.minute > 10))
             df_stats = df_att.groupby('employee_id').agg(
                 asistencias=('check_in', 'count'),
                 retardos=('retardo', 'sum'),
@@ -147,7 +147,6 @@ class ReportHelper(models.AbstractModel):
         else:
             df_stats = pd.DataFrame(columns=['employee_id', 'asistencias', 'retardos'])
 
-        # Obtener todas las ausencias (vacaciones, permisos, incapacidades)
         leaves = env['hr.leave'].search([
             ('state', '=', 'validate'),
             ('date_from', '<=', date_end),
@@ -160,10 +159,12 @@ class ReportHelper(models.AbstractModel):
             'hasta': lv.date_to
         } for lv in leaves])
 
-        df_leave['desde'] = pd.to_datetime(df_leave['desde'])
-        df_leave['hasta'] = pd.to_datetime(df_leave['hasta'])
+        if not df_leave.empty:
+            df_leave['desde'] = pd.to_datetime(df_leave['desde'])
+            df_leave['hasta'] = pd.to_datetime(df_leave['hasta'])
+        else:
+            df_leave = pd.DataFrame(columns=['employee_id', 'tipo', 'desde', 'hasta'])
 
-        # Contar tipos de ausencias
         def count_type(df, name):
             if df.empty:
                 return pd.DataFrame(columns=['employee_id', name])
@@ -174,45 +175,74 @@ class ReportHelper(models.AbstractModel):
         df_inc = count_type(df_leave, 'Incapacidad')
         df_perm = count_type(df_leave, 'Permiso')
 
-        # Unir todo
         df = df_emp.merge(df_stats, how='left', left_on='id', right_on='employee_id')
         df = df.merge(df_vac, how='left', on='employee_id')
         df = df.merge(df_inc, how='left', on='employee_id')
         df = df.merge(df_perm, how='left', on='employee_id')
 
-        # Rellenar nulos
         df[['asistencias', 'retardos', 'Vacaciones', 'Incapacidad', 'Permiso']] = df[
             ['asistencias', 'retardos', 'Vacaciones', 'Incapacidad', 'Permiso']
         ].fillna(0).astype(int)
 
-        # Calcular faltas (días hábiles - asistencias - ausencias)
         business_days = pd.date_range(date_start, date_end, freq='B')
         total_dias_habiles = len(business_days)
-        df['Faltas'] = total_dias_habiles - (
-            df['asistencias'] + df['Vacaciones'] + df['Incapacidad'] + df['Permiso']
-        )
+        df['Faltas'] = total_dias_habiles - (df['asistencias'] + df['Vacaciones'] + df['Incapacidad'] + df['Permiso'])
         df['Faltas'] = df['Faltas'].clip(lower=0)
 
-        # Formatear fecha de ingreso
         if not df['fecha_ingreso'].isnull().all():
             df['fecha_ingreso'] = pd.to_datetime(df['fecha_ingreso'], errors='coerce').dt.strftime('%Y-%m-%d')
 
-        # Construir filas finales
-        for _, r in df.iterrows():
+        # --- NUEVO: marcación por día ---
+        for _, emp in df.iterrows():
+            emp_id = emp['id']
+            daily_marks = []
+            for day in pd.date_range(date_start, date_end, freq='D'):
+                # 1️⃣ Verificar si hay asistencia ese día
+                att_day = df_att[
+                    (df_att['employee_id'] == emp_id)
+                    & (df_att['check_in'].dt.date == day.date())
+                ]
+                if not att_day.empty:
+                    # Retardo o asistencia normal
+                    mark = 'R' if att_day['retardo'].any() else 'A'
+                else:
+                    # 2️⃣ Verificar si hay leave (vacaciones, incapacidad o permiso)
+                    lv_day = df_leave[
+                        (df_leave['employee_id'] == emp_id)
+                        & (df_leave['desde'].dt.date <= day.date())
+                        & (df_leave['hasta'].dt.date >= day.date())
+                    ]
+                    if not lv_day.empty:
+                        tipo = lv_day.iloc[0]['tipo'].lower()
+                        if 'vacac' in tipo:
+                            mark = 'V'
+                        elif 'incap' in tipo:
+                            mark = 'I'
+                        elif 'perm' in tipo:
+                            mark = 'P'
+                        else:
+                            mark = '-'
+                    else:
+                        # 3️⃣ Falta
+                        mark = 'F'
+                daily_marks.append(mark)
+
+            # --- Agregar fila completa ---
             rows.append([
-                r['numero'],
-                r['nombre'],
-                r['fecha_ingreso'] if pd.notna(r['fecha_ingreso']) else 'N/A',
-                r['empresa'],
-                r['departamento'],
-                r['puesto'],
-                r['tipo_pago'],
-                int(r['asistencias']),
-                int(r['Vacaciones']),
-                int(r['retardos']),
-                int(r['Incapacidad']),
-                int(r['Permiso']),
-                int(r['Faltas']),
+                emp['numero'],
+                emp['nombre'],
+                emp['fecha_ingreso'] if pd.notna(emp['fecha_ingreso']) else 'N/A',
+                emp['empresa'],
+                emp['departamento'],
+                emp['puesto'],
+                emp['tipo_pago'],
+                int(emp['asistencias']),
+                int(emp['Vacaciones']),
+                int(emp['retardos']),
+                int(emp['Incapacidad']),
+                int(emp['Permiso']),
+                int(emp['Faltas']),
+                *daily_marks
             ])
 
         return rows
