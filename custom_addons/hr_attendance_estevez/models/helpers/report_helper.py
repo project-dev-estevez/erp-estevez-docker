@@ -192,15 +192,22 @@ class ReportHelper(models.AbstractModel):
         else:
             df_leave = pd.DataFrame(columns=['employee_id', 'tipo', 'desde', 'hasta'])
 
-        def count_type(df, name):
+        def count_days_type(df, name, date_start, date_end):
             if df.empty:
                 return pd.DataFrame(columns=['employee_id', name])
             mask = df['tipo'].str.contains(name, case=False, na=False)
-            return df[mask].groupby('employee_id').size().reset_index(name=name)
+            df_type = df[mask].copy()
+            # Calcular días de cada registro dentro del periodo del reporte
+            df_type['desde_clip'] = df_type['desde'].apply(lambda d: max(d, date_start))
+            df_type['hasta_clip'] = df_type['hasta'].apply(lambda d: min(d, date_end))
+            df_type['dias'] = (df_type['hasta_clip'] - df_type['desde_clip']).dt.days + 1
+            # Solo contar días positivos
+            df_type['dias'] = df_type['dias'].clip(lower=0)
+            return df_type.groupby('employee_id')['dias'].sum().reset_index(name=name)
 
-        df_vac = count_type(df_leave, 'Vacaciones')
-        df_inc = count_type(df_leave, 'Incapacidad')
-        df_perm = count_type(df_leave, 'Permiso')
+        df_vac = count_days_type(df_leave, 'Vacaciones', date_start, date_end)
+        df_inc = count_days_type(df_leave, 'Incapacidad', date_start, date_end)
+        df_perm = count_days_type(df_leave, 'Permiso', date_start, date_end)
 
         df = df_emp.merge(df_stats, how='left', left_on='id', right_on='employee_id')
         df = df.merge(df_vac, how='left', on='employee_id')
