@@ -2,7 +2,7 @@ from odoo import models
 import pytz  # type: ignore
 import pandas as pd # type: ignore
 import random
-from datetime import datetime, timedelta, date
+from datetime import datetime
 
 class ReportHelper(models.AbstractModel):
     _name = 'hr_attendance_estevez.report_helper'
@@ -79,6 +79,7 @@ class ReportHelper(models.AbstractModel):
         return rows
 
     def _get_payroll_report_rows(self, env, filters):
+        # --- Encabezados del reporte ---
         header = [
             'Numero Empleado',
             'Nombre Completo',
@@ -95,7 +96,7 @@ class ReportHelper(models.AbstractModel):
             'Faltas'
         ]
 
-        # --- NUEVO: columnas dinámicas por día ---
+        # --- Columnas por día ---
         date_start = filters.get('date_start')
         date_end = filters.get('date_end')
         if isinstance(date_start, str):
@@ -108,60 +109,83 @@ class ReportHelper(models.AbstractModel):
 
         rows = [header]
 
-        # ---- Parte original de tu código (resumen de nómina) ----
-        domain_att = []
+        # --- Dominio base para empleados ---
+        domain_emp = []
         if filters.get('company_id'):
-            domain_att.append(('employee_id.company_id', '=', filters['company_id']))
+            domain_emp.append(('company_id', '=', filters['company_id']))
         if filters.get('department_id'):
-            domain_att.append(('employee_id.department_id', '=', filters['department_id']))
+            domain_emp.append(('department_id', '=', filters['department_id']))
+
+        # --- Obtener empleados (optimizado con search_read) ---
+        fields_emp = [
+            'id', 'employee_number', 'name', 'employment_start_date',
+            'company_id', 'department_id', 'job_id', 'payment_type'
+        ]
+        employees_read = env['hr.employee'].search_read(domain_emp, fields_emp)
+
+        def rel_name(val):
+            return val[1] if isinstance(val, (list, tuple)) and len(val) > 1 else ''
+
+        df_emp = pd.DataFrame.from_records(employees_read)
+        if df_emp.empty:
+            return rows
+
+        df_emp['empresa'] = df_emp['company_id'].apply(rel_name)
+        df_emp['departamento'] = df_emp['department_id'].apply(rel_name)
+        df_emp['puesto'] = df_emp['job_id'].apply(rel_name)
+
+        payment_map = dict(env['hr.employee']._fields['payment_type'].selection) if 'payment_type' in env['hr.employee']._fields else {}
+        df_emp['tipo_pago'] = df_emp['payment_type'].map(lambda v: payment_map.get(v, v if v else 'N/A'))
+
+        df_emp = df_emp.rename(columns={
+            'employee_number': 'numero',
+            'name': 'nombre',
+            'employment_start_date': 'fecha_ingreso'
+        })
+        df_emp = df_emp[['id', 'numero', 'nombre', 'fecha_ingreso', 'empresa', 'departamento', 'puesto', 'tipo_pago']]
+        df_emp['numero'] = df_emp['numero'].fillna('N/A')
+
+        # --- Asistencias ---
+        domain_att = []
         if filters.get('date_start'):
             domain_att.append(('check_in', '>=', date_start))
         if filters.get('date_end'):
             domain_att.append(('check_in', '<=', date_end))
+        # filtrar por company/department en attendances si se pasó el filtro
+        if filters.get('company_id'):
+            domain_att.append(('employee_id.company_id', '=', filters['company_id']))
+        if filters.get('department_id'):
+            domain_att.append(('employee_id.department_id', '=', filters['department_id']))
 
-        employees = env['hr.employee'].search([])
-        df_emp = pd.DataFrame([{
-            'id': emp.id,
-            'numero': getattr(emp, 'employee_number', 'N/A'),
-            'nombre': emp.name,
-            'fecha_ingreso': getattr(emp, 'employment_start_date', None),
-            'empresa': emp.company_id.name if emp.company_id else '',
-            'departamento': emp.department_id.name if emp.department_id else '',
-            'puesto': emp.job_id.name if emp.job_id else '',
-            'tipo_pago': dict(emp._fields['payment_type'].selection).get(emp.payment_type, emp.payment_type) if hasattr(emp, 'payment_type') else 'N/A',
-        } for emp in employees])
-
-        attendances = env['hr.attendance'].search(domain_att)
-        df_att = pd.DataFrame([{
-            'employee_id': att.employee_id.id,
-            'check_in': att.check_in,
-        } for att in attendances])
+        attendances = env['hr.attendance'].search_read(domain_att, ['employee_id', 'check_in'])
+        df_att = pd.DataFrame.from_records(attendances)
 
         if not df_att.empty:
             df_att['check_in'] = pd.to_datetime(df_att['check_in'])
+            df_att['employee_id'] = df_att['employee_id'].apply(lambda v: v[0] if v else None)
             df_att['retardo'] = (df_att['check_in'].dt.hour > 8) | ((df_att['check_in'].dt.hour == 8) & (df_att['check_in'].dt.minute > 10))
             df_stats = df_att.groupby('employee_id').agg(
                 asistencias=('check_in', 'count'),
-                retardos=('retardo', 'sum'),
+                retardos=('retardo', 'sum')
             ).reset_index()
         else:
             df_stats = pd.DataFrame(columns=['employee_id', 'asistencias', 'retardos'])
 
-        leaves = env['hr.leave'].search([
+        # --- Ausencias (Vacaciones, Incapacidades, Permisos) ---
+        leave_domain = [
             ('state', '=', 'validate'),
             ('date_from', '<=', date_end),
             ('date_to', '>=', date_start),
-        ])
-        df_leave = pd.DataFrame([{
-            'employee_id': lv.employee_id.id,
-            'tipo': lv.holiday_status_id.name,
-            'desde': lv.date_from,
-            'hasta': lv.date_to
-        } for lv in leaves])
+        ]
+        # si quieres limitar leaves por empresa/departamento se puede añadir filtrando por employee_id a partir de df_emp['id']
+        leaves = env['hr.leave'].search_read(leave_domain, ['employee_id', 'holiday_status_id', 'date_from', 'date_to'])
+        df_leave = pd.DataFrame.from_records(leaves)
 
         if not df_leave.empty:
-            df_leave['desde'] = pd.to_datetime(df_leave['desde'])
-            df_leave['hasta'] = pd.to_datetime(df_leave['hasta'])
+            df_leave['employee_id'] = df_leave['employee_id'].apply(lambda v: v[0] if v else None)
+            df_leave['tipo'] = df_leave['holiday_status_id'].apply(lambda v: v[1] if isinstance(v, (list, tuple)) and len(v) > 1 else '')
+            df_leave['desde'] = pd.to_datetime(df_leave['date_from'])
+            df_leave['hasta'] = pd.to_datetime(df_leave['date_to'])
         else:
             df_leave = pd.DataFrame(columns=['employee_id', 'tipo', 'desde', 'hasta'])
 
@@ -192,25 +216,21 @@ class ReportHelper(models.AbstractModel):
         if not df['fecha_ingreso'].isnull().all():
             df['fecha_ingreso'] = pd.to_datetime(df['fecha_ingreso'], errors='coerce').dt.strftime('%Y-%m-%d')
 
-        # --- NUEVO: marcación por día ---
+        # --- Marcación por día ---
         for _, emp in df.iterrows():
             emp_id = emp['id']
             daily_marks = []
             for day in pd.date_range(date_start, date_end, freq='D'):
-                # 1️⃣ Verificar si hay asistencia ese día
                 att_day = df_att[
-                    (df_att['employee_id'] == emp_id)
-                    & (df_att['check_in'].dt.date == day.date())
+                    (df_att['employee_id'] == emp_id) & (df_att['check_in'].dt.date == day.date())
                 ]
                 if not att_day.empty:
-                    # Retardo o asistencia normal
                     mark = 'R' if att_day['retardo'].any() else 'A'
                 else:
-                    # 2️⃣ Verificar si hay leave (vacaciones, incapacidad o permiso)
                     lv_day = df_leave[
-                        (df_leave['employee_id'] == emp_id)
-                        & (df_leave['desde'].dt.date <= day.date())
-                        & (df_leave['hasta'].dt.date >= day.date())
+                        (df_leave['employee_id'] == emp_id) &
+                        (df_leave['desde'].dt.date <= day.date()) &
+                        (df_leave['hasta'].dt.date >= day.date())
                     ]
                     if not lv_day.empty:
                         tipo = lv_day.iloc[0]['tipo'].lower()
@@ -223,11 +243,9 @@ class ReportHelper(models.AbstractModel):
                         else:
                             mark = '-'
                     else:
-                        # 3️⃣ Falta
                         mark = 'F'
                 daily_marks.append(mark)
 
-            # --- Agregar fila completa ---
             rows.append([
                 emp['numero'],
                 emp['nombre'],
