@@ -119,7 +119,7 @@ class ReportHelper(models.AbstractModel):
         if filters.get('department_id'):
             domain_emp.append(('department_id', '=', filters['department_id']))
 
-        # --- Obtener empleados (optimizado con search_read) ---
+        # --- Obtener empleados ---
         fields_emp = [
             'id', 'employee_number', 'name', 'employment_start_date',
             'company_id', 'department_id', 'job_id', 'payment_type'
@@ -154,7 +154,6 @@ class ReportHelper(models.AbstractModel):
             domain_att.append(('check_in', '>=', date_start))
         if filters.get('date_end'):
             domain_att.append(('check_in', '<=', date_end))
-        # filtrar por company/department en attendances si se pasó el filtro
         if filters.get('company_id'):
             domain_att.append(('employee_id.company_id', '=', filters['company_id']))
         if filters.get('department_id'):
@@ -180,28 +179,30 @@ class ReportHelper(models.AbstractModel):
             ('date_from', '<=', date_end),
             ('date_to', '>=', date_start),
         ]
-        # si quieres limitar leaves por empresa/departamento se puede añadir filtrando por employee_id a partir de df_emp['id']
         leaves = env['hr.leave'].search_read(leave_domain, ['employee_id', 'holiday_status_id', 'date_from', 'date_to'])
         df_leave = pd.DataFrame.from_records(leaves)
 
         if not df_leave.empty:
             df_leave['employee_id'] = df_leave['employee_id'].apply(lambda v: v[0] if v else None)
             df_leave['tipo'] = df_leave['holiday_status_id'].apply(lambda v: v[1] if isinstance(v, (list, tuple)) and len(v) > 1 else '')
-            df_leave['desde'] = pd.to_datetime(df_leave['date_from'])
-            df_leave['hasta'] = pd.to_datetime(df_leave['date_to'])
+            df_leave['desde'] = pd.to_datetime(df_leave['date_from']).dt.date
+            df_leave['hasta'] = pd.to_datetime(df_leave['date_to']).dt.date
         else:
             df_leave = pd.DataFrame(columns=['employee_id', 'tipo', 'desde', 'hasta'])
 
+        # --- Conteo de días dentro del rango del reporte ---
         def count_days_type(df, name, date_start, date_end):
             if df.empty:
                 return pd.DataFrame(columns=['employee_id', name])
             mask = df['tipo'].str.contains(name, case=False, na=False)
             df_type = df[mask].copy()
-            # Calcular días de cada registro dentro del periodo del reporte
-            df_type['desde_clip'] = df_type['desde'].apply(lambda d: max(d, date_start))
-            df_type['hasta_clip'] = df_type['hasta'].apply(lambda d: min(d, date_end))
+            # Calcular solo los días dentro del rango del reporte
+            df_type['desde_clip'] = df_type['desde'].apply(lambda d: max(d, date_start.date()))
+            df_type['hasta_clip'] = df_type['hasta'].apply(lambda d: min(d, date_end.date()))
+            # Convertir a datetime64 para permitir el cálculo de diferencia
+            df_type['desde_clip'] = pd.to_datetime(df_type['desde_clip'])
+            df_type['hasta_clip'] = pd.to_datetime(df_type['hasta_clip'])
             df_type['dias'] = (df_type['hasta_clip'] - df_type['desde_clip']).dt.days + 1
-            # Solo contar días positivos
             df_type['dias'] = df_type['dias'].clip(lower=0)
             return df_type.groupby('employee_id')['dias'].sum().reset_index(name=name)
 
@@ -209,6 +210,7 @@ class ReportHelper(models.AbstractModel):
         df_inc = count_days_type(df_leave, 'Incapacidad', date_start, date_end)
         df_perm = count_days_type(df_leave, 'Permiso', date_start, date_end)
 
+        # --- Combinar todo ---
         df = df_emp.merge(df_stats, how='left', left_on='id', right_on='employee_id')
         df = df.merge(df_vac, how='left', on='employee_id')
         df = df.merge(df_inc, how='left', on='employee_id')
@@ -218,11 +220,13 @@ class ReportHelper(models.AbstractModel):
             ['asistencias', 'retardos', 'Vacaciones', 'Incapacidad', 'Permiso']
         ].fillna(0).astype(int)
 
+        # --- Faltas ---
         business_days = pd.date_range(date_start, date_end, freq='B')
         total_dias_habiles = len(business_days)
         df['Faltas'] = total_dias_habiles - (df['asistencias'] + df['Vacaciones'] + df['Incapacidad'] + df['Permiso'])
         df['Faltas'] = df['Faltas'].clip(lower=0)
 
+        # --- Formateo de fecha ingreso ---
         if not df['fecha_ingreso'].isnull().all():
             df['fecha_ingreso'] = pd.to_datetime(df['fecha_ingreso'], errors='coerce').dt.strftime('%Y-%m-%d')
 
@@ -239,8 +243,8 @@ class ReportHelper(models.AbstractModel):
                 else:
                     lv_day = df_leave[
                         (df_leave['employee_id'] == emp_id) &
-                        (df_leave['desde'].dt.date <= day.date()) &
-                        (df_leave['hasta'].dt.date >= day.date())
+                        (df_leave['desde'] <= day.date()) &
+                        (df_leave['hasta'] >= day.date())
                     ]
                     if not lv_day.empty:
                         tipo = lv_day.iloc[0]['tipo'].lower()
