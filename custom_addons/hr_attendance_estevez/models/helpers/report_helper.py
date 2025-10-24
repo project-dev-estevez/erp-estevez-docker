@@ -3,6 +3,8 @@ import pytz  # type: ignore
 import pandas as pd # type: ignore
 import random
 from datetime import datetime, time
+import holidays
+import holidays
 
 class ReportHelper(models.AbstractModel):
     _name = 'hr_attendance_estevez.report_helper'
@@ -196,14 +198,30 @@ class ReportHelper(models.AbstractModel):
                 return pd.DataFrame(columns=['employee_id', name])
             mask = df['tipo'].str.contains(name, case=False, na=False)
             df_type = df[mask].copy()
-            # Calcular solo los días dentro del rango del reporte
+            # Calcular solo los días dentro del rango del reporte, excluyendo domingos y festivos oficiales de México
             df_type['desde_clip'] = df_type['desde'].apply(lambda d: max(d, date_start.date()))
             df_type['hasta_clip'] = df_type['hasta'].apply(lambda d: min(d, date_end.date()))
-            # Convertir a datetime64 para permitir el cálculo de diferencia
-            df_type['desde_clip'] = pd.to_datetime(df_type['desde_clip'])
-            df_type['hasta_clip'] = pd.to_datetime(df_type['hasta_clip'])
-            df_type['dias'] = (df_type['hasta_clip'] - df_type['desde_clip']).dt.days + 1
-            df_type['dias'] = df_type['dias'].clip(lower=0)
+
+            # Usar holidays para México en el rango de años del reporte
+            years = set([date_start.year, date_end.year])
+            if date_start.year != date_end.year:
+                years = set(range(date_start.year, date_end.year + 1))
+            mx_holidays = holidays.Mexico(years=years)
+
+            def is_holiday(day):
+                return day in mx_holidays
+
+            def count_valid_days(row):
+                desde = row['desde_clip']
+                hasta = row['hasta_clip']
+                if pd.isnull(desde) or pd.isnull(hasta) or desde > hasta:
+                    return 0
+                days = pd.date_range(desde, hasta, freq='D')
+                if len(days) == 0:
+                    return 0
+                return int(sum((day.weekday() != 6) and not is_holiday(day) for day in days))
+
+            df_type['dias'] = df_type.apply(count_valid_days, axis=1)
             return df_type.groupby('employee_id')['dias'].sum().reset_index(name=name)
 
         df_vac = count_days_type(df_leave, 'Vacaciones', date_start, date_end)
