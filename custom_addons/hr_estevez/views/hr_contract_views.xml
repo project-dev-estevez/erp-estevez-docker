@@ -47,7 +47,9 @@
                     <!-- Fecha de ingreso a la empresa -->
                     <field name="date_of_entry"/>
                     <field name="date_start" string="Fecha Inicio de Contrato"/>
-                    <field name="date_end" string="Fecha Fin de Contrato"/>
+                    <field name="contract_duration" string="Duración del Contrato" 
+               options="{'readonly': [('state', '=', 'open')]}"/>
+                    <field name="date_end" string="Fecha Fin de Contrato"/>                   
                     <field name="days_to_expiry"/>
                     <field name="bank" invisible="1"/>
                     <field name="bank_account" invisible="1"/>
