@@ -137,7 +137,7 @@ class HrAttendance(models.Model):
             elif record.check_out:
                 # Conversión automática a la zona horaria del usuario
                 local_dt = fields.Datetime.context_timestamp(record, record.check_out)
-                record.check_out_display = local_dt.strftime('%d-%m-%Y %H:%M:%S')
+                record.check_out_display = local_dt.strftime('%d/%m/%Y %H:%M:%S')
             else:
                 record.check_out_display = ''
 
