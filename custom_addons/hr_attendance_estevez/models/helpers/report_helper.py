@@ -2,7 +2,7 @@ from odoo import models
 import pytz  # type: ignore
 import pandas as pd # type: ignore
 import random
-from datetime import datetime
+from datetime import datetime, time
 
 class ReportHelper(models.AbstractModel):
     _name = 'hr_attendance_estevez.report_helper'
@@ -103,6 +103,9 @@ class ReportHelper(models.AbstractModel):
             date_start = datetime.strptime(date_start, '%Y-%m-%d')
         if isinstance(date_end, str):
             date_end = datetime.strptime(date_end, '%Y-%m-%d')
+        # Ajustar date_end al final del día para incluir todas las asistencias de ese día
+        if date_end is not None:
+            date_end = datetime.combine(date_end.date(), time(23, 59, 59))
 
         date_columns = [d.strftime('%d/%m') for d in pd.date_range(date_start, date_end, freq='D')]
         header.extend(date_columns)
