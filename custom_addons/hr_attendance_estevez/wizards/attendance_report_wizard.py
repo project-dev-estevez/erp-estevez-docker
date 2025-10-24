@@ -1,4 +1,5 @@
 from odoo import models, fields, _
+from odoo.exceptions import UserError
 
 
 from datetime import date, timedelta
@@ -7,24 +8,45 @@ class AttendanceReportWizard(models.TransientModel):
     _name = 'attendance.report.wizard'
     _description = 'Wizard para generar reporte de asistencias'
 
-    def _default_date_start(self):
-        today = date.today()
-        return today.replace(day=1)
+    date_start = fields.Date(
+        string='Fecha inicio', 
+        required=True, 
+        default=lambda self: date.today().replace(day=1)
+    )
 
-    def _default_date_end(self):
-        today = date.today()
-        next_month = today.replace(day=28) + timedelta(days=4)
-        return next_month - timedelta(days=next_month.day)
+    date_end = fields.Date(
+        string='Fecha final', 
+        required=True, 
+        default=lambda self: date.today()
+    )
 
-    date_start = fields.Date(string='Fecha inicio', required=True, default=_default_date_start)
-    date_end = fields.Date(string='Fecha final', required=True, default=_default_date_end)
-    company_id = fields.Many2one('res.company', string='Empresa', required=False)
-    department_id = fields.Many2one('hr.department', string='Departamento', required=False)
+    company_id = fields.Many2one(
+        'res.company', 
+        string='Empresa', 
+        required=False
+    )
+    
+    department_id = fields.Many2one(
+        'hr.department', 
+        string='Departamento', 
+        required=False
+    )
+
     payment_type = fields.Selection(
         selection=lambda self: self.env['hr.employee'].fields_get(['payment_type'])['payment_type']['selection'],
-        string='Tipo de Pago', required=False)
+        string='Tipo de Pago', required=False
+    )
+
+    def _validate_dates(self):
+        today = date.today()
+        for wizard in self:
+            if wizard.date_end > today:
+                raise UserError("La fecha final no puede ser mayor que la fecha actual.")
+            if wizard.date_end < wizard.date_start:
+                raise UserError("La fecha final no puede ser menor que la fecha inicial.")
 
     def action_generate_report(self):
+        self._validate_dates()
         data = {
             'date_start': self.date_start.isoformat() if self.date_start else False,
             'date_end': self.date_end.isoformat() if self.date_end else False,
