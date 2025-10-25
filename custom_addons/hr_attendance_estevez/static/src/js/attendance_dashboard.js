@@ -11,6 +11,10 @@ class AttendanceDashboard extends Component {
         })
         this.orm = useService("orm");
         this.root = useRef('attendance-dashboard')
+        // Cargar los últimos 15 días por defecto
+        setTimeout(() => {
+            this.onclick_this_filter("last_15_days");
+        }, 0);
     }
     /**
      * Event handler for the 'change' event of the filter input element.
