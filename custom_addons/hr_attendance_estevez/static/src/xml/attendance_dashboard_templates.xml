@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version="1.0" encoding="UTF-8"?>
 <template id="template" xml:space="preserve">
     <!--    This is an XML template for an HR Attendance Dashboard that includes a form -->
     <!--    for filtering attendance data, a search bar for finding specific employees, -->
@@ -8,43 +8,53 @@
         <div class="o_action_manager" style="height: 100%; overflow-y:scroll"
              t-ref="attendance-dashboard">
         <div class="employee_dashboard">
-        <div style="padding:10px;">
-            <h1>Dashboard de Asistencias</h1>
-        </div>
-            <div style="float:left; width:25%; padding:0px 10px;">
-            <form class="form-group col-6 w-auto">
-                <select style="border:1px solid #333;" id="filter_duration"
-                        class="form-control" t-on-change="onChangeFilter">
-                    <option value=""/>
+        <div class="row">
+            <div class="col m-0 p-0">
+                <div class="shadow-sm border m-2 p-4 bg-white">
+                    <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-md-between">
+                        <div class="d-flex align-items-center mb-3 mb-md-0">
+                            <div class="me-2 p-2 bg-primary bg-opacity-10 rounded-2 border border-primary border-opacity-20">
+                                <i class="fa fa-chart-line text-primary fs-4"></i>
+                            </div>
+                            <div>
+                                <h1 class="mb-1 fw-bold text-primary fs-2">
+                                    Dashboard de Asistencias
+                                </h1>
+                                <small class="text-muted fw-medium text-uppercase opacity-75">
+                                    Resumen de Asistencia, Ausencias y Puntualidad
+                                </small>
+                            </div>
+                        </div>
+                                <!-- Filtros y buscador alineados a la derecha -->
+                        <div class="d-flex align-items-center ms-auto gap-2" style="min-width:350px;">
+                            <form class="form-group m-0">
+                                <select style="border:1px solid #333; min-width:140px;" id="filter_duration"
+                                        class="form-control" t-on-change="onChangeFilter">
+                                    <option value=""/>
                     <option id="this_week"
-                            value="this_week">Esta Semana</option>
+                        value="this_week">Esta Semana</option>
                     <option id="last_15_days"
-                            value="last_15_days">Últimos 15 días</option>
+                        value="last_15_days" selected="selected">Últimos 15 días</option>
                     <option id="this_month"
-                            value="this_month">Este Mes</option>
-                </select>
-            </form>
+                        value="this_month">Este Mes</option>
+                                </select>
+                            </form>
+                            <div class="d-flex align-items-center" style="min-width:180px;">
+                                <input type="text" class="search-bar form-control" style="border:1px solid #333;" id="search-bar"/>
+                                <t t-jquery=".search-bar" t-operation="after">
+                                    <button type="object" t-on-click="_OnClickSearchEmployee"
+                                            class="btn btn-primary search_employee ms-2"
+                                            style="margin:0px 0px;">
+                                        Buscar
+                                    </button>
+                                </t>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-            <div style="padding:0px 5px; float:left;">
-            <t t-jquery=".form-group" t-operation="after">
-                <button type="object"
-                        t-on-click="_OnClickPdfReport"
-                        class="btn btn-primary print_attendance_pdf_report">
-                    Imprimir PDF
-                </button>
-            </t>
-        </div>
-            <div style="display:flex; margin-left:37px; width:30%; float:left;">
-            <input type="text" class="search-bar" style="border:1px solid #333;"
-                   id="search-bar"/>
-                <t t-jquery=".search-bar" t-operation="after">
-                <button type="object" t-on-click="_OnClickSearchEmployee"
-                        class="btn btn-primary search_employee"
-                        style="margin:0px 10px;">
-                    Buscar
-                </button>
-            </t>
-        </div>
+                <!-- Filtros y buscador ahora están en el header -->
             <div class="attendance_table">
             <table id="attendance_table" class="hr_attendance"/>
         </div>
