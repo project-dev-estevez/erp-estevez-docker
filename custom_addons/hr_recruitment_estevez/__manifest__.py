@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     "name": "Reclutamiento Estevez",
+    'license': 'LGPL-3',
     "summary": "Extensión del módulo de reclutamiento para Estevez.Jor",
     "description": """
         Este módulo extiende el módulo de reclutamiento para agregar la lógica de negocio de Estevez.Jor

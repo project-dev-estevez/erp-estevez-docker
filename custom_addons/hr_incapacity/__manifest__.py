@@ -1,5 +1,6 @@
 {
     'name': 'Incapacidades Estevez',
+    'license': 'LGPL-3',
     'version': '1.0',
     'category': 'Human Resources',
     'summary': 'Gestión de incapacidades para empleados',

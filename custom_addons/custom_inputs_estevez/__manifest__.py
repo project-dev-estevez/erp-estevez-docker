@@ -3,6 +3,7 @@
     'name': 'Custom Inputs Estevez',
     'version': '1.0.0',
     'category': 'Web',
+    'license': 'LGPL-3',
     'summary': 'Personalización global de estilos y spinner en Odoo',
     'description': """
         Módulo para aplicar estilos personalizados a los campos input y

@@ -1,5 +1,6 @@
 {
     'name': "Integración HR - eLearning",
+    'license': 'LGPL-3',
     'summary': "Integración entre módulo de empleados y cursos eLearning",
     'description': """
         Módulo que muestra los cursos inscritos por cada empleado en su ficha de RRHH

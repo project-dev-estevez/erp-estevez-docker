@@ -1,5 +1,6 @@
 {
     'name': 'Stock Estevez',
+    'license': 'LGPL-3',
     'version': '1.0',
     'summary': 'Modulo stock de Estevez',
     'depends': ['base', 'stock', 'product', 'uom', 'hr', 'mail'],
