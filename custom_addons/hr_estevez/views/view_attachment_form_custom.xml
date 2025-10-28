@@ -7,8 +7,8 @@
             <xpath expr="//form/sheet" position="replace">
                 <sheet>
                     <group>
-                        <field name="name"/>
-                        <field name="datas" widget="binary"/>
+                        <field name="name" readonly="1"/>
+                        <field name="datas" widget="binary" string="Seleccionar Archivo..."/>
                     </group>
                 </sheet>
             </xpath>
