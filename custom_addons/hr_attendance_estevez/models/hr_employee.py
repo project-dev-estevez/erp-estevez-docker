@@ -1,6 +1,6 @@
 import re
 
-import pandas
+import pandas # type: ignore
 from datetime import date, timedelta
 from odoo import api, fields, models
 from odoo.http import request
@@ -10,7 +10,7 @@ from odoo.tools import date_utils
 class HrEmployee(models.Model):
     """This module extends the 'hr.employee' model of  Odoo Employees Module.
      It adds a new method called 'get_employee_leave_data', which is used to
-     retrieve data for the dashboard."""
+     retrieve data for the attendance dashboard."""
     _inherit = 'hr.employee'
     _check_company_auto = True
 
@@ -18,54 +18,41 @@ class HrEmployee(models.Model):
     def get_employee_leave_data(self, option):
         """Returns data to the dashboard"""
         employee_data = []
-        res_config = self.env['res.config.settings'].search([], limit=1,
-                                                            order='id desc')
+        res_config = self.env['res.config.settings'].search([], limit=1, order='id desc')
         dates = False
         if option == 'this_week':
             dates = pandas.date_range(
                 date_utils.start_of(fields.Date.today(), 'week'),
                 date_utils.end_of(fields.Date.today(), 'week')
-                - timedelta(
-                    days=0),
-                freq='d').strftime(
-                "%Y-%m-%d").tolist()
+                - timedelta(days=0), freq='d').strftime("%Y-%m-%d").tolist()
         elif option == 'this_month':
             dates = pandas.date_range(
                 date_utils.start_of(fields.Date.today(), 'month'),
                 date_utils.end_of(fields.Date.today(), 'month')
-                - timedelta(
-                    days=0),
-                freq='d').strftime(
-                "%Y-%m-%d").tolist()
+                - timedelta(days=0), freq='d').strftime("%Y-%m-%d").tolist()
         elif option == 'last_15_days':
-            dates = [str(date.today() - timedelta(days=day))
-                     for day in range(15)]
+            dates = [str(date.today() - timedelta(days=day)) for day in range(15)]
 
         cids = request.httprequest.cookies.get('cids', '')
         split_cids = re.split(r'[,-]', cids)
         allowed_company_ids = [int(cid) for cid in split_cids if cid.isdigit()]
-        for employee in self.env['hr.employee'].search(
-                [('company_id', '=', allowed_company_ids)]):
+        for employee in self.env['hr.employee'].search([('company_id', '=', allowed_company_ids)]):
             leave_data = []
             employee_present_dates = []
             employee_leave_dates = []
             total_absent_count = 0
             query = ("""
-                SELECT hl.id,employee_id,request_date_from,request_date_to,
-                hlt.leave_code,hlt.color
+                SELECT hl.id,employee_id,request_date_from,request_date_to,hlt.leave_code,hlt.color
                 FROM hr_leave hl
 				INNER JOIN hr_leave_type hlt ON hlt.id = hl.holiday_status_id 
-                WHERE hl.state = 'validate' AND employee_id = '%s'"""
-                     % employee.id)
+                WHERE hl.state = 'validate' AND employee_id = '%s'""" % employee.id)
             self._cr.execute(query)
             all_leave_rec = self._cr.dictfetchall()
             for leave in all_leave_rec:
                 leave_dates = pandas.date_range(
-                    leave.get('request_date_from'),
-                    leave.get('request_date_to') - timedelta(
-                        days=0),
-                    freq='d').strftime(
-                    "%Y-%m-%d").tolist()
+                        leave.get('request_date_from'),
+                        leave.get('request_date_to') - timedelta(days=0), freq='d'
+                    ).strftime("%Y-%m-%d").tolist()
                 leave_dates.insert(0, leave.get('leave_code'))
                 leave_dates.insert(1, leave.get('color'))
                 for leave_date in leave_dates:
@@ -74,12 +61,10 @@ class HrEmployee(models.Model):
                             leave_date
                         )
             for employee_check_in in employee.attendance_ids:
-                employee_present_dates.append(
-                    str(employee_check_in.check_in.date()))
+                employee_present_dates.append(str(employee_check_in.check_in.date()))
             for leave_date in dates:
                 color = "#ffffff"
-                marks = self.env[
-                    'res.config.settings'].search([], limit=1)
+                marks = self.env['res.config.settings'].search([], limit=1)
                 state = None
                 if marks:
                     if leave_date in employee_present_dates:
