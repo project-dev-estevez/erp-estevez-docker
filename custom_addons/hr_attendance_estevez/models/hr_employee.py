@@ -20,12 +20,10 @@ class HrEmployee(models.Model):
         """Obtiene datos de ausencias y asistencias para el dashboard."""
         dates = self._get_filtered_dates(option)
         allowed_company_ids = self._get_allowed_company_ids()
-
         employees = self.search([('company_id', 'in', allowed_company_ids)])
-        res_config = self.env['res.config.settings'].search([], limit=1, order='id desc')
 
         employee_data = [
-            self._get_single_employee_leave_info(emp, dates, res_config)
+            self._get_single_employee_leave_info(emp, dates)
             for emp in employees
         ]
 
@@ -57,14 +55,14 @@ class HrEmployee(models.Model):
         cids = request.httprequest.cookies.get('cids', '')
         return [int(cid) for cid in re.split(r'[,-]', cids) if cid.isdigit()]
 
-    def _get_single_employee_leave_info(self, employee, dates, res_config):
+    def _get_single_employee_leave_info(self, employee, dates):
         """Obtiene la información de ausencias y asistencias para un empleado."""
         leave_records = self._get_validated_leaves(employee.id)
         leave_map = self._build_leave_map(leave_records, dates)
 
         present_dates = {str(att.check_in.date()) for att in employee.attendance_ids}
         leave_data, total_absent_count = self._generate_leave_data(
-            dates, present_dates, leave_map, res_config
+            dates, present_dates, leave_map
         )
 
         return {
@@ -107,7 +105,7 @@ class HrEmployee(models.Model):
         }
         return color_map.get(color_code, "#ffffff")
 
-    def _generate_leave_data(self, dates, present_dates, leave_map, res_config):
+    def _generate_leave_data(self, dates, present_dates, leave_map):
         """Genera los datos diarios de asistencia/ausencia."""
         leave_data = []
         total_absent_count = 0
@@ -116,10 +114,10 @@ class HrEmployee(models.Model):
             if leave_date in leave_map:
                 leave_info = leave_map[leave_date]
                 state = leave_info['code']
-                color = leave_info['color']
+                color = leave_info['color'] 
                 total_absent_count += 1
             else:
-                state = res_config.present if leave_date in present_dates else res_config.absent
+                state = '✅' if leave_date in present_dates else '❌'
                 color = "#ffffff"
 
             leave_data.append({
