@@ -52,19 +52,11 @@ class HrEmployee(models.Model):
 
     def _get_single_employee_leave_info(self, employee, dates):
         """Obtiene la información de ausencias y asistencias para un empleado."""
-        if not dates:
-            leave_records = []
-        else:
-            date_start = dates[0]
-            date_end = dates[-1]
-            leave_records = self._get_validated_leaves(employee.id, date_start, date_end)
+        leave_records = self._get_validated_leaves(employee.id, dates[0], dates[-1]) if dates else []
         leave_map = self._build_leave_map(leave_records, dates)
-        _logger.info('Mapa de permisos para el empleado %s: %s', employee.name, leave_map)
 
         present_dates = {str(att.check_in.date()) for att in employee.attendance_ids}
-        leave_data, total_absent_count = self._generate_leave_data(
-            dates, present_dates, leave_map
-        )
+        leave_data, total_absent_count = self._generate_leave_data(dates, present_dates, leave_map)
 
         return {
             'id': employee.id,
@@ -97,7 +89,7 @@ class HrEmployee(models.Model):
             for leave_date in leave_dates:
                 if leave_date in dates:
                     leave_map[leave_date] = {
-                        'code': leave_type.leave_code,
+                        'code': leave_type.code_id,
                         'color': self._resolve_leave_color(leave_type.color),
                     }
         return leave_map

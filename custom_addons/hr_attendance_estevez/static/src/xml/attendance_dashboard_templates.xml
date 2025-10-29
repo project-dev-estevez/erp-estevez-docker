@@ -1,9 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <template id="template" xml:space="preserve">
-    <!--    This is an XML template for an HR Attendance Dashboard that includes a form -->
-    <!--    for filtering attendance data, a search bar for finding specific employees, -->
-    <!--    and an HTML table for displaying attendance information. The template also -->
-    <!--    adds a "Print PDF" button to the form using jQuery.-->
     <t t-name="AttendanceDashboard" owl="1">
         <div class="o_action_manager" style="height: 100%; overflow-y:scroll"
              t-ref="attendance-dashboard">
