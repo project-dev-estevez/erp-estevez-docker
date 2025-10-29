@@ -1,6 +1,5 @@
 
 import re
-from datetime import date, timedelta
 import pandas as pd # type: ignore
 from odoo import api, fields, models
 from odoo.http import request

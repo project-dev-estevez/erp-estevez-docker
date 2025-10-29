@@ -4,7 +4,6 @@ import pandas as pd # type: ignore
 import random
 from datetime import datetime, time
 import holidays
-import holidays
 
 class ReportHelper(models.AbstractModel):
     _name = 'hr_attendance_estevez.report_helper'
