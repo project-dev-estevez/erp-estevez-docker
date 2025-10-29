@@ -51,7 +51,7 @@ class AttendanceDashboard extends Component {
         await this.orm.call(
             "hr.employee",
             "get_employee_leave_data",
-            [ev]
+            []
         ).then((result) => {
             this.result = result
             this.state.filteredDurationDates = result.filtered_duration_dates

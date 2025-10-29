@@ -19,9 +19,9 @@ class HrEmployee(models.Model):
     # ==========================
 
     @api.model
-    def get_employee_leave_data(self, option: str):
+    def get_employee_leave_data(self):
         """Obtiene datos de ausencias y asistencias para el dashboard."""
-        dates = self._get_filtered_dates(option)
+        dates = self._get_filtered_dates()
         allowed_company_ids = self._get_allowed_company_ids()
         employees = self.search([('company_id', 'in', allowed_company_ids)])
         employee_data = [
@@ -38,18 +38,11 @@ class HrEmployee(models.Model):
     # Métodos privados auxiliares
     # ==========================
 
-    def _get_filtered_dates(self, option: str):
-        """Retorna la lista de fechas según la opción seleccionada."""
+    def _get_filtered_dates(self):
+        """Retorna la lista de fechas desde el primer día del mes hasta hoy."""
         today = fields.Date.today()
-        if option == 'this_week':
-            start, end = date_utils.start_of(today, 'week'), date_utils.end_of(today, 'week')
-        elif option == 'this_month':
-            start, end = date_utils.start_of(today, 'month'), date_utils.end_of(today, 'month')
-        elif option == 'last_15_days':
-            return [(today - timedelta(days=day)).strftime("%Y-%m-%d") for day in range(15)]
-        else:
-            return []
-
+        start = date_utils.start_of(today, 'month')
+        end = today
         return pd.date_range(start, end, freq='d').strftime("%Y-%m-%d").tolist()
 
     def _get_allowed_company_ids(self):
@@ -65,7 +58,6 @@ class HrEmployee(models.Model):
             date_start = dates[0]
             date_end = dates[-1]
             leave_records = self._get_validated_leaves(employee.id, date_start, date_end)
-        _logger.info('Permisos validados encontrados para el empleado %s: %s', employee.name, leave_records)
         leave_map = self._build_leave_map(leave_records, dates)
         _logger.info('Mapa de permisos para el empleado %s: %s', employee.name, leave_map)
 
