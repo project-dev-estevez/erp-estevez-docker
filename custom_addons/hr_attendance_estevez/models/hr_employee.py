@@ -1,9 +1,12 @@
+
 import re
 from datetime import date, timedelta
 import pandas as pd # type: ignore
 from odoo import api, fields, models
 from odoo.http import request
 from odoo.tools import date_utils
+import logging
+_logger = logging.getLogger(__name__)
 
 class HrEmployee(models.Model):
     """Extiende el modelo hr.employee para incluir métodos
@@ -21,7 +24,6 @@ class HrEmployee(models.Model):
         dates = self._get_filtered_dates(option)
         allowed_company_ids = self._get_allowed_company_ids()
         employees = self.search([('company_id', 'in', allowed_company_ids)])
-
         employee_data = [
             self._get_single_employee_leave_info(emp, dates)
             for emp in employees
@@ -57,8 +59,15 @@ class HrEmployee(models.Model):
 
     def _get_single_employee_leave_info(self, employee, dates):
         """Obtiene la información de ausencias y asistencias para un empleado."""
-        leave_records = self._get_validated_leaves(employee.id)
+        if not dates:
+            leave_records = []
+        else:
+            date_start = dates[0]
+            date_end = dates[-1]
+            leave_records = self._get_validated_leaves(employee.id, date_start, date_end)
+        _logger.info('Permisos validados encontrados para el empleado %s: %s', employee.name, leave_records)
         leave_map = self._build_leave_map(leave_records, dates)
+        _logger.info('Mapa de permisos para el empleado %s: %s', employee.name, leave_map)
 
         present_dates = {str(att.check_in.date()) for att in employee.attendance_ids}
         leave_data, total_absent_count = self._generate_leave_data(
@@ -72,10 +81,15 @@ class HrEmployee(models.Model):
             'total_absent_count': total_absent_count,
         }
 
-    def _get_validated_leaves(self, employee_id):
-        """Obtiene todos los permisos validados del empleado."""
+    def _get_validated_leaves(self, employee_id, date_start, date_end):
+        """Obtiene los permisos validados del empleado en el rango de fechas."""
         return self.env['hr.leave'].search_read(
-            [('state', '=', 'validate'), ('employee_id', '=', employee_id)],
+            [
+                ('state', '=', 'validate'),
+                ('employee_id', '=', employee_id),
+                ('request_date_to', '>=', date_start),
+                ('request_date_from', '<=', date_end),
+            ],
             ['request_date_from', 'request_date_to', 'holiday_status_id']
         )
 
