@@ -1,5 +1,6 @@
 {
     'name': 'n8n Estevez',
+    'license': 'LGPL-3',
     'version': '1.0.0',
     'summary': 'Incrusta el chat de IA de n8n en el backend de Odoo',
     'author': 'Equipo Estevez',

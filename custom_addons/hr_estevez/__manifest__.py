@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 {
     'name': "RH Estevez",
+    
+    'license': 'LGPL-3',
 
     'summary': "Extensión del módulo de empleados para Estevez.Jor",
 

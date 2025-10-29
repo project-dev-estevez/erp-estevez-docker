@@ -1,5 +1,6 @@
 {
     'name': 'Custom Training Extension',
+    'license': 'LGPL-3',
     'version': '1.0',
     'summary': 'Extensión para reportes de cursos y empleados',
     'description': 'Módulo que agrega catálogos y relación empleado-curso para reportes detallados.',

@@ -1,5 +1,6 @@
 {
     'name': 'Roles & Permissions',
+    'license': 'LGPL-3',
     'version': '1.0',
     'category': 'Access Rights',
     'depends': ['base'],
