@@ -4,6 +4,8 @@ import pandas as pd # type: ignore
 import random
 from datetime import datetime, time
 import holidays
+import logging
+_logger = logging.getLogger(__name__)
 
 class ReportHelper(models.AbstractModel):
     _name = 'hr_attendance_estevez.report_helper'
@@ -120,6 +122,8 @@ class ReportHelper(models.AbstractModel):
         date_start = self._parse_date(filters.get('date_start'))
         date_end = self._parse_date(filters.get('date_end'), end_of_day=True)
 
+        _logger.info(f"date_start parseado: {date_start}, date_end parseado: {date_end}")
+
         # Columnas por día (dd/mm)
         date_columns = [d.strftime('%d/%m') for d in pd.date_range(date_start, date_end, freq='D')]
         header.extend(date_columns)
@@ -127,6 +131,8 @@ class ReportHelper(models.AbstractModel):
         return header, date_start, date_end
 
     def _parse_date(self, date_str, end_of_day=False):
+        if not date_str:
+            return None
         if isinstance(date_str, str):
             date_obj = datetime.strptime(date_str, '%Y-%m-%d')
         else:
@@ -187,8 +193,13 @@ class ReportHelper(models.AbstractModel):
 
         attendances = env['hr.attendance'].search_read(domain, ['employee_id', 'check_in'])
         df_att = pd.DataFrame.from_records(attendances)
+        # Asegura que las columnas existen aunque el DataFrame esté vacío y que 'check_in' sea datetime
         if df_att.empty:
-            return pd.DataFrame(columns=['employee_id', 'asistencias', 'retardos']), df_att
+            df_att = pd.DataFrame({'employee_id': pd.Series(dtype='object'),
+                                   'check_in': pd.to_datetime(pd.Series([], dtype='datetime64[ns]')),
+                                   'retardo': pd.Series(dtype='bool')})
+            df_stats = pd.DataFrame(columns=['employee_id', 'asistencias', 'retardos'])
+            return df_stats, df_att
 
         df_att['check_in'] = pd.to_datetime(df_att['check_in'])
         df_att['employee_id'] = df_att['employee_id'].apply(lambda v: v[0] if v else None)

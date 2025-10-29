@@ -1,6 +1,5 @@
 from odoo import models
 
-
 class PayrollReportXlsx(models.AbstractModel):
     _name = 'report.hr_attendance_estevez.report_payroll_xlsx'
     _inherit = 'report.report_xlsx.abstract'
