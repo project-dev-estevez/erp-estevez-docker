@@ -43,10 +43,10 @@ class HrContract(models.Model):
     )
 
     contract_duration = fields.Selection([        
-        ('1_month', '1 Mes'),
-        ('2_months', '2 Meses'),
-        ('3_months', '3 Meses'),
-        ('6_months', '6 Meses'),
+        ('30_days', '30 Días'),
+        ('60_days', '60 Días'),
+        ('90_days', '90 Días'),
+        ('180_days', '180 Días'),
         ('1_year', '1 Año'),
         ('2_years', '2 Años'),
         ('indefinite', 'Indefinido'),
@@ -66,10 +66,10 @@ class HrContract(models.Model):
                 
                 # Mapeo de duraciones
                 duration_map = {
-                    '1_month': relativedelta(months=1),
-                    '2_months': relativedelta(months=2),
-                    '3_months': relativedelta(months=3),
-                    '6_months': relativedelta(months=6),
+                    '30_days': relativedelta(days=30),
+                    '60_days': relativedelta(days=60),
+                    '90_days': relativedelta(days=90),
+                    '180_days': relativedelta(days=180),
                     '1_year': relativedelta(years=1),
                     '2_years': relativedelta(years=2),
                 }
@@ -89,10 +89,10 @@ class HrContract(models.Model):
                 if current_duration and current_duration != 'custom' and current_duration != 'indefinite':
                     # Calcular cuál debería ser la fecha_end para la duración actual
                     duration_map = {
-                        '1_month': relativedelta(months=1),
-                        '2_months': relativedelta(months=2),
-                        '3_months': relativedelta(months=3),
-                        '6_months': relativedelta(months=6),
+                        '30_days': relativedelta(days=30),
+                        '60_days': relativedelta(days=60),
+                        '90_days': relativedelta(days=90),
+                        '180_days': relativedelta(days=180),
                         '1_year': relativedelta(years=1),
                         '2_years': relativedelta(years=2),
                     }

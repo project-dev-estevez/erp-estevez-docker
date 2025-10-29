@@ -17,7 +17,7 @@ class HrEmployee(models.Model):
     state_id = fields.Many2one('hr.state', string="Estado", ondelete='set null')    
     state_key = fields.Char(compute='_compute_state_key', store=True)
 
-    municipality_id = fields.Many2one('hr.municipality', string="Municipio", ondelete='set null')
+    municipality_id = fields.Many2one('hr.municipality', string="Municipio", domain="[('state_id', '=', state_id)]", ondelete='set null')
     municipality_key = fields.Char(compute='_compute_municipality_key', store=True)
 
     occupation_id = fields.Many2one('hr.occupation', string="Ocupaciones", ondelete='set null')
@@ -93,10 +93,10 @@ class HrEmployee(models.Model):
     )
 
 
-    rfc = fields.Char(string='RFC')
-    curp = fields.Char(string='CURP')
-    nss = fields.Char(string='NSS')
-    voter_key = fields.Char(string='Clave Elector')
+    rfc = fields.Char(string='RFC', help='RFC de 13 dígitos', size=13)
+    curp = fields.Char(string='CURP', help='CURP de 18 dígitos', size=18)
+    nss = fields.Char(string='NSS', help='Número de Seguridad Social', size=11)
+    voter_key = fields.Char(string='Clave Elector', size=18 )
     license_number = fields.Char(string='Número de Licencia')
     infonavit = fields.Boolean(string='Infonavit', default=False)
     private_colonia = fields.Char(string="Colonia")
@@ -116,7 +116,7 @@ class HrEmployee(models.Model):
     marital = fields.Selection([
         ('single', 'Soltero(a)'),
         ('married', 'Casado(a)'),
-        ('cohabitant', 'En Concubinato'),
+        ('cohabitant', 'Unión libre'),
         ('widower', 'Viudo(a)'),
         ('divorced', 'Divorciado(a)')
     ], string='Estado Civil', required=True, tracking=True)
