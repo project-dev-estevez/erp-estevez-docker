@@ -1,7 +1,6 @@
 # wizards/payroll_report_wizard.py
 from odoo import models, fields, _
 from odoo.exceptions import UserError
-from datetime import date
 
 class PayrollReportWizard(models.TransientModel):
     _name = 'payroll.report.wizard'
@@ -10,13 +9,13 @@ class PayrollReportWizard(models.TransientModel):
     date_start = fields.Date(
         string='Fecha inicio', 
         required=True, 
-        default=lambda self: date.today().replace(day=1)
+        default=lambda self: fields.Date.context_today(self).replace(day=1)
     )
 
     date_end = fields.Date(
         string='Fecha final', 
         required=True, 
-        default=lambda self: date.today()
+        default=lambda self: fields.Date.context_today(self)
     )
 
     company_id = fields.Many2one(
@@ -32,7 +31,7 @@ class PayrollReportWizard(models.TransientModel):
     )
 
     def _validate_dates(self):
-        today = date.today()
+        today = fields.Date.context_today(self)
         for wizard in self:
             if wizard.date_end > today:
                 raise UserError("La fecha final no puede ser mayor que la fecha actual.")

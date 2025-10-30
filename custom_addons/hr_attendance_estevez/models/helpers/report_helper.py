@@ -8,8 +8,21 @@ import logging
 _logger = logging.getLogger(__name__)
 
 class ReportHelper(models.AbstractModel):
+
     _name = 'hr_attendance_estevez.report_helper'
     _description = 'Helpers para reportes de asistencias y nómina'
+
+    @staticmethod
+    def _extract_m2o_name(value):
+        """Extrae el nombre de un campo many2one (lista/tupla [id, nombre]) o retorna '' si no aplica."""
+        return value[1] if isinstance(value, (list, tuple)) and len(value) > 1 else ''
+
+    @staticmethod
+    def _get_payment_type_display(value, payment_map):
+        """Traduce el valor técnico de payment_type a su etiqueta legible."""
+        if value:
+            return payment_map.get(value, value)
+        return 'N/A'
 
     def get_report_rows(self, env, report_type='attendance', filters=None):
         """
@@ -92,7 +105,7 @@ class ReportHelper(models.AbstractModel):
         if df_emp.empty:
             return rows
 
-        # 3️⃣ Obtener estadísticas de asistencias
+        # 3️⃣ Obtener estadísticas de asistencias -> Total de asistencias y Total de retardos
         df_stats, df_att = self._get_attendance_stats(env, filters, date_start, date_end)
 
         # 4️⃣ Obtener y procesar ausencias
@@ -160,14 +173,16 @@ class ReportHelper(models.AbstractModel):
         if df.empty:
             return df
 
-        rel_name = lambda v: v[1] if isinstance(v, (list, tuple)) and len(v) > 1 else ''
-        df['empresa'] = df['company_id'].apply(rel_name)
-        df['departamento'] = df['department_id'].apply(rel_name)
-        df['puesto'] = df['job_id'].apply(rel_name)
+        # Extraer nombres de campos many2one
+        df['empresa'] = df['company_id'].apply(self._extract_m2o_name)
+        df['departamento'] = df['department_id'].apply(self._extract_m2o_name)
+        df['puesto'] = df['job_id'].apply(self._extract_m2o_name)
 
+        # Traducir tipo de pago
         payment_map = dict(env['hr.employee']._fields['payment_type'].selection)
-        df['tipo_pago'] = df['payment_type'].map(lambda v: payment_map.get(v, v if v else 'N/A'))
+        df['tipo_pago'] = df['payment_type'].map(lambda v: self._get_payment_type_display(v, payment_map))
 
+        # Renombrar columnas y limpiar datos
         df = df.rename(columns={
             'employee_number': 'numero',
             'name': 'nombre',
