@@ -252,21 +252,27 @@ class ReportHelper(models.AbstractModel):
             return pd.DataFrame(columns=['employee_id', name])
 
         # Comparar en minúsculas para evitar problemas de mayúsculas/minúsculas y tildes
+        _logger.info("Valores únicos en tipo: %s", df['tipo'].unique())
         mask = df['tipo'].str.lower().str.contains(name.lower(), na=False)
         df_type = df[mask].copy()
         df_type['desde_clip'] = df_type['desde'].apply(lambda d: max(d, date_start.date()))
         df_type['hasta_clip'] = df_type['hasta'].apply(lambda d: min(d, date_end.date()))
+        _logger.info("Ausencias filtradas para '%s':\n%s", name, df_type[['employee_id','tipo','desde','hasta','desde_clip','hasta_clip']])
 
         years = set(range(date_start.year, date_end.year + 1))
         mx_holidays = holidays.Mexico(years=years)
 
         def count_valid_days(row):
             if pd.isnull(row['desde_clip']) or pd.isnull(row['hasta_clip']) or row['desde_clip'] > row['hasta_clip']:
+                _logger.info("Ausencia ignorada (empleado %s): desde_clip=%s, hasta_clip=%s", row.get('employee_id'), row.get('desde_clip'), row.get('hasta_clip'))
                 return 0
             days = pd.date_range(row['desde_clip'], row['hasta_clip'], freq='D')
-            return sum((day.weekday() != 6) and (day.date() not in mx_holidays) for day in days)
+            count = sum((day.weekday() != 6) and (day.date() not in mx_holidays) for day in days)
+            _logger.info("Empleado %s, tipo %s, desde %s hasta %s: días contados=%d", row.get('employee_id'), row.get('tipo'), row.get('desde_clip'), row.get('hasta_clip'), count)
+            return count
 
         df_type['dias'] = df_type.apply(count_valid_days, axis=1)
+        _logger.info("Días totales por empleado para '%s':\n%s", name, df_type.groupby('employee_id')['dias'].sum())
         return df_type.groupby('employee_id')['dias'].sum().reset_index(name=name)
 
     # -------------------------------------------------------------------------
