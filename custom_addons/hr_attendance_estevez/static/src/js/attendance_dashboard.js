@@ -66,7 +66,7 @@ class AttendanceDashboard extends Component {
         const day = parts[2];
         const month = months[parseInt(parts[1], 10) - 1];
         const year = parts[0];
-        return `${day}-${month}-${year}`;
+        return `${day} ${month}`;
     }
 }
 AttendanceDashboard.template = 'AttendanceDashboard';
