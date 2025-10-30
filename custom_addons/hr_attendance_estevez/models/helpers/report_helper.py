@@ -190,6 +190,7 @@ class ReportHelper(models.AbstractModel):
             'employment_start_date': 'fecha_ingreso'
         })
         df['numero'] = df['numero'].fillna('N/A')
+        _logger.info("IDs de empleados base: %s", df['id'].tolist())
 
         return df[['id', 'numero', 'nombre', 'fecha_ingreso', 'empresa', 'departamento', 'puesto', 'tipo_pago']]
 
@@ -280,9 +281,24 @@ class ReportHelper(models.AbstractModel):
     # 5️⃣ Combinación y faltas
     # -------------------------------------------------------------------------
     def _combine_all_data(self, df_emp, df_stats, df_vac, df_inc, df_perm, date_start, date_end):
-        df = df_emp.merge(df_stats, how='left', left_on='id', right_on='employee_id')
+        # Asegurar que los IDs sean del mismo tipo (int)
+        df_emp['id'] = df_emp['id'].astype(int)
+        df_stats['employee_id'] = df_stats['employee_id'].astype(int) if not df_stats.empty else df_stats['employee_id']
         for extra_df in [df_vac, df_inc, df_perm]:
-            df = df.merge(extra_df, how='left', on='employee_id')
+            if not extra_df.empty:
+                extra_df['employee_id'] = extra_df['employee_id'].astype(int)
+
+        # Merge principal
+        df = df_emp.merge(df_stats, how='left', left_on='id', right_on='employee_id')
+        # Merge de ausencias usando id del empleado base
+        for extra_df in [df_vac, df_inc, df_perm]:
+            if not extra_df.empty:
+                df = df.merge(extra_df, how='left', left_on='id', right_on='employee_id')
+
+        # Asegurar que las columnas de ausencias siempre existan
+        for col in ['Vacaciones', 'Incapacidad', 'Permiso']:
+            if col not in df.columns:
+                df[col] = 0
 
         df = df.fillna({'asistencias': 0, 'retardos': 0, 'Vacaciones': 0, 'Incapacidad': 0, 'Permiso': 0})
         df[['asistencias', 'retardos', 'Vacaciones', 'Incapacidad', 'Permiso']] = df[
