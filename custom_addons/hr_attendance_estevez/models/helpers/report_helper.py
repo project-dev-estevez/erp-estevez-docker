@@ -135,11 +135,9 @@ class ReportHelper(models.AbstractModel):
         date_start = self._parse_date(filters.get('date_start'))
         date_end = self._parse_date(filters.get('date_end'), end_of_day=True)
 
-        mx_holidays = holidays.Mexico(years=range(date_start.year, date_end.year + 1))
         date_columns = [
             d.strftime('%d/%m')
             for d in pd.date_range(date_start, date_end, freq='D')
-            if d.weekday() != 6 and d.date() not in mx_holidays  # 6 = domingo
         ]
         header.extend(date_columns)
         return header, date_start, date_end
@@ -300,11 +298,7 @@ class ReportHelper(models.AbstractModel):
     # -------------------------------------------------------------------------
     def _generate_rows(self, df, df_att, df_leave, date_start, date_end):
         rows = []
-        mx_holidays = holidays.Mexico(years=range(date_start.year, date_end.year + 1))
-        date_range = [
-            d for d in pd.date_range(date_start, date_end, freq='D')
-            if d.weekday() != 6 and d.date() not in mx_holidays
-        ]
+        date_range = pd.date_range(date_start, date_end, freq='D')
         for _, emp in df.iterrows():
             marks = [self._get_daily_mark(emp['id'], day, df_att, df_leave) for day in date_range]
             rows.append([
