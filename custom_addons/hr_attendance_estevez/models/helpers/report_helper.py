@@ -110,9 +110,10 @@ class ReportHelper(models.AbstractModel):
 
         # 4️⃣ Obtener y procesar ausencias
         df_leave = self._get_leaves_df(env, date_start, date_end)
-        df_vac = self._count_days_type(df_leave, 'Vacaciones', date_start, date_end)
-        df_inc = self._count_days_type(df_leave, 'Incapacidad', date_start, date_end)
-        df_perm = self._count_days_type(df_leave, 'Permiso', date_start, date_end)
+        _logger.info("Contenido de df_leave:\n%s", df_leave)
+        df_vac = self._count_days_type(df_leave, 'vacacion', date_start, date_end)
+        df_inc = self._count_days_type(df_leave, 'incapacidad', date_start, date_end)
+        df_perm = self._count_days_type(df_leave, 'permiso', date_start, date_end)
 
         # 5️⃣ Combinar todo en un solo DataFrame
         df_combined = self._combine_all_data(df_emp, df_stats, df_vac, df_inc, df_perm, date_start, date_end)
@@ -250,7 +251,8 @@ class ReportHelper(models.AbstractModel):
         if df.empty:
             return pd.DataFrame(columns=['employee_id', name])
 
-        mask = df['tipo'].str.contains(name, case=False, na=False)
+        # Comparar en minúsculas para evitar problemas de mayúsculas/minúsculas y tildes
+        mask = df['tipo'].str.lower().str.contains(name.lower(), na=False)
         df_type = df[mask].copy()
         df_type['desde_clip'] = df_type['desde'].apply(lambda d: max(d, date_start.date()))
         df_type['hasta_clip'] = df_type['hasta'].apply(lambda d: min(d, date_end.date()))
