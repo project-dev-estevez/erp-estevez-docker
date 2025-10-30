@@ -117,6 +117,7 @@ class ReportHelper(models.AbstractModel):
 
         # 5️⃣ Combinar todo en un solo DataFrame
         df_combined = self._combine_all_data(df_emp, df_stats, df_vac, df_inc, df_perm, date_start, date_end)
+        _logger.info("DF combinado antes de filas:\n%s", df_combined)
 
         # 6️⃣ Generar las filas finales
         rows.extend(self._generate_rows(df_combined, df_att, df_leave, date_start, date_end))
