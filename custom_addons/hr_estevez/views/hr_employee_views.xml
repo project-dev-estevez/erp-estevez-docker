@@ -201,11 +201,11 @@
                                     </div>
                                     <div class="row g-1">
                                         <div class="col p-1">                                            
-                                            <field name="state_id" placeholder="Estado" options="{'no_open': True, 'no_quick_create': True}"/>
+                                            <field name="state_id" placeholder="Estado" options="{'no_open': True, 'no_quick_create': True, 'no_create': True, 'no_create_edit': True}"/>
                                             <field name="state_key" invisible="1"/>
                                         </div>
                                         <div class="col p-1">
-                                            <field name="municipality_id" placeholder="Municipio" options="{'no_open': True, 'no_quick_create': True}"/>
+                                            <field name="municipality_id" placeholder="Municipio" options="{'no_open': True, 'no_quick_create': True, 'no_create': True, 'no_create_edit': True}"/>
                                             <field name="municipality_key" invisible="1"/>
                                         </div>
                                     </div>
@@ -225,10 +225,10 @@
                             <group>
                                 <field name="birthday"/>
                                 <field name="age" invisible="not birthday"/>
-                                <field name="rfc"/>
-                                <field name="curp"/>
-                                <field name="nss"/>
-                                <field name="voter_key"/>
+                                <field name="rfc" placeholder="13 dígitos"/>
+                                <field name="curp" placeholder="18 dígitos"/>
+                                <field name="nss" placeholder="11 dígitos"/>
+                                <field name="voter_key" placeholder="18 dígitos"/>
                                 <field name="infonavit"/> 
                                 <field name="license_number"/>
                             </group>
@@ -336,6 +336,7 @@
                                 <field name="id" string="Código" readonly="1"/>
                                 <field name="create_date" string="Fecha de Creación" readonly="1"/>
                                 <field name="administrative_type" string="Tipo de Acta"/>
+                                <field name="description" string="Descripción"/>
                                 <field name="date" string="Fecha del Acta"/>
                                 <button name="download_memorandum_report" type="object" string="Reporte" class="btn-secondary fa fa-download"/>
                             </list>

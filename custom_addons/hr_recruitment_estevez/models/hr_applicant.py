@@ -34,7 +34,7 @@ class HrApplicant(models.Model):
     marital_status = fields.Selection([
         ('single', 'Soltero(a)'),
         ('married', 'Casado(a)'),
-        ('cohabitant', 'En Concubinato'),
+        ('cohabitant', 'Unión Libre'),
         ('widower', 'Viudo(a)'),
         ('divorced', 'Divorciado(a)')
     ], string='Estado Civil', tracking=True)
