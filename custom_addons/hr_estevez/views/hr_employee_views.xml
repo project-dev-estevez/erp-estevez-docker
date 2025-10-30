@@ -268,9 +268,9 @@
                                 <field name="emergency_phone" class="o_force_ltr" string="Teléfono del Primer Contacto"/>
 
                                 <!-- Segundo contacto -->
-                                <field name="emergency_contact_2" string="Segundo Contacto" invisible="1"/>
-                                <field name="emergency_contact_relationship_2" string="Parentesco del Segundo Contacto" invisible="1"/>
-                                <field name="emergency_phone_2" class="o_force_ltr" string="Teléfono del Segundo Contacto" invisible="1"/>
+                                <field name="emergency_contact_2" string="Segundo Contacto"/>
+                                <field name="emergency_contact_relationship_2" string="Parentesco del Segundo Contacto"/>
+                                <field name="emergency_phone_2" class="o_force_ltr" string="Teléfono del Segundo Contacto"/>
                             </group>
 
                             <group string="Situación Familiar">
