@@ -408,40 +408,48 @@
                 </xpath>
 
                 <!-- Nueva página de Permisos -->
-                <xpath expr="//notebook/page[@name='vacations']" position="after">
+                <xpath expr="//page[@name='vacations']" position="replace">
                     <page name="permits" string="Permisos">
-                        <group>
-                            <div class="table-responsive">
-                                <table class="table table-bordered table-striped o_list_view">
-                                    <thead>
-                                        <tr>
-                                            <th>Fecha Registro</th>
-                                            <th>Fecha Inicio</th>
-                                            <th>Fecha Termino</th>
-                                            <th>Días Solicitados</th>
-                                            <th>Goce de Sueldo</th>
-                                            <th>Comentarios</th>
-                                            <th>Tipo</th>
-                                            <th>Acciones</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td>--</td>
-                                            <td>--</td>
-                                            <td>--</td>
-                                            <td>--</td>
-                                            <td>--</td>
-                                            <td>--</td>
-                                            <td>--</td>
-                                            <td>
-                                                Botones de Acciones
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </group>
+                        <field name="time_off_in_lieu_ids">
+                            <list>
+                                <field name="request_date" string="Fecha Registro"/>
+                                <field name="request_date_from" string="Fecha Inicio"/>
+                                <field name="request_date_to" string="Fecha Termino"/>
+                                <field name="number_of_days" string="Días Solicitados"/>
+                                <field name="state" string="Estado"/>
+                                <field name="notes" string="Comentarios"/>
+                                <field name="leave_id" string="Ausencia Relacionada"/>
+                            </list>
+                            <form>
+                                <sheet>
+                                    <group>
+                                        <group>
+                                            <field name="employee_id" readonly="1"/>
+                                            <field name="request_date"/>
+                                            <field name="state" widget="statusbar" 
+                                                statusbar_visible="draft,pending,approved,rejected"/>
+                                        </group>
+                                        <group>
+                                            <field name="request_date_from"/>
+                                            <field name="request_date_to"/>
+                                            <field name="number_of_days" readonly="1"/>
+                                        </group>
+                                    </group>
+                                    <group>
+                                        <field name="name" placeholder="Descripción de la solicitud"/>
+                                        <field name="notes" placeholder="Notas adicionales"/>
+                                    </group>
+                                </sheet>
+                                <footer>
+                                    <button name="action_submit" string="Enviar" type="object" class="btn-primary"/>
+                                    <button name="action_approve" string="Aprobar" type="object" class="btn-primary"/>
+                                    <button name="action_reject" string="Rechazar" type="object" class="btn-secondary"/>
+                                    <button name="action_draft" string="Volver a Borrador" type="object" class="btn-secondary"/>
+                                    <button string="Cerrar" class="btn-secondary" special="cancel"/>
+                                </footer>
+                            </form>
+                        </field>
+
                     </page>
                 </xpath>
 
