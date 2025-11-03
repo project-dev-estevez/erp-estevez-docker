@@ -130,7 +130,15 @@ class HrEmployee(models.Model):
         'hr.vacation.period', 'employee_id', string="Periodos de Vacaciones"
     )
 
-    emergency_contact_relationship = fields.Char(string="Parentesco del Primer Contacto")
+    #emergency_contact_relationship = fields.Char(string="Parentesco del Primer Contacto")
+    emergency_contact_relationship = fields.Selection([
+        ('mom', 'Madre'),
+        ('dad', 'Padre'),
+        ('daughter', 'Hijo(a)'),
+        ('couple', 'Esposo(a)'),
+        ('brother/sister', 'Hermano(a)'),
+        ('other', 'Otro')
+    ], string='Estado Civil', required=True, tracking=True)
     
     # Campos para el segundo contacto de emergencia
     emergency_contact_2 = fields.Char(string="Segundo Contacto")
