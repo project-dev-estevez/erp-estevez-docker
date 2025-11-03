@@ -120,6 +120,18 @@ export class GeofenceDrawing extends Component {
                     })
                 );
             });
+
+            // --- AJUSTE DE ZOOM Y CENTRADO ---
+            // Si hay features, ajusta el mapa al área de la geocerca
+            if (readFeatures.length > 0) {
+                const extent = ol.extent.createEmpty();
+                readFeatures.forEach(f => ol.extent.extend(extent, f.getGeometry().getExtent()));
+                this.olmap.getView().fit(extent, {
+                    padding: [40, 40, 40, 40], // margen opcional
+                    maxZoom: 18, // zoom máximo permitido
+                    duration: 500 // animación opcional
+                });
+            }
         }
     }
 

@@ -25,8 +25,8 @@ class CertificateWizard(models.TransientModel):
         res['course_id'] = course.id
         res['hours'] = course.duration if hasattr(course, 'duration') else 0.0
     # res['instructor'] = course.instructor if hasattr(course, 'instructor') else 'Instructor'  # Removido
-        res['employer'] = course.employer if hasattr(course, 'employer') else 'Patrón'
-        res['workers_rep'] = course.workers_rep if hasattr(course, 'workers_rep') else 'Representante'
+        res['employer'] = 'Edwin Gonzalez Soria'
+        res['workers_rep'] = 'Jessica Carina Callejas Vazquez'
         return res
 
     def action_generate_certificate(self):

@@ -54,7 +54,7 @@
         "views/res_config_settings.xml",
         "views/hr_attendance_reasons_view.xml",
         "views/hr_attendance_geofence.xml",
-        "views/hr_attendance_views.xml",
+        # "views/hr_attendance_views.xml",
         "views/hr_employee_views.xml",        
     ],
     "assets": {

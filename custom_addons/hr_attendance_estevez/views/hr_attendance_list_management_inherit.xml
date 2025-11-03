@@ -4,6 +4,12 @@
         <field name="model">hr.attendance</field>
         <field name="inherit_id" ref="hr_attendance.view_attendance_tree"/>
         <field name="arch" type="xml">
+
+            <!-- Ocultar botón Create -->
+            <xpath expr="//list" position="attributes">
+                <attribute name="create">false</attribute>
+            </xpath>
+
             <xpath expr="//field[@name='employee_id']" position="after">
                 <field name="department_id" string="Departamento"/>
                 <field name="job_id" string="Puesto de trabajo" readonly="1"/>
@@ -23,7 +29,14 @@
                         invisible="check_in_latitude == False or check_in_longitude == False"/>
             </xpath>
 
-            <xpath expr="//field[@name='check_out']" position="after">
+            <xpath expr="//field[@name='check_out']" position="replace">
+                <field name="is_auto_closed" column_invisible="1"/>
+                <field name="check_out_display" 
+                       string="Salida"
+                       decoration-warning="is_auto_closed == True and not check_out"/>
+            </xpath>
+
+            <xpath expr="//field[@name='check_out_display']" position="after">
                 <button name="action_show_checkout_photo"
                         type="object"
                         string=""
@@ -72,6 +85,39 @@
                         string=""
                         icon="fa-comment"
                         class="btn btn-secondary btn-sm"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="hr_attendance_view_filter" model="ir.ui.view">
+        <field name="name">hr.attendance.search.inherit</field>
+        <field name="model">hr.attendance</field>
+        <field name="inherit_id" ref="hr_attendance.hr_attendance_view_filter"/>
+        <field name="arch" type="xml">
+
+            <!-- Filtro por rango de fechas -->
+            <xpath expr="//filter[@name='check_in_filter']" position="replace">
+                <filter string="Hoy" name="today" domain="[('check_in', '&gt;=', (context_today()).strftime('%%Y-%%m-%%d 00:00:00')), ('check_in', '&lt;=', (context_today()).strftime('%%Y-%%m-%%d 23:59:59'))]" help="Asistencias de hoy"/>
+                <filter string="Ayer" name="yesterday" domain="[('check_in', '&gt;=', (context_today() - datetime.timedelta(days=1)).strftime('%%Y-%%m-%%d 00:00:00')), ('check_in', '&lt;=', (context_today() - datetime.timedelta(days=1)).strftime('%%Y-%%m-%%d 23:59:59'))]" help="Asistencias de ayer"/>
+                <filter string="Antier" name="before_yesterday" domain="[('check_in', '&gt;=', (context_today() - datetime.timedelta(days=2)).strftime('%%Y-%%m-%%d 00:00:00')), ('check_in', '&lt;=', (context_today() - datetime.timedelta(days=2)).strftime('%%Y-%%m-%%d 23:59:59'))]" help="Asistencias de antier"/>
+                <filter string="Fecha" name="check_in_filter" date="check_in"/>
+            </xpath>
+
+            <!-- Filtros por estado -->
+            <xpath expr="//filter[@name='myattendances']" position="before">
+                <field name="status"/>
+                <filter name="filter_status_pending"
+                        string="Pendiente"
+                        domain="[('status', '=', 'pending')]"/>
+                <filter name="filter_status_retarded"
+                        string="Retardo"
+                        domain="[('status', '=', 'retarded')]"/>
+                <filter name="filter_status_approved"
+                        string="Aprobado"
+                        domain="[('status', '=', 'approved')]"/>
+                <filter name="filter_status_rejected"
+                        string="Rechazado"
+                        domain="[('status', '=', 'rejected')]"/>
             </xpath>
         </field>
     </record>

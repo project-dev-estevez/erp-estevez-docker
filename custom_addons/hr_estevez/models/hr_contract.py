@@ -1,5 +1,6 @@
 from odoo import api, models, fields, exceptions, _
 from datetime import date, datetime
+from dateutil.relativedelta import relativedelta 
 import logging
 
 _logger = logging.getLogger(__name__)
@@ -41,8 +42,69 @@ class HrContract(models.Model):
         store=True
     )
 
+    contract_duration = fields.Selection([        
+        ('30_days', '30 Días'),
+        ('60_days', '60 Días'),
+        ('90_days', '90 Días'),
+        ('180_days', '180 Días'),
+        ('1_year', '1 Año'),
+        ('2_years', '2 Años'),
+        ('indefinite', 'Indefinido'),
+        ('custom', 'Personalizado')
+    ],  string='Duración del Contrato', default='')
+
     document_file = fields.Binary(string="Archivo Adjunto", help="Adjunta un único documento relacionado con el contrato.")
     document_filename = fields.Char(string="Nombre del Archivo", compute="_compute_document_filename", store=True)
+
+    @api.onchange('contract_duration', 'date_start')
+    def _onchange_contract_duration(self):
+        """Calcula automáticamente la fecha fin basado en la duración seleccionada"""
+        for contract in self:
+            # Solo calcular si se seleccionó una opción válida (no el placeholder)
+            if contract.contract_duration and contract.contract_duration != 'custom' and contract.date_start:
+                start_date = contract.date_start
+                
+                # Mapeo de duraciones
+                duration_map = {
+                    '30_days': relativedelta(days=30),
+                    '60_days': relativedelta(days=60),
+                    '90_days': relativedelta(days=90),
+                    '180_days': relativedelta(days=180),
+                    '1_year': relativedelta(years=1),
+                    '2_years': relativedelta(years=2),
+                }
+                
+                if contract.contract_duration == 'indefinite':
+                    contract.date_end = False
+                elif contract.contract_duration in duration_map:
+                    contract.date_end = start_date + duration_map[contract.contract_duration]
+    
+    @api.onchange('date_end')
+    def _onchange_date_end(self):
+        """Si se modifica manualmente la fecha fin, cambiar a 'Personalizado' solo si es necesario"""
+        for contract in self:
+            if contract.date_end and contract.date_start:
+                # Verificar si la fecha_end actual coincide con la duración seleccionada
+                current_duration = contract.contract_duration
+                if current_duration and current_duration != 'custom' and current_duration != 'indefinite':
+                    # Calcular cuál debería ser la fecha_end para la duración actual
+                    duration_map = {
+                        '30_days': relativedelta(days=30),
+                        '60_days': relativedelta(days=60),
+                        '90_days': relativedelta(days=90),
+                        '180_days': relativedelta(days=180),
+                        '1_year': relativedelta(years=1),
+                        '2_years': relativedelta(years=2),
+                    }
+                    
+                    if current_duration in duration_map:
+                        expected_end = contract.date_start + duration_map[current_duration]
+                        # Si la fecha_end actual NO coincide con la esperada, entonces es personalizado
+                        if contract.date_end != expected_end:
+                            contract.contract_duration = 'custom'
+                else:
+                    # Si ya era custom o indefinido, mantenerlo así
+                    contract.contract_duration = 'custom'
 
     def _get_initial_state(self, vals):
         """

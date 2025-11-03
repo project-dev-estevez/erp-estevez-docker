@@ -20,7 +20,7 @@ patch(ImageField.prototype, {
         var self = this;
         if (window.location.protocol !== "https:") {
             this.notificationService.add(
-                _t("https Failed: Warning! WEBCAM MAY ONLY WORKS WITH HTTPS CONNECTIONS. So your Odoo instance must be configured in https mode."), 
+                _t("Advertencia: La cámara web solo funciona con conexiones HTTPS. Su instancia de Odoo debe estar configurada en modo HTTPS."), 
                 { type: "danger" }
             );
             return;

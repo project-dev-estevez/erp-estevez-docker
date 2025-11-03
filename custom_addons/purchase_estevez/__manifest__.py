@@ -1,5 +1,6 @@
 {
     'name': 'Compras Estevez',
+    'license': 'LGPL-3',
     'version': '1.0',
     'summary': 'Modulo compras de Estevez',
     'depends': ['product','purchase', 'base', 'account', 'purchase_requisition'],

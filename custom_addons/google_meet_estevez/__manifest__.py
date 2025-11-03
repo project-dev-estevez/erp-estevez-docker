@@ -1,5 +1,6 @@
 {
     'name': 'Google Meet Integration',
+    'license': 'LGPL-3',
     'version': '1.0',
     'summary': 'Agrega enlaces de Google Meet a eventos',
     'depends': ['google_calendar', 'calendar'],

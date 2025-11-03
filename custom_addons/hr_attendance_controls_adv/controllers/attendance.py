@@ -11,6 +11,20 @@ class HrAttendance(HrAttendance):
         rslt['attendance']['id'] = employee.last_attendance_id.id or False
         return rslt
     
+    @staticmethod
+    def _get_user_attendance_data(employee):
+        response = super(HrAttendance, HrAttendance)._get_user_attendance_data(employee)
+        
+        if employee:
+            response['attendance_status'] = employee.attendance_status
+        
+        return response
+    
+    @http.route('/hr_attendance/attendance_user_data', type="json", auth="user", readonly=True)
+    def user_attendance_data(self):
+        employee = request.env.user.employee_id
+        return self._get_user_attendance_data(employee)
+    
     @http.route('/hr_attendance/update_checkin_controls', type="json", auth="public")
     def update_checkin_controls(self, token, attendance_id, check_in_latitude, check_in_longitude, check_in_geofence_ids, check_in_photo, check_in_ipaddress):
         company = self._get_company(token)
@@ -64,3 +78,28 @@ class HrAttendance(HrAttendance):
             ('employee_ids', 'in',int(employee_id))
             ], ['id', 'name', 'overlay_paths'])
         return geofences
+        """
+        Verificar si un punto está dentro de un círculo
+        Usando fórmula de distancia haversine
+        """
+        import math
+        
+        # Radio de la Tierra en metros
+        R = 6371000
+        
+        # Convertir grados a radianes
+        lat1 = math.radians(lat)
+        lng1 = math.radians(lng)
+        lat2 = math.radians(center_lat)
+        lng2 = math.radians(center_lng)
+        
+        # Diferencias
+        dlat = lat2 - lat1
+        dlng = lng2 - lng1
+        
+        # Fórmula haversine
+        a = math.sin(dlat/2)**2 + math.cos(lat1) * math.cos(lat2) * math.sin(dlng/2)**2
+        c = 2 * math.atan2(math.sqrt(a), math.sqrt(1-a))
+        distance = R * c
+        
+        return distance <= radius_meters

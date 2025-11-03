@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<template id="template" xml:space="preserve">
+    <t t-name="AttendanceDashboard" owl="1">
+        <div class="o_action_manager" style="height: 100%; overflow-y:scroll"
+             t-ref="attendance-dashboard">
+        <div class="employee_dashboard">
+        <div class="row">
+            <div class="col m-0 p-0">
+                <div class="shadow-sm border m-2 p-4 bg-white">
+                    <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-md-between">
+                        <div class="d-flex align-items-center mb-3 mb-md-0">
+                            <div class="me-2 p-2 bg-primary bg-opacity-10 rounded-2 border border-primary border-opacity-20">
+                                <i class="fa fa-chart-line text-primary fs-4"></i>
+                            </div>
+                            <div>
+                                <h1 class="mb-1 fw-bold text-primary fs-2">
+                                    Dashboard de Asistencias
+                                </h1>
+                                <small class="text-muted fw-medium text-uppercase opacity-75">
+                                    Resumen de Asistencia, Ausencias y Puntualidad
+                                </small>
+                            </div>
+                        </div>
+                                <!-- Filtros y buscador alineados a la derecha -->
+                        <div class="d-flex align-items-center ms-auto gap-2" style="min-width:350px;">
+                            <div class="d-flex align-items-center" style="min-width:380px;">
+                                <input type="text" class="search-bar form-control" style="border:1px solid #333;" id="search-bar"/>
+                                <t t-jquery=".search-bar" t-operation="after">
+                                    <button type="object" t-on-click="_OnClickSearchEmployee"
+                                            class="btn btn-primary search_employee ms-2"
+                                            style="margin:0px 0px;">
+                                        Buscar
+                                    </button>
+                                </t>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+                <!-- Filtros y buscador ahora están en el header -->
+            <div class="attendance_table">
+            <table id="attendance_table" class="hr_attendance"/>
+        </div>
+            <div class="attendance">
+            <table class="table" id="attendance_table_nm">
+                <thead class="attendance">
+                    <th style="width:9%;"><strong>Empleado</strong></th>
+                    <t t-foreach="state.filteredDurationDates" t-as="tDate"
+                       t-key="tDate_index">
+                        <th style="width:6%;" t-out="formatDate(tDate)"/>
+                    </t>
+                    <th style="width:0%; text-align: center;"><strong>Total</strong></th>
+                </thead>
+                <tbody class="attendance">
+                    <tr t-foreach="state.employeeData" t-as="employee"
+                        t-key="employee_index" class="attendance">
+                        <td t-out="employee.name"
+                            t-att-data-name="employee.name"/>
+                        <t
+                                t-foreach="employee.leave_data" t-as="leave"
+                                t-key="leave_index">
+                            <td class="employee-leave-data table-data"
+                                t-attf-style="background: {{ leave.color }};">
+                                <t t-if="leave.state">
+                                <span class="leave-data"
+                                      t-out="leave.state or 'null'"/>
+                                </t>
+                            </td>
+                        </t>
+                        <td t-out="employee.total_absent_count"
+                            style="text-align: center;"/>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        </div>
+        </div>
+    </t>
+</template>

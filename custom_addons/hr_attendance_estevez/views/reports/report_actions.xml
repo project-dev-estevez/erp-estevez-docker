@@ -1,0 +1,30 @@
+<!-- views/reports/report_actions.xml -->
+<odoo>
+    <record id="report_payroll_xlsx" model="ir.actions.report">
+        <field name="name">Reporte Nómina</field>
+        <field name="model">payroll.report.wizard</field>
+        <field name="report_type">xlsx</field>
+        <field name="report_name">hr_attendance_estevez.report_payroll_xlsx</field>
+        <field name="report_file">hr_attendance_estevez.report_payroll_xlsx</field>
+    </record>
+
+    <record id="report_attendance_xlsx" model="ir.actions.report">
+        <field name="name">Reporte Asistencias</field>
+        <field name="model">attendance.report.wizard</field>
+        <field name="report_type">xlsx</field>
+        <field name="report_name">hr_attendance_estevez.report_attendance_xlsx</field>
+        <field name="report_file">hr_attendance_estevez.report_attendance_xlsx</field>
+    </record>
+
+    <!-- Menus para los wizards de reportes -->
+    <menuitem id="menu_attendance_report_wizard"
+            name="Reporte de Asistencias"
+            parent="hr_attendance.menu_hr_attendance_reporting"
+            action="action_attendance_report_wizard"
+            sequence="20"/>
+    <menuitem id="menu_payroll_report_wizard"
+            name="Reporte de Nómina"
+            parent="hr_attendance.menu_hr_attendance_reporting"
+            action="action_payroll_report_wizard"
+            sequence="21"/>
+</odoo>

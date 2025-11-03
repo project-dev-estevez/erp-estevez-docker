@@ -17,7 +17,7 @@ class HrEmployee(models.Model):
     state_id = fields.Many2one('hr.state', string="Estado", ondelete='set null')    
     state_key = fields.Char(compute='_compute_state_key', store=True)
 
-    municipality_id = fields.Many2one('hr.municipality', string="Municipio", ondelete='set null')
+    municipality_id = fields.Many2one('hr.municipality', string="Municipio", domain="[('state_id', '=', state_id)]", ondelete='set null')
     municipality_key = fields.Char(compute='_compute_municipality_key', store=True)
 
     occupation_id = fields.Many2one('hr.occupation', string="Ocupaciones", ondelete='set null')
@@ -43,7 +43,8 @@ class HrEmployee(models.Model):
     project = fields.Char(string='Proyecto')
 
     # Segunda Columna en la Vista de Empleados 
-    company_id = fields.Many2one('res.company', string='Company', compute='_compute_company', store=True, readonly=True)
+    #company_id = fields.Many2one('res.company', string='Company', compute='_compute_company', store=True, readonly=True)
+    company_id = fields.Many2one('res.company', string='Compañía', default=lambda self: self.env.company)
     direction_id = fields.Many2one('hr.direction', string='Dirección')
     area_id = fields.Many2one('hr.area', string='Área')
 
@@ -59,11 +60,43 @@ class HrEmployee(models.Model):
         ('imss', 'IMSS'),
     ], string='Tipo de Nómina')
 
+    patron = fields.Selection([
+        ('estevezjor', 'EstevezJor Servicios S.A. de C.V.'),
+        ('corporativo_comunicacion', 'Corporativo en Comunicacion Digital del Futuro, S.A. de C.V.'),
+        ('planta_ambientalista', 'Planta Ambientalista EESZ S.A. de C.V.'),
+        ('herrajes', 'Herrajes Estevez S.A. de C.V.'),
+        ('pnk', 'PNK & Ble Strategies, S.A. de C.V.'),
+        ('voch', 'Voch Especialistas de México, S.A. de C.V.'),
+        ('rastreo', 'Rastreo Satelital de México J&J S.A. de C.V.'),
+        ('grupo_back', 'Grupo Back Bone de México S.A. de C.V.')
+    ], string='Patrón')
 
-    rfc = fields.Char(string='RFC')
-    curp = fields.Char(string='CURP')
-    nss = fields.Char(string='NSS')
-    voter_key = fields.Char(string='Clave Elector')
+    establecimiento = fields.Selection([
+        ('estevezjor', 'Estevez.Jor Servicios'),
+        ('herrajes', 'Herrajes Estevez'),
+        ('grupo_back', 'Grupo BackBone'),
+        ('kuali', 'Kuali Digital'),
+        ('makili', 'Makili'),
+        ('vigiliner', 'Vigiliner')                
+    ], string='Patrón')
+
+    bank_id = fields.Many2one('res.bank', string='Banco')
+    clabe = fields.Char(
+        string='CLABE',
+        size=18,
+        help='CLABE interbancaria de 18 dígitos'
+    )
+    
+    account_number = fields.Char(
+        string='Número de Cuenta',
+        help='Número de cuenta bancaria'
+    )
+
+
+    rfc = fields.Char(string='RFC', help='RFC de 13 dígitos', size=13)
+    curp = fields.Char(string='CURP', help='CURP de 18 dígitos', size=18)
+    nss = fields.Char(string='NSS', help='Número de Seguridad Social', size=11)
+    voter_key = fields.Char(string='Clave Elector', size=18 )
     license_number = fields.Char(string='Número de Licencia')
     infonavit = fields.Boolean(string='Infonavit', default=False)
     private_colonia = fields.Char(string="Colonia")
@@ -83,7 +116,7 @@ class HrEmployee(models.Model):
     marital = fields.Selection([
         ('single', 'Soltero(a)'),
         ('married', 'Casado(a)'),
-        ('cohabitant', 'En Concubinato'),
+        ('cohabitant', 'Unión libre'),
         ('widower', 'Viudo(a)'),
         ('divorced', 'Divorciado(a)')
     ], string='Estado Civil', required=True, tracking=True)
@@ -174,6 +207,38 @@ class HrEmployee(models.Model):
 
             # Avanzar al siguiente año
             year_start = year_start.replace(year=year_start.year + 1)
+
+    @api.model
+    def create(self, vals):
+    
+        if 'employee_number' in vals and vals['employee_number'] and not vals.get('barcode'):
+            vals['barcode'] = vals['employee_number']
+        elif 'barcode' in vals and vals['barcode'] and not vals.get('employee_number'):
+            vals['employee_number'] = vals['barcode']
+        return super().create(vals)
+
+    def write(self, vals):
+        
+        
+        # Si se actualiza barcode, sincronizar con employee_number
+        if 'barcode' in vals and vals['barcode']:
+            vals['employee_number'] = vals['barcode']
+        
+        # Si se actualiza employee_number, sincronizar con barcode  
+        elif 'employee_number' in vals and vals['employee_number']:
+            vals['barcode'] = vals['employee_number']
+            
+        return super().write(vals)
+
+    def generate_random_barcode(self):
+        
+        for employee in self:
+            # Llamar al método original para generar el barcode
+            super(HrEmployee, employee).generate_random_barcode()
+            
+            # Sincronizar employee_number con el barcode generado
+            if employee.barcode and not employee.employee_number:
+                employee.employee_number = employee.barcode
 
     @api.depends('state_id')
     def _compute_state_key(self):

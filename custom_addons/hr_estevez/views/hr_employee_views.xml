@@ -1,33 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <data> 
-
-        <!-- Heredar la vista de búsqueda -->
+    <data>         
         <record id="view_employee_search_inherit" model="ir.ui.view">
             <field name="name">hr.employee.search.inherit</field>
             <field name="model">hr.employee</field>
-            <field name="inherit_id" ref="hr.view_employee_filter"/> <!-- Asegúrate de que esta referencia sea correcta -->
-            <field name="arch" type="xml">
-                <!-- Modificar el filtro "Archived" -->
+            <field name="inherit_id" ref="hr.view_employee_filter"/>
+            <field name="arch" type="xml">                
                 <filter name="inactive" position="attributes">
                     <attribute name="string">Bajas</attribute>
-                </filter>
+                </filter>                
             </field>
-        </record>
- 
-        <!-- Heredar la vista de formulario -->
+        </record>         
         <record id="view_employee_form_inherit" model="ir.ui.view">
             <field name="name">hr.employee.form.inherit</field>
             <field name="model">hr.employee</field>
             <field name="inherit_id" ref="hr.view_employee_form"/>
-            <field name="arch" type="xml">
-
-                <!-- Botones del toolbar -->
+            <field name="arch" type="xml">                                                                                              
+                <xpath expr="//page[@name='hr_settings']//group[@name='active_group']/div[@class='o_row'][field[@name='user_id']]" position="after">            
+                    <label for="barcode"/>
+                    <div class="o_row">
+                        <field name="barcode" groups="hr.group_hr_user" string="Número de Empleado"/>
+                        <button string="Generate" class="btn btn-link" type="object" name="generate_random_barcode" invisible="barcode" groups="hr.group_hr_user"/>
+                        <!--button name="243" string="Print Badge" class="btn btn-link" type="action" invisible="not barcode" groups="hr.group_hr_user"/-->
+                    </div>
+                </xpath>
+                <xpath expr="//page[@name='hr_settings']//group[@name='identification_group']" position="replace"/>                                               
                 <xpath expr="//div[@name='button_box']/button[last()]" position="after">
                     <button name="action_open_whatsapp" class="oe_stat_button" icon="fa-whatsapp" type="object" string="WhatsApp" invisible="not (work_phone or private_phone)"/>
                     <button name="action_open_employee_documents" class="oe_stat_button" icon="fa-file-text-o" type="object" string="Documentos" />
-                </xpath>
-            
+                </xpath>            
                 <!-- Botones del Header -->
                 <xpath expr="//header" position="inside">
                     <button name="action_archive_employee"
@@ -88,6 +89,7 @@
                 <xpath expr="//notebook/page[@name='hr_settings']" position="inside">
                     <group name="managers" string="Aprobadores" class="hide-group-if-empty" invisible="1"/>
                 </xpath>
+                
 
                 <!-- Nombres, Apellidos, # empleado, Proyecto y Etiquetas -->
                 <xpath expr="//group/group[field[@name='work_email']]" position="replace">
@@ -106,13 +108,14 @@
                 <!-- Compañia, Dirección, Departamento, Area, Puesto de Trabajo, Jefe Inmediato -->
                 <xpath expr="//group/group[field[@name='department_id']]" position="replace">
                     <group>
-                        <field name="company_id" string="Compañia" readonly="1" invisible="not direction_id"/>
+                        <field name="company_id" widget="many2one" options="{'no_create': True, 'no_create_edit': True}"/>
                         <field name="direction_id" options="{'no_create': True}"/>
                         <field name="department_id" domain="[('direction_id', '=', direction_id)]" invisible="not direction_id" options="{'no_create': True}"/>
                         <field name="area_id" domain="[('department_id', '=', department_id)]" invisible="not department_id" options="{'no_create': True}"/>
-                        <field name="job_id" domain="[('department_id', '=', department_id)]" invisible="not department_id" options="{'no_create': True}"/>
+                        <!--field name="job_id" domain="[('department_id', '=', department_id)]" invisible="not department_id" options="{'no_create': True}"/-->
+                        <field name="job_id" domain="['|', ('name', 'ilike', 'Becario'), ('direction_id', '=', direction_id)]" options="{'no_create': True}" context="{'default_direction_id': direction_id}"/>
                         <field name="parent_id" string="Jefe Inmediato" options="{'no_create': True}"/>
-                        <field name="coach_id" string="Instructor" options="{'no_create': True}"/>  
+                        <field name="coach_id" string="Instructor" options="{'no_create': True}" invisible="1"/>  
                         <field name="occupation_id" string="Ocupación" options="{'no_create': True}"/>
                         <field name="occupation_key" invisible="1"/> 
                         
@@ -198,11 +201,11 @@
                                     </div>
                                     <div class="row g-1">
                                         <div class="col p-1">                                            
-                                            <field name="state_id" placeholder="Estado" options="{'no_open': True, 'no_quick_create': True}"/>
+                                            <field name="state_id" placeholder="Estado" options="{'no_open': True, 'no_quick_create': True, 'no_create': True, 'no_create_edit': True}"/>
                                             <field name="state_key" invisible="1"/>
                                         </div>
                                         <div class="col p-1">
-                                            <field name="municipality_id" placeholder="Municipio" options="{'no_open': True, 'no_quick_create': True}"/>
+                                            <field name="municipality_id" placeholder="Municipio" options="{'no_open': True, 'no_quick_create': True, 'no_create': True, 'no_create_edit': True}"/>
                                             <field name="municipality_key" invisible="1"/>
                                         </div>
                                     </div>
@@ -222,10 +225,10 @@
                             <group>
                                 <field name="birthday"/>
                                 <field name="age" invisible="not birthday"/>
-                                <field name="rfc"/>
-                                <field name="curp"/>
-                                <field name="nss"/>
-                                <field name="voter_key"/>
+                                <field name="rfc" placeholder="13 dígitos"/>
+                                <field name="curp" placeholder="18 dígitos"/>
+                                <field name="nss" placeholder="11 dígitos"/>
+                                <field name="voter_key" placeholder="18 dígitos"/>
                                 <field name="infonavit"/> 
                                 <field name="license_number"/>
                             </group>
@@ -242,9 +245,9 @@
                                 <field name="study_field"/>
                                 <field name="study_school"/>
                                 <field name="estudios_id"/>                                
-                                <field name="estudios_key"/>  
+                                <field name="estudios_key" invisible="1"/> 
                                 <field name="documento_id"/> 
-                                <field name="documento_key"/> 
+                                <field name="documento_key" invisible="1"/> 
                             </group> 
                         </group>
 
@@ -333,6 +336,7 @@
                                 <field name="id" string="Código" readonly="1"/>
                                 <field name="create_date" string="Fecha de Creación" readonly="1"/>
                                 <field name="administrative_type" string="Tipo de Acta"/>
+                                <field name="description" string="Descripción"/>
                                 <field name="date" string="Fecha del Acta"/>
                                 <button name="download_memorandum_report" type="object" string="Reporte" class="btn-secondary fa fa-download"/>
                             </list>
@@ -585,6 +589,29 @@
                         </notebook>
                     </page>
                 </xpath>
+
+               <!-- Reemplazar el grupo UBICACIÓN actual por uno que incluya ambos grupos en la misma fila -->
+        <xpath expr="//page[@name='public']/group[1]" position="replace">            
+            <group string="Ubicación">                
+                <group>            
+                    <field name="employment_start_date"/>
+                    <field name="address_id" context="{'show_address': 1}" options="{'highlight_first_line': True, 'no_edit': True, 'no_create': True, 'no_open': True}" domain="[('is_company', '=', True)]"/>
+                    <field name="work_location_id" string="Ubicación Laboral" context="{'default_address_id': address_id}" placeholder="e.g. Building 2, Remote, etc."/>
+                    <field name="patron" string="Patrón" widget="selection"/>
+                    <field name="establecimiento" string="Establecimiento" widget="selection"/>                
+                </group>                
+            </group>            
+            <group string="Información Bancaria">                
+                <group>            
+                    <field name="bank_id" string="Banco" options="{'no_create': True, 'no_create_edit': True}"/>
+                    <field name="clabe" string="CLABE" placeholder="18 dígitos"        
+       required="bank_id"/>
+    <field name="account_number" string="Número de Cuenta"/>          
+                </group>            
+            </group>        
+        </xpath>
+      
+
 
             </field>
         </record>

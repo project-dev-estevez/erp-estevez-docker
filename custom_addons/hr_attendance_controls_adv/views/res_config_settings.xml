@@ -7,117 +7,117 @@
 			<field name="inherit_id" ref="hr_attendance.res_config_settings_view_form"/>			
 			<field name="arch" type="xml">	
                 <block name="overtime_settings" position="after">
-                    <block title="Check In / Check Out Control" id="hr_attendance_controls_check_in_out">
-                        <div class="col-12 col-lg-6 o_setting_box" title="Geolocation">
+                    <block title="Controles de Entrada / Salida" id="hr_attendance_controls_check_in_out">
+                        <div class="col-12 col-lg-6 o_setting_box" title="Geolocalización">
                             <div class="o_setting_left_pane">
                                 <field name="hr_attendance_geolocation"/>
                             </div>
                             <div class="o_setting_right_pane">
-                                <span class="o_form_label">Geolocation</span>
+                                <span class="o_form_label">Geolocalización</span>
                                 <div class="text-muted">
-                                    Enable to Capture the Geolocation while using the attendance
+                                    Activar para capturar la ubicación GPS durante el registro de asistencia
                                 </div>
                             </div>
                         </div>
-                        <div class="col-12 col-lg-6 o_setting_box" title="Geofence">
+                        <div class="col-12 col-lg-6 o_setting_box" title="Geocerca">
                             <div class="o_setting_left_pane">
                                 <field name="hr_attendance_geofence"/>
                             </div>
                             <div class="o_setting_right_pane">
-                                <span class="o_form_label">Geofence</span>
+                                <span class="o_form_label">Geocerca</span>
                                 <div class="text-muted">
-                                    Enable to Capture the Geofence while using the attendance
+                                    Activar para validar que el empleado esté dentro del área permitida
                                 </div>
                             </div>
                         </div>
-                        <div class="col-12 col-lg-6 o_setting_box" title="Photo">
+                        <div class="col-12 col-lg-6 o_setting_box" title="Reconocimiento Facial">
                             <div class="o_setting_left_pane">
                                 <field name="hr_attendance_face_recognition"/>
                             </div>
                             <div class="o_setting_right_pane">
-                                <span class="o_form_label">Face Recognition</span>
+                                <span class="o_form_label">Reconocimiento Facial</span>
                                 <div class="text-muted">
-                                    Enable to Check Face Recognition while using the attendance
+                                    Activar para verificar la identidad del empleado mediante reconocimiento facial
                                 </div>
                             </div>
                         </div>
-                        <div class="col-12 col-lg-6 o_setting_box" title="Photo">
+                        <div class="col-12 col-lg-6 o_setting_box" title="Fotografía">
                             <div class="o_setting_left_pane">
                                 <field name="hr_attendance_photo"/>
                             </div>
                             <div class="o_setting_right_pane">
-                                <span class="o_form_label">Photo</span>
+                                <span class="o_form_label">Fotografía</span>
                                 <div class="text-muted">
-                                    Enable to Capture the Photo while using the attendance
+                                    Activar para capturar una fotografía durante el registro de asistencia
                                 </div>
                             </div>
                         </div>
-                        <div class="col-12 col-lg-6 o_setting_box" title="IP Address">
+                        <div class="col-12 col-lg-6 o_setting_box" title="Dirección IP">
                             <div class="o_setting_left_pane">
                                 <field name="hr_attendance_ip"/>
                             </div>
                             <div class="o_setting_right_pane">
-                                <span class="o_form_label">IP Address</span>
+                                <span class="o_form_label">Dirección IP</span>
                                 <div class="text-muted">
-                                    Enable to Capture the IP Address while using the attendance
+                                    Activar para registrar la dirección IP desde donde se realiza el registro
                                 </div>
                             </div>
                         </div>
-                        <div class="col-12 col-lg-6 o_setting_box" title="Reason">
+                        <div class="col-12 col-lg-6 o_setting_box" title="Motivo">
                             <div class="o_setting_left_pane">
                                 <field name="hr_attendance_reason"/>
                             </div>
                             <div class="o_setting_right_pane">
-                                <span class="o_form_label">Reason</span>
+                                <span class="o_form_label">Motivo</span>
                                 <div class="text-muted">
-                                    Enable to Capture the Reasons while using the attendance
+                                    Activar para capturar el motivo o razón durante el registro de asistencia
                                 </div>
                             </div>
                         </div>
                     </block>
 
-                    <block title="Kiosk Mode Control" id="hr_attendance_controls_kiosk">
-                        <div class="col-12 col-lg-6 o_setting_box" title="Geolocation">
+                    <block title="Controles en Modo Kiosco" id="hr_attendance_controls_kiosk">
+                        <div class="col-12 col-lg-6 o_setting_box" title="Geolocalización">
                             <div class="o_setting_left_pane">
                                 <field name="hr_attendance_geolocation_k"/>
                             </div>
                             <div class="o_setting_right_pane">
-                                <span class="o_form_label">Geolocation</span>
+                                <span class="o_form_label">Geolocalización</span>
                                 <div class="text-muted">
-                                    Enable to Capture the Geolocation while using the attendance
+                                    Activar para capturar la ubicación GPS en el modo kiosco
                                 </div>
                             </div>
                         </div>
-                        <div class="col-12 col-lg-6 o_setting_box" title="Geofence">
+                        <div class="col-12 col-lg-6 o_setting_box" title="Geocerca">
                             <div class="o_setting_left_pane">
                                 <field name="hr_attendance_geofence_k"/>
                             </div>
                             <div class="o_setting_right_pane">
-                                <span class="o_form_label">Geofence</span>
+                                <span class="o_form_label">Geocerca</span>
                                 <div class="text-muted">
-                                    Enable to Capture the Geofence while using the attendance
+                                    Activar para validar ubicación mediante geocerca en modo kiosco
                                 </div>
                             </div>
                         </div>
-                        <div class="col-12 col-lg-6 o_setting_box" title="Photo">
+                        <div class="col-12 col-lg-6 o_setting_box" title="Reconocimiento Facial">
                             <div class="o_setting_left_pane">
                                 <field name="hr_attendance_face_recognition_k"/>
                             </div>
                             <div class="o_setting_right_pane">
-                                <span class="o_form_label">Face Recognition</span>
+                                <span class="o_form_label">Reconocimiento Facial</span>
                                 <div class="text-muted">
-                                    Enable to Check Face Recognition while using the kiosk mode
+                                    Activar para verificar identidad mediante reconocimiento facial en modo kiosco
                                 </div>
                             </div>
                         </div>
-                        <div class="col-12 col-lg-6 o_setting_box" title="IP Address">
+                        <div class="col-12 col-lg-6 o_setting_box" title="Dirección IP">
                             <div class="o_setting_left_pane">
                                 <field name="hr_attendance_ip_k"/>
                             </div>
                             <div class="o_setting_right_pane">
-                                <span class="o_form_label">IP Address</span>
+                                <span class="o_form_label">Dirección IP</span>
                                 <div class="text-muted">
-                                    Enable to Capture the IP Address while using the attendance
+                                    Activar para registrar la dirección IP en modo kiosco
                                 </div>
                             </div>
                         </div>

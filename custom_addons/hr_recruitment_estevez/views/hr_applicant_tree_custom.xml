@@ -4,6 +4,9 @@
     <field name="model">hr.applicant</field>
     <field name="inherit_id" ref="hr_recruitment.crm_case_tree_view_job"/>
     <field name="arch" type="xml">
+    <list position="attributes">
+        <attribute name="default_order">date_last_stage_update desc</attribute>
+      </list>
       <xpath expr="//field[@name='partner_name']" position="attributes">
         <attribute name="width">180</attribute>
       </xpath> 

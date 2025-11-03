@@ -1,5 +1,6 @@
 {
     'name': 'Profile Estevez',
+    'license': 'LGPL-3',
     'version': '1.0',
     'category': 'Custom',
     'summary': 'Personalizaciones del perfil de usuario',

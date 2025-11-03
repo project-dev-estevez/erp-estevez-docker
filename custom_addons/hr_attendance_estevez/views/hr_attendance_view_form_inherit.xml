@@ -5,15 +5,112 @@
         <field name="model">hr.attendance</field>
         <field name="inherit_id" ref="hr_attendance.hr_attendance_view_form"/>
         <field name="arch" type="xml">
+            
+            <!-- Reemplazar el header -->
             <xpath expr="//header" position="replace">
                 <header>
                     <field name="status" widget="statusbar" options="{'clickable': '1'}"/>
                 </header>
             </xpath>
-            <xpath expr="//field[@name='employee_id']" position="attributes">
-                <attribute name="readonly">1</attribute>
+
+            <!-- Reemplazar TODO el group dentro de sheet -->
+            <xpath expr="//sheet/group" position="replace">
+                <group>
+                    <!-- Información del empleado y tiempos -->
+                    <group colspan="2">
+                        <group col="1">
+                            <field name="employee_id" widget="many2one_avatar_user" readonly="1"/>
+                            <field name="check_in" string="Entrada" options="{'rounding': 0}"/>
+                            <field name="check_out" string="Salida" options="{'rounding': 0}" placeholder="Trabajando actualmente"/>
+                        </group>
+                        <group col="1">
+                            <div class="d-flex flex-column align-items-center pt-4">
+                                <span class="badge bg-secondary mb-2">Tiempo Trabajado</span>
+                                <h1 class="oe_title text-primary mb-0">
+                                    <field name="worked_hours" widget="float_time" nolabel="1" readonly="1"/>
+                                </h1>
+                            </div>
+                        </group>
+                    </group>
+
+                    <!-- Separador Check In -->
+                    <separator string="Entrada"/>
+                    
+                    <!-- Sección Check In -->
+                    <group name="check_in_group" colspan="2">
+                        <group>
+                            <field name="check_in_ipaddress" string="IP de Entrada"/>
+                            <field name="checkin_device" string="Dispositivo" readonly="1"/>
+                            <field name="in_browser" string="Navegador"/>
+                            <field name="check_in_geofence_ids" string="Geocercas" widget="many2many_tags" readonly="1"/>
+                            <label for="in_latitude" string="Coordenadas GPS"/>
+                            <div>
+                                <div class="o_row">
+                                    <span>
+                                        <field name="in_latitude"/>
+                                    </span>,
+                                    <span>
+                                        <field name="in_longitude" nolabel="1"/>
+                                    </span>
+                                </div>
+                                <button
+                                    name="action_in_attendance_maps"
+                                    type="object"
+                                    class="btn btn-link ps-0 pt-0 pb-2"
+                                    icon="oi-arrow-right"
+                                    string="Mapa Completo"
+                                    colspan="2"/>
+                            </div>
+                            <div class="text-center">
+                                <field name="check_in_photo" widget="image" nolabel="1" options="{'size': [200, 200]}" readonly="1"/>
+                            </div>
+                        </group>
+                        
+                        <group>
+                            <field name="check_in_map_html" nolabel="1" readonly="1"/>
+                        </group>
+                    </group>
+
+                    <!-- Separador Check Out -->
+                    <separator string="Salida" name="check_out_separator" invisible="not check_out"/>
+                    
+                    <!-- Sección Check Out -->
+                    <group colspan="2" name="check_out_group" invisible="not check_out">
+                        <group>
+                            <field name="check_out_ipaddress" string="IP de Salida"/>
+                            <field name="checkout_device" string="Dispositivo" readonly="1"/>
+                            <field name="out_browser" string="Navegador"/>
+                            <field name="check_out_geofence_ids" string="Geocercas" widget="many2many_tags" readonly="1"/>
+                            <label for="out_latitude" string="Coordenadas GPS"/>
+                            <div>
+                                <div class="o_row">
+                                    <span>
+                                        <field name="out_latitude"/>
+                                    </span>,
+                                    <span>
+                                        <field name="out_longitude" nolabel="1"/>
+                                    </span>
+                                </div>
+                                <button
+                                    name="action_out_attendance_maps"
+                                    type="object"
+                                    class="btn btn-link ps-0 pt-0 pb-2"
+                                    icon="oi-arrow-right"
+                                    string="Mapa Completo"
+                                    colspan="2"/>
+                            </div>
+                            <div class="text-center">
+                                <field name="check_out_photo" widget="image" nolabel="1" options="{'size': [200, 200]}" readonly="1"/>
+                            </div>
+                        </group>
+                        
+                        <group>
+                            <field name="check_out_map_html" nolabel="1" readonly="1"/>
+                        </group>
+                    </group>
+                </group>
             </xpath>
+            
         </field>
     </record>
-
 </odoo>
