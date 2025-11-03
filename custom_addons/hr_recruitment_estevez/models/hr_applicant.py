@@ -24,6 +24,8 @@ class HrApplicant(models.Model):
     degree_id = fields.Many2one('hr.recruitment.degree', string="Escolaridad")
     address = fields.Text(string="Dirección")
     phone = fields.Char(string="Teléfono", compute="_compute_phone")
+    # En tu modelo hr.applicant
+    employee_id = fields.Many2one('hr.employee', string='Empleado Relacionado')
 
     # Antecedentes Heredo Familiares
     family_medical_history = fields.Text(string="Antecedentes Heredo Familiares")
@@ -292,14 +294,17 @@ class HrApplicant(models.Model):
                         'stage_id': new_stage_id,
                         'enter_date': now,
                     })
-
-        # Preservar el reclutador (user_id) si no está en los valores
-        if 'user_id' not in vals:
-            for record in self:
-                if record.user_id:
-                    vals['user_id'] = record.user_id.id
-
-        return super(HrApplicant, self).write(vals)
+        result = super(HrApplicant, self).write(vals)                
+    
+        for applicant in self:
+            if applicant.employee_id:
+                try:
+                    applicant.sync_attachment_changes(applicant.employee_id.id)
+                    _logger.info(f"Attachments sincronizados automáticamente para applicant {applicant.id}")
+                except Exception as e:
+                    _logger.error(f"Error sincronizando attachments para applicant {applicant.id}: {e}")
+        
+        return result
     
     # Computed fields
     @api.depends('weight', 'height')
@@ -516,6 +521,7 @@ class HrApplicant(models.Model):
 
         # Crear empleado directamente
         employee = self.env['hr.employee'].create(employee_vals)
+        self.employee_id = employee.id
 
         # Transferir categorías
         for appl_cat in self.categ_ids:
@@ -527,16 +533,8 @@ class HrApplicant(models.Model):
             if emp_cat.id not in employee.category_ids.ids:
                 employee.write({'category_ids': [(4, emp_cat.id)]})
 
-        # Transferir attachments
-        attachments = self.env['ir.attachment'].search([
-            ('res_model', '=', 'hr.applicant'),
-            ('res_id', '=', self.id)
-        ])
-        for attachment in attachments:
-            attachment.copy({
-                'res_model': 'hr.employee',
-                'res_id': employee.id,
-            })
+        # Sincronizar attachments (NUEVA IMPLEMENTACIÓN)
+        self._sync_attachments_to_employee(employee)
 
         # Log
         _logger.info(
@@ -549,6 +547,127 @@ class HrApplicant(models.Model):
             'res_model': 'hr.employee',
             'view_mode': 'form',
             'res_id': employee.id,
+        }
+
+    def _sync_attachments_to_employee(self, employee):
+        """Sincroniza attachments del applicant al employee"""
+        attachments = self.env['ir.attachment'].search([
+            ('res_model', '=', 'hr.applicant'),
+            ('res_id', '=', self.id)
+        ])
+        
+        for attachment in attachments:
+            # Buscar si ya existe el mismo archivo en el empleado
+            existing_attachment = self.env['ir.attachment'].search([
+                ('res_model', '=', 'hr.employee'),
+                ('res_id', '=', employee.id),
+                ('name', '=', attachment.name),
+            ], limit=1)
+            
+            if not existing_attachment:
+                # Crear nueva copia
+                attachment.copy({
+                    'res_model': 'hr.employee',
+                    'res_id': employee.id,
+                })
+
+    def sync_attachment_changes(self, employee_id, direction='applicant_to_employee'):
+        """Sincroniza cambios de attachments - ahora bidireccional"""
+        employee = self.env['hr.employee'].browse(employee_id)
+        
+        if direction == 'applicant_to_employee':
+            
+            applicant_attachments = self.env['ir.attachment'].search([
+                ('res_model', '=', 'hr.applicant'),
+                ('res_id', '=', self.id)
+            ])
+            
+            applicant_files = {att.name: att for att in applicant_attachments}
+            
+            employee_attachments = self.env['ir.attachment'].search([
+                ('res_model', '=', 'hr.employee'),
+                ('res_id', '=', employee.id)
+            ])
+            
+            # Sincronizar: actualizar archivos existentes
+            for emp_att in employee_attachments:
+                if emp_att.name in applicant_files:
+                    app_att = applicant_files[emp_att.name]
+                    if app_att.datas != emp_att.datas:
+                        emp_att.write({'datas': app_att.datas})
+            
+            # Agregar nuevos archivos
+            for app_name, app_att in applicant_files.items():
+                if app_name not in [e.name for e in employee_attachments]:
+                    app_att.copy({
+                        'res_model': 'hr.employee',
+                        'res_id': employee.id,
+                    })
+            
+            # Eliminar archivos del empleado que ya no existen en el applicant
+            for emp_att in employee_attachments:
+                if emp_att.name not in applicant_files:
+                    emp_att.unlink()
+                    
+        elif direction == 'employee_to_applicant':
+            
+            employee_attachments = self.env['ir.attachment'].search([
+                ('res_model', '=', 'hr.employee'),
+                ('res_id', '=', employee.id)
+            ])
+            
+            employee_files = {att.name: att for att in employee_attachments}
+            
+            applicant_attachments = self.env['ir.attachment'].search([
+                ('res_model', '=', 'hr.applicant'),
+                ('res_id', '=', self.id)
+            ])
+            
+            # Sincronizar: actualizar archivos existentes
+            for app_att in applicant_attachments:
+                if app_att.name in employee_files:
+                    emp_att = employee_files[app_att.name]
+                    if emp_att.datas != app_att.datas:
+                        app_att.write({'datas': emp_att.datas})
+            
+            # Agregar nuevos archivos
+            for emp_name, emp_att in employee_files.items():
+                if emp_name not in [a.name for a in applicant_attachments]:
+                    emp_att.copy({
+                        'res_model': 'hr.applicant',
+                        'res_id': self.id,
+                    })
+            
+            # Eliminar archivos del applicant que ya no existen en el employee
+            for app_att in applicant_attachments:
+                if app_att.name not in employee_files:
+                    app_att.unlink()
+
+    def action_sync_attachments(self):
+        """Acción para sincronizar attachments manualmente"""
+        for applicant in self:
+            # Buscar el empleado relacionado
+            if hasattr(applicant, 'employee_id') and applicant.employee_id:
+                applicant.sync_attachment_changes(applicant.employee_id.id, 'applicant_to_employee')
+            else:
+                # Si no hay campo employee_id, buscar por nombre/email
+                employee = self.env['hr.employee'].search([
+                    '|',
+                    ('name', '=ilike', applicant.partner_name),
+                    ('work_email', '=ilike', applicant.email_from)
+                ], limit=1)
+                if employee:
+                    applicant.sync_attachment_changes(employee.id, 'applicant_to_employee')
+        
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': 'Sincronización completada',
+                'message': 'Los documentos se han sincronizado correctamente',
+                'type': 'success',
+                'sticky': False,
+            }
         }
 
     def action_save(self):
@@ -569,4 +688,68 @@ class HrApplicant(models.Model):
             
         }
 
+class IrAttachmentSync(models.Model):
+    _inherit = 'ir.attachment'
+
+    def write(self, vals):
+        result = super(IrAttachmentSync, self).write(vals)
+        
+        for attachment in self:
+            # ✅ De APPLICANT → EMPLOYEE
+            if attachment.res_model == 'hr.applicant' and attachment.res_id:
+                applicant = self.env['hr.applicant'].browse(attachment.res_id)
+                if applicant.exists() and applicant.employee_id:
+                    try:
+                        applicant.sync_attachment_changes(applicant.employee_id.id, 'applicant_to_employee')
+                        _logger.info(f"Sync APPLICANT→EMPLOYEE para applicant {applicant.id}")
+                    except Exception as e:
+                        _logger.error(f"Error sync APPLICANT→EMPLOYEE: {e}")
+            
+            # ✅ NUEVO: De EMPLOYEE → APPLICANT  
+            elif attachment.res_model == 'hr.employee' and attachment.res_id:
+                employee = self.env['hr.employee'].browse(attachment.res_id)
+                if employee.exists():
+                    # Buscar el applicant relacionado con este employee
+                    applicant = self.env['hr.applicant'].search([
+                        ('employee_id', '=', employee.id)
+                    ], limit=1)
+                    if applicant:
+                        try:
+                            applicant.sync_attachment_changes(employee.id, 'employee_to_applicant')
+                            _logger.info(f"Sync EMPLOYEE→APPLICANT para employee {employee.id}")
+                        except Exception as e:
+                            _logger.error(f"Error sync EMPLOYEE→APPLICANT: {e}")
+        
+        return result
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        records = super(IrAttachmentSync, self).create(vals_list)
+        
+        for record in records:
+            # ✅ De APPLICANT → EMPLOYEE
+            if record.res_model == 'hr.applicant' and record.res_id:
+                applicant = self.env['hr.applicant'].browse(record.res_id)
+                if applicant.exists() and applicant.employee_id:
+                    try:
+                        applicant.sync_attachment_changes(applicant.employee_id.id, 'applicant_to_employee')
+                        _logger.info(f"CREATE Sync APPLICANT→EMPLOYEE para applicant {applicant.id}")
+                    except Exception as e:
+                        _logger.error(f"Error CREATE sync APPLICANT→EMPLOYEE: {e}")
+            
+            # ✅ NUEVO: De EMPLOYEE → APPLICANT
+            elif record.res_model == 'hr.employee' and record.res_id:
+                employee = self.env['hr.employee'].browse(record.res_id)
+                if employee.exists():
+                    applicant = self.env['hr.applicant'].search([
+                        ('employee_id', '=', employee.id)
+                    ], limit=1)
+                    if applicant:
+                        try:
+                            applicant.sync_attachment_changes(employee.id, 'employee_to_applicant')
+                            _logger.info(f"CREATE Sync EMPLOYEE→APPLICANT para employee {employee.id}")
+                        except Exception as e:
+                            _logger.error(f"Error CREATE sync EMPLOYEE→APPLICANT: {e}")
+        
+        return records
     
