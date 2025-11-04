@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_hr_time_off_in_lieu_form" model="ir.ui.view">
+        <field name="name">hr.time.off.in.lieu.form</field>
+        <field name="model">hr.time.off.in.lieu</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="employee_id"/>
+                            <field name="request_date"/>
+                            <field name="state" widget="statusbar" 
+                                statusbar_visible="draft,pending,approved,rejected"/>
+                        </group>
+                        <group>
+                            <field name="request_date_from"/>
+                            <field name="request_date_to"/>
+                            <field name="number_of_days" readonly="1"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="name" placeholder="Descripción de la solicitud"/>
+                        <field name="notes" placeholder="Notas adicionales"/>
+                    </group>
+                </sheet>
+                <footer>
+                    <button name="action_submit" string="Enviar" type="object" class="btn-primary"/>
+                    <button name="action_approve" string="Aprobar" type="object" class="btn-primary"/>
+                    <button name="action_reject" string="Rechazar" type="object" class="btn-secondary"/>
+                    <button name="action_draft" string="Volver a Borrador" type="object" class="btn-secondary"/>
+                    <button string="Cerrar" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

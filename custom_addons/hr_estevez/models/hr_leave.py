@@ -11,6 +11,8 @@ class HrLeave(models.Model):
     period_id = fields.Many2one('hr.vacation.period', string="Periodo de Vacaciones")
     allocation_ids = fields.One2many('hr.vacation.allocation', 'leave_id', string="Distribución por Períodos")
 
+    time_off_in_lieu_id = fields.Many2one('hr.time.off.in.lieu', string="Solicitud TXT Relacionada")
+    
     def _distribute_vacation_days(self):
         """Distribuye los días de vacaciones entre los períodos disponibles"""
         _logger.info("=== INICIANDO DISTRIBUCIÓN DE DÍAS ===")
@@ -89,18 +91,41 @@ class HrLeave(models.Model):
             _logger.info("DISTRIBUCIÓN COMPLETADA")
 
     def action_approve(self):
-        """Sobrescribir la aprobación para distribuir días automáticamente"""
-        # Primero distribuir los días
+        """Sobrescribir la aprobación para distribuir días automáticamente Y manejar TXT"""
+        # Primero manejar las solicitudes de Tiempo por Tiempo
+        time_off_in_lieu_leaves = self.filtered(
+            lambda l: l.holiday_status_id.is_time_off_in_lieu and 
+                    l.employee_id and 
+                    not l.time_off_in_lieu_id
+        )
+        
+        for leave in time_off_in_lieu_leaves:
+            # Crear la solicitud de TXT relacionada
+            txt_vals = {
+                'name': f"TXT - {leave.employee_id.name} - {leave.request_date_from}",
+                'employee_id': leave.employee_id.id,
+                'request_date': fields.Date.today(),
+                'request_date_from': leave.request_date_from,
+                'request_date_to': leave.request_date_to,
+                'number_of_days': leave.number_of_days,
+                'state': 'approved',
+                'notes': f'Creado automáticamente desde ausencia',
+                'leave_id': leave.id,
+            }
+            txt = self.env['hr.time.off.in.lieu'].create(txt_vals)
+            leave.time_off_in_lieu_id = txt.id
+        
+        # Luego distribuir los días de vacaciones (tu lógica existente)
         vacation_leaves = self.filtered(
             lambda l: l.holiday_status_id.is_vacation and 
-                     l.employee_id and 
-                     l.number_of_days > 0
+                    l.employee_id and 
+                    l.number_of_days > 0
         )
         
         for leave in vacation_leaves:
             leave._distribute_vacation_days()
         
-        # Luego llamar al método original
+        # Llamar al método original
         res = super().action_approve()
         
         # Forzar recálculo de días en los períodos afectados
