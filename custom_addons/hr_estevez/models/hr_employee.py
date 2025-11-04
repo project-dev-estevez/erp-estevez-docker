@@ -111,44 +111,44 @@ class HrEmployee(models.Model):
     country_id = fields.Many2one('res.country', string='País', default=lambda self: self.env.ref('base.mx').id)
     country_of_birth = fields.Many2one('res.country', string="Country of Birth", groups="hr.group_hr_user", tracking=True, default=lambda self: self.env.ref('base.mx').id)
      # Creamos un campo nuevo en lugar de modificar el existente
-    lugar_nacimiento_estado = fields.Selection(
-        selection=[
-            ('aguascalientes', 'Aguascalientes'),
-            ('baja_california', 'Baja California'),
-            ('baja_california_sur', 'Baja California Sur'),
-            ('campeche', 'Campeche'),
-            ('chiapas', 'Chiapas'),
-            ('chihuahua', 'Chihuahua'),
-            ('ciudad_mexico', 'Ciudad de México'),
-            ('coahuila', 'Coahuila'),
-            ('colima', 'Colima'),
-            ('durango', 'Durango'),
-            ('guanajuato', 'Guanajuato'),
-            ('guerrero', 'Guerrero'),
-            ('hidalgo', 'Hidalgo'),
-            ('jalisco', 'Jalisco'),
-            ('mexico', 'Estado de México'),
-            ('michoacan', 'Michoacán'),
-            ('morelos', 'Morelos'),
-            ('nayarit', 'Nayarit'),
-            ('nuevo_leon', 'Nuevo León'),
-            ('oaxaca', 'Oaxaca'),
-            ('puebla', 'Puebla'),
-            ('queretaro', 'Querétaro'),
-            ('quintana_roo', 'Quintana Roo'),
-            ('san_luis_potosi', 'San Luis Potosí'),
-            ('sinaloa', 'Sinaloa'),
-            ('sonora', 'Sonora'),
-            ('tabasco', 'Tabasco'),
-            ('tamaulipas', 'Tamaulipas'),
-            ('tlaxcala', 'Tlaxcala'),
-            ('veracruz', 'Veracruz'),
-            ('yucatan', 'Yucatán'),
-            ('zacatecas', 'Zacatecas')
-        ],
-        string='Lugar de Nacimiento',
-        help='Selecciona el estado de nacimiento del empleado'
-    )
+    # lugar_nacimiento_estado = fields.Selection(
+    #     selection=[
+    #         ('aguascalientes', 'Aguascalientes'),
+    #         ('baja_california', 'Baja California'),
+    #         ('baja_california_sur', 'Baja California Sur'),
+    #         ('campeche', 'Campeche'),
+    #         ('chiapas', 'Chiapas'),
+    #         ('chihuahua', 'Chihuahua'),
+    #         ('ciudad_mexico', 'Ciudad de México'),
+    #         ('coahuila', 'Coahuila'),
+    #         ('colima', 'Colima'),
+    #         ('durango', 'Durango'),
+    #         ('guanajuato', 'Guanajuato'),
+    #         ('guerrero', 'Guerrero'),
+    #         ('hidalgo', 'Hidalgo'),
+    #         ('jalisco', 'Jalisco'),
+    #         ('mexico', 'Estado de México'),
+    #         ('michoacan', 'Michoacán'),
+    #         ('morelos', 'Morelos'),
+    #         ('nayarit', 'Nayarit'),
+    #         ('nuevo_leon', 'Nuevo León'),
+    #         ('oaxaca', 'Oaxaca'),
+    #         ('puebla', 'Puebla'),
+    #         ('queretaro', 'Querétaro'),
+    #         ('quintana_roo', 'Quintana Roo'),
+    #         ('san_luis_potosi', 'San Luis Potosí'),
+    #         ('sinaloa', 'Sinaloa'),
+    #         ('sonora', 'Sonora'),
+    #         ('tabasco', 'Tabasco'),
+    #         ('tamaulipas', 'Tamaulipas'),
+    #         ('tlaxcala', 'Tlaxcala'),
+    #         ('veracruz', 'Veracruz'),
+    #         ('yucatan', 'Yucatán'),
+    #         ('zacatecas', 'Zacatecas')
+    #     ],
+    #     string='Lugar de Nacimiento',
+    #     help='Selecciona el estado de nacimiento del empleado'
+    # )
     private_country_id = fields.Many2one("res.country", string="Private Country", groups="hr.group_hr_user", default=lambda self: self.env.ref('base.mx').id)
     is_mexico = fields.Boolean(string="Is Mexico", compute="_compute_is_mexico", store=False)
 
