@@ -238,7 +238,7 @@
                            <group string="Nacionalidad">
                                 <field name="country_id" options='{"no_open": True, "no_create": True}'/>
                                 <field name="country_of_birth"/>  
-                                <!-- <field name="lugar_nacimiento_estado"/>                                 -->
+                                <!--<field name="lugar_nacimiento_estado"/>-->
                             </group>
                             <group string="Educación">
                                 <field name="certificate"/>
@@ -415,7 +415,7 @@
                 </xpath>
 
                 <!-- Nueva página de Permisos -->
-                <xpath expr="//page[@name='vacations']" position="replace">
+                <xpath expr="//page[@name='vacations']" position="after">
                     <page name="permits" string="Permisos">
                         <field name="time_off_in_lieu_ids">
                             <list>
