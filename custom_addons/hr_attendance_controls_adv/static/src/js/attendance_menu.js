@@ -1,13 +1,12 @@
 /** @odoo-module **/
 
-import { _t } from "@web/core/l10n/translation";
 import { patch } from "@web/core/utils/patch";
 import { ActivityMenu } from "@hr_attendance/components/attendance_menu/attendance_menu";
 
 import { useService } from "@web/core/utils/hooks";
-import { onWillStart, useRef } from "@odoo/owl";
+import { onWillStart } from "@odoo/owl";
 import { session } from "@web/session";
-import { loadCSS, loadJS , AssetsLoadingError} from '@web/core/assets';
+import { loadJS , AssetsLoadingError} from '@web/core/assets';
 import { rpc } from "@web/core/network/rpc";
 
 import { AttendanceRecognitionDialog } from "./attendance_recognition_dialog"
@@ -21,11 +20,6 @@ patch(ActivityMenu.prototype, {
         this.orm = useService('orm');
         this.dialog = useService("dialog");
         this.notificationService = useService('notification');
-        
-        // geofence
-        this.geofenceContainerRef = useRef("geofence_container");
-        this.geofenceToggleRef = useRef("geofence_toggle");
-        this.geofenceViewRef = useRef("geofence_view");
 
         // session controls
         this.state.show_geolocation = false;
@@ -38,7 +32,6 @@ patch(ActivityMenu.prototype, {
         this.state.latitude = false;
         this.state.longitude = false;
         // geofence
-        this.state.olmap = false;
         this.state.fence_is_inside = false;
         this.state.fence_ids = [];
         this.state.geofences = [];  // 📍 Inicializar array de geocercas
@@ -60,8 +53,6 @@ patch(ActivityMenu.prototype, {
         onWillStart(async () => {
             try {
                 await loadJS('/hr_attendance_controls_adv/static/src/lib/faceapi/source/face-api.js');
-                await loadCSS('/hr_attendance_controls_adv/static/src/lib/ol-6.12.0/ol.css');
-                await loadCSS('/hr_attendance_controls_adv/static/src/lib/ol-ext/ol-ext.css');
                 await loadJS('/hr_attendance_controls_adv/static/src/lib/ol-6.12.0/ol.js');
                 await loadJS('/hr_attendance_controls_adv/static/src/lib/ol-ext/ol-ext.js');
                 this.onOpenedContent();
@@ -158,7 +149,6 @@ patch(ActivityMenu.prototype, {
                 this.state.show_geofence = true;
                 try {
                     await this.loadGeofences();
-                    await this._getGeofenceMap();
                 } catch (error) {
                     console.log("Geofence map error:", error);
                 }
@@ -210,102 +200,6 @@ patch(ActivityMenu.prototype, {
                         }
                     },
                     (error) => reject("Geolocation access denied")
-                );
-            } else {
-                resolve();
-            }
-        });
-    },
-
-    async onTogglegeofence(){
-        var self = this;        
-        const toggleIcon = self.geofenceToggleRef.el;
-        const viewElement = self.geofenceViewRef.el;
-        
-        if (toggleIcon.classList.contains('fa-angle-double-down')) {
-            viewElement.classList.remove('d-none');
-            toggleIcon.classList.replace('fa-angle-double-down', 'fa-angle-double-up');
-            
-            if (self.state.olmap) {
-                self.state.olmap.setTarget(viewElement);
-                setTimeout(() => {
-                    self.state.olmap.updateSize();
-                }, 400);
-            } else {
-                if (typeof ol !== 'undefined') {
-                    await this._getGeofenceMap();
-                }else{
-                    console.log("OpenLayers is not loaded.");
-                }
-            }
-        } else {
-            viewElement.classList.add('d-none');
-            toggleIcon.classList.replace('fa-angle-double-up', 'fa-angle-double-down');
-            
-            if (self.state.olmap) {
-                self.state.olmap.setTarget(viewElement);
-                setTimeout(() => {
-                    self.state.olmap.updateSize();
-                }, 400);
-            } else {
-                if (typeof ol !== 'undefined') {
-                    await this._getGeofenceMap();
-                }else{
-                    console.log("OpenLayers is not loaded.");
-                }
-            }
-        }        
-    },
-
-    _getGeofenceMap() {
-        return new Promise((resolve, reject) => {
-            if (window.location.protocol === 'https:') {
-                navigator.geolocation.getCurrentPosition(
-                    async ({ coords: { accuracy, latitude, longitude } }) => {
-                        if (latitude && longitude) {
-                            this.state = this.state || {}; // Ensure state is initialized
-                            this.state.latitude = latitude;
-                            this.state.longitude = longitude;
-    
-                            if (!this.state.olmap) {
-                                const olmapDiv = this.geofenceViewRef?.el;
-    
-                                if (olmapDiv) {
-                                    olmapDiv.style.width = "100%";
-                                    olmapDiv.style.height = "200px";
-                                }
-    
-                                const vectorSource = new ol.source.Vector({});
-                                this.state.olmap = new ol.Map({
-                                    layers: [
-                                        new ol.layer.Tile({ source: new ol.source.OSM() }),
-                                        new ol.layer.Vector({ source: vectorSource })
-                                    ],
-                                    loadTilesWhileInteracting: true,
-                                    view: new ol.View({
-                                        center: ol.proj.fromLonLat([longitude, latitude]),
-                                        zoom: 2,
-                                    }),
-                                });
-                                this.state.olmap.setTarget(olmapDiv);
-                                
-                                const Coords = [longitude, latitude];
-                                const Accuracy = ol.geom.Polygon.circular(Coords, accuracy);
-                                vectorSource.clear(true);
-                                vectorSource.addFeatures([
-                                    new ol.Feature(Accuracy.transform('EPSG:4326', this.state.olmap.getView().getProjection())),
-                                    new ol.Feature(new ol.geom.Point(ol.proj.fromLonLat(Coords)))
-                                ]);
-                                this.state.olmap.getView().fit(vectorSource.getExtent(), { duration: 100, maxZoom: 6 });
-                                
-                                setTimeout(() => this.state.olmap.updateSize(), 400);
-                            }
-                            resolve();
-                        } else {
-                            reject("Geolocation data is missing.");
-                        }
-                    },
-                    (error) => reject("Geolocation access denied.")
                 );
             } else {
                 resolve();
@@ -439,7 +333,7 @@ patch(ActivityMenu.prototype, {
                 }
             }
             else{
-                self.notificationService.add(_t("You haven't entered any of the geofence zones."), { type: "danger" });
+                self.notificationService.add("You haven't entered any of the geofence zones.", { type: "danger" });
             }
         }
 
@@ -451,10 +345,10 @@ patch(ActivityMenu.prototype, {
 
     showNotification() {
         this.notificationService.add(
-            _t('Gracias por tu contribución. 🎉'), 
+            "Gracias por tu contribución. 🎉",
             { 
                 type: "success",
-                title: _t("¡Excelente!"),
+                title: "¡Excelente!",
                 sticky: false
             }
         );
@@ -718,7 +612,7 @@ patch(ActivityMenu.prototype, {
             }
         } catch (error) {
             console.log("Validation failed:", error);
-            self.notificationService.add(_t(error), { type: "danger" });
+            self.notificationService.add(error, { type: "danger" });
         }
     }
 });
