@@ -237,8 +237,8 @@
                         <group>
                            <group string="Nacionalidad">
                                 <field name="country_id" options='{"no_open": True, "no_create": True}'/>
-                                <field name="country_of_birth"/>
-                                <field name="place_of_birth"/>
+                                <field name="country_of_birth"/>  
+                                <field name="lugar_nacimiento_estado"/>                                
                             </group>
                             <group string="Educación">
                                 <field name="certificate"/>
@@ -281,6 +281,10 @@
                         </group>
                     </page>
                 </xpath>
+                <xpath expr="//page[@name='personal_information']//group[.//field[@name='country_of_birth']]" position="inside">
+    <field name="lugar_nacimiento_estado" widget="selection"/>
+</xpath>
+
 
                 <!-- Nueva página de Incapacidades -->
                 <xpath expr="//notebook/page[@name='personal_information']" position="after">
