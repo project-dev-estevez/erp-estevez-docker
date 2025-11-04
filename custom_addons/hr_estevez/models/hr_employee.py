@@ -110,7 +110,7 @@ class HrEmployee(models.Model):
 
     country_id = fields.Many2one('res.country', string='País', default=lambda self: self.env.ref('base.mx').id)
     country_of_birth = fields.Many2one('res.country', string="Country of Birth", groups="hr.group_hr_user", tracking=True, default=lambda self: self.env.ref('base.mx').id)    
-    lugar_nacimiento_estado = fields.Selection(
+    """lugar_nacimiento_estado = fields.Selection(
         selection=[
             ('aguascalientes', 'Aguascalientes'),
             ('baja_california', 'Baja California'),
@@ -147,7 +147,7 @@ class HrEmployee(models.Model):
         ],
         string='Lugar de Nacimiento',
         help='Selecciona el estado de nacimiento del empleado'
-    )
+    )"""
     private_country_id = fields.Many2one("res.country", string="Private Country", groups="hr.group_hr_user", default=lambda self: self.env.ref('base.mx').id)
     is_mexico = fields.Boolean(string="Is Mexico", compute="_compute_is_mexico", store=False)
 
