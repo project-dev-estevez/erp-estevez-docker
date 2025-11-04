@@ -62,6 +62,3 @@ Odoo – Plataforma ER
 PostgreSQL – Base de datos relacional
 Docker – Contenerización
 Docker Compose – Orquestación de servicios
-
-
-

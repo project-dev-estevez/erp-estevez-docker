@@ -109,7 +109,45 @@ class HrEmployee(models.Model):
     age = fields.Integer(string='Edad', compute='_compute_age')
 
     country_id = fields.Many2one('res.country', string='País', default=lambda self: self.env.ref('base.mx').id)
-    country_of_birth = fields.Many2one('res.country', string="Country of Birth", groups="hr.group_hr_user", tracking=True, default=lambda self: self.env.ref('base.mx').id)
+    country_of_birth = fields.Many2one('res.country', string="Country of Birth", groups="hr.group_hr_user", tracking=True, default=lambda self: self.env.ref('base.mx').id)    
+    lugar_nacimiento_estado = fields.Selection(
+        selection=[
+            ('aguascalientes', 'Aguascalientes'),
+            ('baja_california', 'Baja California'),
+            ('baja_california_sur', 'Baja California Sur'),
+            ('campeche', 'Campeche'),
+            ('chiapas', 'Chiapas'),
+            ('chihuahua', 'Chihuahua'),
+            ('ciudad_mexico', 'Ciudad de México'),
+            ('coahuila', 'Coahuila'),
+            ('colima', 'Colima'),
+            ('durango', 'Durango'),
+            ('guanajuato', 'Guanajuato'),
+            ('guerrero', 'Guerrero'),
+            ('hidalgo', 'Hidalgo'),
+            ('jalisco', 'Jalisco'),
+            ('mexico', 'Estado de México'),
+            ('michoacan', 'Michoacán'),
+            ('morelos', 'Morelos'),
+            ('nayarit', 'Nayarit'),
+            ('nuevo_leon', 'Nuevo León'),
+            ('oaxaca', 'Oaxaca'),
+            ('puebla', 'Puebla'),
+            ('queretaro', 'Querétaro'),
+            ('quintana_roo', 'Quintana Roo'),
+            ('san_luis_potosi', 'San Luis Potosí'),
+            ('sinaloa', 'Sinaloa'),
+            ('sonora', 'Sonora'),
+            ('tabasco', 'Tabasco'),
+            ('tamaulipas', 'Tamaulipas'),
+            ('tlaxcala', 'Tlaxcala'),
+            ('veracruz', 'Veracruz'),
+            ('yucatan', 'Yucatán'),
+            ('zacatecas', 'Zacatecas')
+        ],
+        string='Lugar de Nacimiento',
+        help='Selecciona el estado de nacimiento del empleado'
+    )
     private_country_id = fields.Many2one("res.country", string="Private Country", groups="hr.group_hr_user", default=lambda self: self.env.ref('base.mx').id)
     is_mexico = fields.Boolean(string="Is Mexico", compute="_compute_is_mexico", store=False)
 
@@ -130,7 +168,15 @@ class HrEmployee(models.Model):
         'hr.vacation.period', 'employee_id', string="Periodos de Vacaciones"
     )
 
-    emergency_contact_relationship = fields.Char(string="Parentesco del Primer Contacto")
+    #emergency_contact_relationship = fields.Char(string="Parentesco del Primer Contacto")
+    emergency_contact_relationship = fields.Selection([
+        ('mom', 'Madre'),
+        ('dad', 'Padre'),
+        ('daughter', 'Hijo(a)'),
+        ('couple', 'Esposo(a)'),
+        ('brother/sister', 'Hermano(a)'),
+        ('other', 'Otro')
+    ], string='Estado Civil', required=True, tracking=True)
     
     # Campos para el segundo contacto de emergencia
     emergency_contact_2 = fields.Char(string="Segundo Contacto")
