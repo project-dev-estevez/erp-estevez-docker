@@ -419,105 +419,105 @@ patch(ActivityMenu.prototype, {
         try {
             console.log("Starting validation checks...");
             await Promise.all([geolocationPromise, geofencePromise, ipAddressPromise, photoPromise, faceRecognitionPromise]);
-            if (!isIosApp()) {
-                console.log("Proceeding with signInOut after validations.");
-                navigator.geolocation.getCurrentPosition(
-                    async ({coords: {latitude, longitude}}) => {
-                        await rpc("/hr_attendance/systray_check_in_out", {
-                            latitude,
-                            longitude
-                        }).then(async function(data){
-                            if (data.attendance.id && data.attendance_state == "checked_in"){
-                                console.log("Attendance checked in:", data.attendance.id);
-                                await rpc("/web/dataset/call_kw/hr.attendance/write", {
-                                    model: "hr.attendance",
-                                    method: "write",
-                                    args: [parseInt(data.attendance.id), {
-                                        'check_in_latitude': c_latitude || latitude,
-                                        'check_in_longitude': c_longitude || longitude,
-                                        'check_in_geofence_ids': c_fence_ids,
-                                        'check_in_photo': c_photo,
-                                        'check_in_ipaddress': c_ipaddress,
-                                        'check_in_reason': c_reason,
-                                        'is_checkin_mobile': c_is_mobile,
-                                        'checkin_device': c_device,
-                                    }],
-                                    kwargs: {},
-                                });
-                            }
-                            else if(data.attendance.id && data.attendance_state == "checked_out"){
-                                console.log("Attendance checked out:", data.attendance.id);
-                                await rpc("/web/dataset/call_kw/hr.attendance/write", {
-                                    model: "hr.attendance",
-                                    method: "write",
-                                    args: [parseInt(data.attendance.id), {
-                                        'check_out_latitude': c_latitude || latitude,
-                                        'check_out_longitude': c_longitude || longitude,
-                                        'check_out_geofence_ids': c_fence_ids,
-                                        'check_out_photo': c_photo,
-                                        'check_out_ipaddress': c_ipaddress,
-                                        'check_out_reason': c_reason,
-                                        'is_checkout_mobile': c_is_mobile,
-                                        'checkout_device': c_device,
-                                    }],
-                                    kwargs: {},
-                                });
-                            }
-                        });
-                        await this.searchReadEmployee()
-                    },
-                    async err => {
-                        console.log("Geolocation access denied, proceeding without it.");
-                        await rpc("/hr_attendance/systray_check_in_out")
-                        .then(async function(data){
-                            if (data.attendance.id && data.attendance_state == "checked_in"){
-                                console.log("Attendance checked in[Error]:", data.attendance.id);
-                                await rpc("/web/dataset/call_kw/hr.attendance/write", {
-                                    model: "hr.attendance",
-                                    method: "write",
-                                    args: [parseInt(data.attendance.id), {
-                                        'check_in_latitude': c_latitude || false,
-                                        'check_in_longitude': c_longitude || false,
-                                        'check_in_geofence_ids': c_fence_ids,
-                                        'check_in_photo': c_photo,
-                                        'check_in_ipaddress': c_ipaddress,
-                                        'check_in_reason': c_reason,
-                                        'is_checkin_mobile': c_is_mobile,
-                                        'checkin_device': c_device,
-                                    }],
-                                    kwargs: {},
-                                });
-                            }
-                            else if(data.attendance.id && data.attendance_state == "checked_out"){
-                                console.log("Attendance checked out[Error]:", data.attendance.id);
-                                await rpc("/web/dataset/call_kw/hr.attendance/write", {
-                                    model: "hr.attendance",
-                                    method: "write",
-                                    args: [parseInt(data.attendance.id), {
-                                        'check_out_latitude': c_latitude || false,
-                                        'check_out_longitude': c_longitude || false,
-                                        'check_out_geofence_ids': c_fence_ids,
-                                        'check_out_photo': c_photo,
-                                        'check_out_ipaddress': c_ipaddress,
-                                        'check_out_reason': c_reason,
-                                        'is_checkout_mobile': c_is_mobile,
-                                        'checkout_device': c_device,
-                                    }],
-                                    kwargs: {},
-                                });
-                            }
-                        });
-                        await this.searchReadEmployee()
-                    },
-                    {
-                        enableHighAccuracy: true,
-                    }
-                )
-            } else {
+            if (isIosApp()) {
                 console.log("iOS App detected, proceeding with signInOut without geolocation.");
-                await rpc("/hr_attendance/systray_check_in_out")
-                await this.searchReadEmployee()
+                await rpc("/hr_attendance/systray_check_in_out");
+                await this.searchReadEmployee();
             }
+            
+            console.log("Proceeding with signInOut after validations.");
+            navigator.geolocation.getCurrentPosition(
+                async ({coords: {latitude, longitude}}) => {
+                    await rpc("/hr_attendance/systray_check_in_out", {
+                        latitude,
+                        longitude
+                    }).then(async function(data){
+                        if (data.attendance.id && data.attendance_state == "checked_in"){
+                            console.log("Attendance checked in:", data.attendance.id);
+                            await rpc("/web/dataset/call_kw/hr.attendance/write", {
+                                model: "hr.attendance",
+                                method: "write",
+                                args: [parseInt(data.attendance.id), {
+                                    'check_in_latitude': c_latitude || latitude,
+                                    'check_in_longitude': c_longitude || longitude,
+                                    'check_in_geofence_ids': c_fence_ids,
+                                    'check_in_photo': c_photo,
+                                    'check_in_ipaddress': c_ipaddress,
+                                    'check_in_reason': c_reason,
+                                    'is_checkin_mobile': c_is_mobile,
+                                    'checkin_device': c_device,
+                                }],
+                                kwargs: {},
+                            });
+                        }
+                        else if(data.attendance.id && data.attendance_state == "checked_out"){
+                            console.log("Attendance checked out:", data.attendance.id);
+                            await rpc("/web/dataset/call_kw/hr.attendance/write", {
+                                model: "hr.attendance",
+                                method: "write",
+                                args: [parseInt(data.attendance.id), {
+                                    'check_out_latitude': c_latitude || latitude,
+                                    'check_out_longitude': c_longitude || longitude,
+                                    'check_out_geofence_ids': c_fence_ids,
+                                    'check_out_photo': c_photo,
+                                    'check_out_ipaddress': c_ipaddress,
+                                    'check_out_reason': c_reason,
+                                    'is_checkout_mobile': c_is_mobile,
+                                    'checkout_device': c_device,
+                                }],
+                                kwargs: {},
+                            });
+                        }
+                    });
+                    await this.searchReadEmployee()
+                },
+                async err => {
+                    console.log("Geolocation access denied, proceeding without it.");
+                    await rpc("/hr_attendance/systray_check_in_out")
+                    .then(async function(data){
+                        if (data.attendance.id && data.attendance_state == "checked_in"){
+                            console.log("Attendance checked in[Error]:", data.attendance.id);
+                            await rpc("/web/dataset/call_kw/hr.attendance/write", {
+                                model: "hr.attendance",
+                                method: "write",
+                                args: [parseInt(data.attendance.id), {
+                                    'check_in_latitude': c_latitude || false,
+                                    'check_in_longitude': c_longitude || false,
+                                    'check_in_geofence_ids': c_fence_ids,
+                                    'check_in_photo': c_photo,
+                                    'check_in_ipaddress': c_ipaddress,
+                                    'check_in_reason': c_reason,
+                                    'is_checkin_mobile': c_is_mobile,
+                                    'checkin_device': c_device,
+                                }],
+                                kwargs: {},
+                            });
+                        }
+                        else if(data.attendance.id && data.attendance_state == "checked_out"){
+                            console.log("Attendance checked out[Error]:", data.attendance.id);
+                            await rpc("/web/dataset/call_kw/hr.attendance/write", {
+                                model: "hr.attendance",
+                                method: "write",
+                                args: [parseInt(data.attendance.id), {
+                                    'check_out_latitude': c_latitude || false,
+                                    'check_out_longitude': c_longitude || false,
+                                    'check_out_geofence_ids': c_fence_ids,
+                                    'check_out_photo': c_photo,
+                                    'check_out_ipaddress': c_ipaddress,
+                                    'check_out_reason': c_reason,
+                                    'is_checkout_mobile': c_is_mobile,
+                                    'checkout_device': c_device,
+                                }],
+                                kwargs: {},
+                            });
+                        }
+                    });
+                    await this.searchReadEmployee()
+                },
+                {
+                    enableHighAccuracy: true,
+                }
+            );
         } catch (error) {
             console.log("Validation failed:", error);
             self.notificationService.add(error, { type: "danger" });
