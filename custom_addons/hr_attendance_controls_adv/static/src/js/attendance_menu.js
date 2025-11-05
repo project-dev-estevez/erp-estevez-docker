@@ -276,21 +276,7 @@ patch(ActivityMenu.prototype, {
         
         // Cerrar dropdown de manera más robusta usando el parent
         try {
-            // Intentar cerrar usando el dropdown heredado del parent
-            if (super.dropdown && typeof super.dropdown.close === 'function') {
-                super.dropdown.close();
-            } else if (this.dropdown && typeof this.dropdown.close === 'function') {
-                this.dropdown.close();
-            } else {
-                // Fallback: buscar el elemento dropdown en el DOM
-                const dropdownElement = document.querySelector('.o_hr_attendance_menu');
-                if (dropdownElement) {
-                    const bootstrapDropdown = dropdownElement.closest('.dropdown');
-                    if (bootstrapDropdown) {
-                        bootstrapDropdown.click();
-                    }
-                }
-            }
+            super.dropdown.close();
         } catch (error) {
             console.warn('Error closing dropdown:', error);
         }
@@ -543,6 +529,8 @@ patch(ActivityMenu.prototype, {
             const company_id = session.user_companies.allowed_companies[0] || session.user_companies.current_company || false;            
             const records = await self.orm.call('hr.attendance.geofence', "search_read", [[['company_id', '=', company_id], ['employee_ids', 'in', self.employee.id]], ['id', 'name', 'overlay_paths']], {});
             
+            console.log("Geofence records fetched:", records);
+
             if (records && records.length > 0){
                 const geolocation = await new Promise((resolve, reject) => {
                     navigator.geolocation.getCurrentPosition(
