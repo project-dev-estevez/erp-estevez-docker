@@ -34,14 +34,14 @@ patch(ActivityMenu.prototype, {
         // geofence
         this.state.fence_is_inside = false;
         this.state.fence_ids = [];
-        this.state.geofences = [];  // 📍 Inicializar array de geocercas
+        this.state.geofences = [];  // Listado de geocercas asociadas al empleado
         //ipaddress
         this.state.ipaddress = false;        
 
         //temp arrays
         this.labeledFaceDescriptors = [];
 
-        //validate button
+        // Indican si el menú está listo para usarse y si está abierto
         this.state.isReady = false;
         this.state.show_check_inout_button = false;
 
@@ -55,6 +55,7 @@ patch(ActivityMenu.prototype, {
                 await loadJS('/hr_attendance_controls_adv/static/src/lib/faceapi/source/face-api.js');
                 await loadJS('/hr_attendance_controls_adv/static/src/lib/ol-6.12.0/ol.js');
                 await loadJS('/hr_attendance_controls_adv/static/src/lib/ol-ext/ol-ext.js');
+                await this.searchReadEmployee();
                 this.onOpenedContent();
             } catch (error) {
                 if (!(error instanceof AssetsLoadingError)) {
@@ -64,55 +65,7 @@ patch(ActivityMenu.prototype, {
         });
     },
 
-    async loadDeviceInfo() {
-        const userAgentData = navigator.userAgentData;
-
-        if (!userAgentData) return;
-
-        const isMobile = userAgentData.mobile || false;
-        const platform = userAgentData.platform || "Desconocido";
-
-        this.state.deviceInfo = {
-            isMobile,
-            platform
-        };
-    },
-
-    async loadGeofences(){
-        var self = this;
-
-        // ⚠️ VALIDACIÓN: Si no hay empleado aún, intentar obtenerlo
-        if (!self.employee || !self.employee.id) {
-            console.log("No hay empleado cargado, intentando obtener datos del empleado...");
-            try {
-                await self.searchReadEmployee();
-            } catch (error) {
-                return;
-            }
-        }
-        
-        const company_id = session.user_companies.allowed_companies[0] || session.user_companies.current_company || false;
-        if (!company_id) {
-            return;
-        }
-
-        const records = await self.orm.call('hr.attendance.geofence', "search_read", [
-            [['company_id', '=', company_id], ['employee_ids', 'in', self.employee.id]],
-            ['id', 'name', 'overlay_paths', 'description']
-        ], {});
-
-        // 🔒 ASEGURAR: Siempre mantener como array, incluso si records es null/undefined
-        self.state.geofences = records || [];
-
-        console.log("📍 Geofences loaded for employee ID", self.employee.id, ":", records);
-        console.log("📊 Total geofences found:", self.state.geofences.length);
-    },
-
-    async onOpenedContent(){
-        this.loadControls();
-        this.state.show_check_inout_button = true;
-    },
-    
+    // Carga los datos del empleado actual y actualiza el estado del menú
     async searchReadEmployee(){    
         const result = await rpc("/hr_attendance/attendance_user_data");
         this.employee = result;
@@ -126,147 +79,164 @@ patch(ActivityMenu.prototype, {
         this.state.checkedIn = this.employee.attendance_state === "checked_in";
         this.isFirstAttendance = this.employee.hours_previously_today === 0;
         this.state.isDisplayed = this.employee.display_systray;
-        
-        // 🎯 PASO 7A: Agregar attendance_status al estado para usar en templates
         this.state.attendance_status = this.employee.attendance_status;
         
         // 🎯 PASO 7B: Log para verificar
         console.log("✅ Employee data loaded, attendance_status:", this.employee.attendance_status);
     },
 
-    async loadControls(){
-        if (window.location.protocol == 'https:') {
-            await this.loadDeviceInfo();
-            if (session.hr_attendance_geolocation) {
-                this.state.show_geolocation = true;
-                try {
-                    await this._getGeolocation();
-                }
-                catch (error) {
-                    console.log("Geolocation error:", error);
-                }
-            }
-            if (session.hr_attendance_geofence) {
-                this.state.show_geofence = true;
-                try {
-                    await this.loadGeofences();
-                } catch (error) {
-                    console.log("Geofence map error:", error);
-                }
-            }
-            if (session.hr_attendance_ip) {
-                this.state.show_ipaddress = true;
-                try {
-                    await this._getIpAddress();
-                } catch (error) {
-                    console.log("IP Address retrieval failed:", error);
-                }
-            }
-            if (session.hr_attendance_face_recognition) {
-                this.state.show_recognition = true;
-                try {
-                    await this._initRecognition();
-                } catch (error) {
-                    console.log("Facerecognitio failed:", error);
-                }
-            }
-            if (session.hr_attendance_photo){
-                this.state.show_photo = true;
-            }
+    async onOpenedContent(){        
+        this.loadControls();
+        this.state.show_check_inout_button = true;
+    },
 
-            this.state.isReady = true;
-        }else{
+    // Carga los controles configurados para el módulo de asistencia
+    async loadControls(){
+        if (window.location.protocol != 'https:'){
             this.state.show_geolocation = false;
             this.state.show_geofence = false;
             this.state.show_ipaddress = false;
             this.state.show_recognition = false;
             this.state.show_photo = false;
+
+            return false;
         }
 
+        this.loadDeviceInfo();
+
+        // Obtener latitud y longitud del usuario
+        if (session.hr_attendance_geolocation) {
+            this.state.show_geolocation = true;
+            try {
+                await this._getGeolocation();
+            }
+            catch (error) {
+                console.log("Geolocation error:", error);
+            }
+        }
+
+        // Obtener geocercas associadas al empleado
+        if (session.hr_attendance_geofence) {
+            this.state.show_geofence = true;
+            try {
+                await this.loadGeofences();
+            } catch (error) {
+                console.log("Geofence map error:", error);
+            }
+        }
+
+        // Obtener dirección IP del usuario
+        if (session.hr_attendance_ip) {
+            this.state.show_ipaddress = true;
+            try {
+                await this._getIpAddress();
+            } catch (error) {
+                console.log("IP Address retrieval failed:", error);
+            }
+        }
+
+        // Inicializar reconocimiento facial
+        if (session.hr_attendance_face_recognition) {
+            this.state.show_recognition = true;
+            try {
+                await this._initRecognition();
+            } catch (error) {
+                console.log("Facerecognitio failed:", error);
+            }
+        }
+
+        // Habilitar captura de foto
+        if (session.hr_attendance_photo){
+            this.state.show_photo = true;
+        }
+
+        this.state.isReady = true;
         return true;
     },
 
+    // Carga la información del dispositivo desde el cual se está accediendo
+    loadDeviceInfo() {
+        const userAgentData = navigator.userAgentData;
+
+        if (!userAgentData) return;
+
+        const isMobile = userAgentData.mobile || false;
+        const platform = userAgentData.platform || "Desconocido";
+
+        this.state.deviceInfo = {
+            isMobile,
+            platform
+        };
+    },
+
+    // Obtiene la geolocalización del usuario: Latitud y Longitud
     _getGeolocation() {
         return new Promise((resolve, reject) => {
-            if (window.location.protocol === 'https:') {
-                navigator.geolocation.getCurrentPosition(
-                    async ({ coords: { latitude, longitude } }) => {
-                        if (latitude && longitude) {
-                            this.state = this.state || {};
-                            this.state.latitude = latitude;
-                            this.state.longitude = longitude;
-                            resolve({ latitude, longitude });
-                        } else {
-                            reject("Coordinates not found");
-                        }
-                    },
-                    (error) => reject("Geolocation access denied")
-                );
-            } else {
-                resolve();
-            }
+            navigator.geolocation.getCurrentPosition(
+                async ({ coords: { latitude, longitude } }) => {
+                    if (!(latitude && longitude)) {
+                        return reject("Coordinates not found");                        
+                    }
+
+                    this.state.latitude = latitude;
+                    this.state.longitude = longitude;
+                    resolve({ latitude, longitude });
+                },
+                () => reject("Geolocation access denied")
+            );
         });
     },
 
+    // Obtiene las geocercas asociadas al empleado actual
+    async loadGeofences(){
+        const company_id = session.user_companies.allowed_companies[0] || session.user_companies.current_company || false;
+        if (!company_id) {
+            return;
+        }
+
+        const records = await this.orm.call('hr.attendance.geofence', "search_read", [
+            [['company_id', '=', company_id], ['employee_ids', 'in', this.employee.id]],
+            ['id', 'name', 'overlay_paths', 'description']
+        ], {});
+
+        // 🔒 ASEGURAR: Siempre mantener como array, incluso si records es null/undefined
+        this.state.geofences = records || [];
+
+        console.log("📍 Geofences loaded for employee ID", this.employee.id, ":", records);
+        console.log("📊 Total geofences found:", this.state.geofences.length);
+    },
+
+    // Obtiene la dirección IP pública del usuario
     _getIpAddress() {
         return new Promise((resolve, reject) => {
-            if (window.location.protocol === 'https:') {
-                fetch("https://api.ipify.org?format=json")
-                    .then(response => {
-                        if (!response.ok) {
-                            reject("Failed to fetch IP address.");
-                        }
-                        return response.json();
-                    })
-                    .then(data => {
-                        if (data.ip) {
-                            this.state = this.state || {};
-                            this.state.ipaddress = data.ip;
-                            resolve(data.ip);
-                        } else {
-                            reject("IP address not found in response.");
-                        }
-                    })
-                    .catch(error => {
-                        console.log("Error fetching IP address:", error.message || error);
-                        resolve();
-                    });
-            } else {
-                resolve();
-            }
+            fetch("https://api.ipify.org?format=json")
+                .then(response => {
+                    if (!response.ok) {
+                        return reject("Failed to fetch IP address.");
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (!data.ip) {
+                        return reject("IP address not found in response.");
+                    }
+                    this.state.ipaddress = data.ip;
+                    resolve(data.ip);
+                })
+                .catch(error => {
+                    console.log("Error fetching IP address:", error.message || error);
+                    resolve();
+                });
         });
     },
 
+    // Inicializa el reconocimiento facial cargando los modelos y descriptores
     async _initRecognition(){
-        var self = this;
-        if (window.location.protocol == 'https:') {
-            if (!("faceapi" in window)) {
-                self._loadFaceapi();
-            } 
-            else {
-                await self._loadModels();
-            }
-        }
+        await this._loadModels();
     },
 
-    _loadFaceapi () {
-        var self = this;
-        if (!("faceapi" in window)) {
-            (function (w, d, s, g, js, fjs) {
-                g = w.faceapi || (w.faceapi = {});
-                g.faceapi = { q: [], ready: function (cb) { this.q.push(cb); } };
-                js = d.createElement(s); fjs = d.getElementsByTagName(s)[0];
-                js.src = window.origin + '/hr_attendance_controls_adv/static/src/lib/source/face-api.js';
-                fjs.parentNode.insertBefore(js, fjs); js.onload = async function () {
-                    console.log("apis loaded");
-                    await self._loadModels();
-                };
-            }(window, document, 'script'));
-        }
-    },
-
+    // Carga los modelos de face-api.js y las imágenes etiquetadas del servidor
     async _loadModels() {
-        var self = this;
         const promises = [];
         promises.push([
             faceapi.nets.tinyFaceDetector.loadFromUri('/hr_attendance_controls_adv/static/src/lib/faceapi/weights'),
@@ -276,20 +246,21 @@ patch(ActivityMenu.prototype, {
             faceapi.nets.faceExpressionNet.loadFromUri('/hr_attendance_controls_adv/static/src/lib/faceapi/weights'),
         ])
         return Promise.all(promises).then(() => {
-            self.loadLabeledImages();            
+            this.loadLabeledImages();            
             return Promise.resolve();
         });
     },
 
+    // Carga las imágenes etiquetadas del servidor y crea descriptores faciales
     async loadLabeledImages(){
-        var self = this;
+        const self = this;
         await rpc('/hr_attendance_controls_adv/loadLabeledImages/').then(async function (data) {            
             self.labeledFaceDescriptors = await Promise.all(
                 data.map((data, i) => {  
                 const descriptors = [];
-                for (var i = 0; i < data.descriptors.length; i++) {                    
+                for (let i = 0; i < data.descriptors.length; i++) {                    
                     if (data.descriptors[i].length != 0) {
-                        var desc = new Uint8Array([...window.atob(data.descriptors[i])].map(d => d.charCodeAt(0))).buffer;
+                        let desc = new Uint8Array([...window.atob(data.descriptors[i])].map(d => d.charCodeAt(0))).buffer;
                         if (desc.byteLength > 0){
                             descriptors.push(new Float32Array(desc));
                         }
@@ -298,61 +269,6 @@ patch(ActivityMenu.prototype, {
                 return new faceapi.LabeledFaceDescriptors(data.label.toString(), descriptors);
             }));
         })
-    },
-
-    async _validate_Geofence () {
-        var self = this;
-        
-        let fence_is_inside = false;
-        let fence_ids = [];
-
-        if (window.location.protocol == 'https:') {
-            const company_id = session.user_companies.allowed_companies[0] || session.user_companies.current_company || false;            
-            const records = await self.orm.call('hr.attendance.geofence', "search_read", [[['company_id', '=', company_id], ['employee_ids', 'in', self.employee.id]], ['id', 'name', 'overlay_paths']], {});
-            
-            if (records && records.length > 0){
-                const geolocation = await new Promise((resolve, reject) => {
-                    navigator.geolocation.getCurrentPosition(
-                        ({ coords: { latitude, longitude } }) => resolve({ latitude, longitude }),
-                        (err) => reject(err)
-                    );
-                });
-
-                const coords = ol.proj.fromLonLat([geolocation.longitude, geolocation.latitude]);
-
-                for (const record of records) {
-                    const value = JSON.parse(record.overlay_paths);
-                    if (Object.keys(value).length > 0) {
-                        const features = new ol.format.GeoJSON().readFeatures(value);
-                        const geometry = features[0].getGeometry();
-                        
-                        if (geometry.intersectsCoordinate(coords)) {
-                            fence_is_inside = true;
-                            fence_ids.push(parseInt(record.id));
-                        }
-                    }
-                }
-            }
-            else{
-                self.notificationService.add("You haven't entered any of the geofence zones.", { type: "danger" });
-            }
-        }
-
-        return {
-            'fence_is_inside': fence_is_inside, 
-            'fence_ids': fence_ids,
-        };
-    },
-
-    showNotification() {
-        this.notificationService.add(
-            "Gracias por tu contribución. 🎉",
-            { 
-                type: "success",
-                title: "¡Excelente!",
-                sticky: false
-            }
-        );
     },
     
     async signInOut() {
@@ -615,6 +531,61 @@ patch(ActivityMenu.prototype, {
             console.log("Validation failed:", error);
             self.notificationService.add(error, { type: "danger" });
         }
-    }
+    },
+
+    async _validate_Geofence() {
+        var self = this;
+        
+        let fence_is_inside = false;
+        let fence_ids = [];
+
+        if (window.location.protocol == 'https:') {
+            const company_id = session.user_companies.allowed_companies[0] || session.user_companies.current_company || false;            
+            const records = await self.orm.call('hr.attendance.geofence', "search_read", [[['company_id', '=', company_id], ['employee_ids', 'in', self.employee.id]], ['id', 'name', 'overlay_paths']], {});
+            
+            if (records && records.length > 0){
+                const geolocation = await new Promise((resolve, reject) => {
+                    navigator.geolocation.getCurrentPosition(
+                        ({ coords: { latitude, longitude } }) => resolve({ latitude, longitude }),
+                        (err) => reject(err)
+                    );
+                });
+
+                const coords = ol.proj.fromLonLat([geolocation.longitude, geolocation.latitude]);
+
+                for (const record of records) {
+                    const value = JSON.parse(record.overlay_paths);
+                    if (Object.keys(value).length > 0) {
+                        const features = new ol.format.GeoJSON().readFeatures(value);
+                        const geometry = features[0].getGeometry();
+                        
+                        if (geometry.intersectsCoordinate(coords)) {
+                            fence_is_inside = true;
+                            fence_ids.push(parseInt(record.id));
+                        }
+                    }
+                }
+            }
+            else{
+                self.notificationService.add("You haven't entered any of the geofence zones.", { type: "danger" });
+            }
+        }
+
+        return {
+            'fence_is_inside': fence_is_inside, 
+            'fence_ids': fence_ids,
+        };
+    },
+
+    showNotification() {
+        this.notificationService.add(
+            "Gracias por tu contribución. 🎉",
+            { 
+                type: "success",
+                title: "¡Excelente!",
+                sticky: false
+            }
+        );
+    },
 });
 export default ActivityMenu;
