@@ -85,8 +85,13 @@ patch(ActivityMenu.prototype, {
         console.log("✅ Employee data loaded, attendance_status:", this.employee.attendance_status);
     },
 
-    async onOpenedContent(){        
-        this.loadControls();
+    async onOpenedContent() {
+        if (this.state.isReady) {
+            // Ya está todo listo, no recargar
+            this.state.show_check_inout_button = true;
+            return;
+        }
+        await this.loadControls();
         this.state.show_check_inout_button = true;
     },
 
@@ -276,7 +281,7 @@ patch(ActivityMenu.prototype, {
         
         // Cerrar dropdown de manera más robusta usando el parent
         try {
-            super.dropdown.close();
+            self.dropdown.close();
         } catch (error) {
             console.warn('Error closing dropdown:', error);
         }
