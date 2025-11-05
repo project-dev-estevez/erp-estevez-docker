@@ -315,42 +315,27 @@ patch(ActivityMenu.prototype, {
         let c_is_mobile = self.state.deviceInfo?.isMobile || false;
         let c_device = self.state.deviceInfo?.platform || 'Unknown';
         
-        // Define Promises
-        const geolocationPromise = self.state.show_geolocation
-        ? (c_latitude && c_longitude
-            ? Promise.resolve(true)
-            : new Promise((resolve, reject) => {
-                navigator.geolocation.getCurrentPosition(
-                    ({ coords: { latitude, longitude } }) => {
-                        if (latitude && longitude) {
-                            self.state.latitude = c_latitude = latitude;
-                            self.state.longitude = c_longitude = longitude;
-                            resolve({ latitude, longitude });
-                        } else {
-                            reject("Coordinates not found");
-                        }
-                    },
-                    (error) => reject("Geolocation access denied")
-                );
-            }))
-        : Promise.resolve(true);
-                
+        // Define Promises for each validation                
         const geofencePromise = self.state.show_geofence
             ? new Promise(async (resolve, reject) => {
                 try {
+                    console.log('[GEOFENCE PROMISE] Validating geofence...');
                     const { fence_is_inside, fence_ids } = await self._validate_Geofence();
+                    console.log('[GEOFENCE PROMISE] Result:', { fence_is_inside, fence_ids });
                     if (fence_is_inside && fence_ids.length > 0) {
                         c_fence_ids = Object.values(fence_ids);
                         c_fence_is_inside = fence_is_inside;
+                        console.log('[GEOFENCE PROMISE] Geofence validation PASSED. IDs:', c_fence_ids);
                         resolve(true);
                     } else {
+                        console.warn('[GEOFENCE PROMISE] Geofence validation FAILED. Not inside any geofence.');
                         reject("You haven't entered any of the geofence zones.");
                     }
                 } catch (err) {
-                    console.log(err);
+                    console.error('[GEOFENCE PROMISE] Exception during geofence validation:', err);
                     reject(`Geofence validation error: ${err}`);
                 }
-                })
+            })
             : Promise.resolve(true);
 
         const ipAddressPromise = self.state.show_ipaddress
@@ -418,7 +403,7 @@ patch(ActivityMenu.prototype, {
 
         try {
             console.log("Starting validation checks...");
-            await Promise.all([geolocationPromise, geofencePromise, ipAddressPromise, photoPromise, faceRecognitionPromise]);
+            await Promise.all([geofencePromise, ipAddressPromise, photoPromise, faceRecognitionPromise]);
             if (isIosApp()) {
                 console.log("iOS App detected, proceeding with signInOut without geolocation.");
                 await rpc("/hr_attendance/systray_check_in_out");
@@ -427,8 +412,8 @@ patch(ActivityMenu.prototype, {
             
             console.log("Proceeding with signInOut after validations.");
             await rpc("/hr_attendance/systray_check_in_out", {
-                latitude,
-                longitude
+                latitude: c_latitude,
+                longitude: c_longitude
             }).then(async function(data){
 
                 if ( !data.attendance.id ) {
@@ -451,7 +436,7 @@ patch(ActivityMenu.prototype, {
                     [`check_${inOrOut}_ipaddress`]: c_ipaddress,
                     [`check_${inOrOut}_reason`]: c_reason,
                     [`is_check${inOrOut}_mobile`]: c_is_mobile,
-                    [`check${inOrOut}device`]: c_device,
+                    [`check${inOrOut}_device`]: c_device,
                 };
 
                 await rpc("/web/dataset/call_kw/hr.attendance/write", {
@@ -471,40 +456,53 @@ patch(ActivityMenu.prototype, {
 
     async _validate_Geofence() {
         var self = this;
-        
         let fence_is_inside = false;
         let fence_ids = [];
 
-        const company_id = session.user_companies.allowed_companies[0] || session.user_companies.current_company || false;            
+        const company_id = session.user_companies.allowed_companies[0] || session.user_companies.current_company || false;
         const records = await self.orm.call('hr.attendance.geofence', "search_read", [[['company_id', '=', company_id], ['employee_ids', 'in', self.employee.id]], ['id', 'name', 'overlay_paths']], {});
-        
+
         console.log("1.Geofence records fetched:", records);
+        console.log("[GEOFENCE] Validating for lat/lon:", self.state.latitude, self.state.longitude);
 
         if (records && records.length > 0){
-            console.log("2.Validating geofence for coordinates:", self.state.latitude, self.state.longitude);
-
             const coords = ol.proj.fromLonLat([self.state.longitude, self.state.latitude]);
+            console.log("[GEOFENCE] Projected coords (lon, lat):", coords);
 
             for (const record of records) {
-                const value = JSON.parse(record.overlay_paths);
-                if (Object.keys(value).length > 0) {
-                    const features = new ol.format.GeoJSON().readFeatures(value);
-                    const geometry = features[0].getGeometry();
-                    
-                    if (geometry.intersectsCoordinate(coords)) {
-                        fence_is_inside = true;
-                        fence_ids.push(parseInt(record.id));
+                try {
+                    const value = JSON.parse(record.overlay_paths);
+                    console.log(`[GEOFENCE] Record ID: ${record.id}, Name: ${record.name}`);
+                    console.log("[GEOFENCE] overlay_paths:", value);
+                    if (Object.keys(value).length > 0) {
+                        const features = new ol.format.GeoJSON().readFeatures(value);
+                        if (!features.length) {
+                            console.warn(`[GEOFENCE] No features found in overlay_paths for record ${record.id}`);
+                            continue;
+                        }
+                        const geometry = features[0].getGeometry();
+                        console.log(`[GEOFENCE] Geometry type:`, geometry.getType());
+                        const intersects = geometry.intersectsCoordinate(coords);
+                        console.log(`[GEOFENCE] intersectsCoordinate result:`, intersects);
+                        if (intersects) {
+                            fence_is_inside = true;
+                            fence_ids.push(parseInt(record.id));
+                        }
+                    } else {
+                        console.warn(`[GEOFENCE] overlay_paths is empty for record ${record.id}`);
                     }
+                } catch (err) {
+                    console.error(`[GEOFENCE] Error parsing overlay_paths for record ${record.id}:`, err);
                 }
             }
-        }
-        else{
+            console.log(`[GEOFENCE] fence_is_inside:`, fence_is_inside, `fence_ids:`, fence_ids);
+        } else {
             console.log("3.No geofence records found for employee ID:", self.employee.id);
             self.notificationService.add("You haven't entered any of the geofence zones.", { type: "danger" });
         }
 
         return {
-            'fence_is_inside': fence_is_inside, 
+            'fence_is_inside': fence_is_inside,
             'fence_ids': fence_ids,
         };
     },
