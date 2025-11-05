@@ -83,6 +83,7 @@ patch(ActivityMenu.prototype, {
 
         // ⚠️ VALIDACIÓN: Si no hay empleado aún, intentar obtenerlo
         if (!self.employee || !self.employee.id) {
+            console.log("No hay empleado cargado, intentando obtener datos del empleado...");
             try {
                 await self.searchReadEmployee();
             } catch (error) {
