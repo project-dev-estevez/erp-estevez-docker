@@ -426,98 +426,43 @@ patch(ActivityMenu.prototype, {
             }
             
             console.log("Proceeding with signInOut after validations.");
-            navigator.geolocation.getCurrentPosition(
-                async ({coords: {latitude, longitude}}) => {
-                    await rpc("/hr_attendance/systray_check_in_out", {
-                        latitude,
-                        longitude
-                    }).then(async function(data){
-                        if (data.attendance.id && data.attendance_state == "checked_in"){
-                            console.log("Attendance checked in:", data.attendance.id);
-                            await rpc("/web/dataset/call_kw/hr.attendance/write", {
-                                model: "hr.attendance",
-                                method: "write",
-                                args: [parseInt(data.attendance.id), {
-                                    'check_in_latitude': c_latitude || latitude,
-                                    'check_in_longitude': c_longitude || longitude,
-                                    'check_in_geofence_ids': c_fence_ids,
-                                    'check_in_photo': c_photo,
-                                    'check_in_ipaddress': c_ipaddress,
-                                    'check_in_reason': c_reason,
-                                    'is_checkin_mobile': c_is_mobile,
-                                    'checkin_device': c_device,
-                                }],
-                                kwargs: {},
-                            });
-                        }
-                        else if(data.attendance.id && data.attendance_state == "checked_out"){
-                            console.log("Attendance checked out:", data.attendance.id);
-                            await rpc("/web/dataset/call_kw/hr.attendance/write", {
-                                model: "hr.attendance",
-                                method: "write",
-                                args: [parseInt(data.attendance.id), {
-                                    'check_out_latitude': c_latitude || latitude,
-                                    'check_out_longitude': c_longitude || longitude,
-                                    'check_out_geofence_ids': c_fence_ids,
-                                    'check_out_photo': c_photo,
-                                    'check_out_ipaddress': c_ipaddress,
-                                    'check_out_reason': c_reason,
-                                    'is_checkout_mobile': c_is_mobile,
-                                    'checkout_device': c_device,
-                                }],
-                                kwargs: {},
-                            });
-                        }
-                    });
-                    await this.searchReadEmployee()
-                },
-                async err => {
-                    console.log("Geolocation access denied, proceeding without it.");
-                    await rpc("/hr_attendance/systray_check_in_out")
-                    .then(async function(data){
-                        if (data.attendance.id && data.attendance_state == "checked_in"){
-                            console.log("Attendance checked in[Error]:", data.attendance.id);
-                            await rpc("/web/dataset/call_kw/hr.attendance/write", {
-                                model: "hr.attendance",
-                                method: "write",
-                                args: [parseInt(data.attendance.id), {
-                                    'check_in_latitude': c_latitude || false,
-                                    'check_in_longitude': c_longitude || false,
-                                    'check_in_geofence_ids': c_fence_ids,
-                                    'check_in_photo': c_photo,
-                                    'check_in_ipaddress': c_ipaddress,
-                                    'check_in_reason': c_reason,
-                                    'is_checkin_mobile': c_is_mobile,
-                                    'checkin_device': c_device,
-                                }],
-                                kwargs: {},
-                            });
-                        }
-                        else if(data.attendance.id && data.attendance_state == "checked_out"){
-                            console.log("Attendance checked out[Error]:", data.attendance.id);
-                            await rpc("/web/dataset/call_kw/hr.attendance/write", {
-                                model: "hr.attendance",
-                                method: "write",
-                                args: [parseInt(data.attendance.id), {
-                                    'check_out_latitude': c_latitude || false,
-                                    'check_out_longitude': c_longitude || false,
-                                    'check_out_geofence_ids': c_fence_ids,
-                                    'check_out_photo': c_photo,
-                                    'check_out_ipaddress': c_ipaddress,
-                                    'check_out_reason': c_reason,
-                                    'is_checkout_mobile': c_is_mobile,
-                                    'checkout_device': c_device,
-                                }],
-                                kwargs: {},
-                            });
-                        }
-                    });
-                    await this.searchReadEmployee()
-                },
-                {
-                    enableHighAccuracy: true,
+            await rpc("/hr_attendance/systray_check_in_out", {
+                latitude,
+                longitude
+            }).then(async function(data){
+
+                if ( !data.attendance.id ) {
+                    return self.notificationService.add("No se encontró el registro de asistencia.", { type: "danger" });
                 }
-            );
+
+                let inOrOut = '';
+                if (data.attendance_state == "checked_in") {
+                    inOrOut = 'in';
+                } else if (data.attendance_state == "checked_out") {
+                    inOrOut = 'out';
+                }
+
+                // Construir el objeto de campos dinámicamente según inOrOut
+                const attendanceFields = {
+                    [`check_${inOrOut}_latitude`]: c_latitude,
+                    [`check_${inOrOut}_longitude`]: c_longitude,
+                    [`check_${inOrOut}_geofence_ids`]: c_fence_ids,
+                    [`check_${inOrOut}_photo`]: c_photo,
+                    [`check_${inOrOut}_ipaddress`]: c_ipaddress,
+                    [`check_${inOrOut}_reason`]: c_reason,
+                    [`is_check${inOrOut}_mobile`]: c_is_mobile,
+                    [`check${inOrOut}device`]: c_device,
+                };
+
+                await rpc("/web/dataset/call_kw/hr.attendance/write", {
+                    model: "hr.attendance",
+                    method: "write",
+                    args: [parseInt(data.attendance.id), attendanceFields],
+                    kwargs: {},
+                });
+            });
+            await this.searchReadEmployee();
+
         } catch (error) {
             console.log("Validation failed:", error);
             self.notificationService.add(error, { type: "danger" });
@@ -530,38 +475,32 @@ patch(ActivityMenu.prototype, {
         let fence_is_inside = false;
         let fence_ids = [];
 
-        if (window.location.protocol == 'https:') {
-            const company_id = session.user_companies.allowed_companies[0] || session.user_companies.current_company || false;            
-            const records = await self.orm.call('hr.attendance.geofence', "search_read", [[['company_id', '=', company_id], ['employee_ids', 'in', self.employee.id]], ['id', 'name', 'overlay_paths']], {});
-            
-            console.log("Geofence records fetched:", records);
+        const company_id = session.user_companies.allowed_companies[0] || session.user_companies.current_company || false;            
+        const records = await self.orm.call('hr.attendance.geofence', "search_read", [[['company_id', '=', company_id], ['employee_ids', 'in', self.employee.id]], ['id', 'name', 'overlay_paths']], {});
+        
+        console.log("1.Geofence records fetched:", records);
 
-            if (records && records.length > 0){
-                const geolocation = await new Promise((resolve, reject) => {
-                    navigator.geolocation.getCurrentPosition(
-                        ({ coords: { latitude, longitude } }) => resolve({ latitude, longitude }),
-                        (err) => reject(err)
-                    );
-                });
+        if (records && records.length > 0){
+            console.log("2.Validating geofence for coordinates:", self.state.latitude, self.state.longitude);
 
-                const coords = ol.proj.fromLonLat([geolocation.longitude, geolocation.latitude]);
+            const coords = ol.proj.fromLonLat([self.state.longitude, self.state.latitude]);
 
-                for (const record of records) {
-                    const value = JSON.parse(record.overlay_paths);
-                    if (Object.keys(value).length > 0) {
-                        const features = new ol.format.GeoJSON().readFeatures(value);
-                        const geometry = features[0].getGeometry();
-                        
-                        if (geometry.intersectsCoordinate(coords)) {
-                            fence_is_inside = true;
-                            fence_ids.push(parseInt(record.id));
-                        }
+            for (const record of records) {
+                const value = JSON.parse(record.overlay_paths);
+                if (Object.keys(value).length > 0) {
+                    const features = new ol.format.GeoJSON().readFeatures(value);
+                    const geometry = features[0].getGeometry();
+                    
+                    if (geometry.intersectsCoordinate(coords)) {
+                        fence_is_inside = true;
+                        fence_ids.push(parseInt(record.id));
                     }
                 }
             }
-            else{
-                self.notificationService.add("You haven't entered any of the geofence zones.", { type: "danger" });
-            }
+        }
+        else{
+            console.log("3.No geofence records found for employee ID:", self.employee.id);
+            self.notificationService.add("You haven't entered any of the geofence zones.", { type: "danger" });
         }
 
         return {
