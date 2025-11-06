@@ -121,4 +121,9 @@
             </xpath>
         </field>
     </record>
+
+    <!-- Heredar acción para remover filtros por default -->
+     <record id="hr_attendance.hr_attendance_action" model="ir.actions.act_window">
+        <field name="context">{}</field>
+     </record>
 </odoo>
