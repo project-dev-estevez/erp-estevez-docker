@@ -398,6 +398,8 @@ patch(ActivityMenu.prototype, {
                     return self.notificationService.add("No se encontró el registro de asistencia.", { type: "danger" });
                 }
 
+                console.log("Attendance data:", data);
+
                 let inOrOut = '';
                 if (data.attendance_state == "checked_in") {
                     inOrOut = 'in';
