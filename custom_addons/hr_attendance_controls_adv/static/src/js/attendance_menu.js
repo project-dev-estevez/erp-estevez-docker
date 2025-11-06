@@ -69,7 +69,6 @@ patch(ActivityMenu.prototype, {
     async searchReadEmployee(){    
         const result = await rpc("/hr_attendance/attendance_user_data");
         this.employee = result;
-        console.log("Employee data:", this.employee);
 
         if (!this.employee.id) {
             this.state.isDisplayed = false;
@@ -80,9 +79,6 @@ patch(ActivityMenu.prototype, {
         this.isFirstAttendance = this.employee.hours_previously_today === 0;
         this.state.isDisplayed = this.employee.display_systray;
         this.state.attendance_status = this.employee.attendance_status;
-        
-        // 🎯 PASO 7B: Log para verificar
-        console.log("✅ Employee data loaded, attendance_status:", this.employee.attendance_status);
     },
 
     async onOpenedContent() {
@@ -206,9 +202,6 @@ patch(ActivityMenu.prototype, {
 
         // 🔒 ASEGURAR: Siempre mantener como array, incluso si records es null/undefined
         this.state.geofences = records || [];
-
-        console.log("📍 Geofences loaded for employee ID", this.employee.id, ":", records);
-        console.log("📊 Total geofences found:", this.state.geofences.length);
     },
 
     // Obtiene la dirección IP pública del usuario
@@ -315,15 +308,14 @@ patch(ActivityMenu.prototype, {
             ? new Promise(async (resolve, reject) => {
                 try {
                     const { fence_is_inside, fence_ids } = await self._validate_Geofence();
-                    if (fence_is_inside && fence_ids.length > 0) {
-                        c_fence_ids = Object.values(fence_ids);
-                        c_fence_is_inside = fence_is_inside;
-                        resolve(true);
-                    } else {
-                        reject("You haven't entered any of the geofence zones.");
-                    }
+                    c_fence_ids = Object.values(fence_ids);
+                    c_fence_is_inside = fence_is_inside;
+                    // Siempre resolvemos, aunque no esté en geocerca
+                    resolve(true);
                 } catch (err) {
-                    reject(`Geofence validation error: ${err}`);
+                    c_fence_ids = [];
+                    c_fence_is_inside = false;
+                    resolve(true);
                 }
             })
             : Promise.resolve(true);
@@ -448,27 +440,32 @@ patch(ActivityMenu.prototype, {
         const company_id = session.user_companies.allowed_companies[0] || session.user_companies.current_company || false;
         const records = await self.orm.call('hr.attendance.geofence', "search_read", [[['company_id', '=', company_id], ['employee_ids', 'in', self.employee.id]], ['id', 'name', 'overlay_paths']], {});
 
-        if (records && records.length > 0){
-            const coords = ol.proj.fromLonLat([self.state.longitude, self.state.latitude]);
-            for (const record of records) {
-                try {
-                    const value = JSON.parse(record.overlay_paths);
-                    if (Object.keys(value).length > 0) {
-                        const features = new ol.format.GeoJSON().readFeatures(value);
-                        if (!features.length) {
-                            continue;
-                        }
-                        const geometry = features[0].getGeometry();
-                        const intersects = geometry.intersectsCoordinate(coords);
-                        if (intersects) {
-                            fence_is_inside = true;
-                            fence_ids.push(parseInt(record.id));
-                        }
+        if (!records || records.length === 0) {
+            console.log("No geofences found for validation.");
+            self.notificationService.add("Estás fuera de la geocerca!", { type: "danger" });
+            return {
+                'fence_is_inside': fence_is_inside,
+                'fence_ids': fence_ids,
+            };
+        }
+
+        const coords = ol.proj.fromLonLat([self.state.longitude, self.state.latitude]);
+        for (const record of records) {
+            try {
+                const value = JSON.parse(record.overlay_paths);
+                if (Object.keys(value).length > 0) {
+                    const features = new ol.format.GeoJSON().readFeatures(value);
+                    if (!features.length) {
+                        continue;
                     }
-                } catch (err) {}
-            }
-        } else {
-            self.notificationService.add("You haven't entered any of the geofence zones.", { type: "danger" });
+                    const geometry = features[0].getGeometry();
+                    const intersects = geometry.intersectsCoordinate(coords);
+                    if (intersects) {
+                        fence_is_inside = true;
+                        fence_ids.push(parseInt(record.id));
+                    }
+                }
+            } catch (err) {}
         }
 
         return {
