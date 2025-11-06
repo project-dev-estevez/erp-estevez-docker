@@ -65,12 +65,6 @@
                             Pulsa el botón para iniciar tu <strong>jornada</strong> 😉
                         </p>
 
-                        <div t-attf-class="geofence_container mb8 {{ this.state.show_geofence ? '' : 'd-none' }}" id="geofence_container" t-ref="geofence_container">
-                            <i t-attf-class="fa fa-1x fa-angle-double-down geofence_toggle" id="geofence_toggle" t-on-click="onTogglegeofence" t-ref="geofence_toggle">
-                                Map Location
-                            </i>
-                            <div t-attf-class="geofence_view d-none" t-ref="geofence_view"></div>
-                        </div>
 
                         <button t-on-click="() => this.signInOut()"
                                 class="btn btn-success w-100">

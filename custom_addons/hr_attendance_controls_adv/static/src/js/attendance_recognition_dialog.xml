@@ -6,7 +6,7 @@
             <t t-set-slot="header">
                 <div class="d-flex w-100">
                     <h4>Reconocimiento Facial</h4>
-                    <div t-on-click="onClose" type="button" class="btn-close" aria-label="Close"/>
+                    <div t-on-click="props.close" type="button" class="btn-close"/>
                 </div>
             </t>
             <div class="container-fluid">

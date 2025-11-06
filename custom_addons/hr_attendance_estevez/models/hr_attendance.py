@@ -144,8 +144,16 @@ class HrAttendance(models.Model):
     @api.depends('check_in', 'check_out')
     def _compute_check_dates(self):
         for record in self:
-            record.check_in_date = record.check_in.date() if record.check_in else False
-            record.check_out_date = record.check_out.date() if record.check_out else False
+            if record.check_in:
+                local_check_in = fields.Datetime.context_timestamp(record, record.check_in)
+                record.check_in_date = local_check_in.date()
+            else:
+                record.check_in_date = False
+            if record.check_out:
+                local_check_out = fields.Datetime.context_timestamp(record, record.check_out)
+                record.check_out_date = local_check_out.date()
+            else:
+                record.check_out_date = False
 
     @api.model
     def create(self, vals):
@@ -156,10 +164,9 @@ class HrAttendance(models.Model):
                     check_in_dt = datetime.strptime(check_in, '%Y-%m-%d %H:%M:%S')
                 else:
                     check_in_dt = check_in
-                if check_in_dt.hour > 8 or (check_in_dt.hour == 8 and check_in_dt.minute > 15):
-                    vals['status'] = 'retarded'
-                else:
-                    vals['status'] = 'pending'
+                local_dt = fields.Datetime.context_timestamp(self, check_in_dt)
+                status = 'retarded' if (local_dt.hour > 8 or (local_dt.hour == 8 and local_dt.minute > 15)) else 'pending'
+                vals['status'] = status
             except Exception:
                 vals['status'] = 'pending'
         return super().create(vals)

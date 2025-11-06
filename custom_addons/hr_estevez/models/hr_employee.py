@@ -225,6 +225,12 @@ class HrEmployee(models.Model):
         string="Cantidad de Documentos",
         compute="_compute_ir_attachment_count"
     )
+
+    time_off_in_lieu_ids = fields.One2many(
+        'hr.time.off.in.lieu', 
+        'employee_id', 
+        string='Solicitudes de Tiempo por Tiempo'
+    )
     
     def _compute_ir_attachment_count(self):
         for employee in self:
@@ -673,6 +679,7 @@ class HrEmployee(models.Model):
         return translations.get(country_name, country_name)
     
     def action_archive_employee(self):
+        self.ensure_one()  # Asegura que solo se actúa sobre un registro
         return {
             'type': 'ir.actions.act_window',
             'name': 'Dar de Baja al Empleado',
@@ -682,8 +689,8 @@ class HrEmployee(models.Model):
             'context': {'default_employee_id': self.id},
         }
 
-    # Método para reactivar
     def action_reactivate_employee(self):
+        self.ensure_one()
         return {
             'type': 'ir.actions.act_window',
             'name': 'Reactivar Empleado',
@@ -812,6 +819,7 @@ class HrEmployee(models.Model):
 
     # Sobrescribir métodos estándar para manejar archivado/desarchivado directo
     def action_archive(self):
+        _logger.info(f"Archivando empleados: {self.ids}")
         res = super(HrEmployee, self).action_archive()
         for employee in self:
             try:
@@ -821,6 +829,7 @@ class HrEmployee(models.Model):
         return res
 
     def action_unarchive(self):
+        
         res = super(HrEmployee, self).action_unarchive()
         for employee in self:
             try:

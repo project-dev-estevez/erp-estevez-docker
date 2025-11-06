@@ -67,7 +67,8 @@
         'views/hr_employee_history_views.xml',
         'views/hr_leave.xml',
         'views/hr_leave_type_views.xml',
-        'views/hr_vacation_period_views.xml',        
+        'views/hr_vacation_period_views.xml',
+        'views/hr_time_off_in_lieu_views.xml',       
     ],
     # only loaded in demonstration mode
     'demo': [
