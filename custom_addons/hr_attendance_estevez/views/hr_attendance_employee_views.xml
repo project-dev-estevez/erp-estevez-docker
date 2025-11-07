@@ -13,7 +13,6 @@
                 <field name="check_out_date" string="Salida"/>
                 <field name="status" widget="badge"
                        decoration-info="status == 'pending'"
-                       decoration-warning="status == 'retarded'"
                        decoration-success="status == 'approved'"
                        decoration-danger="status == 'rejected'"/>
 

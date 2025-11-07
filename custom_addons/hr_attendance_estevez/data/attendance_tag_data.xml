@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="attendance_tag_retardo" model="hr.attendance.tag">
+        <field name="name">Retardo</field>
+        <field name="color">2</field> <!-- Rojo -->
+    </record>
+    <record id="attendance_tag_sin_geocerca" model="hr.attendance.tag">
+        <field name="name">Sin Geocerca</field>
+        <field name="color">2</field> <!-- Rojo -->
+    </record>
+    <record id="attendance_tag_fuera_geocerca" model="hr.attendance.tag">
+        <field name="name">Fuera de geocerca</field>
+        <field name="color">2</field> <!-- Rojo -->
+    </record>
+    <record id="attendance_tag_aprobado_auto" model="hr.attendance.tag">
+        <field name="name">Aprobado automáticamente</field>
+        <field name="color">10</field> <!-- Verde -->
+    </record>
+</odoo>

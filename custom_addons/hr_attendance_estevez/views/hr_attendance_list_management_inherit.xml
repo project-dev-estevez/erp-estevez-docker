@@ -13,6 +13,7 @@
             <xpath expr="//field[@name='employee_id']" position="after">
                 <field name="department_id" string="Departamento"/>
                 <field name="job_id" string="Puesto de trabajo" readonly="1"/>
+                <field name="tag_ids" widget="many2many_tags" string="Etiquetas"/>
             </xpath>
             <xpath expr="//field[@name='check_in']" position="after">
                 <button name="action_show_checkin_photo"
@@ -63,8 +64,7 @@
             </xpath>
             <xpath expr="//field[@name='worked_hours']" position="after">
                 <field name="status" widget="badge"
-                    decoration-info="status == 'pending'"
-                    decoration-warning="status == 'retarded'"
+                    decoration-warning="status == 'pending'"
                     decoration-success="status == 'approved'"
                     decoration-danger="status == 'rejected'"/>
 
@@ -109,9 +109,9 @@
                 <filter name="filter_status_pending"
                         string="Pendiente"
                         domain="[('status', '=', 'pending')]"/>
-                <filter name="filter_status_retarded"
+                <!-- <filter name="filter_status_retarded"
                         string="Retardo"
-                        domain="[('status', '=', 'retarded')]"/>
+                        domain="[('tag_ids', 'in', [ref('hr_attendance_estevez.attendance_tag_retardo')])]"/> -->
                 <filter name="filter_status_approved"
                         string="Aprobado"
                         domain="[('status', '=', 'approved')]"/>

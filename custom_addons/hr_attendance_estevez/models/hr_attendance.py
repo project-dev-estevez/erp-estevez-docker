@@ -5,7 +5,7 @@ import logging
 _logger = logging.getLogger(__name__)
 
 class HrAttendance(models.Model):
-    
+        
     _inherit = 'hr.attendance'
 
     department_id = fields.Many2one(
@@ -26,13 +26,21 @@ class HrAttendance(models.Model):
 
     status = fields.Selection([
         ('pending', 'Pendiente'),
-        ('retarded', 'Retardo'),
         ('approved', 'Aprobado'),
         ('rejected', 'Rechazado')], 
         string='Estado', 
         default='pending',
         tracking=True, 
         required=True
+    )
+
+    tag_ids = fields.Many2many(
+        'hr.attendance.tag',
+        'hr_attendance_tag_rel',
+        'attendance_id',
+        'tag_id',
+        string='Etiquetas',
+        help='Etiquetas asociadas a la asistencia.'
     )
 
     check_in_date = fields.Date(
@@ -157,19 +165,73 @@ class HrAttendance(models.Model):
 
     @api.model
     def create(self, vals):
+        tag_ids = []
+        # Referencias a los tags
+        tag_retardo = self.env.ref('hr_attendance_estevez.attendance_tag_retardo', raise_if_not_found=False)
+        tag_sin_geocerca = self.env.ref('hr_attendance_estevez.attendance_tag_sin_geocerca', raise_if_not_found=False)
+        tag_fuera_geocerca = self.env.ref('hr_attendance_estevez.attendance_tag_fuera_geocerca', raise_if_not_found=False)
+        tag_aprobado_auto = self.env.ref('hr_attendance_estevez.attendance_tag_aprobado_auto', raise_if_not_found=False)
+
         check_in = vals.get('check_in')
-        if check_in:
-            try:
+        estado = 'pending'
+        try:
+            if check_in:
                 if isinstance(check_in, str):
                     check_in_dt = datetime.strptime(check_in, '%Y-%m-%d %H:%M:%S')
                 else:
                     check_in_dt = check_in
                 local_dt = fields.Datetime.context_timestamp(self, check_in_dt)
-                status = 'retarded' if (local_dt.hour > 8 or (local_dt.hour == 8 and local_dt.minute > 15)) else 'pending'
-                vals['status'] = status
-            except Exception:
-                vals['status'] = 'pending'
+                # Validación de retardo
+                if (local_dt.hour > 8 or (local_dt.hour == 8 and local_dt.minute > 10)):
+                    if tag_retardo:
+                        tag_ids.append(tag_retardo.id)
+                # Validación de geocerca
+                # Suponiendo que existe un método/atributo para obtener geocercas del empleado
+                employee_id = vals.get('employee_id')
+                geocercas = []
+                if employee_id:
+                    employee = self.env['hr.employee'].browse(employee_id)
+                    # Ajusta esto según tu modelo de geocercas
+                    geocercas = getattr(employee, 'geofence_ids', [])
+                if not geocercas:
+                    if tag_sin_geocerca:
+                        tag_ids.append(tag_sin_geocerca.id)
+                else:
+                    # Validar si el check-in fue dentro de la geocerca
+                    # Debes implementar la función is_checkin_in_geofence(check_in_dt, geocercas, vals)
+                    dentro_geocerca = False
+                    try:
+                        dentro_geocerca = self.is_checkin_in_geofence(check_in_dt, geocercas, vals)
+                    except Exception:
+                        dentro_geocerca = False
+                    if not dentro_geocerca:
+                        if tag_fuera_geocerca:
+                            tag_ids.append(tag_fuera_geocerca.id)
+                # Si no hay tags de retardo, sin geocerca o fuera de geocerca, se aprueba automáticamente
+                if not tag_ids:
+                    estado = 'approved'
+                    if tag_aprobado_auto:
+                        tag_ids.append(tag_aprobado_auto.id)
+        except Exception as e:
+            _logger.error(f"Error en prevalidaciones de asistencia: {str(e)}")
+            estado = 'pending'
+        vals['status'] = estado
+        if tag_ids:
+            vals['tag_ids'] = [(6, 0, tag_ids)]
         return super().create(vals)
+
+    def is_checkin_in_geofence(self, check_in_dt, geocercas, vals):
+        """
+        Valida si el check-in fue dentro de alguna geocerca del empleado.
+        Retorna True si fue dentro, False si fue fuera.
+        """
+        check_in_geofence_ids = vals.get('check_in_geofence_ids', [])
+        if not check_in_geofence_ids or not geocercas:
+            return False
+        # geocercas puede ser un recordset o lista de IDs
+        geofence_ids = [g.id if hasattr(g, 'id') else g for g in geocercas]
+        # Si algún ID de check_in_geofence_ids está en las geocercas del empleado
+        return any(geofence_id in geofence_ids for geofence_id in check_in_geofence_ids)
 
     @api.model
     def auto_close_open_attendances(self):

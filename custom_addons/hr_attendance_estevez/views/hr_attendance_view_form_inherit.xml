@@ -22,6 +22,7 @@
                             <field name="employee_id" widget="many2one_avatar_user" readonly="1"/>
                             <field name="check_in" string="Entrada" options="{'rounding': 0}" readonly="1"/>
                             <field name="check_out" string="Salida" options="{'rounding': 0}" placeholder="Trabajando actualmente" readonly="1"/>
+                            <field name="tag_ids" widget="many2many_tags" string="Etiquetas"/>
                         </group>
                         <group col="1">
                             <div class="d-flex flex-column align-items-center pt-4">
