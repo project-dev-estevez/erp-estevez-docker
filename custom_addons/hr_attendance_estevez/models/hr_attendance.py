@@ -129,13 +129,13 @@ class HrAttendance(models.Model):
             else:
                 record.check_out_map_html = "<p style='text-align:center; color:#999; width:100%; height:360px; display:flex; align-items:center; justify-content:center; border:1px dashed #ccc; margin:0;'>Sin ubicación GPS</p>"
     
-    @api.depends('check_out', 'is_auto_closed')
+    @api.depends('check_out', 'is_auto_closed', 'check_in')
     def _compute_check_out_display(self):
         for record in self:
-            if record.is_auto_closed and not record.check_out:
+            # Mostrar "No Registró" si es cierre automático y check_in == check_out o check_out vacío
+            if record.is_auto_closed and (not record.check_out or record.check_in == record.check_out):
                 record.check_out_display = 'No Registró'
             elif record.check_out:
-                # Conversión automática a la zona horaria del usuario
                 local_dt = fields.Datetime.context_timestamp(record, record.check_out)
                 record.check_out_display = local_dt.strftime('%d/%m/%Y %H:%M:%S')
             else:
@@ -176,30 +176,36 @@ class HrAttendance(models.Model):
         """
         🕚 CRONJOB: Cierra automáticamente todas las asistencias abiertas a las 11:58 PM
         Busca asistencias con check_in pero sin check_out y las cierra automáticamente
-        """        
+        """
         try:
-            # 🔍 Buscar asistencias abiertas (sin check_out)
             open_attendances = self.search([
                 ('check_out', '=', False),
                 ('check_in', '!=', False)
             ])
-            
             if not open_attendances:
                 _logger.info("🟢 No hay asistencias abiertas para cerrar")
                 return True
-            
             for attendance in open_attendances:
-                try:                    
-                    # ✅ Actualizar la asistencia
+                try:
+                    # Cierre automático: check_out igual a check_in
                     attendance.write({
                         'is_auto_closed': True,
+                        'check_out': attendance.check_in,
                     })
                 except Exception as e:
                     _logger.error(f"❌ Error cerrando asistencia ID {attendance.id}: {str(e)}")
                     continue
-    
             return True
-            
         except Exception as e:
             _logger.error(f"❌ Error en cronjob auto_close_open_attendances: {str(e)}")
             return False
+    # Hereda y expone un método para ser llamado desde el modelo employee custom
+    @api.model
+    def close_attendance_as_auto(self, attendance):
+        """
+        Cierra una asistencia abierta asignando check_out igual a check_in y marcando is_auto_closed.
+        """
+        attendance.write({
+            'is_auto_closed': True,
+            'check_out': attendance.check_in,
+        })

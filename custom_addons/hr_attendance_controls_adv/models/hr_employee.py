@@ -29,22 +29,22 @@ class HrEmployee(models.Model):
                     employee.attendance_status = 'in_work'
 
     def _attendance_action_change(self, geo_information=None):
-        """ Check In/Check Out action mejorado para evitar cerrar check-ins de días anteriores. """
+        """Check In/Check Out action mejorado para evitar cerrar check-ins de días anteriores y marcar cierre automático si corresponde."""
         self.ensure_one()
         action_date = fields.Datetime.now()
 
-        # Buscar el último registro abierto de asistencia
         attendance = self.env['hr.attendance'].search([
             ('employee_id', '=', self.id),
             ('check_out', '=', False)
         ], order='check_in desc', limit=1)
 
         if attendance:
-            # Comprobar si el último check-in es de un día anterior (zona horaria del empleado)
             last_check_in_date = fields.Datetime.context_timestamp(self, attendance.check_in).date()
             today = fields.Datetime.context_timestamp(self, action_date).date()
             if last_check_in_date < today:
-                # El último check-in es de un día anterior, crear nuevo registro (check-in)
+                # Cerrar el check-in anterior como automático (check_out = check_in)
+                self.env['hr.attendance'].close_attendance_as_auto(attendance)
+                # Crear nuevo registro (check-in)
                 vals = {
                     'employee_id': self.id,
                     'check_in': action_date,
