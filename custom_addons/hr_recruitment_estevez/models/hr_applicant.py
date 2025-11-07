@@ -605,9 +605,9 @@ class HrApplicant(models.Model):
                     })
             
             # Eliminar archivos del empleado que ya no existen en el applicant
-            for emp_att in employee_attachments:
-                if emp_att.name not in applicant_files:
-                    emp_att.unlink()
+            #for emp_att in employee_attachments:
+            #    if emp_att.name not in applicant_files:
+            #        emp_att.unlink()
                     
         elif direction == 'employee_to_applicant':
             
@@ -639,9 +639,9 @@ class HrApplicant(models.Model):
                     })
             
             # Eliminar archivos del applicant que ya no existen en el employee
-            for app_att in applicant_attachments:
-                if app_att.name not in employee_files:
-                    app_att.unlink()
+            #for app_att in applicant_attachments:
+             #   if app_att.name not in employee_files:
+              #      app_att.unlink()
 
     def action_sync_attachments(self):
         """Acción para sincronizar attachments manualmente"""

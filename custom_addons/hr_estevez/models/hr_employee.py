@@ -176,11 +176,18 @@ class HrEmployee(models.Model):
         ('couple', 'Esposo(a)'),
         ('brother/sister', 'Hermano(a)'),
         ('other', 'Otro')
-    ], string='Estado Civil', required=True, tracking=True)
+    ], string='Estado Civil', tracking=True)
     
     # Campos para el segundo contacto de emergencia
     emergency_contact_2 = fields.Char(string="Segundo Contacto")
-    emergency_contact_relationship_2 = fields.Char(string="Parentesco del Segundo Contacto")
+    emergency_contact_relationship_2 = fields.Selection([
+        ('mom', 'Madre'),
+        ('dad', 'Padre'),
+        ('daughter', 'Hijo(a)'),
+        ('couple', 'Esposo(a)'),
+        ('brother/sister', 'Hermano(a)'),
+        ('other', 'Otro')
+    ], string='Estado Civil', tracking=True)
     emergency_phone_2 = fields.Char(string="Teléfono del Segundo Contacto")
 
     #Campos para asignaciones
