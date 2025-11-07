@@ -9,7 +9,6 @@
         <field name="active" eval="True"/>
         <field name="interval_number">1</field>
         <field name="interval_type">days</field>
-        <field name="numbercall">-1</field>
         <field name="nextcall" eval="(datetime.utcnow() + timedelta(days=0)).replace(hour=5, minute=58, second=0).strftime('%Y-%m-%d 23:58:00')" />
     </record>
 
