@@ -28,6 +28,50 @@ class HrEmployee(models.Model):
                 else:
                     employee.attendance_status = 'in_work'
 
+    def _attendance_action_change(self, geo_information=None):
+        """ Check In/Check Out action mejorado para evitar cerrar check-ins de días anteriores. """
+        self.ensure_one()
+        action_date = fields.Datetime.now()
+
+        # Buscar el último registro abierto de asistencia
+        attendance = self.env['hr.attendance'].search([
+            ('employee_id', '=', self.id),
+            ('check_out', '=', False)
+        ], order='check_in desc', limit=1)
+
+        if attendance:
+            # Comprobar si el último check-in es de un día anterior (zona horaria del empleado)
+            last_check_in_date = fields.Datetime.context_timestamp(self, attendance.check_in).date()
+            today = fields.Datetime.context_timestamp(self, action_date).date()
+            if last_check_in_date < today:
+                # El último check-in es de un día anterior, crear nuevo registro (check-in)
+                vals = {
+                    'employee_id': self.id,
+                    'check_in': action_date,
+                }
+                if geo_information:
+                    vals.update({'in_%s' % key: geo_information[key] for key in geo_information})
+                return self.env['hr.attendance'].create(vals)
+            else:
+                # Si es de hoy, hacer check-out
+                if geo_information:
+                    attendance.write({
+                        'check_out': action_date,
+                        **{'out_%s' % key: geo_information[key] for key in geo_information}
+                    })
+                else:
+                    attendance.write({'check_out': action_date})
+                return attendance
+        else:
+            # No hay registro abierto, crear uno nuevo (check-in)
+            vals = {
+                'employee_id': self.id,
+                'check_in': action_date,
+            }
+            if geo_information:
+                vals.update({'in_%s' % key: geo_information[key] for key in geo_information})
+            return self.env['hr.attendance'].create(vals)
+
 class HrEmployeeFaces(models.Model):
     _name = "hr.employee.faces"
     _description = "Face Recognition Images"

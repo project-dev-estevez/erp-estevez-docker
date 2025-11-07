@@ -385,10 +385,7 @@ patch(ActivityMenu.prototype, {
 
         try {
             await Promise.all([geofencePromise, ipAddressPromise, photoPromise, faceRecognitionPromise]);
-            if (isIosApp()) {
-                await rpc("/hr_attendance/systray_check_in_out");
-                await this.searchReadEmployee();
-            }
+
             await rpc("/hr_attendance/systray_check_in_out", {
                 latitude: c_latitude,
                 longitude: c_longitude
