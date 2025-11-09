@@ -109,9 +109,10 @@
                 <filter name="filter_status_pending"
                         string="Pendiente"
                         domain="[('status', '=', 'pending')]"/>
-                <!-- <filter name="filter_status_retarded"
+                <filter name="filter_status_retarded"
                         string="Retardo"
-                        domain="[('tag_ids', 'in', [ref('hr_attendance_estevez.attendance_tag_retardo')])]"/> -->
+                        help="Muestra las asistencias con la etiqueta 'Retardo'"
+                        domain="[('tag_ids', 'in', [1])]"/>
                 <filter name="filter_status_approved"
                         string="Aprobado"
                         domain="[('status', '=', 'approved')]"/>
