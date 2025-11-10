@@ -74,8 +74,9 @@ export class AttendanceRecognitionDialog extends Component {
 
             video.onloadedmetadata = async () => {
                 await video.play();
-                this.state.videoWidth = video.offsetWidth;
-                this.state.videoHeight = video.offsetHeight;
+                // Usar video.videoWidth/video.videoHeight para compatibilidad iOS
+                this.state.videoWidth = video.videoWidth;
+                this.state.videoHeight = video.videoHeight;
                 this.onVideoReady(video);
             };
         } catch (error) {
