@@ -81,14 +81,13 @@ patch(ActivityMenu.prototype, {
         this.state.attendance_status = this.employee.attendance_status;
     },
 
-    async onOpenedContent() {
+    async onOpenedContent() {        
+        await this.loadControls();
         if (this.state.isReady) {
             // Ya está todo listo, no recargar
             this.state.show_check_inout_button = true;
             return;
         }
-        await this.loadControls();
-        this.state.show_check_inout_button = true;
     },
 
     // Carga los controles configurados para el módulo de asistencia
