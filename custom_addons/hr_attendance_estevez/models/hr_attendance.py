@@ -110,10 +110,10 @@ class HrAttendance(models.Model):
         for record in self:
             if record.in_latitude and record.in_longitude:
                 lat, lng = record.in_latitude, record.in_longitude
-                url = f"https://maps.google.com/maps?q={lat},{lng}&hl=es&z=16&output=embed"
+                url = f"https://maps.google.com/maps?q={lat},{lng}&hl=es&z=17&output=embed"
                 record.check_in_map_html = f"""
-                    <div style="width: 100%; height: 360px; overflow: hidden;">
-                        <iframe width="100%" height="360px" frameborder="0" style="border:0; display:block;"
+                    <div style="width: 100%; height: 380px; overflow: hidden;">
+                        <iframe width="100%" height="380px" frameborder="0" style="border:0; display:block;"
                                 src="{url}"
                                 allowfullscreen></iframe>
                     </div>
@@ -126,10 +126,10 @@ class HrAttendance(models.Model):
         for record in self:
             if record.out_latitude and record.out_longitude:
                 lat, lng = record.out_latitude, record.out_longitude
-                url = f"https://maps.google.com/maps?q={lat},{lng}&hl=es&z=16&output=embed"
+                url = f"https://maps.google.com/maps?q={lat},{lng}&hl=es&z=17&output=embed"
                 record.check_out_map_html = f"""
-                    <div style="width: 100%; height: 360px; overflow: hidden;">
-                        <iframe width="100%" height="360px" frameborder="0" style="border:0; display:block;"
+                    <div style="width: 100%; height: 380px; overflow: hidden;">
+                        <iframe width="100%" height="380px" frameborder="0" style="border:0; display:block;"
                                 src="{url}"
                                 allowfullscreen></iframe>
                     </div>
