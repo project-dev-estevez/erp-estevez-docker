@@ -34,7 +34,7 @@
                 <field name="is_auto_closed" column_invisible="1"/>
                 <field name="check_out_display" 
                        string="Salida"
-                       decoration-warning="is_auto_closed == True and not check_out"/>
+                       decoration-warning="is_auto_closed"/>
             </xpath>
 
             <xpath expr="//field[@name='check_out_display']" position="after">

@@ -10,9 +10,9 @@
                 <field name="department_id" string="Departamento" optional="show"/>
                 <field name="job_id" string="Puesto" optional="show"/>
                 <field name="check_in_date" string="Entrada"/>
-                <field name="check_out_date" string="Salida"/>
+                <field name="check_out_display" string="Salida"/>
                 <field name="status" widget="badge"
-                       decoration-info="status == 'pending'"
+                       decoration-warning="status == 'pending'"
                        decoration-success="status == 'approved'"
                        decoration-danger="status == 'rejected'"/>
 
