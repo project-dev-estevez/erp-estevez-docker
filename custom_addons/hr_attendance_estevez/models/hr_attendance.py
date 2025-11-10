@@ -5,7 +5,7 @@ import logging
 _logger = logging.getLogger(__name__)
 
 class HrAttendance(models.Model):
-        
+            
     _inherit = 'hr.attendance'
 
     department_id = fields.Many2one(
@@ -81,6 +81,24 @@ class HrAttendance(models.Model):
         compute='_compute_has_admin_comments',
         store=False
     )
+
+    has_geofence_or_retardo_tag = fields.Boolean(
+        string='Tag de geocerca o retardo',
+        compute='_compute_has_geofence_or_retardo_tag',
+        store=False
+    )
+
+    def _compute_has_geofence_or_retardo_tag(self):
+        tag_xml_ids = {
+            'hr_attendance_estevez.attendance_tag_retardo',
+            'hr_attendance_estevez.attendance_tag_fuera_geocerca',
+            'hr_attendance_estevez.attendance_tag_sin_geocerca',
+        }
+        for record in self:
+            external_ids = record.tag_ids.get_external_id()
+            record.has_geofence_or_retardo_tag = any(
+                external_ids.get(tag.id) in tag_xml_ids for tag in record.tag_ids
+            )
 
     @api.depends('message_ids', 'message_ids.body', 'message_ids.is_internal')
     def _compute_has_admin_comments(self):
