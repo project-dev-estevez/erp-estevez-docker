@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+<record id="view_employee_elearning_report_tree" model="ir.ui.view">
+    <field name="name">employee.elearning.report.tree</field>
+    <field name="model">employee.elearning.report</field>
+    <field name="arch" type="xml">
+        <list>            
+            <field name="curp" width="200"/>
+            <!--field name="employee_id" invisible="1"/-->
+            <field name="employee_name" width="190"/>
+            <field name="primer_apellido" width="150"/>
+            <field name="segundo_apellido" width="150"/>
+            <field name="state_key" width="90"/>
+            <field name="municipality_key" width="110"/>
+            <field name="occupation_key" width="110"/>
+            <field name="estudios_key" width="130"/>
+            <field name="documento_key" width="135"/>
+            <field name="institucion_key" width="135"/>
+            <field name="course_id" width="135"/>            
+            <field name="course_name" width="135"/>
+            <field name="tematica_key" width="135"/>
+            <field name="duracion" width="80"/>
+            <field name="fecha_inicio" width="90"/>
+            <field name="fecha_termino" width="100"/>
+            <field name="clave_tipo_agente" width="100"/>
+            <field name="clave_modalidad" width="100"/>
+            <field name="clave_capacitacion" width="100"/>
+
+            <field name="channel_type" string="Tipo"/>
+            <field name="modalidad" string="Modalidad"/>
+            <field name="completion" string="% Completado"/>
+            <field name="date_completed" string="Fecha Finalización"/>
+            <field name="score" string="Calificación"/>
+        </list>
+    </field>
+</record>
+
+<record id="action_employee_elearning_report" model="ir.actions.act_window">
+    <field name="name">Reporte Curso - Empleado</field>
+    <field name="res_model">employee.elearning.report</field>
+    <field name="view_mode">list,form</field>
+    <field name="view_id" ref="view_employee_elearning_report_tree"/>
+</record>
+
+
+</odoo>

@@ -10,8 +10,8 @@
                         <field name="employee_id" invisible="1"/>
                         <field name="date"/>
                         <field name="description" widget="html"/>
-                        <field name="fraction"/>
                         <field name="article"/>
+                        <field name="fraction"/>                        
                         <field name="administrative_type"/>
                     </group>
                     <footer>

@@ -241,13 +241,22 @@
                                 <!--<field name="lugar_nacimiento_estado"/>-->
                             </group>
                             <group string="Educación">
-                                <field name="certificate"/>
-                                <field name="study_field"/>
+                                <field name="certificate" invisible="1"/>
+                                <field name="study_field" invisible="1"/>
+                                <field name="study_field_new" widget="selection"/>
+                                <field name="study_tag_ids" widget="many2many_tags"
+       options="{'color_field': 'color', 'no_create_edit': True}"
+       placeholder="Selecciona habilidades..."
+       groups="hr.group_hr_user"/>
+
+
                                 <field name="study_school"/>
                                 <field name="estudios_id"/>                                
                                 <field name="estudios_key" invisible="1"/> 
                                 <field name="documento_id"/> 
                                 <field name="documento_key" invisible="1"/> 
+                                <field name="institucion_id"/>
+                                <field name="institucion_key" invisible="1"/> 
                             </group> 
                         </group>
 
@@ -274,7 +283,7 @@
                             </group>
 
                             <group string="Situación Familiar">
-                                <field name="marital"/>
+                                <field name="marital"/>                                
                                 <field name="spouse_complete_name" invisible="marital not in ['married', 'cohabitant']"/>
                                 <field name="children"/>
                             </group>
@@ -592,6 +601,10 @@
                         </notebook>
                     </page>
                 </xpath>
+
+                <xpath expr="//page[@name='assignments']" position="attributes">
+    <attribute name="invisible">1</attribute>
+</xpath>
 
                <!-- Reemplazar el grupo UBICACIÓN actual por uno que incluya ambos grupos en la misma fila -->
         <xpath expr="//page[@name='public']/group[1]" position="replace">            

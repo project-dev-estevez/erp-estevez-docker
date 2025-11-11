@@ -29,6 +29,65 @@ class HrEmployee(models.Model):
     documento_id = fields.Many2one('hr.probatorio', string="Documento probatorio", ondelete='set null')
     documento_key = fields.Char(compute='_compute_documento_key', store=True)
 
+    institucion_id = fields.Many2one('hr.institucion', string="Institución", ondelete='set null')
+    institucion_key = fields.Char(compute='_compute_institucion_key', store=True)
+
+    study_field_new = fields.Selection([
+        ('administracion', 'Administración'),
+        ('contaduria', 'Contaduría'),
+        ('derecho', 'Derecho'),
+        ('psicologia', 'Psicología'),
+        ('medicina', 'Medicina'),
+        ('enfermeria', 'Enfermería'),
+        ('arquitectura', 'Arquitectura'),
+        ('ingenieria_civil', 'Ingeniería Civil'),
+        ('ingenieria_industrial', 'Ingeniería Industrial'),
+        ('ingenieria_sistemas', 'Ingeniería en Sistemas Computacionales'),
+        ('ingenieria_electronica', 'Ingeniería Electrónica'),
+        ('ingenieria_mecanica', 'Ingeniería Mecánica'),
+        ('ingenieria_quimica', 'Ingeniería Química'),
+        ('biologia', 'Biología'),
+        ('biotecnologia', 'Biotecnología'),
+        ('mercadotecnia', 'Mercadotecnia'),
+        ('comunicacion', 'Ciencias de la Comunicación'),
+        ('educacion', 'Ciencias de la Educación'),
+        ('pedagogia', 'Pedagogía'),
+        ('sociologia', 'Sociología'),
+        ('trabajo_social', 'Trabajo Social'),
+        ('diseno_grafico', 'Diseño Gráfico'),
+        ('diseno_industrial', 'Diseño Industrial'),
+        ('turismo', 'Turismo'),
+        ('gastronomia', 'Gastronomía'),
+        ('ingenieria_ambiental', 'Ingeniería Ambiental'),
+        ('ingenieria_en_software', 'Ingeniería en Software'),
+        ('matematicas', 'Matemáticas'),
+        ('fisica', 'Física'),
+        ('quimica', 'Química'),
+        ('veterinaria', 'Medicina Veterinaria y Zootecnia'),
+        ('agronomia', 'Agronomía'),
+        ('relaciones_internacionales', 'Relaciones Internacionales'),
+        ('economia', 'Economía'),
+        ('finanzas', 'Finanzas'),
+        ('arte', 'Artes Visuales'),
+        ('musica', 'Música'),
+        ('teatro', 'Teatro'),
+        ('filosofia', 'Filosofía'),
+        ('historia', 'Historia'),
+        ('ciencias_politicas', 'Ciencias Políticas'),
+    ], string="Campo de estudio", help="Selecciona la carrera universitaria del empleado")
+
+    study_tag_ids = fields.Many2many(
+        'hr.study.tag',             # modelo relacionado
+        'employee_skill_tag_rel',   # tabla relacional (nombre libre, pero descriptivo)
+        'employee_id',              # columna que referencia a hr.employee
+        'tag_id',                   # columna que referencia a hr.skill.tag
+        string='Habilidades',       # nombre visible
+        help='Selecciona las habilidades o etiquetas que describen al empleado.',
+    )
+
+
+
+
     gender = fields.Selection([
         ('male', 'Masculino'),
         ('female', 'Femenino'),
@@ -158,6 +217,8 @@ class HrEmployee(models.Model):
         ('widower', 'Viudo(a)'),
         ('divorced', 'Divorciado(a)')
     ], string='Estado Civil', required=True, tracking=True)
+
+    spouse_name = fields.Char(string="Nombre del cónyuge")
 
     spouse_birthdate = fields.Date(string="Spouse Birthdate", groups="hr.group_hr_user", store=False)
 
@@ -318,6 +379,11 @@ class HrEmployee(models.Model):
     def _compute_documento_key(self):
         for employee in self:            
             employee.documento_key = employee.documento_id.code if employee.documento_id else False 
+
+    @api.depends('institucion_id')
+    def _compute_institucion_key(self):
+        for employee in self:            
+            employee.institucion_key = employee.institucion_id.code if employee.institucion_id else False 
 
     @api.depends('employment_start_date')
     def _compute_years_of_service(self):
