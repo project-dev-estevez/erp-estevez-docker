@@ -77,11 +77,11 @@ class HrEmployee(models.Model):
     ], string="Campo de estudio", help="Selecciona la carrera universitaria del empleado")
 
     study_tag_ids = fields.Many2many(
-        'hr.study.tag',             # modelo relacionado
-        'employee_skill_tag_rel',   # tabla relacional (nombre libre, pero descriptivo)
-        'employee_id',              # columna que referencia a hr.employee
-        'tag_id',                   # columna que referencia a hr.skill.tag
-        string='Habilidades',       # nombre visible
+        'hr.study.tag', 
+        'employee_skill_tag_rel', 
+        'employee_id',   
+        'tag_id',    
+        string='Etiqueta',      
         help='Selecciona las habilidades o etiquetas que describen al empleado.',
     )
 
