@@ -29,11 +29,15 @@ class HrEmployee(models.Model):
     documento_id = fields.Many2one('hr.probatorio', string="Documento probatorio", ondelete='set null')
     documento_key = fields.Char(compute='_compute_documento_key', store=True)
 
-    gender = fields.Selection([
-        ('male', 'Masculino'),
-        ('female', 'Femenino'),
-        ('indistinct', 'Indistinto')  # Cambiar la etiqueta de 'other'
-    ], groups="hr.group_hr_user", tracking=True)
+    gender = fields.Selection(
+        selection_add=[
+            ('male', 'Masculino'),
+            ('female', 'Femenino'),
+            ('indistinct', 'Indistinto') # Cambiar la etiqueta de 'other'
+        ],
+        groups="hr.group_hr_user",
+        tracking=True
+    )
 
     # Primera Columna en la Vista de Empleados
     names = fields.Char(string='Nombres')
@@ -69,7 +73,7 @@ class HrEmployee(models.Model):
         ('voch', 'Voch Especialistas de México, S.A. de C.V.'),
         ('rastreo', 'Rastreo Satelital de México J&J S.A. de C.V.'),
         ('grupo_back', 'Grupo Back Bone de México S.A. de C.V.')
-    ], string='Patrón')
+    ], string='Patrón Fiscal')
 
     establecimiento = fields.Selection([
         ('estevezjor', 'Estevez.Jor Servicios'),
@@ -78,7 +82,7 @@ class HrEmployee(models.Model):
         ('kuali', 'Kuali Digital'),
         ('makili', 'Makili'),
         ('vigiliner', 'Vigiliner')                
-    ], string='Patrón')
+    ], string='Establecimiento')
 
     bank_id = fields.Many2one('res.bank', string='Banco')
     clabe = fields.Char(
@@ -201,28 +205,52 @@ class HrEmployee(models.Model):
 
             # Avanzar al siguiente año
             year_start = year_start.replace(year=year_start.year + 1)
+            
+    @api.model_create_multi
+    def create(self, vals_list):
+        # Combina los dos antiguos 'create' en uno solo (seguro y actualizado)
+        for vals in vals_list:
+            # --- Parte 1: número de empleado y código de barras ---
+            if 'employee_number' in vals and vals['employee_number'] and not vals.get('barcode'):
+                vals['barcode'] = vals['employee_number']
+            elif 'barcode' in vals and vals['barcode'] and not vals.get('employee_number'):
+                vals['employee_number'] = vals['barcode']
 
-    @api.model
-    def create(self, vals):
-    
-        if 'employee_number' in vals and vals['employee_number'] and not vals.get('barcode'):
-            vals['barcode'] = vals['employee_number']
-        elif 'barcode' in vals and vals['barcode'] and not vals.get('employee_number'):
-            vals['employee_number'] = vals['barcode']
-        return super().create(vals)
+            # --- Parte 2: construir nombre completo ---
+            if 'names' in vals or 'last_name' in vals or 'mother_last_name' in vals:
+                names = vals.get('names', '').strip()
+                last_name = vals.get('last_name', '').strip()
+                mother_last_name = vals.get('mother_last_name', '').strip()
+                vals['name'] = f"{names} {last_name} {mother_last_name}".strip()
+
+        # Crear empleado(s)
+        employees = super(HrEmployee, self).create(vals_list)
+
+        # --- Parte 3: acciones después de crear ---
+        for employee in employees:
+            if employee.employment_start_date:
+                try:
+                    employee.generate_vacation_periods()
+                except Exception as e:
+                    _logger.error(f"Error generando períodos: {str(e)}")
+
+            try:
+                _logger.info("Intentando sincronizar con CodeIgniter")
+                self._sync_codeigniter(employee, 'create')
+            except Exception as e:
+                _logger.error(f"Error en sincronización: {str(e)}")
+
+        return employees
 
     def write(self, vals):
-        
-        
         # Si se actualiza barcode, sincronizar con employee_number
         if 'barcode' in vals and vals['barcode']:
             vals['employee_number'] = vals['barcode']
-        
-        # Si se actualiza employee_number, sincronizar con barcode  
+        # Si se actualiza employee_number, sincronizar con barcode
         elif 'employee_number' in vals and vals['employee_number']:
             vals['barcode'] = vals['employee_number']
-            
         return super().write(vals)
+    
 
     def generate_random_barcode(self):
         
@@ -439,30 +467,6 @@ class HrEmployee(models.Model):
             _logger.error(f"Error de conexión: {str(e)}")
             return False
 
-    @api.model
-    def create(self, vals):
-        # Construir nombre completo
-        if 'names' in vals or 'last_name' in vals or 'mother_last_name' in vals:
-            names = vals.get('names', '').strip()
-            last_name = vals.get('last_name', '').strip()
-            mother_last_name = vals.get('mother_last_name', '').strip()
-            vals['name'] = f"{names} {last_name} {mother_last_name}".strip()
-        
-        # Crear empleado
-        employee = super(HrEmployee, self).create(vals)
-        
-        # Generar períodos de vacaciones si hay fecha de ingreso
-        if vals.get('employment_start_date'):
-            employee.generate_vacation_periods()
-        
-        # Sincronizar con CodeIgniter
-        try:
-            _logger.info("Intentando sincronizar con CodeIgniter")
-            self._sync_codeigniter(employee, 'create')
-        except Exception as e:
-            _logger.error(f"Error en sincronización: {str(e)}")
-        
-        return employee
 
     def write(self, vals):
         # Construir nombre completo si cambian los componentes

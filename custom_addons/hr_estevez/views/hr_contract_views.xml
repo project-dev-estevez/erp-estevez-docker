@@ -86,11 +86,11 @@
                     <group>
                         <div class="card" style="width: 18rem; margin: 10px auto;">
                             <div class="card-body text-center">
-                                <i class="fa fa-file-pdf-o fa-5x text-danger" invisible="not document_file" aria-hidden="true"></i>
-                                <i class="fa fa-clock-o fa-2x text-warning" invisible="document_file" aria-hidden="true"></i>
+                                <i class="fa fa-file-pdf-o fa-5x text-danger" invisible="not document_file" aria-hidden="true" title="Archivo PDF"></i>
+                                <i class="fa fa-clock-o fa-2x text-warning" invisible="document_file" aria-hidden="true" title="Pendiente por adjuntar"></i>
                                 <h5 class="card-title mt-3" invisible="not document_file">Contrato Adjunto</h5>
                                 <h5 class="card-title mt-3" invisible="document_file">Pendiente por Adjuntar...</h5>
-                                <i class="fa fa-check fa-2x text-success" invisible="not document_file"></i>
+                                <i class="fa fa-check fa-2x text-success" invisible="not document_file" aria-hidden="true" title="Archivo adjuntado correctamente"></i>
 
                                 <!-- Campo para adjuntar el archivo -->
                                 <field name="document_file" filename="document_filename" widget="binary" string="Adjuntar Archivo" class="mt-2"/>

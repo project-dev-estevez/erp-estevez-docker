@@ -10,7 +10,7 @@ class HrArea(models.Model):
     employee_ids = fields.One2many('hr.employee', 'area_id', string='Empleados')
     coordinator_id = fields.Many2one('hr.employee', string='Coordinador')
     direction_id = fields.Many2one('hr.direction', string='Dirección')
-    job_id = fields.Many2one('res.job', string='Puesto')
+    job_id = fields.Many2one('hr.job', string='Puesto')
     area_ids = fields.One2many('hr.area', 'department_id', string='Áreas')
     total_employees = fields.Integer(string='Total Empleados', compute='_compute_total_employees')
 
@@ -19,19 +19,20 @@ class HrArea(models.Model):
         if self.department_id:
             self.company_id = self.department_id.company_id
 
-    @api.model
-    def create(self, vals):
-        if 'department_id' in vals:
-            department = self.env['hr.department'].browse(vals['department_id'])
-            vals['company_id'] = department.company_id.id
-        return super(HrArea, self).create(vals)
+    @api.model_create_multi
+    def create(self, vals_list):
+        for vals in vals_list:
+            if 'department_id' in vals:
+             department = self.env['hr.department'].browse(vals['department_id'])
+             vals['company_id'] = department.company_id.id
+        return super(HrArea, self).create(vals_list)
 
     def write(self, vals):
         if 'department_id' in vals:
             department = self.env['hr.department'].browse(vals['department_id'])
             vals['company_id'] = department.company_id.id
         return super(HrArea, self).write(vals)
-    
+
     
     @api.depends('employee_ids')
     def _compute_total_employees(self):
