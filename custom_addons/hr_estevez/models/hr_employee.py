@@ -29,6 +29,65 @@ class HrEmployee(models.Model):
     documento_id = fields.Many2one('hr.probatorio', string="Documento probatorio", ondelete='set null')
     documento_key = fields.Char(compute='_compute_documento_key', store=True)
 
+    institucion_id = fields.Many2one('hr.institucion', string="Institución", ondelete='set null')
+    institucion_key = fields.Char(compute='_compute_institucion_key', store=True)
+
+    study_field_new = fields.Selection([
+        ('administracion', 'Administración'),
+        ('contaduria', 'Contaduría'),
+        ('derecho', 'Derecho'),
+        ('psicologia', 'Psicología'),
+        ('medicina', 'Medicina'),
+        ('enfermeria', 'Enfermería'),
+        ('arquitectura', 'Arquitectura'),
+        ('ingenieria_civil', 'Ingeniería Civil'),
+        ('ingenieria_industrial', 'Ingeniería Industrial'),
+        ('ingenieria_sistemas', 'Ingeniería en Sistemas Computacionales'),
+        ('ingenieria_electronica', 'Ingeniería Electrónica'),
+        ('ingenieria_mecanica', 'Ingeniería Mecánica'),
+        ('ingenieria_quimica', 'Ingeniería Química'),
+        ('biologia', 'Biología'),
+        ('biotecnologia', 'Biotecnología'),
+        ('mercadotecnia', 'Mercadotecnia'),
+        ('comunicacion', 'Ciencias de la Comunicación'),
+        ('educacion', 'Ciencias de la Educación'),
+        ('pedagogia', 'Pedagogía'),
+        ('sociologia', 'Sociología'),
+        ('trabajo_social', 'Trabajo Social'),
+        ('diseno_grafico', 'Diseño Gráfico'),
+        ('diseno_industrial', 'Diseño Industrial'),
+        ('turismo', 'Turismo'),
+        ('gastronomia', 'Gastronomía'),
+        ('ingenieria_ambiental', 'Ingeniería Ambiental'),
+        ('ingenieria_en_software', 'Ingeniería en Software'),
+        ('matematicas', 'Matemáticas'),
+        ('fisica', 'Física'),
+        ('quimica', 'Química'),
+        ('veterinaria', 'Medicina Veterinaria y Zootecnia'),
+        ('agronomia', 'Agronomía'),
+        ('relaciones_internacionales', 'Relaciones Internacionales'),
+        ('economia', 'Economía'),
+        ('finanzas', 'Finanzas'),
+        ('arte', 'Artes Visuales'),
+        ('musica', 'Música'),
+        ('teatro', 'Teatro'),
+        ('filosofia', 'Filosofía'),
+        ('historia', 'Historia'),
+        ('ciencias_politicas', 'Ciencias Políticas'),
+    ], string="Campo de estudio", help="Selecciona la carrera universitaria del empleado")
+
+    study_tag_ids = fields.Many2many(
+        'hr.study.tag', 
+        'employee_skill_tag_rel', 
+        'employee_id',   
+        'tag_id',    
+        string='Etiqueta',      
+        help='Selecciona las habilidades o etiquetas que describen al empleado.',
+    )
+
+
+
+
     gender = fields.Selection([
         ('male', 'Masculino'),
         ('female', 'Femenino'),
@@ -69,7 +128,7 @@ class HrEmployee(models.Model):
         ('voch', 'Voch Especialistas de México, S.A. de C.V.'),
         ('rastreo', 'Rastreo Satelital de México J&J S.A. de C.V.'),
         ('grupo_back', 'Grupo Back Bone de México S.A. de C.V.')
-    ], string='Patrón')
+    ], string='Patrón Fiscal')
 
     establecimiento = fields.Selection([
         ('estevezjor', 'Estevez.Jor Servicios'),
@@ -78,7 +137,7 @@ class HrEmployee(models.Model):
         ('kuali', 'Kuali Digital'),
         ('makili', 'Makili'),
         ('vigiliner', 'Vigiliner')                
-    ], string='Patrón')
+    ], string='Establecimiento')
 
     bank_id = fields.Many2one('res.bank', string='Banco')
     clabe = fields.Char(
@@ -158,6 +217,8 @@ class HrEmployee(models.Model):
         ('widower', 'Viudo(a)'),
         ('divorced', 'Divorciado(a)')
     ], string='Estado Civil', required=True, tracking=True)
+
+    spouse_name = fields.Char(string="Nombre del cónyuge")
 
     spouse_birthdate = fields.Date(string="Spouse Birthdate", groups="hr.group_hr_user", store=False)
 
@@ -260,28 +321,52 @@ class HrEmployee(models.Model):
 
             # Avanzar al siguiente año
             year_start = year_start.replace(year=year_start.year + 1)
+            
+    @api.model_create_multi
+    def create(self, vals_list):
+        # Combina los dos antiguos 'create' en uno solo (seguro y actualizado)
+        for vals in vals_list:
+            # --- Parte 1: número de empleado y código de barras ---
+            if 'employee_number' in vals and vals['employee_number'] and not vals.get('barcode'):
+                vals['barcode'] = vals['employee_number']
+            elif 'barcode' in vals and vals['barcode'] and not vals.get('employee_number'):
+                vals['employee_number'] = vals['barcode']
 
-    @api.model
-    def create(self, vals):
-    
-        if 'employee_number' in vals and vals['employee_number'] and not vals.get('barcode'):
-            vals['barcode'] = vals['employee_number']
-        elif 'barcode' in vals and vals['barcode'] and not vals.get('employee_number'):
-            vals['employee_number'] = vals['barcode']
-        return super().create(vals)
+            # --- Parte 2: construir nombre completo ---
+            if 'names' in vals or 'last_name' in vals or 'mother_last_name' in vals:
+                names = vals.get('names', '').strip()
+                last_name = vals.get('last_name', '').strip()
+                mother_last_name = vals.get('mother_last_name', '').strip()
+                vals['name'] = f"{names} {last_name} {mother_last_name}".strip()
+
+        # Crear empleado(s)
+        employees = super(HrEmployee, self).create(vals_list)
+
+        # --- Parte 3: acciones después de crear ---
+        for employee in employees:
+            if employee.employment_start_date:
+                try:
+                    employee.generate_vacation_periods()
+                except Exception as e:
+                    _logger.error(f"Error generando períodos: {str(e)}")
+
+            try:
+                _logger.info("Intentando sincronizar con CodeIgniter")
+                self._sync_codeigniter(employee, 'create')
+            except Exception as e:
+                _logger.error(f"Error en sincronización: {str(e)}")
+
+        return employees
 
     def write(self, vals):
-        
-        
         # Si se actualiza barcode, sincronizar con employee_number
         if 'barcode' in vals and vals['barcode']:
             vals['employee_number'] = vals['barcode']
-        
-        # Si se actualiza employee_number, sincronizar con barcode  
+        # Si se actualiza employee_number, sincronizar con barcode
         elif 'employee_number' in vals and vals['employee_number']:
             vals['barcode'] = vals['employee_number']
-            
         return super().write(vals)
+    
 
     def generate_random_barcode(self):
         
@@ -318,6 +403,11 @@ class HrEmployee(models.Model):
     def _compute_documento_key(self):
         for employee in self:            
             employee.documento_key = employee.documento_id.code if employee.documento_id else False 
+
+    @api.depends('institucion_id')
+    def _compute_institucion_key(self):
+        for employee in self:            
+            employee.institucion_key = employee.institucion_id.code if employee.institucion_id else False 
 
     @api.depends('employment_start_date')
     def _compute_years_of_service(self):

@@ -7,9 +7,9 @@
                 <field name="name"/>
                 <field name="attached"/>
                 <templates>
-                    <t t-name="kanban-box">
-                        <div class="oe_kanban_card">
-                            <div class="oe_kanban_content">
+                    <t t-name="card">
+                        <div class="o_kanban_card">
+                            <div class="o_kanban_card_content">
                                 <h3><t t-esc="record.name.value"/></h3>
                                 <div t-if="record.attached.raw_value" class="text-success">
                                     Archivo Adjunto
@@ -17,19 +17,28 @@
                                 <div t-else="" class="text-danger">
                                     Sin Adjuntar
                                 </div>
-                                <button class="oe_stat_button" name="action_attach_document" type="object" icon="fa-paperclip" string="Adjuntar"/>
-                                <button t-if="record.attached.raw_value" 
-                                        class="oe_stat_button" 
-                                        name="action_view_document" 
-                                        type="object" 
-                                        icon="fa-eye" 
-                                        string="Visualizar"/>
-                                <button t-if="record.attached.raw_value" 
-                                        class="oe_stat_button" 
-                                        name="action_download_document" 
-                                        type="object" 
-                                        icon="fa-download" 
-                                        string="Descargar"/>
+                                <div class="o_kanban_card_footer mt-2">
+                                    <button class="btn btn-light border"
+                                            type="object"
+                                            name="action_attach_document"
+                                            title="Adjuntar documento">
+                                        <i class="fa fa-paperclip"></i> Adjuntar
+                                    </button>
+                                    <button t-if="record.attached.raw_value"
+                                            class="btn btn-light border"
+                                            type="object"
+                                            name="action_view_document"
+                                            title="Visualizar documento">
+                                        <i class="fa fa-eye"></i> Ver
+                                    </button>
+                                    <button t-if="record.attached.raw_value"
+                                            class="btn btn-light border"
+                                            type="object"
+                                            name="action_download_document"
+                                            title="Descargar documento">
+                                        <i class="fa fa-download"></i> Descargar
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </t>

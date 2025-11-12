@@ -7,6 +7,7 @@ from dateutil.relativedelta import relativedelta
 _logger = logging.getLogger(__name__)
 
 class CustomDevolucion(models.Model):
+    _inherit = 'mail.thread'
     _name = 'custom.devolucion'
     _description = 'Devoluciones'
 

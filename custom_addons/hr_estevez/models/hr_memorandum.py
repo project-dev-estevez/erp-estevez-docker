@@ -137,12 +137,13 @@ class HrMemorandum(models.Model):
             _logger.error(f"Error de conexión con CodeIgniter: {str(e)}")
             return False
 
-    @api.model
-    def create(self, vals):
-        record = super(HrMemorandum, self).create(vals)
+    @api.model_create_multi
+    def create(self, vals_list):
+        records = super(HrMemorandum, self).create(vals_list)
         # Sincronizar después de crear
-        record._sync_codeigniter('create')
-        return record
+        for record in records:
+            record._sync_codeigniter('create')
+        return records
 
     def write(self, vals):
         res = super(HrMemorandum, self).write(vals)

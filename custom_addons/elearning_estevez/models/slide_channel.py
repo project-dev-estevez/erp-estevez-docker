@@ -53,4 +53,10 @@ class SlideChannel(models.Model):
         string="Modalidad",
         default='presencial'
     )
+
+    area_tematica = fields.Many2one(
+        'hr.tematicas', 
+        string="Area Tematica", 
+        help="Selecciona el area tematica del curso"
+    )
     

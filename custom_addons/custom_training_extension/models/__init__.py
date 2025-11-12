@@ -15,3 +15,5 @@ from . import hr_institucion
 from . import hr_occupation
 from . import hr_certificados
 from . import hr_instructores
+from . import employee_elearning_report
+from . import slide_channel_partner
