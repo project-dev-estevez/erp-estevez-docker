@@ -24,6 +24,7 @@
         'views/hr_employee_course_views.xml',
         'views/hr_courses_views.xml',        
         'views/hr_thematics_views.xml',
+        'views/employee_elearning_report_views.xml',
         'views/menus.xml'
     ],
     'installable': True,

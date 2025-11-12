@@ -1,119 +1,126 @@
-import re
 
-import pandas
-from datetime import date, timedelta
+import re
+import pandas as pd # type: ignore
 from odoo import api, fields, models
 from odoo.http import request
 from odoo.tools import date_utils
-
+import logging
+_logger = logging.getLogger(__name__)
 
 class HrEmployee(models.Model):
-    """This module extends the 'hr.employee' model of  Odoo Employees Module.
-     It adds a new method called 'get_employee_leave_data', which is used to
-     retrieve data for the dashboard."""
+    """Extiende el modelo hr.employee para incluir métodos
+    relacionados con los datos de ausencias para el dashboard."""
     _inherit = 'hr.employee'
     _check_company_auto = True
 
-    @api.model
-    def get_employee_leave_data(self, option):
-        """Returns data to the dashboard"""
-        employee_data = []
-        res_config = self.env['res.config.settings'].search([], limit=1,
-                                                            order='id desc')
-        dates = False
-        if option == 'this_week':
-            dates = pandas.date_range(
-                date_utils.start_of(fields.Date.today(), 'week'),
-                date_utils.end_of(fields.Date.today(), 'week')
-                - timedelta(
-                    days=0),
-                freq='d').strftime(
-                "%Y-%m-%d").tolist()
-        elif option == 'this_month':
-            dates = pandas.date_range(
-                date_utils.start_of(fields.Date.today(), 'month'),
-                date_utils.end_of(fields.Date.today(), 'month')
-                - timedelta(
-                    days=0),
-                freq='d').strftime(
-                "%Y-%m-%d").tolist()
-        elif option == 'last_15_days':
-            dates = [str(date.today() - timedelta(days=day))
-                     for day in range(15)]
+    # ==========================
+    # Métodos públicos
+    # ==========================
 
-        cids = request.httprequest.cookies.get('cids', '')
-        split_cids = re.split(r'[,-]', cids)
-        allowed_company_ids = [int(cid) for cid in split_cids if cid.isdigit()]
-        for employee in self.env['hr.employee'].search(
-                [('company_id', '=', allowed_company_ids)]):
-            leave_data = []
-            employee_present_dates = []
-            employee_leave_dates = []
-            total_absent_count = 0
-            query = ("""
-                SELECT hl.id,employee_id,request_date_from,request_date_to,
-                hlt.leave_code,hlt.color
-                FROM hr_leave hl
-				INNER JOIN hr_leave_type hlt ON hlt.id = hl.holiday_status_id 
-                WHERE hl.state = 'validate' AND employee_id = '%s'"""
-                     % employee.id)
-            self._cr.execute(query)
-            all_leave_rec = self._cr.dictfetchall()
-            for leave in all_leave_rec:
-                leave_dates = pandas.date_range(
-                    leave.get('request_date_from'),
-                    leave.get('request_date_to') - timedelta(
-                        days=0),
-                    freq='d').strftime(
-                    "%Y-%m-%d").tolist()
-                leave_dates.insert(0, leave.get('leave_code'))
-                leave_dates.insert(1, leave.get('color'))
-                for leave_date in leave_dates:
-                    if leave_date in dates:
-                        employee_leave_dates.append(
-                            leave_date
-                        )
-            for employee_check_in in employee.attendance_ids:
-                employee_present_dates.append(
-                    str(employee_check_in.check_in.date()))
-            for leave_date in dates:
-                color = "#ffffff"
-                marks = self.env[
-                    'res.config.settings'].search([], limit=1)
-                state = None
-                if marks:
-                    if leave_date in employee_present_dates:
-                        state = res_config.present
-                    else:
-                        state = res_config.absent
-                if leave_date in employee_leave_dates:
-                    state = leave_dates[0]
-                    color = "#F06050" if leave_dates[1] == 1 \
-                        else "#F4A460" if leave_dates[1] == 2 \
-                        else "#F7CD1F" if leave_dates[1] == 3 \
-                        else "#6CC1ED" if leave_dates[1] == 4 \
-                        else "#814968" if leave_dates[1] == 5 \
-                        else "#EB7E7F" if leave_dates[1] == 6 \
-                        else "#2C8397" if leave_dates[1] == 7 \
-                        else "#475577" if leave_dates[1] == 8 \
-                        else "#D6145F" if leave_dates[1] == 9 \
-                        else "#30C381" if leave_dates[1] == 10 \
-                        else "#9365B8" if leave_dates[1] == 11 \
-                        else "#ffffff"
-                    total_absent_count += 1
-                leave_data.append({
-                    'id': employee.id,
-                    'leave_date': leave_date,
-                    'state': state,
-                    'color': color
-                })
-            employee_data.append({
-                'id': employee.id,
-                'name': employee.name,
-                'leave_data': leave_data[::-1],
-                'total_absent_count': total_absent_count
-            })
+    @api.model
+    def get_employee_leave_data(self):
+        """Obtiene datos de ausencias y asistencias para el dashboard."""
+        dates = self._get_filtered_dates()
+        allowed_company_ids = self._get_allowed_company_ids()
+        employees = self.search([('company_id', 'in', allowed_company_ids)])
+        employee_data = [
+            self._get_single_employee_leave_info(emp, dates)
+            for emp in employees
+        ]
+
         return {
             'employee_data': employee_data,
-            'filtered_duration_dates': dates[::-1]
+            'filtered_duration_dates': dates[::-1],
         }
+
+    # ==========================
+    # Métodos privados auxiliares
+    # ==========================
+
+    def _get_filtered_dates(self):
+        """Retorna la lista de fechas desde el primer día del mes hasta hoy."""
+        today = fields.Date.today()
+        start = date_utils.start_of(today, 'month')
+        end = today
+        return pd.date_range(start, end, freq='d').strftime("%Y-%m-%d").tolist()
+
+    def _get_allowed_company_ids(self):
+        """Obtiene los IDs de compañías permitidas a partir de las cookies."""
+        cids = request.httprequest.cookies.get('cids', '')
+        return [int(cid) for cid in re.split(r'[,-]', cids) if cid.isdigit()]
+
+    def _get_single_employee_leave_info(self, employee, dates):
+        """Obtiene la información de ausencias y asistencias para un empleado."""
+        leave_records = self._get_validated_leaves(employee.id, dates[0], dates[-1]) if dates else []
+        leave_map = self._build_leave_map(leave_records, dates)
+
+        present_dates = {str(att.check_in.date()) for att in employee.attendance_ids}
+        leave_data, total_absent_count = self._generate_leave_data(dates, present_dates, leave_map)
+
+        return {
+            'id': employee.id,
+            'name': employee.name,
+            'leave_data': leave_data[::-1],
+            'total_absent_count': total_absent_count,
+        }
+
+    def _get_validated_leaves(self, employee_id, date_start, date_end):
+        """Obtiene los permisos validados del empleado en el rango de fechas."""
+        return self.env['hr.leave'].search_read(
+            [
+                ('state', '=', 'validate'),
+                ('employee_id', '=', employee_id),
+                ('request_date_to', '>=', date_start),
+                ('request_date_from', '<=', date_end),
+            ],
+            ['request_date_from', 'request_date_to', 'holiday_status_id']
+        )
+
+    def _build_leave_map(self, leave_records, dates):
+        """Construye un mapa con las fechas de permisos y sus códigos/colores."""
+        leave_map = {}
+        for leave in leave_records:
+            leave_type = self.env['hr.leave.type'].browse(leave['holiday_status_id'][0])
+            leave_dates = pd.date_range(
+                leave['request_date_from'], leave['request_date_to'], freq='d'
+            ).strftime("%Y-%m-%d").tolist()
+
+            for leave_date in leave_dates:
+                if leave_date in dates:
+                    leave_map[leave_date] = {
+                        'code': leave_type.code_id,
+                        'color': self._resolve_leave_color(leave_type.color),
+                    }
+        return leave_map
+
+    def _resolve_leave_color(self, color_code):
+        """Devuelve el color hexadecimal correspondiente al código de color."""
+        color_map = {
+            1: "#F06050", 2: "#F4A460", 3: "#F7CD1F", 4: "#6CC1ED", 5: "#814968",
+            6: "#EB7E7F", 7: "#2C8397", 8: "#475577", 9: "#D6145F", 10: "#30C381",
+            11: "#9365B8"
+        }
+        return color_map.get(color_code, "#ffffff")
+
+    def _generate_leave_data(self, dates, present_dates, leave_map):
+        """Genera los datos diarios de asistencia/ausencia."""
+        leave_data = []
+        total_absent_count = 0
+
+        for leave_date in dates:
+            if leave_date in leave_map:
+                leave_info = leave_map[leave_date]
+                state = leave_info['code']
+                color = leave_info['color'] 
+                total_absent_count += 1
+            else:
+                state = '✅' if leave_date in present_dates else '❌'
+                color = "#ffffff"
+
+            leave_data.append({
+                'leave_date': leave_date,
+                'state': state,
+                'color': color,
+            })
+
+        return leave_data, total_absent_count

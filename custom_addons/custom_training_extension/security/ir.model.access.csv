@@ -30,3 +30,4 @@ access_hr_probatorio_user,hr.probatorio,model_hr_probatorio,base.group_user,1,1,
 access_hr_institucion_user,hr.institucion,model_hr_institucion,base.group_user,1,0,0,0
 access_hr_certificados_user,hr.certificados,model_hr_certificados,base.group_user,1,0,0,0
 access_hr_instructores_user,hr.instructores,model_hr_instructores,base.group_user,1,0,0,0
+access_employee_elearning_report_user,employee.elearning.report.user,model_employee_elearning_report,,1,1,1,1

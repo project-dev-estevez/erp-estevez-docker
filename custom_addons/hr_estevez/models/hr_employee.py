@@ -17,7 +17,7 @@ class HrEmployee(models.Model):
     state_id = fields.Many2one('hr.state', string="Estado", ondelete='set null')    
     state_key = fields.Char(compute='_compute_state_key', store=True)
 
-    municipality_id = fields.Many2one('hr.municipality', string="Municipio", ondelete='set null')
+    municipality_id = fields.Many2one('hr.municipality', string="Municipio", domain="[('state_id', '=', state_id)]", ondelete='set null')
     municipality_key = fields.Char(compute='_compute_municipality_key', store=True)
 
     occupation_id = fields.Many2one('hr.occupation', string="Ocupaciones", ondelete='set null')
@@ -29,15 +29,70 @@ class HrEmployee(models.Model):
     documento_id = fields.Many2one('hr.probatorio', string="Documento probatorio", ondelete='set null')
     documento_key = fields.Char(compute='_compute_documento_key', store=True)
 
-    gender = fields.Selection(
-        selection_add=[
-            ('male', 'Masculino'),
-            ('female', 'Femenino'),
-            ('indistinct', 'Indistinto') # Cambiar la etiqueta de 'other'
-        ],
-        groups="hr.group_hr_user",
-        tracking=True
+    institucion_id = fields.Many2one('hr.institucion', string="Institución", ondelete='set null')
+    institucion_key = fields.Char(compute='_compute_institucion_key', store=True)
+
+    study_field_new = fields.Selection([
+        ('administracion', 'Administración'),
+        ('contaduria', 'Contaduría'),
+        ('derecho', 'Derecho'),
+        ('psicologia', 'Psicología'),
+        ('medicina', 'Medicina'),
+        ('enfermeria', 'Enfermería'),
+        ('arquitectura', 'Arquitectura'),
+        ('ingenieria_civil', 'Ingeniería Civil'),
+        ('ingenieria_industrial', 'Ingeniería Industrial'),
+        ('ingenieria_sistemas', 'Ingeniería en Sistemas Computacionales'),
+        ('ingenieria_electronica', 'Ingeniería Electrónica'),
+        ('ingenieria_mecanica', 'Ingeniería Mecánica'),
+        ('ingenieria_quimica', 'Ingeniería Química'),
+        ('biologia', 'Biología'),
+        ('biotecnologia', 'Biotecnología'),
+        ('mercadotecnia', 'Mercadotecnia'),
+        ('comunicacion', 'Ciencias de la Comunicación'),
+        ('educacion', 'Ciencias de la Educación'),
+        ('pedagogia', 'Pedagogía'),
+        ('sociologia', 'Sociología'),
+        ('trabajo_social', 'Trabajo Social'),
+        ('diseno_grafico', 'Diseño Gráfico'),
+        ('diseno_industrial', 'Diseño Industrial'),
+        ('turismo', 'Turismo'),
+        ('gastronomia', 'Gastronomía'),
+        ('ingenieria_ambiental', 'Ingeniería Ambiental'),
+        ('ingenieria_en_software', 'Ingeniería en Software'),
+        ('matematicas', 'Matemáticas'),
+        ('fisica', 'Física'),
+        ('quimica', 'Química'),
+        ('veterinaria', 'Medicina Veterinaria y Zootecnia'),
+        ('agronomia', 'Agronomía'),
+        ('relaciones_internacionales', 'Relaciones Internacionales'),
+        ('economia', 'Economía'),
+        ('finanzas', 'Finanzas'),
+        ('arte', 'Artes Visuales'),
+        ('musica', 'Música'),
+        ('teatro', 'Teatro'),
+        ('filosofia', 'Filosofía'),
+        ('historia', 'Historia'),
+        ('ciencias_politicas', 'Ciencias Políticas'),
+    ], string="Campo de estudio", help="Selecciona la carrera universitaria del empleado")
+
+    study_tag_ids = fields.Many2many(
+        'hr.study.tag', 
+        'employee_skill_tag_rel', 
+        'employee_id',   
+        'tag_id',    
+        string='Etiqueta',      
+        help='Selecciona las habilidades o etiquetas que describen al empleado.',
     )
+
+
+
+
+    gender = fields.Selection([
+        ('male', 'Masculino'),
+        ('female', 'Femenino'),
+        ('indistinct', 'Indistinto')  # Cambiar la etiqueta de 'other'
+    ], groups="hr.group_hr_user", tracking=True)
 
     # Primera Columna en la Vista de Empleados
     names = fields.Char(string='Nombres')
@@ -97,10 +152,10 @@ class HrEmployee(models.Model):
     )
 
 
-    rfc = fields.Char(string='RFC')
-    curp = fields.Char(string='CURP')
-    nss = fields.Char(string='NSS')
-    voter_key = fields.Char(string='Clave Elector')
+    rfc = fields.Char(string='RFC', help='RFC de 13 dígitos', size=13)
+    curp = fields.Char(string='CURP', help='CURP de 18 dígitos', size=18)
+    nss = fields.Char(string='NSS', help='Número de Seguridad Social', size=11)
+    voter_key = fields.Char(string='Clave Elector', size=18 )
     license_number = fields.Char(string='Número de Licencia')
     infonavit = fields.Boolean(string='Infonavit', default=False)
     private_colonia = fields.Char(string="Colonia")
@@ -113,17 +168,57 @@ class HrEmployee(models.Model):
     age = fields.Integer(string='Edad', compute='_compute_age')
 
     country_id = fields.Many2one('res.country', string='País', default=lambda self: self.env.ref('base.mx').id)
-    country_of_birth = fields.Many2one('res.country', string="Country of Birth", groups="hr.group_hr_user", tracking=True, default=lambda self: self.env.ref('base.mx').id)
+    country_of_birth = fields.Many2one('res.country', string="Country of Birth", groups="hr.group_hr_user", tracking=True, default=lambda self: self.env.ref('base.mx').id)    
+    """lugar_nacimiento_estado = fields.Selection(
+        selection=[
+            ('aguascalientes', 'Aguascalientes'),
+            ('baja_california', 'Baja California'),
+            ('baja_california_sur', 'Baja California Sur'),
+            ('campeche', 'Campeche'),
+            ('chiapas', 'Chiapas'),
+            ('chihuahua', 'Chihuahua'),
+            ('ciudad_mexico', 'Ciudad de México'),
+            ('coahuila', 'Coahuila'),
+            ('colima', 'Colima'),
+            ('durango', 'Durango'),
+            ('guanajuato', 'Guanajuato'),
+            ('guerrero', 'Guerrero'),
+            ('hidalgo', 'Hidalgo'),
+            ('jalisco', 'Jalisco'),
+            ('mexico', 'Estado de México'),
+            ('michoacan', 'Michoacán'),
+            ('morelos', 'Morelos'),
+            ('nayarit', 'Nayarit'),
+            ('nuevo_leon', 'Nuevo León'),
+            ('oaxaca', 'Oaxaca'),
+            ('puebla', 'Puebla'),
+            ('queretaro', 'Querétaro'),
+            ('quintana_roo', 'Quintana Roo'),
+            ('san_luis_potosi', 'San Luis Potosí'),
+            ('sinaloa', 'Sinaloa'),
+            ('sonora', 'Sonora'),
+            ('tabasco', 'Tabasco'),
+            ('tamaulipas', 'Tamaulipas'),
+            ('tlaxcala', 'Tlaxcala'),
+            ('veracruz', 'Veracruz'),
+            ('yucatan', 'Yucatán'),
+            ('zacatecas', 'Zacatecas')
+        ],
+        string='Lugar de Nacimiento',
+        help='Selecciona el estado de nacimiento del empleado'
+    )"""
     private_country_id = fields.Many2one("res.country", string="Private Country", groups="hr.group_hr_user", default=lambda self: self.env.ref('base.mx').id)
     is_mexico = fields.Boolean(string="Is Mexico", compute="_compute_is_mexico", store=False)
 
     marital = fields.Selection([
         ('single', 'Soltero(a)'),
         ('married', 'Casado(a)'),
-        ('cohabitant', 'En Concubinato'),
+        ('cohabitant', 'Unión libre'),
         ('widower', 'Viudo(a)'),
         ('divorced', 'Divorciado(a)')
     ], string='Estado Civil', required=True, tracking=True)
+
+    spouse_name = fields.Char(string="Nombre del cónyuge")
 
     spouse_birthdate = fields.Date(string="Spouse Birthdate", groups="hr.group_hr_user", store=False)
 
@@ -134,11 +229,26 @@ class HrEmployee(models.Model):
         'hr.vacation.period', 'employee_id', string="Periodos de Vacaciones"
     )
 
-    emergency_contact_relationship = fields.Char(string="Parentesco del Primer Contacto")
+    #emergency_contact_relationship = fields.Char(string="Parentesco del Primer Contacto")
+    emergency_contact_relationship = fields.Selection([
+        ('mom', 'Madre'),
+        ('dad', 'Padre'),
+        ('daughter', 'Hijo(a)'),
+        ('couple', 'Esposo(a)'),
+        ('brother/sister', 'Hermano(a)'),
+        ('other', 'Otro')
+    ], string='Estado Civil', tracking=True)
     
     # Campos para el segundo contacto de emergencia
     emergency_contact_2 = fields.Char(string="Segundo Contacto")
-    emergency_contact_relationship_2 = fields.Char(string="Parentesco del Segundo Contacto")
+    emergency_contact_relationship_2 = fields.Selection([
+        ('mom', 'Madre'),
+        ('dad', 'Padre'),
+        ('daughter', 'Hijo(a)'),
+        ('couple', 'Esposo(a)'),
+        ('brother/sister', 'Hermano(a)'),
+        ('other', 'Otro')
+    ], string='Estado Civil', tracking=True)
     emergency_phone_2 = fields.Char(string="Teléfono del Segundo Contacto")
 
     #Campos para asignaciones
@@ -175,6 +285,12 @@ class HrEmployee(models.Model):
     ir_attachment_count = fields.Integer(
         string="Cantidad de Documentos",
         compute="_compute_ir_attachment_count"
+    )
+
+    time_off_in_lieu_ids = fields.One2many(
+        'hr.time.off.in.lieu', 
+        'employee_id', 
+        string='Solicitudes de Tiempo por Tiempo'
     )
     
     def _compute_ir_attachment_count(self):
@@ -287,6 +403,11 @@ class HrEmployee(models.Model):
     def _compute_documento_key(self):
         for employee in self:            
             employee.documento_key = employee.documento_id.code if employee.documento_id else False 
+
+    @api.depends('institucion_id')
+    def _compute_institucion_key(self):
+        for employee in self:            
+            employee.institucion_key = employee.institucion_id.code if employee.institucion_id else False 
 
     @api.depends('employment_start_date')
     def _compute_years_of_service(self):
@@ -624,6 +745,7 @@ class HrEmployee(models.Model):
         return translations.get(country_name, country_name)
     
     def action_archive_employee(self):
+        self.ensure_one()  # Asegura que solo se actúa sobre un registro
         return {
             'type': 'ir.actions.act_window',
             'name': 'Dar de Baja al Empleado',
@@ -633,8 +755,8 @@ class HrEmployee(models.Model):
             'context': {'default_employee_id': self.id},
         }
 
-    # Método para reactivar
     def action_reactivate_employee(self):
+        self.ensure_one()
         return {
             'type': 'ir.actions.act_window',
             'name': 'Reactivar Empleado',
@@ -763,6 +885,7 @@ class HrEmployee(models.Model):
 
     # Sobrescribir métodos estándar para manejar archivado/desarchivado directo
     def action_archive(self):
+        _logger.info(f"Archivando empleados: {self.ids}")
         res = super(HrEmployee, self).action_archive()
         for employee in self:
             try:
@@ -772,6 +895,7 @@ class HrEmployee(models.Model):
         return res
 
     def action_unarchive(self):
+        
         res = super(HrEmployee, self).action_unarchive()
         for employee in self:
             try:

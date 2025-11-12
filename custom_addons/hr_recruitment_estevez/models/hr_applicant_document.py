@@ -54,14 +54,14 @@ class HrApplicantDocument(models.Model):
     def create_required_documents(self, applicant_id):
         """ Crea registros temporales de documentos requeridos """
         required_documents = [
-            'INE Frente',
-            'INE Reverso',
+            'INE Frente/Reverso',
+            #'INE Reverso',
             'Curriculum',
             'Acta de Nacimiento',
             'Comprobante de estudios',
             'Comprobante de domicilio',
             'Comprobante Número de Seguridad Social',
-            'Formato RFC',
+            #'Formato RFC',
             'Licencia de Conducir',
             'Cartas de Recomendacion Laboral',
             'Carta de Recomendacion Personal',

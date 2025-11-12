@@ -11,6 +11,7 @@
                         <group>
                             <field name="tipo_agente" string="Tipo Agente"/>
                             <field name="modalidad" string="Modalidad" />
+                            <field name="area_tematica" string="Area Tematica"/>
                         </group>
                     </div>
                     <div class="col-lg-6">

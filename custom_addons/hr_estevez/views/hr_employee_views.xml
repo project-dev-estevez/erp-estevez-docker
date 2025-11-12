@@ -201,11 +201,11 @@
                                     </div>
                                     <div class="row g-1">
                                         <div class="col p-1">                                            
-                                            <field name="state_id" placeholder="Estado" options="{'no_open': True, 'no_quick_create': True}"/>
+                                            <field name="state_id" placeholder="Estado" options="{'no_open': True, 'no_quick_create': True, 'no_create': True, 'no_create_edit': True}"/>
                                             <field name="state_key" invisible="1"/>
                                         </div>
                                         <div class="col p-1">
-                                            <field name="municipality_id" placeholder="Municipio" options="{'no_open': True, 'no_quick_create': True}"/>
+                                            <field name="municipality_id" placeholder="Municipio" options="{'no_open': True, 'no_quick_create': True, 'no_create': True, 'no_create_edit': True}"/>
                                             <field name="municipality_key" invisible="1"/>
                                         </div>
                                     </div>
@@ -225,10 +225,10 @@
                             <group>
                                 <field name="birthday"/>
                                 <field name="age" invisible="not birthday"/>
-                                <field name="rfc"/>
-                                <field name="curp"/>
-                                <field name="nss"/>
-                                <field name="voter_key"/>
+                                <field name="rfc" placeholder="13 dígitos"/>
+                                <field name="curp" placeholder="18 dígitos"/>
+                                <field name="nss" placeholder="11 dígitos"/>
+                                <field name="voter_key" placeholder="18 dígitos"/>
                                 <field name="infonavit"/> 
                                 <field name="license_number"/>
                             </group>
@@ -237,17 +237,26 @@
                         <group>
                            <group string="Nacionalidad">
                                 <field name="country_id" options='{"no_open": True, "no_create": True}'/>
-                                <field name="country_of_birth"/>
-                                <field name="place_of_birth"/>
+                                <field name="country_of_birth"/>  
+                                <!--<field name="lugar_nacimiento_estado"/>-->
                             </group>
                             <group string="Educación">
-                                <field name="certificate"/>
-                                <field name="study_field"/>
+                                <field name="certificate" invisible="1"/>
+                                <field name="study_field" invisible="1"/>
+                                <field name="study_field_new" widget="selection"/>
+                                <field name="study_tag_ids" widget="many2many_tags"
+       options="{'color_field': 'color', 'no_create_edit': True}"
+       placeholder="Selecciona habilidades..."
+       groups="hr.group_hr_user"/>
+
+
                                 <field name="study_school"/>
                                 <field name="estudios_id"/>                                
                                 <field name="estudios_key" invisible="1"/> 
                                 <field name="documento_id"/> 
                                 <field name="documento_key" invisible="1"/> 
+                                <field name="institucion_id"/>
+                                <field name="institucion_key" invisible="1"/> 
                             </group> 
                         </group>
 
@@ -268,19 +277,22 @@
                                 <field name="emergency_phone" class="o_force_ltr" string="Teléfono del Primer Contacto"/>
 
                                 <!-- Segundo contacto -->
-                                <field name="emergency_contact_2" string="Segundo Contacto" invisible="1"/>
-                                <field name="emergency_contact_relationship_2" string="Parentesco del Segundo Contacto" invisible="1"/>
-                                <field name="emergency_phone_2" class="o_force_ltr" string="Teléfono del Segundo Contacto" invisible="1"/>
+                                <field name="emergency_contact_2" string="Segundo Contacto"/>
+                                <field name="emergency_contact_relationship_2" string="Parentesco del Segundo Contacto"/>
+                                <field name="emergency_phone_2" class="o_force_ltr" string="Teléfono del Segundo Contacto"/>
                             </group>
 
                             <group string="Situación Familiar">
-                                <field name="marital"/>
+                                <field name="marital"/>                                
                                 <field name="spouse_complete_name" invisible="marital not in ['married', 'cohabitant']"/>
                                 <field name="children"/>
                             </group>
                         </group>
                     </page>
                 </xpath>
+                <!-- <xpath expr="//page[@name='personal_information']//group[.//field[@name='country_of_birth']]" position="inside">
+                    <field name="lugar_nacimiento_estado" widget="selection"/>
+                </xpath> -->
 
                 <!-- Nueva página de Incapacidades -->
                 <xpath expr="//notebook/page[@name='personal_information']" position="after">
@@ -336,6 +348,7 @@
                                 <field name="id" string="Código" readonly="1"/>
                                 <field name="create_date" string="Fecha de Creación" readonly="1"/>
                                 <field name="administrative_type" string="Tipo de Acta"/>
+                                <field name="description" string="Descripción"/>
                                 <field name="date" string="Fecha del Acta"/>
                                 <button name="download_memorandum_report" type="object" string="Reporte" class="btn-secondary fa fa-download"/>
                             </list>
@@ -411,40 +424,48 @@
                 </xpath>
 
                 <!-- Nueva página de Permisos -->
-                <xpath expr="//notebook/page[@name='vacations']" position="after">
+                <xpath expr="//page[@name='vacations']" position="after">
                     <page name="permits" string="Permisos">
-                        <group>
-                            <div class="table-responsive">
-                                <table class="table table-bordered table-striped o_list_view">
-                                    <thead>
-                                        <tr>
-                                            <th>Fecha Registro</th>
-                                            <th>Fecha Inicio</th>
-                                            <th>Fecha Termino</th>
-                                            <th>Días Solicitados</th>
-                                            <th>Goce de Sueldo</th>
-                                            <th>Comentarios</th>
-                                            <th>Tipo</th>
-                                            <th>Acciones</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td>--</td>
-                                            <td>--</td>
-                                            <td>--</td>
-                                            <td>--</td>
-                                            <td>--</td>
-                                            <td>--</td>
-                                            <td>--</td>
-                                            <td>
-                                                Botones de Acciones
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </group>
+                        <field name="time_off_in_lieu_ids">
+                            <list>
+                                <field name="request_date" string="Fecha Registro"/>
+                                <field name="request_date_from" string="Fecha Inicio"/>
+                                <field name="request_date_to" string="Fecha Termino"/>
+                                <field name="number_of_days" string="Días Solicitados"/>
+                                <field name="state" string="Estado"/>
+                                <field name="notes" string="Comentarios"/>
+                                <field name="leave_id" string="Ausencia Relacionada"/>
+                            </list>
+                            <form>
+                                <sheet>
+                                    <group>
+                                        <group>
+                                            <field name="employee_id" readonly="1"/>
+                                            <field name="request_date"/>
+                                            <field name="state" widget="statusbar" 
+                                                statusbar_visible="draft,pending,approved,rejected"/>
+                                        </group>
+                                        <group>
+                                            <field name="request_date_from"/>
+                                            <field name="request_date_to"/>
+                                            <field name="number_of_days" readonly="1"/>
+                                        </group>
+                                    </group>
+                                    <group>
+                                        <field name="name" placeholder="Descripción de la solicitud"/>
+                                        <field name="notes" placeholder="Notas adicionales"/>
+                                    </group>
+                                </sheet>
+                                <footer>
+                                    <button name="action_submit" string="Enviar" type="object" class="btn-primary"/>
+                                    <button name="action_approve" string="Aprobar" type="object" class="btn-primary"/>
+                                    <button name="action_reject" string="Rechazar" type="object" class="btn-secondary"/>
+                                    <button name="action_draft" string="Volver a Borrador" type="object" class="btn-secondary"/>
+                                    <button string="Cerrar" class="btn-secondary" special="cancel"/>
+                                </footer>
+                            </form>
+                        </field>
+
                     </page>
                 </xpath>
 
@@ -580,6 +601,10 @@
                         </notebook>
                     </page>
                 </xpath>
+
+                <xpath expr="//page[@name='assignments']" position="attributes">
+    <attribute name="invisible">1</attribute>
+</xpath>
 
                <!-- Reemplazar el grupo UBICACIÓN actual por uno que incluya ambos grupos en la misma fila -->
         <xpath expr="//page[@name='public']/group[1]" position="replace">            

@@ -4,6 +4,10 @@
         <field name="model">hr.attendance</field>
         <field name="inherit_id" ref="hr_attendance.view_attendance_tree"/>
         <field name="arch" type="xml">
+            <xpath expr="//list" position="attributes">
+                <attribute name="decoration-success">status == 'approved'</attribute>
+                <attribute name="decoration-danger">has_geofence_or_retardo_tag</attribute>
+            </xpath>
 
             <!-- Ocultar botón Create -->
             <xpath expr="//list" position="attributes">
@@ -13,6 +17,7 @@
             <xpath expr="//field[@name='employee_id']" position="after">
                 <field name="department_id" string="Departamento"/>
                 <field name="job_id" string="Puesto de trabajo" readonly="1"/>
+                <field name="tag_ids" widget="many2many_tags" string="Etiquetas"/>
             </xpath>
             <xpath expr="//field[@name='check_in']" position="after">
                 <button name="action_show_checkin_photo"
@@ -33,7 +38,7 @@
                 <field name="is_auto_closed" column_invisible="1"/>
                 <field name="check_out_display" 
                        string="Salida"
-                       decoration-warning="is_auto_closed == True and not check_out"/>
+                       decoration-warning="is_auto_closed"/>
             </xpath>
 
             <xpath expr="//field[@name='check_out_display']" position="after">
@@ -63,8 +68,7 @@
             </xpath>
             <xpath expr="//field[@name='worked_hours']" position="after">
                 <field name="status" widget="badge"
-                    decoration-info="status == 'pending'"
-                    decoration-warning="status == 'retarded'"
+                    decoration-warning="status == 'pending'"
                     decoration-success="status == 'approved'"
                     decoration-danger="status == 'rejected'"/>
 
@@ -111,7 +115,8 @@
                         domain="[('status', '=', 'pending')]"/>
                 <filter name="filter_status_retarded"
                         string="Retardo"
-                        domain="[('status', '=', 'retarded')]"/>
+                        help="Muestra las asistencias con la etiqueta 'Retardo'"
+                        domain="[('tag_ids', 'in', [1])]"/>
                 <filter name="filter_status_approved"
                         string="Aprobado"
                         domain="[('status', '=', 'approved')]"/>
@@ -121,4 +126,9 @@
             </xpath>
         </field>
     </record>
+
+    <!-- Heredar acción para remover filtros por default -->
+     <record id="hr_attendance.hr_attendance_action" model="ir.actions.act_window">
+        <field name="context">{}</field>
+     </record>
 </odoo>

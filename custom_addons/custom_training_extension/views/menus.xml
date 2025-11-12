@@ -3,9 +3,9 @@
 
     <menuitem 
         id="carga"
-        name="Carga Masiva"
+        name="Reporte Curso - Empleado"
         parent="website_slides.website_slides_menu_report" 
-        action="action_states"
+        action="custom_training_extension.action_employee_elearning_report"
         sequence="200"/>  
     <menuitem 
         id="catalogos"

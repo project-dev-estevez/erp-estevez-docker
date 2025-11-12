@@ -187,3 +187,16 @@
         }
     }
 }
+
+@media not all and (min-resolution:.001dpcm) { 
+  @supports (-webkit-touch-callout: none) {
+    #videoContainer {
+      min-height: 350px !important;
+      height: 350px !important;
+    }
+    #video {
+      height: 100% !important;
+      width: 100% !important;
+    }
+  }
+}

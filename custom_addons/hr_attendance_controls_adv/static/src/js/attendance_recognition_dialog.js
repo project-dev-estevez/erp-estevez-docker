@@ -74,8 +74,16 @@ export class AttendanceRecognitionDialog extends Component {
 
             video.onloadedmetadata = async () => {
                 await video.play();
-                this.state.videoWidth = video.offsetWidth;
-                this.state.videoHeight = video.offsetHeight;
+                // Tomar tamaño del div padre para video/canvas
+                const parent = video.parentElement;
+                if (parent) {
+                    // console.log("Parent dimensions:", parent.clientWidth, parent.clientHeight);
+                    this.state.videoWidth = parent.clientWidth;
+                    this.state.videoHeight = parent.clientHeight;
+                } else {
+                    this.state.videoWidth = video.videoWidth;
+                    this.state.videoHeight = video.videoHeight;
+                }
                 this.onVideoReady(video);
             };
         } catch (error) {

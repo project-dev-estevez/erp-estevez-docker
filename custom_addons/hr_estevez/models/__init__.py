@@ -16,3 +16,5 @@ from . import hr_leave
 from . import hr_leave_type
 from . import hr_vacation_allocation
 from . import hr_employee_document
+from . import hr_time_off_in_lieu
+from . import hr_study_tag

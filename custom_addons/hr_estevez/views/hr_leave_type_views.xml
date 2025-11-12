@@ -9,6 +9,9 @@
             <xpath expr="//field[@name='requires_allocation']" position="after">
                 <field name="is_vacation"/>
             </xpath>
+            <xpath expr="//field[@name='requires_allocation']" position="after">
+                <field name="is_time_off_in_lieu"/>
+            </xpath>
         </field>
     </record>
 
