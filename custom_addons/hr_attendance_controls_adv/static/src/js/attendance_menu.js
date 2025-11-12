@@ -182,7 +182,8 @@ patch(ActivityMenu.prototype, {
                     this.state.longitude = longitude;
                     resolve({ latitude, longitude });
                 },
-                () => reject("Geolocation access denied")
+                () => reject("Geolocation access denied"),
+                { enableHighAccuracy: true }
             );
         });
     },
