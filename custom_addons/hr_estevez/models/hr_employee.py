@@ -513,6 +513,16 @@ class HrEmployee(models.Model):
         # Generar períodos de vacaciones si hay fecha de ingreso
         if vals.get('employment_start_date'):
             employee.generate_vacation_periods()
+
+        if not vals.get('employee_number'):
+            # Obtener la empresa del contexto o de los valores
+            company_id = vals.get('company_id', self.env.company.id)
+            next_number = self._get_next_employee_number(company_id)
+            vals['employee_number'] = next_number
+        
+        # Sincronizar con barcode
+        if 'employee_number' in vals and not vals.get('barcode'):
+            vals['barcode'] = vals['employee_number']
         
         # Sincronizar con CodeIgniter
         try:
@@ -530,6 +540,11 @@ class HrEmployee(models.Model):
             last_name_val = vals.get('last_name', self.last_name) or ''
             mother_last_name_val = vals.get('mother_last_name', self.mother_last_name) or ''
             vals['name'] = f"{names_val} {last_name_val} {mother_last_name_val}".strip()
+
+        if 'employee_number' in vals and 'barcode' not in vals:
+            vals['barcode'] = vals['employee_number']
+        elif 'barcode' in vals and 'employee_number' not in vals:
+            vals['employee_number'] = vals['barcode']
         
         # Regenerar períodos solo si cambia la fecha de ingreso Y no hay días tomados
         if 'employment_start_date' in vals:
@@ -564,6 +579,80 @@ class HrEmployee(models.Model):
             _logger.error(f"Error en sincronización de actualización: {str(e)}")
 
         return res
+
+    def _get_next_employee_number(self, company_id=False):
+        """Obtener el siguiente número de empleado por empresa"""
+        # Si no se proporciona company_id, usar la compañía actual del entorno
+        if not company_id:
+            company_id = self.env.company.id
+
+        # Buscar el último empleado por empresa
+        last_employee = self.search([
+            ('company_id', '=', company_id),
+            ('employee_number', '!=', False)
+        ], order='id desc', limit=1)
+
+        if last_employee and last_employee.employee_number:
+            # Intentar extraer el número y incrementar
+            try:
+                # Asumimos que el employee_number es un string numérico
+                last_number = int(last_employee.employee_number)
+                next_number = last_number + 1
+            except (ValueError, TypeError):
+                # Si no es numérico, empezar desde 1
+                next_number = 1
+        else:
+            # Primer empleado en la empresa
+            next_number = 1
+
+        # Formatear con ceros a la izquierda (5 dígitos)
+        return str(next_number).zfill(5)
+    
+    def generate_random_barcode(self):
+        """Sobrescribir el método de generar barcode para usar nuestro número por empresa"""
+        for employee in self:
+            if not employee.employee_number:
+                next_number = self._get_next_employee_number(employee.company_id.id)
+                employee.write({
+                    'employee_number': next_number,
+                    'barcode': next_number
+                })
+            else:
+                # Si ya tiene número, sincronizar
+                employee.barcode = employee.employee_number
+        
+        # Mostrar notificación
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': 'Número Generado',
+                'message': f'Número de empleado generado: {self.employee_number}',
+                'type': 'success',
+                'sticky': False,
+            }
+        }
+    
+    def action_sync_employee_numbers(self):
+        """Acción para sincronizar todos los números existentes"""
+        employees = self.search([])
+        for employee in employees:
+            if employee.employee_number and not employee.barcode:
+                employee.barcode = employee.employee_number
+            elif employee.barcode and not employee.employee_number:
+                employee.employee_number = employee.barcode
+        
+        _logger.info(f"Sincronizados {len(employees)} empleados")
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': 'Sincronización Completada',
+                'message': f'Se han sincronizado {len(employees)} empleados',
+                'type': 'success',
+                'sticky': False,
+            }
+        }
     
     @api.depends('birthday')
     def _compute_age(self):
