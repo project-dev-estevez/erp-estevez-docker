@@ -20,7 +20,7 @@
     'version': '0.2',
 
     # any module necessary for this one to work correctly
-    'depends': ['base', 'hr', 'hr_holidays', 'hr_contract', 'stock', 'product', 'stock_estevez', 'custom_training_extension'],
+    'depends': ['base', 'hr', 'hr_holidays', 'hr_contract', 'stock', 'product', 'stock_estevez', 'custom_training_extension', 'web'],
 
     # always loaded
     'data': [
