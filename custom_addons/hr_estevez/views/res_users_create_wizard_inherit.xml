@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Heredar el wizard de creación simple de usuarios desde empleados -->
+    <record id="view_users_simple_form_inherit_employee" model="ir.ui.view">
+        <field name="name">res.users.simple.form.inherit.employee</field>
+        <field name="model">res.users</field>
+        <field name="inherit_id" ref="base.view_users_simple_form"/>
+        <field name="arch" type="xml">
+            
+            <!-- Modificar el label que está antes del campo login -->
+            <xpath expr="//label[@for='login']" position="attributes">
+                <attribute name="string">Correo electrónico o número de empleado</attribute>
+            </xpath>
+            
+            <!-- Modificar el placeholder del campo login -->
+            <xpath expr="//field[@name='login']" position="attributes">
+                <attribute name="placeholder">e.g. email@yourcompany.com or EMP001</attribute>
+            </xpath>
+                        
+        </field>
+    </record>
+</odoo>

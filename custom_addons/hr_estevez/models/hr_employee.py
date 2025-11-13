@@ -1,7 +1,7 @@
 import json
 import logging
 from odoo import api, models, fields, _
-from odoo.exceptions import UserError
+from odoo.exceptions import UserError, ValidationError
 from datetime import date, timedelta, datetime
 from dateutil.relativedelta import relativedelta
 import re
@@ -683,7 +683,60 @@ class HrEmployee(models.Model):
                 }
             else:
                 raise UserError("The employee does not have a phone number.")
-            
+    
+    def action_create_user(self):
+        """
+        Valida que el empleado tenga email corporativo o employee_number
+        antes de permitir la creación del usuario.
+        """
+        self.ensure_one()
+        
+        # Validar si ya tiene usuario
+        if self.user_id:
+            raise ValidationError(_("This employee already has an user."))
+        
+        has_email = bool(self.work_email)
+        has_employee_number = bool(self.employee_number)
+        
+        # Validación: debe tener al menos uno de los dos campos
+        if not has_email and not has_employee_number:
+            raise UserError(_(
+                '❌ NO SE PUEDE CREAR EL USUARIO\n\n'
+                'El empleado "%s" necesita al menos UNO de los siguientes campos:\n\n'
+                '  ✓ Correo Corporativo (Email de Trabajo)\n'
+                '  ✓ Número de Empleado\n\n'
+                '📝 Por favor complete alguno de estos campos e intente nuevamente.'
+            ) % self.name)
+        
+        # Advertencia en log si solo tiene employee_number
+        if has_employee_number and not has_email:
+            _logger.warning(
+                f"Empleado {self.name} (ID: {self.id}) solo tiene número de empleado, "
+                f"creando usuario sin email corporativo"
+            )
+        
+        _logger.info(
+            f"Creando usuario para empleado {self.name} (ID: {self.id}) - "
+            f"Email: {has_email}, Número: {has_employee_number}"
+        )
+        
+        # Retornar acción del wizard con contexto prellenado
+        return {
+            'name': _('Create User'),
+            'type': 'ir.actions.act_window',
+            'res_model': 'res.users',
+            'view_mode': 'form',
+            'view_id': self.env.ref('base.view_users_simple_form').id,
+            'target': 'new',
+            'context': dict(self._context, **{
+                'default_create_employee_id': self.id,
+                'default_name': self.name,
+                'default_phone': self.work_phone,
+                'default_mobile': self.mobile_phone,
+                'default_login': self.work_email or self.employee_number,
+                'default_partner_id': self.work_contact_id.id,
+            })
+        }
 
     def action_open_employee_documents(self):
         self.ensure_one()
