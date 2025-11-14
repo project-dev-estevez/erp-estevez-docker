@@ -8,14 +8,12 @@ class ResUsers(models.Model):
     _inherit = 'res.users'
     
     # Campo para rastrear si el usuario ya cambió su contraseña predeterminada
-    # To DO: completar comentario
-    # TEMPORALMENTE COMENTADO - Descomentar después de actualizar módulo
-    # password_changed = fields.Boolean(
-    #     string='Contraseña Cambiada',
-    #     default=True,
-    #     help='Indica si el usuario ya cambió su contraseña predeterminada. '
-    #          'False significa que debe cambiar la contraseña en el primer login.'
-    # )
+    password_changed = fields.Boolean(
+        string='Contraseña Cambiada',
+        default=True,
+        help='Indica si el usuario ya cambió su contraseña predeterminada. '
+             'False significa que debe cambiar la contraseña en el primer login.'
+    )
 
     @api.model
     def _get_login_domain(self, login):
@@ -89,8 +87,7 @@ class ResUsers(models.Model):
                     if not vals.get('password'):
                         vals['password'] = '12345678'
                         # Marcar que la contraseña NO ha sido cambiada
-                        # TEMPORALMENTE COMENTADO
-                        # vals['password_changed'] = False
+                        vals['password_changed'] = False
                         
                         _logger.info(
                             f"🔑 Asignando contraseña por defecto '12345678' para usuario: {login} "
@@ -125,8 +122,7 @@ class ResUsers(models.Model):
         """
         # Si se está cambiando la contraseña, marcar como cambiada
         if 'password' in vals:
-            # TEMPORALMENTE COMENTADO
-            # vals['password_changed'] = True
+            vals['password_changed'] = True
             _logger.info(f"🔄 Contraseña cambiada para usuario(s): {self.mapped('login')}")
         
         return super(ResUsers, self).write(vals)
