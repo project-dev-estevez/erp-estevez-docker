@@ -8,6 +8,7 @@ class ResUsers(models.Model):
     _inherit = 'res.users'
     
     # Campo para rastrear si el usuario ya cambió su contraseña predeterminada
+    # To DO: completar comentario
     password_changed = fields.Boolean(
         string='Contraseña Cambiada',
         default=True,
