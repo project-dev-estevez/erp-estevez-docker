@@ -29,12 +29,14 @@ class HomeInherit(Home):
             _logger.info(f"🔍 Usuario autenticado: {user.login}")
             _logger.info(f"   📅 login_date: {user.login_date}")
             _logger.info(f"   📧 Tiene '@' en login: {'@' in user.login if user.login else 'N/A'}")
-            _logger.info(f"   🔐 password_changed: {user.password_changed}")
+            # TEMPORALMENTE COMENTADO - password_changed no existe aún
+            # _logger.info(f"   🔐 password_changed: {user.password_changed}")
             
             # Detectar primer login:
             # - login NO contiene '@' (es employee_number, no email)
             # - password_changed es False (aún no ha cambiado la contraseña predeterminada)
-            if user.login and '@' not in user.login and not user.password_changed:
+            # TEMPORALMENTE DESHABILITADO - Descomentar después de actualizar módulo
+            if False and user.login and '@' not in user.login:
                 _logger.info(f"🔐 PRIMER LOGIN detectado para usuario: {user.login}")
                 _logger.info(f"   ↪️  Abriendo wizard de cambio de contraseña...")
                 
