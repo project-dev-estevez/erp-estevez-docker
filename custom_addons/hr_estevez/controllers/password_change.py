@@ -59,7 +59,7 @@ class PasswordChangeController(http.Controller):
             _logger.info(f"✅ Contraseña cambiada exitosamente para usuario: {user.login}")
             
             # Redirigir con mensaje de éxito
-            return redirect('/web?password_changed=success')
+            return redirect('/web')
             
         except Exception as e:
             _logger.error(f"Error al cambiar contraseña para {user.login}: {str(e)}")
