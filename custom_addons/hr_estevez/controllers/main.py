@@ -36,28 +36,9 @@ class HomeInherit(Home):
             # - password_changed es False (aún no ha cambiado la contraseña predeterminada)
             if user.login and '@' not in user.login and not user.password_changed:
                 _logger.info(f"🔐 PRIMER LOGIN detectado para usuario: {user.login}")
-                _logger.info(f"   ↪️  Abriendo wizard de cambio de contraseña...")
+                _logger.info(f"   ↪️  Redirigiendo a página de cambio de contraseña...")
                 
-                # Crear el wizard de cambio de contraseña (change.password.own)
-                # Este wizard permite al usuario cambiar su propia contraseña sin verificación previa
-                try:
-                    wizard = request.env['change.password.own'].sudo().create({})
-                    wizard_id = wizard.id
-                    
-                    _logger.info(f"   ✅ Wizard creado (ID: {wizard_id})")
-                    
-                    # Redirigir al wizard en modo formulario con título personalizado
-                    # create=false oculta el botón "New"
-                    # title personaliza el título de la ventana
-                    return request.redirect(
-                        f'/web#id={wizard_id}&model=change.password.own&view_type=form&cids=1&menu_id='
-                        f'&create=false&edit=true'
-                    )
-                except Exception as e:
-                    _logger.error(f"   ❌ Error al crear wizard: {str(e)}")
-                    # Fallback: redirigir a preferencias
-                    action_id = request.env.ref('base.action_res_users_my').id
-                    return request.redirect(f'/web#id={user.id}&action={action_id}&model=res.users&view_type=form')
+                return request.redirect('/web/change_password_required')
             else:
                 _logger.info(f"✅ Login normal (contraseña ya cambiada o usuario con email)")
         

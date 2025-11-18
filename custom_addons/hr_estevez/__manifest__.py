@@ -52,6 +52,7 @@
         # Archivos de Vistas
         'views/hr_user_base_inherit_views.xml',
         'views/res_users_create_wizard_inherit.xml',
+        'views/password_change_template.xml',
         'views/hr_job_views.xml',
         'views/hr_direction_views.xml',
         'views/hr_department_views.xml',
