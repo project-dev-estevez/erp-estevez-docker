@@ -113,7 +113,44 @@ class ResUsers(models.Model):
                 )
         
         # Llamar al create original
-        return super(ResUsers, self).create(vals_list)
+        users = super(ResUsers, self).create(vals_list)
+        
+        # Asignar rol "Empleado: Asistencias" si se está creando desde un empleado
+        for user in users:
+            if self._context.get('default_create_employee_id'):
+                self._assign_employee_role(user)
+                # Forzar que solo tenga los grupos del rol asignado
+                user.set_groups_from_roles(force=True)
+        
+        return users
+    
+    def _assign_employee_role(self, user):
+        """
+        Asigna automáticamente el rol 'Empleado: Asistencias' al usuario creado desde empleado.
+        """
+        try:
+            # Buscar el rol por nombre
+            employee_role = self.env['res.users.role'].sudo().search([
+                ('name', 'ilike', 'Empleado%Asistencias')
+            ], limit=1)
+            
+            if not employee_role:
+                _logger.warning("⚠️ No se encontró el rol 'Empleado: Asistencias'")
+                return
+            
+            # Crear la línea de rol para el usuario
+            self.env['res.users.role.line'].sudo().create({
+                'user_id': user.id,
+                'role_id': employee_role.id,
+                'is_enabled': True,
+            })
+            
+            _logger.info(
+                f"✅ Rol '{employee_role.name}' asignado exitosamente al usuario: {user.login}"
+            )
+            
+        except Exception as e:
+            _logger.error(f"❌ Error al asignar rol al usuario {user.login}: {str(e)}")
     
     def write(self, vals):
         """
