@@ -52,6 +52,7 @@ patch(ActivityMenu.prototype, {
 
         onWillStart(async () => {
             try {
+                this.loadDeviceInfo();
                 await loadJS('/hr_attendance_controls_adv/static/src/lib/faceapi/source/face-api.js');
                 await loadJS('/hr_attendance_controls_adv/static/src/lib/ol-6.12.0/ol.js');
                 await loadJS('/hr_attendance_controls_adv/static/src/lib/ol-ext/ol-ext.js');
@@ -75,9 +76,11 @@ patch(ActivityMenu.prototype, {
             return;
         }
 
+        const isMobile = this.state.deviceInfo?.isMobile || false;
+
         this.state.checkedIn = this.employee.attendance_state === "checked_in";
         this.isFirstAttendance = this.employee.hours_previously_today === 0;
-        this.state.isDisplayed = this.employee.display_systray;
+        this.state.isDisplayed = this.employee.display_systray && isMobile;
         this.state.attendance_status = this.employee.attendance_status;
     },
 
@@ -160,7 +163,13 @@ patch(ActivityMenu.prototype, {
 
         if (!userAgentData) return;
 
-        const isMobile = userAgentData.mobile || false;
+        const hasTouch = 'ontouchstart' in window || 
+                            navigator.maxTouchPoints > 0 || 
+                            navigator.msMaxTouchPoints > 0;
+        const isSmallScreen = window.innerWidth <= 768;
+        const isTouchAndSmall = hasTouch && isSmallScreen;
+
+        const isMobile = userAgentData.mobile && isTouchAndSmall;
         const platform = userAgentData.platform || "Desconocido";
 
         this.state.deviceInfo = {
