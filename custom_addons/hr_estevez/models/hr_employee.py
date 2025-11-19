@@ -1,7 +1,7 @@
 import json
 import logging
 from odoo import api, models, fields, _
-from odoo.exceptions import UserError
+from odoo.exceptions import UserError, ValidationError
 from datetime import date, timedelta, datetime
 from dateutil.relativedelta import relativedelta
 import re
@@ -128,7 +128,7 @@ class HrEmployee(models.Model):
         ('voch', 'Voch Especialistas de México, S.A. de C.V.'),
         ('rastreo', 'Rastreo Satelital de México J&J S.A. de C.V.'),
         ('grupo_back', 'Grupo Back Bone de México S.A. de C.V.')
-    ], string='Patrón')
+    ], string='Patrón Fiscal')
 
     establecimiento = fields.Selection([
         ('estevezjor', 'Estevez.Jor Servicios'),
@@ -137,7 +137,7 @@ class HrEmployee(models.Model):
         ('kuali', 'Kuali Digital'),
         ('makili', 'Makili'),
         ('vigiliner', 'Vigiliner')                
-    ], string='Patrón')
+    ], string='Establecimiento')
 
     bank_id = fields.Many2one('res.bank', string='Banco')
     clabe = fields.Char(
@@ -321,28 +321,52 @@ class HrEmployee(models.Model):
 
             # Avanzar al siguiente año
             year_start = year_start.replace(year=year_start.year + 1)
+            
+    @api.model_create_multi
+    def create(self, vals_list):
+        # Combina los dos antiguos 'create' en uno solo (seguro y actualizado)
+        for vals in vals_list:
+            # --- Parte 1: número de empleado y código de barras ---
+            if 'employee_number' in vals and vals['employee_number'] and not vals.get('barcode'):
+                vals['barcode'] = vals['employee_number']
+            elif 'barcode' in vals and vals['barcode'] and not vals.get('employee_number'):
+                vals['employee_number'] = vals['barcode']
 
-    @api.model
-    def create(self, vals):
-    
-        if 'employee_number' in vals and vals['employee_number'] and not vals.get('barcode'):
-            vals['barcode'] = vals['employee_number']
-        elif 'barcode' in vals and vals['barcode'] and not vals.get('employee_number'):
-            vals['employee_number'] = vals['barcode']
-        return super().create(vals)
+            # --- Parte 2: construir nombre completo ---
+            if 'names' in vals or 'last_name' in vals or 'mother_last_name' in vals:
+                names = vals.get('names', '').strip()
+                last_name = vals.get('last_name', '').strip()
+                mother_last_name = vals.get('mother_last_name', '').strip()
+                vals['name'] = f"{names} {last_name} {mother_last_name}".strip()
+
+        # Crear empleado(s)
+        employees = super(HrEmployee, self).create(vals_list)
+
+        # --- Parte 3: acciones después de crear ---
+        for employee in employees:
+            if employee.employment_start_date:
+                try:
+                    employee.generate_vacation_periods()
+                except Exception as e:
+                    _logger.error(f"Error generando períodos: {str(e)}")
+
+            try:
+                _logger.info("Intentando sincronizar con CodeIgniter")
+                self._sync_codeigniter(employee, 'create')
+            except Exception as e:
+                _logger.error(f"Error en sincronización: {str(e)}")
+
+        return employees
 
     def write(self, vals):
-        
-        
         # Si se actualiza barcode, sincronizar con employee_number
         if 'barcode' in vals and vals['barcode']:
             vals['employee_number'] = vals['barcode']
-        
-        # Si se actualiza employee_number, sincronizar con barcode  
+        # Si se actualiza employee_number, sincronizar con barcode
         elif 'employee_number' in vals and vals['employee_number']:
             vals['barcode'] = vals['employee_number']
-            
         return super().write(vals)
+    
 
     def generate_random_barcode(self):
         
@@ -579,6 +603,16 @@ class HrEmployee(models.Model):
         # Generar períodos de vacaciones si hay fecha de ingreso
         if vals.get('employment_start_date'):
             employee.generate_vacation_periods()
+
+        if not vals.get('employee_number'):
+            # Obtener la empresa del contexto o de los valores
+            company_id = vals.get('company_id', self.env.company.id)
+            next_number = self._get_next_employee_number(company_id)
+            vals['employee_number'] = next_number
+        
+        # Sincronizar con barcode
+        if 'employee_number' in vals and not vals.get('barcode'):
+            vals['barcode'] = vals['employee_number']
         
         # Sincronizar con CodeIgniter
         try:
@@ -596,6 +630,11 @@ class HrEmployee(models.Model):
             last_name_val = vals.get('last_name', self.last_name) or ''
             mother_last_name_val = vals.get('mother_last_name', self.mother_last_name) or ''
             vals['name'] = f"{names_val} {last_name_val} {mother_last_name_val}".strip()
+
+        if 'employee_number' in vals and 'barcode' not in vals:
+            vals['barcode'] = vals['employee_number']
+        elif 'barcode' in vals and 'employee_number' not in vals:
+            vals['employee_number'] = vals['barcode']
         
         # Regenerar períodos solo si cambia la fecha de ingreso Y no hay días tomados
         if 'employment_start_date' in vals:
@@ -630,6 +669,80 @@ class HrEmployee(models.Model):
             _logger.error(f"Error en sincronización de actualización: {str(e)}")
 
         return res
+
+    def _get_next_employee_number(self, company_id=False):
+        """Obtener el siguiente número de empleado por empresa"""
+        # Si no se proporciona company_id, usar la compañía actual del entorno
+        if not company_id:
+            company_id = self.env.company.id
+
+        # Buscar el último empleado por empresa
+        last_employee = self.search([
+            ('company_id', '=', company_id),
+            ('employee_number', '!=', False)
+        ], order='id desc', limit=1)
+
+        if last_employee and last_employee.employee_number:
+            # Intentar extraer el número y incrementar
+            try:
+                # Asumimos que el employee_number es un string numérico
+                last_number = int(last_employee.employee_number)
+                next_number = last_number + 1
+            except (ValueError, TypeError):
+                # Si no es numérico, empezar desde 1
+                next_number = 1
+        else:
+            # Primer empleado en la empresa
+            next_number = 1
+
+        # Formatear con ceros a la izquierda (5 dígitos)
+        return str(next_number).zfill(5)
+    
+    def generate_random_barcode(self):
+        """Sobrescribir el método de generar barcode para usar nuestro número por empresa"""
+        for employee in self:
+            if not employee.employee_number:
+                next_number = self._get_next_employee_number(employee.company_id.id)
+                employee.write({
+                    'employee_number': next_number,
+                    'barcode': next_number
+                })
+            else:
+                # Si ya tiene número, sincronizar
+                employee.barcode = employee.employee_number
+        
+        # Mostrar notificación
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': 'Número Generado',
+                'message': f'Número de empleado generado: {self.employee_number}',
+                'type': 'success',
+                'sticky': False,
+            }
+        }
+    
+    def action_sync_employee_numbers(self):
+        """Acción para sincronizar todos los números existentes"""
+        employees = self.search([])
+        for employee in employees:
+            if employee.employee_number and not employee.barcode:
+                employee.barcode = employee.employee_number
+            elif employee.barcode and not employee.employee_number:
+                employee.employee_number = employee.barcode
+        
+        _logger.info(f"Sincronizados {len(employees)} empleados")
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': 'Sincronización Completada',
+                'message': f'Se han sincronizado {len(employees)} empleados',
+                'type': 'success',
+                'sticky': False,
+            }
+        }
     
     @api.depends('birthday')
     def _compute_age(self):
@@ -683,7 +796,77 @@ class HrEmployee(models.Model):
                 }
             else:
                 raise UserError("The employee does not have a phone number.")
+    
+    def action_create_user(self):
+        """
+        Valida que el empleado tenga email corporativo o employee_number
+        antes de permitir la creación del usuario.
+        
+        Flujos:
+        - Con work_email: Invitación por correo (flujo normal Odoo)
+        - Sin work_email (solo employee_number): Contraseña por defecto con cambio obligatorio
+        """
+        self.ensure_one()
+        
+        # Validar si ya tiene usuario
+        if self.user_id:
+            raise ValidationError(_("This employee already has an user."))
+        
+        has_email = bool(self.work_email)
+        has_employee_number = bool(self.employee_number)
+
+        context = dict(self._context)
+        
+        # Validación: debe tener al menos uno de los dos campos
+        if not has_email and not has_employee_number:
+            raise UserError(_(
+                '❌ NO SE PUEDE CREAR EL USUARIO\n\n'
+                'El empleado "%s" necesita al menos UNO de los siguientes campos:\n\n'
+                '  ✓ Correo Corporativo (Email de Trabajo)\n'
+                '  ✓ Número de Empleado\n\n'
+                '📝 Por favor complete alguno de estos campos e intente nuevamente.'
+            ) % self.name)
+        
+        if not has_email:
+            # Sin email: marcar para contraseña por defecto + cambio obligatorio
+            context['default_no_email_employee'] = True
+            context['no_reset_password'] = True  # Evitar envío de email
             
+            _logger.info(
+                f"🔐 Usuario {self.name} (ID: {self.id}) será creado SIN EMAIL - "
+                f"Se asignará contraseña temporal '12345678' con cambio obligatorio en primer login"
+            )
+        else:
+            # Con email: flujo normal de invitación
+            context['no_reset_password'] = False
+            
+            _logger.info(
+                f"📧 Usuario {self.name} (ID: {self.id}) será creado CON EMAIL - "
+                f"Se enviará invitación a: {self.work_email}"
+            )
+        
+        _logger.info(
+            f"Creando usuario para empleado {self.name} (ID: {self.id}) - "
+            f"Email: {has_email}, Número: {has_employee_number}"
+        )
+        
+        # Retornar acción del wizard con contexto prellenado
+        return {
+            'name': _('Create User'),
+            'type': 'ir.actions.act_window',
+            'res_model': 'res.users',
+            'view_mode': 'form',
+            'view_id': self.env.ref('base.view_users_simple_form').id,
+            'target': 'new',
+            'context': dict(context, **{
+                'default_create_employee_id': self.id,
+                'default_name': self.name,
+                'default_phone': self.work_phone,
+                'default_mobile': self.mobile_phone,
+                'default_login': self.work_email or self.employee_number,
+                'default_partner_id': self.work_contact_id.id,
+            })
+        }
 
     def action_open_employee_documents(self):
         self.ensure_one()

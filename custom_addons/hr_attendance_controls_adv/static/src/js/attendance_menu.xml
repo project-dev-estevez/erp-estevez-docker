@@ -11,19 +11,19 @@
                 
                 <!-- 🔴 Pre-work: Sin registro - ícono rojo X -->
                 <i t-if="this.state.attendance_status === 'pre_work'" 
-                   class="fa fa-times-circle text-danger me-1" style="margin-top: 1px;"/>
+                class="fa fa-times-circle text-danger me-1" style="margin-top: 1px;"/>
                 
                 <!-- 🟡 In-work: En jornada - ícono amarillo play -->
                 <i t-if="this.state.attendance_status === 'in_work'" 
-                   class="fa fa-play-circle text-warning me-1" style="margin-top: 1px;"/>
+                class="fa fa-play-circle text-warning me-1" style="margin-top: 1px;"/>
                 
                 <!-- 🟢 Post-work: Completado - ícono verde check -->
                 <i t-if="this.state.attendance_status === 'post_work'" 
-                   class="fa fa-check-circle text-success me-1" style="margin-top: 1px;"/>
+                class="fa fa-check-circle text-success me-1" style="margin-top: 1px;"/>
                 
                 <!-- 🔘 Fallback: Estado desconocido - ícono original -->
                 <i t-if="!this.state.attendance_status" 
-                   class="fa fa-circle-o me-1"/>
+                class="fa fa-circle-o me-1"/>
                 
                 Asistencia
             </button>
