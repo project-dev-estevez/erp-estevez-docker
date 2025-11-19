@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Customizar el favicon y los meta tags para PWA -->
+        <template id="webclient_bootstrap_custom" inherit_id="web.webclient_bootstrap" name="Custom PWA Icons">
+            <xpath expr="//head/link[@rel='icon']" position="replace">
+                <link rel="icon" href="/custom_inputs_estevez/static/src/img/favicon.ico" type="image/x-icon"/>
+                <link rel="shortcut icon" href="/custom_inputs_estevez/static/src/img/favicon.ico" type="image/x-icon"/>
+            </xpath>
+            
+            <xpath expr="//head" position="inside">
+                <!-- Apple Touch Icons -->
+                <link rel="apple-touch-icon" sizes="180x180" href="/custom_inputs_estevez/static/src/img/odoo-icon-192x192.png"/>
+                
+                <!-- Android Chrome Icons -->
+                <link rel="icon" type="image/png" sizes="192x192" href="/custom_inputs_estevez/static/src/img/odoo-icon-192x192.png"/>
+                <link rel="icon" type="image/png" sizes="512x512" href="/custom_inputs_estevez/static/src/img/odoo-icon-512x512.png"/>
+                
+                <!-- PWA Meta Tags -->
+                <meta name="theme-color" content="#714B67"/>
+                <meta name="apple-mobile-web-app-capable" content="yes"/>
+                <meta name="apple-mobile-web-app-status-bar-style" content="black"/>
+                <meta name="apple-mobile-web-app-title" content="ERP Estevez"/>
+                <meta name="application-name" content="ERP Estevez"/>
+                
+                <!-- Manifest -->
+                <link rel="manifest" href="/web/manifest.webmanifest"/>
+            </xpath>
+        </template>
+        
+        <!-- También para el frontend público -->
+        <template id="layout_custom_icons" inherit_id="web.layout" name="Custom Frontend Icons">
+            <xpath expr="//head/link[@rel='shortcut icon']" position="replace">
+                <link rel="shortcut icon" href="/custom_inputs_estevez/static/src/img/favicon.ico" type="image/x-icon"/>
+            </xpath>
+            
+            <xpath expr="//head" position="inside">
+                <link rel="apple-touch-icon" href="/custom_inputs_estevez/static/src/img/odoo-icon-192x192.png"/>
+                <meta name="theme-color" content="#714B67"/>
+            </xpath>
+        </template>
+    </data>
+</odoo>
