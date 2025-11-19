@@ -20,9 +20,7 @@
     'author': 'Estevez',
     'website': '',
     'depends': ['web'],
-    'data': [
-        'views/webclient_templates.xml',
-    ],
+    'data': [],
     'assets': {
         'web.assets_backend': [
             'custom_inputs_estevez/static/src/scss/custom_inputs.scss',
