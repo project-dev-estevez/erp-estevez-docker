@@ -81,8 +81,8 @@ class HrEmployee(models.Model):
         'employee_skill_tag_rel', 
         'employee_id',   
         'tag_id',    
-        string='Etiqueta',      
-        help='Selecciona las habilidades o etiquetas que describen al empleado.',
+        string='Estatus académico',      
+        help='Selecciona el estatus academico del empleado.',
     )
 
 

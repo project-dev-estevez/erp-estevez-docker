@@ -6,6 +6,12 @@
         <field name="model">hr.contract</field>
         <field name="inherit_id" ref="hr_contract.hr_contract_view_form"/>
         <field name="arch" type="xml">
+
+        <!-- Agregar campo payroll_type después de structure_type_id -->
+        <xpath expr="//field[@name='structure_type_id']" position="after">
+            <field name="payroll_type"/>
+        </xpath>
+                
             <!-- Add a new "Guardar" button in the header -->
             <xpath expr="//header" position="inside">
 
@@ -148,6 +154,6 @@
                 <field name="create_uid" string="Creado por" widget="many2one_avatar_user" optional="hide" width="200"/>
             </xpath>                                            
         </field>
-    </record>
-
+    </record>             
+  
 </odoo>
