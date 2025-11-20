@@ -11,7 +11,7 @@ class WebManifestCustom(http.Controller):
         Customiza el manifest de la PWA con los iconos personalizados de Estevez
         """
         manifest = {
-            'name': 'Estevez.Jor',
+            'name': 'ERP Estevez',
             'short_name': 'Estevez',
             'description': 'Sistema ERP Estevez',
             'scope': '/web',
@@ -25,17 +25,30 @@ class WebManifestCustom(http.Controller):
                     'sizes': '64x64',
                     'type': 'image/png',
                 },
+                # Iconos separados para 'any' y 'maskable' (requerido por iOS)
                 {
                     'src': '/custom_inputs_estevez/static/src/img/odoo-icon-192x192.png',
                     'sizes': '192x192',
                     'type': 'image/png',
-                    'purpose': 'any maskable',
+                    'purpose': 'any',
+                },
+                {
+                    'src': '/custom_inputs_estevez/static/src/img/odoo-icon-192x192.png',
+                    'sizes': '192x192',
+                    'type': 'image/png',
+                    'purpose': 'maskable',
                 },
                 {
                     'src': '/custom_inputs_estevez/static/src/img/odoo-icon-512x512.png',
                     'sizes': '512x512',
                     'type': 'image/png',
-                    'purpose': 'any maskable',
+                    'purpose': 'any',
+                },
+                {
+                    'src': '/custom_inputs_estevez/static/src/img/odoo-icon-512x512.png',
+                    'sizes': '512x512',
+                    'type': 'image/png',
+                    'purpose': 'maskable',
                 },
             ],
         }

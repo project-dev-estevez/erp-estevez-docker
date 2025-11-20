@@ -159,9 +159,7 @@ patch(ActivityMenu.prototype, {
 
     // Carga la información del dispositivo desde el cual se está accediendo
     loadDeviceInfo() {
-        const userAgentData = navigator.userAgentData;
-
-        if (!userAgentData) return;
+        const userAgentData = navigator.userAgentData || {};
 
         const hasTouch = 'ontouchstart' in window || 
                             navigator.maxTouchPoints > 0 || 
@@ -169,7 +167,7 @@ patch(ActivityMenu.prototype, {
         const isSmallScreen = window.innerWidth <= 768;
         const isTouchAndSmall = hasTouch && isSmallScreen;
 
-        const isMobile = userAgentData.mobile && isTouchAndSmall;
+        const isMobile = userAgentData.mobile || isTouchAndSmall;
         const platform = userAgentData.platform || "Desconocido";
 
         this.state.deviceInfo = {
