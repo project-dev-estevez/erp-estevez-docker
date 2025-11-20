@@ -15,475 +15,449 @@
             <field name="name">hr.employee.form.inherit</field>
             <field name="model">hr.employee</field>
             <field name="inherit_id" ref="hr.view_employee_form"/>
-            <field name="arch" type="xml">                                                                                              
-                <xpath expr="//page[@name='hr_settings']//group[@name='active_group']/div[hasclass('o_row')][field[@name='user_id']]" position="after">            
-                    <label for="barcode"/>
-                    <div class="o_row">
-                        <field name="barcode" groups="hr.group_hr_user" string="Número de Empleado"/>
-                        <button string="Generate" class="btn btn-link" type="object" name="generate_random_barcode" invisible="barcode" groups="hr.group_hr_user"/>
-                        <!--button name="243" string="Print Badge" class="btn btn-link" type="action" invisible="not barcode" groups="hr.group_hr_user"/-->
-                    </div>
-                </xpath>
-                <xpath expr="//page[@name='hr_settings']//group[@name='identification_group']" position="replace"/>                                               
-                <xpath expr="//div[@name='button_box']/button[last()]" position="after">
-                    <button name="action_open_whatsapp" class="oe_stat_button" icon="fa-whatsapp" type="object" string="WhatsApp" groups="hr.group_hr_user" invisible="not (work_phone or private_phone)"/>
-                    <button name="action_open_employee_documents" class="oe_stat_button" icon="fa-file-text-o" type="object" string="Documentos" />
-                </xpath>            
-                <!-- Botones del Header -->
-                <xpath expr="//header" position="inside">
-                    <button name="action_archive_employee"
-                            string="Dar de baja" 
-                            type="object" 
-                            class="btn-danger"
-                            invisible="not active"/>  <!-- Solo visible si active=True -->
-                </xpath>
-                <xpath expr="//header" position="inside">
-                    <button name="action_view_history"
-                            string="Historial Altas/Bajas"
-                            type="object"
-                            class="btn-secondary"
-                            icon="fa-history"
-                            invisible="active"/>
+            <field name="arch" type="xml">       
+            <xpath expr="//page[@name='hr_settings']//group[@name='active_group']/div[hasclass('o_row')][field[@name='user_id']]" position="after">            
+                <label for="barcode"/>
+                <div class="o_row">
+                    <field name="barcode" groups="hr.group_hr_user" string="Número de Empleado"/>
+                    <button string="Generate" class="btn btn-link" type="object" name="generate_random_barcode" invisible="barcode" groups="hr.group_hr_user"/>
+                    <!--button name="243" string="Print Badge" class="btn btn-link" type="action" invisible="not barcode" groups="hr.group_hr_user"/-->
+                </div>
+            </xpath>
+            <xpath expr="//page[@name='hr_settings']//group[@name='identification_group']" position="replace"/>                                               
+            <xpath expr="//div[@name='button_box']/button[last()]" position="after">
+                <button name="action_open_whatsapp" class="oe_stat_button" icon="fa-whatsapp" type="object" string="WhatsApp" groups="hr.group_hr_user" invisible="not (work_phone or private_phone)"/>
+                <button name="action_open_employee_documents" class="oe_stat_button" icon="fa-file-text-o" type="object" string="Documentos" />
+            </xpath>            
+            <!-- Botones del Header -->
+            <xpath expr="//header" position="inside">
+                <button name="action_archive_employee"
+                    string="Dar de baja" 
+                    type="object" 
+                    class="btn-danger"
+                    invisible="not active"/>  <!-- Solo visible si active=True -->
+            </xpath>
+            <xpath expr="//header" position="inside">
+                <button name="action_view_history"
+                    string="Historial Altas/Bajas"
+                    type="object"
+                    class="btn-secondary"
+                    icon="fa-history"
+                    invisible="active"/>
 
-                    <button name="action_reactivate_employee"
-                            string="Dar de alta"
-                            type="object"
-                            class="btn-success"
-                            invisible="active"/>  <!-- Solo visible si active=False -->
-                </xpath>
+                <button name="action_reactivate_employee"
+                    string="Dar de alta"
+                    type="object"
+                    class="btn-success"
+                    invisible="active"/>  <!-- Solo visible si active=False -->
+            </xpath>
 
-                <!-- Botones en el header para reportes -->
-                <xpath expr="//header" position="inside">
-                    <button name="%(action_report_hr_employee_remision)d"
-                            string="Oficio Remis"
-                            type="action"
-                            class="oe_highlight"
-                            icon="fa-file-pdf-o"/>
+            <!-- Botones en el header para reportes -->
+            <xpath expr="//header" position="inside">
+                <button name="%(action_report_hr_employee_remision)d"
+                    string="Oficio Remis"
+                    type="action"
+                    class="oe_highlight"
+                    icon="fa-file-pdf-o"/>
 
-                    <button name="%(action_report_hr_employee_convenio_salida)d"
-                            string="Convenio de Salida"
-                            type="action"
-                            class="oe_highlight"
-                            icon="fa-file-pdf-o"/>
+                <button name="%(action_report_hr_employee_convenio_salida)d"
+                    string="Convenio de Salida"
+                    type="action"
+                    class="oe_highlight"
+                    icon="fa-file-pdf-o"/>
 
-                    <button name="%(action_report_hr_employee_carta_patronal)d"
-                            string="Carta Patronal"
-                            type="action"
-                            class="oe_highlight"
-                            icon="fa-file-pdf-o"/>
+                <button name="%(action_report_hr_employee_carta_patronal)d"
+                    string="Carta Patronal"
+                    type="action"
+                    class="oe_highlight"
+                    icon="fa-file-pdf-o"/>
 
-                    <button name="action_download_employee_documents"
-                            string="Descargar Documentos"
-                            type="object"
-                            class="oe_highlight"
-                            icon="fa-download"
-                            invisible="not ir_attachment_count"/>
-                </xpath>
+                <button name="action_download_employee_documents"
+                    string="Descargar Documentos"
+                    type="object"
+                    class="oe_highlight"
+                    icon="fa-download"
+                    invisible="not ir_attachment_count"/>
+            </xpath>
 
-                <!-- Eliminar el grupo managers de su ubicación actual -->
-                <xpath expr="//group[@name='managers']" position="replace">
-                    <!-- Eliminar el grupo managers -->
-                </xpath>
+            <!-- Eliminar el grupo managers de su ubicación actual -->
+            <xpath expr="//group[@name='managers']" position="replace">
+                <!-- Eliminar el grupo managers -->
+            </xpath>
 
-                <!-- Insertar el grupo managers en la página hr_settings -->
-                <xpath expr="//notebook/page[@name='hr_settings']" position="inside">
-                    <group name="managers" string="Aprobadores" class="hide-group-if-empty" invisible="1"/>
-                </xpath>
+            <!-- Insertar el grupo managers en la página hr_settings -->
+            <xpath expr="//notebook/page[@name='hr_settings']" position="inside">
+                <group name="managers" string="Aprobadores" class="hide-group-if-empty" invisible="1"/>
+            </xpath>
+
+
+
+            <!-- Nombres, Apellidos, # empleado, Proyecto y Etiquetas -->
+            <xpath expr="//group/group[field[@name='work_email']]" position="replace">
+                <group>
+                    <field name="names"/>
+                    <field name="last_name"/>
+                    <field name="mother_last_name"/>    
+                    <field name="employee_number"/>
+                    <field name="project"/>
+                    <field name="category_ids" widget="many2many_tags"
+                        options="{'color_field': 'color', 'no_create_edit': True}"
+                        placeholder="Tags" groups="hr.group_hr_user"/>                                                              
+                </group>
+            </xpath>
                 
-
-                <!-- Nombres, Apellidos, # empleado, Proyecto y Etiquetas -->
-                <xpath expr="//group/group[field[@name='work_email']]" position="replace">
-                    <group>
-                        <field name="names"/>
-                        <field name="last_name"/>
-                        <field name="mother_last_name"/>
-                        <field name="employee_number"/>
-                        <field name="project"/>
-                        <field name="category_ids" widget="many2many_tags"
-                                    options="{'color_field': 'color', 'no_create_edit': True}"
-                                    placeholder="Tags" groups="hr.group_hr_user"/>                        
-                    </group>
-                </xpath>
-
-                <!-- Compañia, Dirección, Departamento, Area, Puesto de Trabajo, Jefe Inmediato -->
-                <xpath expr="//group/group[field[@name='department_id']]" position="replace">
-                    <group>
-                        <field name="company_id" widget="many2one" options="{'no_create': True, 'no_create_edit': True}"/>
-                        <field name="direction_id" options="{'no_create': True}"/>
-                        <field name="department_id" domain="[('direction_id', '=', direction_id)]" invisible="not direction_id" options="{'no_create': True}"/>
-                        <field name="area_id" domain="[('department_id', '=', department_id)]" invisible="not department_id" options="{'no_create': True}"/>
-                        <!--field name="job_id" domain="[('department_id', '=', department_id)]" invisible="not department_id" options="{'no_create': True}"/-->
-                        <field name="job_id" domain="['|', ('name', 'ilike', 'Becario'), ('direction_id', '=', direction_id)]" options="{'no_create': True}" context="{'default_direction_id': direction_id}"/>
-                        <field name="parent_id" string="Jefe Inmediato" options="{'no_create': True}"/>
-                        <field name="coach_id" string="Instructor" options="{'no_create': True}" invisible="1"/>  
-                        <field name="occupation_id" string="Ocupación" options="{'no_create': True}"/>
-                        <field name="occupation_key" invisible="1"/> 
-                        
-                    </group>
-                </xpath>
-
-                <xpath expr="//group/group[field[@name='coach_id']]" position="after">
-                    <div class="d-flex justify-content-end w-100 mt-4">
-                        <button              
-                            name="action_save" 
-                            type="object" 
-                            string="Guardar"
-                            class="btn-primary"     
-                            confirm="¿Estás seguro de que deseas guardar un empleado nuevo?"
-                        />  
-                    </div>
-                </xpath>
-
-
-                <!-- Información Laboral -->
-                <xpath expr="//notebook/page[@name='public']" position="replace">
-                    <page name="public" string="Información Laboral" >
-                        <group string="Ubicación">
-                            <group>
-                                <field name="employment_start_date"/>
-                                <field name="address_id" context="{'show_address': 1}" options="{'highlight_first_line': True, 'no_edit': True, 'no_create': True, 'no_open': True}" domain="[('is_company', '=', True)]"/>
-                                <field name="work_location_id" string="Ubicación Laboral" context="{'default_address_id': address_id}" placeholder="e.g. Building 2, Remote, etc."/>
-                            </group>
-                        </group>
-                        <group string="Contacto">
-                            <group>
-                                <field name="work_email" string="Correo Laboral" widget="email" placeholder="e.g. johndoe@estevezjor.mx"/>
-                                <field name="work_phone" widget="phone"/>
-                            </group>
-                        </group>
-                        <group string="Nómina">
-                            <group>
-                                <field name="imss_registration_date"/>
-                                <field name="payment_type"/>
-                                <field name="payroll_type"/>
-                            </group>
-                        </group>
-                        <group name="departure" string="Departure" invisible="active">
-                            <field name="departure_reason_id" options="{'no_edit': True, 'no_create': True, 'no_open': True}"/>
-                            <field name="departure_description"/>
-                            <field name="departure_date"/>
-                        </group>
-                        <group string="Horario Laboral">
-                            <group>
-                                <field name="resource_calendar_id" help="The default working hours are set in configuration."/>
-                                <field name="id" invisible="1"/>
-                                <field name="tz" required="id" invisible="1"/>
-                            </group>
-                        </group>
-                    </page>
-                </xpath>
-
-                <!-- Información Personal -->
-                <xpath expr="//notebook/page[@name='personal_information']" position="replace">
-                    <page name="personal_information" string="Información Personal" groups="hr.group_hr_user" >
-                        <group string="Contacto Personal">
-                            <group>
-                                <div style="font-weight: bold;">
-                                    Dirección Personal
-                                </div>
-                                <br/>
-                                <div class="o_address_format">
-                                    <div class="row">
-                                        <div class="col">
-                                            <field name="private_country_id" placeholder="País" class="o_address_country" options='{"no_open": True, "no_create": True}'/>
-                                        </div>
-                                    </div>
-                                    <div class="row g-1">
-                                        <div class="col p-1">
-                                            <field name="private_street" placeholder="Calle"/>
-                                        </div>
-                                        <div class="col p-1">
-                                            <field name="private_street2" placeholder="Número"/>
-                                        </div>
-                                        <div class="col p-1">
-                                            <field name="private_colonia" placeholder="Colonia"/>
-                                        </div>
-                                    </div>
-                                    <div class="row g-1">
-                                        <div class="col p-1">                                            
-                                            <field name="state_id" placeholder="Estado" options="{'no_open': True, 'no_quick_create': True, 'no_create': True, 'no_create_edit': True}"/>
-                                            <field name="state_key" invisible="1"/>
-                                        </div>
-                                        <div class="col p-1">
-                                            <field name="municipality_id" placeholder="Municipio" options="{'no_open': True, 'no_quick_create': True, 'no_create': True, 'no_create_edit': True}"/>
-                                            <field name="municipality_key" invisible="1"/>
-                                        </div>
-                                    </div>
-                                    <div class="row g-1">
-                                        <div class="col p-1">
-                                            <field name="private_zip" placeholder="C.P"/>
-                                        </div>
-                                        <div class="col p-1">
-                                            <field name="fiscal_zip" placeholder="C.P Fiscal"/>
-                                        </div>
-                                    </div>
-                                </div>
-                                <field name="private_email" string="Correo Electronico personal" placeholder="myprivateemail@example.com"/>
-                                <field name="private_phone" string="Telefono Personal"/>
-                                <field name="gender"/>
-                            </group>                                    
-                            <group>
-                                <field name="birthday"/>
-                                <field name="age" invisible="not birthday"/>
-                                <field name="rfc" placeholder="13 dígitos"/>
-                                <field name="curp" placeholder="18 dígitos"/>
-                                <field name="nss" placeholder="11 dígitos"/>
-                                <field name="voter_key" placeholder="18 dígitos"/>
-                                <field name="infonavit"/> 
-                                <field name="license_number"/>
-                            </group>
-                        </group>
-
+            <!-- Compañia, Dirección, Departamento, Area, Puesto de Trabajo, Jefe Inmediato -->
+            <xpath expr="//group/group[field[@name='department_id']]" position="replace">
+                <group>
+                    <field name="company_id" widget="many2one" options="{'no_create': True, 'no_create_edit': True}"/>
+                    <field name="direction_id" options="{'no_create': True}"/>
+                    <field name="department_id" domain="[('direction_id', '=', direction_id)]" invisible="not direction_id" options="{'no_create': True}"/>
+                    <field name="area_id" domain="[('department_id', '=', department_id)]" invisible="not department_id" options="{'no_create': True}"/>                                               
+                    <!--field name="job_id" domain="[('department_id', '=', department_id)]" invisible="not department_id" options="{'no_create': True}"/-->
+                    <field name="job_id" domain="['|', ('name', 'ilike', 'Becario'), ('direction_id', '=', direction_id)]" options="{'no_create': True}" context="{'default_direction_id': direction_id}"/>
+                    <field name="parent_id" string="Jefe Inmediato" options="{'no_create': True}"/>
+                    <field name="coach_id" string="Instructor" options="{'no_create': True}" invisible="1"/>  
+                    <field name="occupation_id" string="Ocupación" options="{'no_create': True}"/>
+                    <field name="occupation_key" invisible="1"/> 
+                </group>
+            </xpath>
+                
+            <xpath expr="//group/group[field[@name='coach_id']]" position="after">
+                <div class="d-flex justify-content-end w-100 mt-4">                        
+                    <button              
+                        name="action_save" 
+                        type="object" 
+                        string="Guardar"
+                        class="btn-primary"     
+                        confirm="¿Estás seguro de que deseas guardar un empleado nuevo?"
+                    />  
+                </div>
+            </xpath>                
+            <!-- Información Laboral -->
+            <xpath expr="//notebook/page[@name='public']" position="replace">
+                <page name="public" string="Información Laboral">
+                    <group string="Ubicación">
                         <group>
-                           <group string="Nacionalidad">
-                                <field name="country_id" options='{"no_open": True, "no_create": True}'/>
-                                <field name="country_of_birth"/>  
-                                <!--<field name="lugar_nacimiento_estado"/>-->
-                            </group>
-                            <group string="Educación">
-                                <field name="certificate" invisible="1"/>
-                                <field name="study_field" invisible="1"/>
-                                <field name="study_field_new" widget="selection"/>
-                                <field name="study_tag_ids" widget="many2many_tags"
-       options="{'color_field': 'color', 'no_create_edit': True}"
-       placeholder="Selecciona habilidades..."
-       groups="hr.group_hr_user"/>
-
-
-                                <field name="study_school"/>
-                                <field name="estudios_id"/>                                
-                                <field name="estudios_key" invisible="1"/> 
-                                <field name="documento_id"/> 
-                                <field name="documento_key" invisible="1"/> 
-                                <field name="institucion_id"/>
-                                <field name="institucion_key" invisible="1"/> 
-                            </group> 
+                            <field name="employment_start_date"/>
+                            <field name="address_id" context="{'show_address': 1}" options="{'highlight_first_line': True, 'no_edit': True, 'no_create': True, 'no_open': True}" domain="[('is_company', '=', True)]"/>                                
+                            <field name="work_location_id" string="Ubicación Laboral" context="{'default_address_id': address_id}" placeholder="e.g. Building 2, Remote, etc."/>
                         </group>
-
-                        <group string="Permiso de Trabajo" invisible="is_mexico">
-                            <field name="visa_no" invisible="is_mexico"/>
-                            <field name="permit_no" invisible="is_mexico"/>
-                            <field name="visa_expire" invisible="is_mexico"/>
-                            <field name="work_permit_expiration_date" invisible="is_mexico"/>
-                            <field name="work_permit_name" invisible="1"/>
-                            <field name="has_work_permit" widget="work_permit_upload" filename="work_permit_name" invisible="is_mexico"/>
-                        </group>
-
-                        <group>                            
-                            <group string="Contacto de Emergencia">
-                                <!-- Primer contacto -->
-                                <field name="emergency_contact" string="Primer Contacto"/>
-                                <field name="emergency_contact_relationship" string="Parentesco del Primer Contacto"/>
-                                <field name="emergency_phone" class="o_force_ltr" string="Teléfono del Primer Contacto"/>
-
-                                <!-- Segundo contacto -->
-                                <field name="emergency_contact_2" string="Segundo Contacto"/>
-                                <field name="emergency_contact_relationship_2" string="Parentesco del Segundo Contacto"/>
-                                <field name="emergency_phone_2" class="o_force_ltr" string="Teléfono del Segundo Contacto"/>
-                            </group>
-
-                            <group string="Situación Familiar">
-                                <field name="marital"/>                                
-                                <field name="spouse_complete_name" invisible="marital not in ['married', 'cohabitant']"/>
-                                <field name="children"/>
-                            </group>
-                        </group>
-                    </page>
-                </xpath>
-                <!-- <xpath expr="//page[@name='personal_information']//group[.//field[@name='country_of_birth']]" position="inside">
-                    <field name="lugar_nacimiento_estado" widget="selection"/>
-                </xpath> -->
-
-                <!-- Nueva página de Incapacidades -->
-                <xpath expr="//notebook/page[@name='personal_information']" position="after">
-                    <page name="disabilities" string="Incapacidades">
-                        <div class="table-responsive">
-                            <table class="table table-bordered table-striped o_list_view">
-                                <thead>
-                                    <tr>
-                                        <th>ID</th>
-                                        <th>Folio</th>
-                                        <th>Fecha Incidente</th>
-                                        <th>Fecha Inicio</th>
-                                        <th>Fecha Fin</th>
-                                        <th>Días</th>
-                                        <th>Tipo</th>
-                                        <th>Comentarios</th>
-                                        <th>Acciones</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>--</td>
-                                        <td>--</td>
-                                        <td>--</td>
-                                        <td>--</td>
-                                        <td>--</td>
-                                        <td>--</td>
-                                        <td>--</td>
-                                        <td>--</td>
-                                        <td>
-                                            Botones de Acciones
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </page>
-                </xpath>
-
-                <xpath expr="//notebook/page[@name='disabilities']" position="attributes">
-                    <attribute name="invisible">1</attribute>
-                </xpath>
-
-                <!-- Nueva página de Actas Administrativas -->
-                <xpath expr="//notebook/page[@name='disabilities']" position="after">
-                    <page name="memorandum" string="Actas Administrativas" >
-                        <!-- Botón para crear una nueva acta -->
-                        <button name="action_open_memorandum_form" type="object" string="Nueva Acta" class="oe_highlight" icon="fa-plus"/>
-
-                        <!-- Tabla para mostrar las actas administrativas -->
-                        <field name="memorandum_ids" widget="one2many" context="{'default_employee_id': id}">
-                            <list>
-                                <field name="id" string="Código" readonly="1"/>
-                                <field name="create_date" string="Fecha de Creación" readonly="1"/>
-                                <field name="administrative_type" string="Tipo de Acta"/>
-                                <field name="description" string="Descripción"/>
-                                <field name="date" string="Fecha del Acta"/>
-                                <button name="download_memorandum_report" type="object" string="Reporte" class="btn-secondary fa fa-download"/>
-                            </list>
-                        </field>
-                    </page>
-                </xpath>
-
-                <!-- Nueva página de Prestamos -->
-                <xpath expr="//notebook/page[@name='memorandum']" position="after">
-                    <page name="loans" string="Préstamos" >
-                        <button name="action_open_loan_form" type="object" string="Nuevo Préstamo" class="oe_highlight" icon="fa-plus"/>
-
-                        <field name="loan_ids" widget="one2many" context="{'default_employee_id': id}">
-                            <list>
-                                <field name="id" string="Código" readonly="1"/>
-                                <field name="concept" string="Concepto" readonly="1"/>
-                                <field name="discount_type" string="Condiciones" readonly="1"/>
-                                <field name="requested_amount" string="Monto Solicitado" readonly="1"/>
-                                <field name="discount" string="Descuento" readonly="1"/>
-                                <field name="remaining_balance" string="Saldo Pendiente" readonly="1"/>
-                                <field name="installments" string="Cuotas" readonly="1"/>
-                                <button name="download_loan_report" type="object" string="Reporte" class="btn-secondary fa fa-download"/>
-                            </list>
-                        </field>
-                    </page>
-                </xpath>
-
-                <xpath expr="//notebook/page[@name='loans']" position="attributes">
-                    <attribute name="invisible">1</attribute>
-                </xpath>
-
-
-                <!-- Nueva página de Vacaciones -->
-                <xpath expr="//notebook/page[@name='loans']" position="after">
-                    <page name="vacations" string="Vacaciones">
+                    </group>
+                    <group string="Contacto">
                         <group>
-                            <group string="Resumen Vacaciones">
-                                <field name="years_of_service" readonly="1"/>
-                                <field name="entitled_days" readonly="1"/>
-                                <field name="vacation_days_taken" readonly="1"/>
-                                <field name="vacation_days_available" readonly="1"/>
-                            </group>
+                            <field name="work_email" string="Correo Laboral" widget="email" placeholder="e.g. johndoe@estevezjor.mx"/>
+                            <field name="work_phone" widget="phone"/>
                         </group>
-                        
-                        <group string="Periodos de Vacaciones">
-                            <!-- Usar colspan para expandir la tabla -->
-                            <field name="vacation_period_ids" 
-                                context="{'default_employee_id': id}"
-                                options="{'create': false}"
-                                colspan="4">
-                                <list deletable="false">
-                                    <field name="period" string="Periodo"/>
-                                    <field name="year_start" string="Inicio"/>
-                                    <field name="year_end" string="Fin"/>
-                                    <field name="entitled_days" string="Días Derecho"/>
-                                    <field name="days_taken" string="Días Tomados"/>
-                                    <field name="days_remaining" string="Días Restantes" 
-                                        decoration-success="days_remaining &gt; 0" 
-                                        decoration-warning="days_remaining == 0" 
-                                        decoration-danger="days_remaining &lt; 0"/>
-                                </list>
-                            </field>
-                            
-                            <div class="text-center" colspan="4">
-                                <button 
-                                    name="generate_vacation_periods" 
-                                    type="object" 
-                                    string="Generar Periodos" 
-                                    class="oe_highlight"/>
+                    </group>
+                    <group string="Nómina">
+                        <group>
+                            <field name="imss_registration_date"/>
+                            <field name="payment_type"/>
+                            <field name="payroll_type"/>
+                        </group>
+                    </group>
+                    <group name="departure" string="Departure" invisible="active">
+                        <field name="departure_reason_id" options="{'no_edit': True, 'no_create': True, 'no_open': True}"/>
+                        <field name="departure_description"/>   
+                        <field name="departure_date"/>                         
+                    </group>
+                    <group string="Horario Laboral">
+                        <group>
+                            <field name="resource_calendar_id" help="The default working hours are set in configuration."/>
+                            <field name="id" invisible="1"/>     
+                            <field name="tz" required="id" invisible="1"/>                           
+                        </group>
+                    </group>
+                </page>
+            </xpath>                       
+            <!-- Información Personal -->         
+            <xpath expr="//notebook/page[@name='personal_information']" position="replace">
+                <page name="personal_information" string="Información Personal" groups="hr.group_hr_user" >
+                    <group string="Contacto Personal">
+                        <group>
+                            <div style="font-weight: bold;">
+                                Dirección Personal
                             </div>
+                            <br/>
+                            <div class="o_address_format">
+                                <div class="row">
+                                    <div class="col">
+                                        <field name="private_country_id" placeholder="País" class="o_address_country" options='{"no_open": True, "no_create": True}'/>
+                                    </div>
+                                </div>
+                                <div class="row g-1">
+                                    <div class="col p-1">
+                                        <field name="private_street" placeholder="Calle"/>
+                                    </div>
+                                    <div class="col p-1">
+                                        <field name="private_street2" placeholder="Número"/>
+                                    </div>      
+                                    <div class="col p-1">
+                                        <field name="private_colonia" placeholder="Colonia"/>
+                                    </div>                                
+                                </div>
+                                <div class="row g-1">
+                                    <div class="col p-1">                                            
+                                        <field name="state_id" placeholder="Estado" options="{'no_open': True, 'no_quick_create': True, 'no_create': True, 'no_create_edit': True}"/>
+                                        <field name="state_key" invisible="1"/>
+                                    </div>
+                                    <div class="col p-1">
+                                        <field name="municipality_id" placeholder="Municipio" options="{'no_open': True, 'no_quick_create': True, 'no_create': True, 'no_create_edit': True}"/>
+                                        <field name="municipality_key" invisible="1"/>
+                                    </div>
+                                </div>
+                                <div class="row g-1">
+                                    <div class="col p-1">
+                                        <field name="private_zip" placeholder="C.P"/>
+                                    </div>
+                                    <div class="col p-1">
+                                        <field name="fiscal_zip" placeholder="C.P Fiscal"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <field name="private_email" string="Correo Electronico personal" placeholder="myprivateemail@example.com"/>
+                            <field name="private_phone" string="Telefono Personal"/>
+                            <field name="gender"/>
+                        </group>                                    
+                        <group>
+                            <field name="birthday"/>
+                            <field name="age" invisible="not birthday"/>
+                            <field name="rfc" placeholder="13 dígitos"/>   
+                            <field name="curp" placeholder="18 dígitos"/>
+                            <field name="nss" placeholder="11 dígitos"/>
+                            <field name="voter_key" placeholder="18 dígitos"/>
+                            <field name="infonavit"/> 
+                            <field name="license_number"/>                             
                         </group>
-                    </page>
-                </xpath>
-
-                <!-- Nueva página de Permisos -->
-                <xpath expr="//page[@name='vacations']" position="after">
-                    <page name="permits" string="Permisos">
-                        <field name="time_off_in_lieu_ids">
-                            <list>
-                                <field name="request_date" string="Fecha Registro"/>
-                                <field name="request_date_from" string="Fecha Inicio"/>
-                                <field name="request_date_to" string="Fecha Termino"/>
-                                <field name="number_of_days" string="Días Solicitados"/>
-                                <field name="state" string="Estado"/>
-                                <field name="notes" string="Comentarios"/>
-                                <field name="leave_id" string="Ausencia Relacionada"/>
+                    </group>
+                    <group>
+                        <group string="Nacionalidad">
+                            <field name="country_id" options='{"no_open": True, "no_create": True}'/>
+                            <field name="country_of_birth"/>  
+                            <!--<field name="lugar_nacimiento_estado"/>-->
+                        </group>
+                        <group string="Educación">     
+                            <field name="certificate" invisible="1"/>
+                            <field name="study_field" invisible="1"/>
+                            <field name="study_field_new" widget="selection"/>
+                            <field name="study_tag_ids" widget="many2many_tags"
+                                options="{'color_field': 'color', 'no_create_edit': True}"
+                                placeholder="Estatus Académico."
+                                groups="hr.group_hr_user"/>
+                            <field name="study_school"/>                                                           
+                            <field name="estudios_id"/>                                
+                            <field name="estudios_key" invisible="1"/>       
+                            <field name="documento_id"/> 
+                            <field name="documento_key" invisible="1"/> 
+                            <field name="institucion_id"/>
+                            <field name="institucion_key" invisible="1"/> 
+                        </group> 
+                    </group>
+                    <group string="Permiso de Trabajo" invisible="is_mexico">
+                        <field name="visa_no" invisible="is_mexico"/>
+                        <field name="permit_no" invisible="is_mexico"/>
+                        <field name="visa_expire" invisible="is_mexico"/>
+                        <field name="work_permit_expiration_date" invisible="is_mexico"/>
+                        <field name="work_permit_name" invisible="1"/>
+                        <field name="has_work_permit" widget="work_permit_upload" filename="work_permit_name" invisible="is_mexico"/>
+                    </group>
+                    <group>                            
+                        <group string="Contacto de Emergencia">
+                            <!-- Primer contacto -->
+                            <field name="emergency_contact" string="Primer Contacto"/>
+                            <field name="emergency_contact_relationship" string="Parentesco del Primer Contacto"/>
+                            <field name="emergency_phone" class="o_force_ltr" string="Teléfono del Primer Contacto"/>
+                            <!-- Segundo contacto -->
+                            <field name="emergency_contact_2" string="Segundo Contacto"/>
+                            <field name="emergency_contact_relationship_2" string="Parentesco del Segundo Contacto"/>
+                            <field name="emergency_phone_2" class="o_force_ltr" string="Teléfono del Segundo Contacto"/>
+                        </group>
+                        <group string="Situación Familiar">
+                            <field name="marital"/>                                
+                            <field name="spouse_complete_name" invisible="marital not in ['married', 'cohabitant']"/>
+                            <field name="children"/>                          
+                        </group> 
+                    </group>                                                
+                </page>
+            </xpath> 
+            <!-- <xpath expr="//page[@name='personal_information']//group[.//field[@name='country_of_birth']]" position="inside">
+                <field name="lugar_nacimiento_estado" widget="selection"/>
+            </xpath> -->
+            <!-- Nueva página de Incapacidades -->
+            <xpath expr="//notebook/page[@name='personal_information']" position="after">
+                <page name="disabilities" string="Incapacidades">
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-striped o_list_view">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Folio</th>
+                                    <th>Fecha Incidente</th>       
+                                    <th>Fecha Inicio</th>
+                                    <th>Fecha Fin</th>
+                                    <th>Días</th>
+                                    <th>Tipo</th>
+                                    <th>Comentarios</th>
+                                    <th>Acciones</th>                                 
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>--</td>
+                                    <td>--</td>
+                                    <td>--</td>
+                                    <td>--</td>
+                                    <td>--</td>
+                                    <td>--</td>
+                                    <td>--</td>
+                                    <td>--</td>                                        
+                                    <td>
+                                        Botones de Acciones
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </page>
+            </xpath>
+            <xpath expr="//notebook/page[@name='disabilities']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>                   
+            <!-- Nueva página de Actas Administrativas -->         
+            <xpath expr="//notebook/page[@name='disabilities']" position="after">
+                <page name="memorandum" string="Actas Administrativas" >   
+                <!-- Botón para crear una nueva acta -->                     
+                    <button name="action_open_memorandum_form" type="object" string="Nueva Acta" class="oe_highlight" icon="fa-plus"/>
+                    <!-- Tabla para mostrar las actas administrativas -->
+                    <field name="memorandum_ids" widget="one2many" context="{'default_employee_id': id}">
+                        <list>
+                            <field name="id" string="Código" readonly="1"/>
+                            <field name="create_date" string="Fecha de Creación" readonly="1"/>                                
+                            <field name="administrative_type" string="Tipo de Acta"/>
+                            <field name="description" string="Descripción"/>
+                            <field name="date" string="Fecha del Acta"/>
+                            <button name="download_memorandum_report" type="object" string="Reporte" class="btn-secondary fa fa-download"/>
+                        </list>
+                    </field>
+                </page>
+            </xpath>                  
+            <!-- Nueva página de Prestamos -->          
+            <xpath expr="//notebook/page[@name='memorandum']" position="after">
+                <page name="loans" string="Préstamos" >
+                    <button name="action_open_loan_form" type="object" string="Nuevo Préstamo" class="oe_highlight" icon="fa-plus"/>
+                    <field name="loan_ids" widget="one2many" context="{'default_employee_id': id}">
+                        <list>
+                            <field name="id" string="Código" readonly="1"/>
+                            <field name="concept" string="Concepto" readonly="1"/>                                
+                            <field name="discount_type" string="Condiciones" readonly="1"/>
+                            <field name="requested_amount" string="Monto Solicitado" readonly="1"/>
+                            <field name="discount" string="Descuento" readonly="1"/>
+                            <field name="remaining_balance" string="Saldo Pendiente" readonly="1"/>
+                            <field name="installments" string="Cuotas" readonly="1"/>
+                            <button name="download_loan_report" type="object" string="Reporte" class="btn-secondary fa fa-download"/>
+                        </list>
+                    </field>
+                </page>
+            </xpath>                     
+            <xpath expr="//notebook/page[@name='loans']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <!-- Nueva página de Vacaciones -->       
+            <xpath expr="//notebook/page[@name='loans']" position="after">
+                <page name="vacations" string="Vacaciones">
+                    <group>
+                        <group string="Resumen Vacaciones">
+                            <field name="years_of_service" readonly="1"/>     
+                            <field name="entitled_days" readonly="1"/>
+                            <field name="vacation_days_taken" readonly="1"/>
+                            <field name="vacation_days_available" readonly="1"/>                          
+                        </group>
+                    </group>                                                                        
+                    <group string="Periodos de Vacaciones">
+                        <!-- Usar colspan para expandir la tabla -->
+                        <field name="vacation_period_ids" 
+                            context="{'default_employee_id': id}"
+                            options="{'create': false}"
+                            colspan="4">
+                            <list deletable="false">
+                                <field name="period" string="Periodo"/>
+                                <field name="year_start" string="Inicio"/> 
+                                <field name="year_end" string="Fin"/>
+                                <field name="entitled_days" string="Días Derecho"/>
+                                <field name="days_taken" string="Días Tomados"/>
+                                <field name="days_remaining" string="Días Restantes" 
+                                    decoration-success="days_remaining &gt; 0" 
+                                    decoration-warning="days_remaining == 0" 
+                                    decoration-danger="days_remaining &lt; 0"/>                                 
                             </list>
-                            <form>
-                                <sheet>
+                        </field>                                
+                        <div class="text-center" colspan="4">
+                            <button 
+                                name="generate_vacation_periods" 
+                                type="object" 
+                                string="Generar Periodos" 
+                                class="oe_highlight"/>
+                        </div>                                                    
+                    </group>
+                </page>
+            </xpath>                  
+            <!-- Nueva página de Permisos -->              
+            <xpath expr="//page[@name='vacations']" position="after">
+                <page name="permits" string="Permisos">
+                    <field name="time_off_in_lieu_ids">
+                        <list>
+                            <field name="request_date" string="Fecha Registro"/>
+                            <field name="request_date_from" string="Fecha Inicio"/>  
+                            <field name="request_date_to" string="Fecha Termino"/>
+                            <field name="number_of_days" string="Días Solicitados"/>
+                            <field name="state" string="Estado"/>
+                            <field name="notes" string="Comentarios"/>
+                            <field name="leave_id" string="Ausencia Relacionada"/>                              
+                        </list>
+                        <form>
+                            <sheet>
+                                <group>
                                     <group>
-                                        <group>
-                                            <field name="employee_id" readonly="1"/>
-                                            <field name="request_date"/>
-                                            <field name="state" widget="statusbar" 
-                                                statusbar_visible="draft,pending,approved,rejected"/>
-                                        </group>
-                                        <group>
-                                            <field name="request_date_from"/>
-                                            <field name="request_date_to"/>
-                                            <field name="number_of_days" readonly="1"/>
-                                        </group>
+                                        <field name="employee_id" readonly="1"/>
+                                        <field name="request_date"/>   
+                                        <field name="state" widget="statusbar" 
+                                            statusbar_visible="draft,pending,approved,rejected"/>                                         
                                     </group>
                                     <group>
-                                        <field name="name" placeholder="Descripción de la solicitud"/>
-                                        <field name="notes" placeholder="Notas adicionales"/>
+                                        <field name="request_date_from"/>
+                                        <field name="request_date_to"/>       
+                                        <field name="number_of_days" readonly="1"/>                                     
                                     </group>
-                                </sheet>
-                                <footer>
-                                    <button name="action_submit" string="Enviar" type="object" class="btn-primary"/>
-                                    <button name="action_approve" string="Aprobar" type="object" class="btn-primary"/>
-                                    <button name="action_reject" string="Rechazar" type="object" class="btn-secondary"/>
-                                    <button name="action_draft" string="Volver a Borrador" type="object" class="btn-secondary"/>
-                                    <button string="Cerrar" class="btn-secondary" special="cancel"/>
-                                </footer>
-                            </form>
-                        </field>
-
-                    </page>
-                </xpath>
-
-                <!-- Nueva página de Asignaciones -->
-                <xpath expr="//notebook/page[@name='permits']" position="after">
-                    <page name="assignments" string="Asignaciones">
-                        <notebook>
-                            <page name="almacen_general" string="Almacen General">
-                                <notebook>
-                                    <page name="herramientas" string="herramientas">
-                                        <field name="tool_assignment_ids" 
-                                            view_id="stock_estevez.view_tool_assignment_tree"
-                                            colspan="6"/>
+                                </group>
+                                <group>
+                                    <field name="name" placeholder="Descripción de la solicitud"/>
+                                    <field name="notes" placeholder="Notas adicionales"/>
+                                </group>
+                            </sheet>   
+                            <footer>
+                                <button name="action_submit" string="Enviar" type="object" class="btn-primary"/>
+                                <button name="action_approve" string="Aprobar" type="object" class="btn-primary"/>
+                                <button name="action_reject" string="Rechazar" type="object" class="btn-secondary"/>
+                                <button name="action_draft" string="Volver a Borrador" type="object" class="btn-secondary"/>
+                                <button string="Cerrar" class="btn-secondary" special="cancel"/>
+                            </footer>                           
+                        </form>
+                    </field>
+                </page>
+            </xpath>                                     
+            <!-- Nueva página de Asignaciones -->
+            <xpath expr="//notebook/page[@name='permits']" position="after">
+                <page name="assignments" string="Asignaciones">
+                    <notebook>
+                        <page name="almacen_general" string="Almacen General">
+                            <notebook>
+                                <page name="herramientas" string="herramientas">
+                                    <field name="tool_assignment_ids" 
+                                        view_id="stock_estevez.view_tool_assignment_tree"
+                                        colspan="6"/>
+                                </page>
+                                <page name="activo_fijo" string="Activo Fijo">
                                     </page>
-
-                                    <page name="activo_fijo" string="Activo Fijo">
-                                    </page>
-
                                     <page name="consumibles" string="Consumibles">
                                         <field name="consumable_assignment_ids" 
                                             view_id="stock_estevez.view_consumable_assignment_tree"
@@ -600,13 +574,14 @@
                             </page>
                         </notebook>
                     </page>
-                </xpath>
+</xpath>
+
 
                 <xpath expr="//page[@name='assignments']" position="attributes">
     <attribute name="invisible">1</attribute>
-</xpath>
+</xpath>         
 
-               <!-- Reemplazar el grupo UBICACIÓN actual por uno que incluya ambos grupos en la misma fila -->
+               <!-- Reemplazar el grupo UBICACIÓN actual por uno que incluya ambos grupos en la misma fila -->      
         <xpath expr="//page[@name='public']/group[1]" position="replace">            
             <group string="Ubicación">                
                 <group>            
@@ -620,12 +595,13 @@
             <group string="Información Bancaria">                
                 <group>            
                     <field name="bank_id" string="Banco" options="{'no_create': True, 'no_create_edit': True}"/>
-                    <field name="clabe" string="CLABE" placeholder="18 dígitos"        
+                    <field name="clabe" string="CLABE" placeholder="18 dígitos" required="bank_id"/>
+                      <field name="clabe" string="CLABE" placeholder="18 dígitos"        
        required="bank_id"/>
     <field name="account_number" string="Número de Cuenta"/>          
                 </group>            
             </group>        
-        </xpath>
+             </xpath>
       
 
 
@@ -657,6 +633,8 @@
                 </xpath>
             </field>
         </record>
-        
+    
+
+
     </data>
 </odoo>

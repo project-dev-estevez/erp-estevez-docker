@@ -11,7 +11,13 @@
                         <field name="date"/>
                         <field name="description" widget="html"/>
                         <field name="article"/>
-                        <field name="fraction"/>                        
+                        <field name="fraction_code"/>                           
+                        <field name="fraction_full_text" 
+                           string="Descripción de fracción seleccionada"
+                           readonly="1"
+                           widget="textarea"
+                           options="{'rows': 6}"
+                           invisible="not fraction_code"/>                     
                         <field name="administrative_type"/>
                     </group>
                     <footer>

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="view_employees_kanban_inherit" model="ir.ui.view">
+            <field name="name">hr.employee.kanban.inherit</field>
+            <field name="model">hr.employee</field>
+            <field name="inherit_id" ref="hr.hr_kanban_view_employees"/>
+            <field name="arch" type="xml">
+                
+                <!-- Reemplazar work_phone con lógica condicional -->
+                <field name="work_phone" position="replace">
+                    <t t-if="record.work_phone.raw_value">
+                        <field name="work_phone"/>
+                    </t>
+                    <t t-elif="record.mobile_phone.raw_value">
+                        <field name="mobile_phone"/>
+                    </t>
+                </field>
+                
+                <!-- Reemplazar work_email con lógica condicional -->
+                <field name="work_email" position="replace">
+                    <t t-if="record.work_email.raw_value">
+                        <field name="work_email"/>
+                    </t>
+                    <t t-elif="record.private_email.raw_value">
+                        <field name="private_email"/>
+                    </t>
+                </field>
+                
+            </field>
+        </record>
+    </data>
+</odoo>

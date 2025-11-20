@@ -9,6 +9,19 @@ class HrEmployeeDocument(models.Model):
     employee_id = fields.Many2one('hr.employee', string="Empleado", required=True)
     attached = fields.Boolean(string="Adjunto", compute="_compute_attached", store=True)
 
+    preview_url = fields.Char(
+        string="Vista previa",
+        compute="_compute_preview_url",
+    )
+
+    def _compute_preview_url(self):
+        for rec in self:
+            if rec.id:
+                rec.preview_url = f"/web/content/{rec._name}/{rec.id}/datas"
+            else:
+                rec.preview_url = False
+
+
     @api.depends('name', 'employee_id')
     def _compute_attached(self):
         for record in self:
@@ -86,12 +99,19 @@ class HrEmployeeDocument(models.Model):
             ('res_id', '=', self.employee_id.id),
             ('name', '=', self.name)
         ], limit=1)
+        
         if not attachment:
             raise UserError("No se encontró el archivo adjunto.")
+        
         return {
-            'type': 'ir.actions.act_url',
-            'url': f'/web/content/{attachment.id}?download=false',
+            'type': 'ir.actions.act_window',
+            'name': f'Vista Previa - {self.name}',
+            'res_model': 'ir.attachment',
+            'res_id': attachment.id,
+            'view_mode': 'form',
             'target': 'new',
+            'views': [(self.env.ref('hr_estevez.view_attachment_image_form').id, 'form')],
+            'flags': {'mode': 'readonly'},
         }
 
     def action_download_document(self):
