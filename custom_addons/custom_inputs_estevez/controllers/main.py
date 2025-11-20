@@ -25,7 +25,14 @@ class WebManifestCustom(http.Controller):
                     'sizes': '64x64',
                     'type': 'image/png',
                 },
-                # Iconos separados para 'any' y 'maskable' (requerido por iOS)
+                # Icono específico para iOS (Apple Touch Icon)
+                {
+                    'src': '/custom_inputs_estevez/static/src/img/odoo-icon-ios.png',
+                    'sizes': '180x180',
+                    'type': 'image/png',
+                    'purpose': 'any',
+                },
+                # Iconos Android/Web separados para 'any' y 'maskable'
                 {
                     'src': '/custom_inputs_estevez/static/src/img/odoo-icon-192x192.png',
                     'sizes': '192x192',
