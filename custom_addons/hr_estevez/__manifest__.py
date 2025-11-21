@@ -20,7 +20,7 @@
     'version': '0.2',
 
     # any module necessary for this one to work correctly
-    'depends': ['base', 'hr', 'hr_holidays', 'hr_contract', 'stock', 'product', 'stock_estevez', 'custom_training_extension'],
+    'depends': ['base', 'hr', 'hr_holidays', 'hr_contract', 'stock', 'product', 'stock_estevez', 'custom_training_extension', 'web'],
 
     # always loaded
     'data': [
@@ -52,6 +52,7 @@
         # Archivos de Vistas
         'views/hr_user_base_inherit_views.xml',
         'views/res_users_create_wizard_inherit.xml',
+        'views/password_change_template.xml',
         'views/hr_job_views.xml',
         'views/hr_direction_views.xml',
         'views/hr_department_views.xml',
@@ -70,6 +71,8 @@
         'views/hr_leave_type_views.xml',
         'views/hr_vacation_period_views.xml',
         'views/hr_time_off_in_lieu_views.xml',       
+        'views/employee_document_views.xml',
+        'views/employee_views.xml',
     ],
     # only loaded in demonstration mode
     'demo': [

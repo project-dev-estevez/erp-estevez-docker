@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+from . import res_users 
 from . import hr_direction
 from . import hr_employee
 from . import hr_area
@@ -18,4 +19,3 @@ from . import hr_vacation_allocation
 from . import hr_employee_document
 from . import hr_time_off_in_lieu
 from . import hr_study_tag
-from . import res_users

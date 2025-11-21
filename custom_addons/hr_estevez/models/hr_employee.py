@@ -81,8 +81,8 @@ class HrEmployee(models.Model):
         'employee_skill_tag_rel', 
         'employee_id',   
         'tag_id',    
-        string='Etiqueta',      
-        help='Selecciona las habilidades o etiquetas que describen al empleado.',
+        string='Estatus académico',      
+        help='Selecciona el estatus academico del empleado.',
     )
 
 
@@ -801,6 +801,10 @@ class HrEmployee(models.Model):
         """
         Valida que el empleado tenga email corporativo o employee_number
         antes de permitir la creación del usuario.
+        
+        Flujos:
+        - Con work_email: Invitación por correo (flujo normal Odoo)
+        - Sin work_email (solo employee_number): Contraseña por defecto con cambio obligatorio
         """
         self.ensure_one()
         
@@ -810,6 +814,8 @@ class HrEmployee(models.Model):
         
         has_email = bool(self.work_email)
         has_employee_number = bool(self.employee_number)
+
+        context = dict(self._context)
         
         # Validación: debe tener al menos uno de los dos campos
         if not has_email and not has_employee_number:
@@ -821,11 +827,22 @@ class HrEmployee(models.Model):
                 '📝 Por favor complete alguno de estos campos e intente nuevamente.'
             ) % self.name)
         
-        # Advertencia en log si solo tiene employee_number
-        if has_employee_number and not has_email:
-            _logger.warning(
-                f"Empleado {self.name} (ID: {self.id}) solo tiene número de empleado, "
-                f"creando usuario sin email corporativo"
+        if not has_email:
+            # Sin email: marcar para contraseña por defecto + cambio obligatorio
+            context['default_no_email_employee'] = True
+            context['no_reset_password'] = True  # Evitar envío de email
+            
+            _logger.info(
+                f"🔐 Usuario {self.name} (ID: {self.id}) será creado SIN EMAIL - "
+                f"Se asignará contraseña temporal '12345678' con cambio obligatorio en primer login"
+            )
+        else:
+            # Con email: flujo normal de invitación
+            context['no_reset_password'] = False
+            
+            _logger.info(
+                f"📧 Usuario {self.name} (ID: {self.id}) será creado CON EMAIL - "
+                f"Se enviará invitación a: {self.work_email}"
             )
         
         _logger.info(
@@ -841,7 +858,7 @@ class HrEmployee(models.Model):
             'view_mode': 'form',
             'view_id': self.env.ref('base.view_users_simple_form').id,
             'target': 'new',
-            'context': dict(self._context, **{
+            'context': dict(context, **{
                 'default_create_employee_id': self.id,
                 'default_name': self.name,
                 'default_phone': self.work_phone,
