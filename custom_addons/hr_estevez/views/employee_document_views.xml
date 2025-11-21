@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <data>
-        <!-- 🌄 Vista personalizada para previsualizar archivos adjuntos -->
+    <data>        
         <record id="view_attachment_image_form" model="ir.ui.view">
             <field name="name">ir.attachment.image.form</field>
             <field name="model">ir.attachment</field>
@@ -12,7 +11,7 @@
                             <!-- Vista previa de imagen -->
                             <div invisible="not mimetype or not ('image/' in mimetype)">
                                 <field name="datas" widget="image"
-                                    style="max-width: 95vw; max-height: 70vh; width: auto; height: auto;
+                                    style="max-width: 100vw; max-height: 100vh; width: auto; height: auto;
                                     object-fit: contain; border: 1px solid #dee2e6; border-radius: 8px;
                                     padding: 10px; background: white;"/>
                             </div>
@@ -21,7 +20,7 @@
                                 <div style="border: 1px solid #dee2e6; border-radius: 8px;
                                     background: #f8f9fa; padding: 10px; margin: 20px 0; height: 80vh;">
                                     <field name="datas" widget="pdf_viewer"
-                                    style="max-width: 95vw; max-height: 70vh; width: auto; height: auto;
+                                    style="max-width: 100vw; max-height: 100vh; width: auto; height: auto;
                                     object-fit: contain; border: 1px solid #dee2e6; border-radius: 8px;
                                     padding: 10px; background: white;"/>
                                 </div>
@@ -35,11 +34,11 @@
                                 </div>
                             </div>
                             <!-- Información del documento -->
-                            <group string="Información del Documento" class="mt-4">
+                            <!--group string="Información del Documento" class="mt-4">
                                 <field name="name" readonly="1" string="Nombre"/>
                                 <field name="mimetype" readonly="1" string="Tipo MIME"/>
                                 <field name="file_size" readonly="1" string="Tamaño"/>
-                            </group>
+                            </group-->
                         </group>
                     </sheet>
                 </form>
