@@ -21,13 +21,7 @@
     <field name="model">hr.incapacity</field>
     <field name="arch" type="xml">
         <form>
-            <header>
-                <button name="action_confirm" string="Enviar para Aprobación" type="object" class="btn-primary" invisible="state != 'draft'"/>
-                <button name="action_validate" string="Aprobar" type="object" class="btn-secondary" invisible="state != 'confirm'"/>
-                <button name="action_refuse" string="Rechazar" type="object" class="btn-danger" invisible="state not in ['draft', 'confirm']"/>
-                <button name="action_draft" string="Volver a Borrador" type="object" class="btn-secondary" invisible="state != 'refuse'"/>
-                <field name="state" widget="statusbar" statusbar_visible="draft,confirm,validate,refuse"/>
-            </header>
+            
             <sheet>
                 <group>
                     <group>

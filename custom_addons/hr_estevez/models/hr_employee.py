@@ -1081,13 +1081,10 @@ class HrEmployee(models.Model):
                 ", ".join(employees_without_date.mapped('name'))
             )
 
-        # <-- Cambia aquí si más adelante quieres otra fecha -->
         effective_new_law = fields.Date.from_string('2022-01-01')
-
         total_created = 0
 
         for employee in self:
-            # Borra periodos previos solo de este empleado
             employee.vacation_period_ids.unlink()
 
             start_date = employee.employment_start_date
@@ -1096,54 +1093,40 @@ class HrEmployee(models.Model):
             year_count = 1
 
             while start_date < today:
-                year_end = start_date + relativedelta(years=1, days=-1)
-                if year_end > today:
-                    year_end = today
+                # Calcular fin de año natural
+                year_end_full = start_date + relativedelta(years=1, days=-1)
+                
+                # Determinar si es el período actual
+                is_current_period = year_end_full >= today
+                period_end = today if is_current_period else year_end_full
 
+                # Determinar días de vacaciones según ley
                 under_new_law = start_date >= effective_new_law
+                entitled_full = self._calculate_entitled_days(year_count, under_new_law)
 
-                if not under_new_law:
-                    # Ley antigua
-                    if year_count == 1:
-                        entitled = 6
-                    elif year_count == 2:
-                        entitled = 8
-                    elif year_count == 3:
-                        entitled = 10
-                    elif year_count == 4:
-                        entitled = 12
-                    elif year_count == 5:
-                        entitled = 14
-                    else:
-                        entitled = 16
+                # Si es el período actual, calcular proporcional
+                if is_current_period:
+                    entitled_days = self._calculate_proportional_days(
+                        start_date, period_end, entitled_full, year_count
+                    )
                 else:
-                    # Nueva ley — usamos year_count como años de servicio para la escala
-                    if year_count == 1:
-                        entitled = 12
-                    elif year_count == 2:
-                        entitled = 14
-                    elif year_count == 3:
-                        entitled = 16
-                    elif year_count == 4:
-                        entitled = 18
-                    elif year_count == 5:
-                        entitled = 20
-                    else:
-                        # A partir del año 6, +2 días por cada bloque de 5 años completos sobre los 5 primeros años
-                        additional_blocks = math.ceil((year_count - 5) / 5.0)
-                        entitled = 20 + (additional_blocks * 2)
+                    entitled_days = entitled_full
 
                 periods.append({
                     'employee_id': employee.id,
                     'year_start': start_date,
-                    'year_end': year_end,
-                    'entitled_days': entitled,
+                    'year_end': period_end,
+                    'entitled_days': entitled_days,
                 })
 
-                start_date = year_end + relativedelta(days=1)
-                year_count += 1
+                # Avanzar al siguiente período si no es el actual
+                if not is_current_period:
+                    start_date = period_end + relativedelta(days=1)
+                    year_count += 1
+                else:
+                    break
 
-                if year_count > 100:
+                if year_count > 50:  # Límite de seguridad
                     break
 
             if periods:
@@ -1159,3 +1142,61 @@ class HrEmployee(models.Model):
                 'sticky': False,
             }
         }
+
+    def _calculate_entitled_days(self, year_count, under_new_law):
+        """Calcular días de vacaciones según años de servicio y ley aplicable"""
+        if not under_new_law:
+            # Ley antigua
+            if year_count == 1:
+                return 6
+            elif year_count == 2:
+                return 8
+            elif year_count == 3:
+                return 10
+            elif year_count == 4:
+                return 12
+            elif year_count == 5:
+                return 14
+            else:
+                return 16
+        else:
+            # Nueva ley
+            if year_count == 1:
+                return 12
+            elif year_count == 2:
+                return 14
+            elif year_count == 3:
+                return 16
+            elif year_count == 4:
+                return 18
+            elif year_count == 5:
+                return 20
+            else:
+                additional_blocks = math.ceil((year_count - 5) / 5.0)
+                return 20 + (additional_blocks * 2)
+
+    def _calculate_proportional_days(self, start_date, end_date, entitled_full, year_count):
+        """Calcular días proporcionales para el período actual"""
+        # Calcular días trabajados en el período
+        days_worked = (end_date - start_date).days + 1
+        
+        # Calcular días totales del período completo (1 año)
+        full_period_end = start_date + relativedelta(years=1, days=-1)
+        days_in_full_period = (full_period_end - start_date).days + 1
+        
+        # Evitar división por cero
+        if days_in_full_period == 0:
+            return 0
+        
+        # Calcular proporcional
+        proportional_days = (entitled_full * days_worked) / days_in_full_period
+        
+        # Redondear según política de la empresa
+        # Opción 1: Redondear al medio día más cercano
+        rounded_days = math.ceil(proportional_days * 2) / 2
+        
+        # Opción 2: Redondear al día completo más cercano (comenta la línea anterior y descomenta esta)
+        # rounded_days = round(proportional_days)
+        
+        # Mínimo 0.5 días si ha trabajado al menos un día
+        return max(0.5, rounded_days) if days_worked > 0 else 0

@@ -22,16 +22,14 @@ class HrIncapacity(models.Model):
     days = fields.Integer(string='Días', compute='_compute_days', store=True)
     comments = fields.Text(string='Comentarios')
     
-    # Alinear estados con hr.leave
+    # Estados simplificados
     state = fields.Selection([
         ('draft', 'Borrador'),
         ('confirm', 'Por Aprobar'),
-        ('validate1', 'Primera Aprobación'),
         ('validate', 'Aprobado'),
         ('refuse', 'Rechazado')
-    ], string='Estado', default='draft', tracking=True)
+    ], string='Estado', default='validate', tracking=True)
     
-    # Campo para relacionar con la ausencia correspondiente
     leave_id = fields.Many2one('hr.leave', string='Ausencia Relacionada', readonly=True)
 
     @api.depends('start_date', 'end_date')
@@ -48,6 +46,10 @@ class HrIncapacity(models.Model):
     def create(self, vals):
         if vals.get('name', 'Nuevo') == 'Nuevo':
             vals['name'] = self.env['ir.sequence'].next_by_code('hr.incapacity') or 'Nuevo'
+        
+        # Forzar estado a "Aprobado" si no se especifica otro
+        if 'state' not in vals:
+            vals['state'] = 'validate'
         
         # Crear primero la incapacidad
         incapacity = super(HrIncapacity, self).create(vals)
@@ -81,6 +83,10 @@ class HrIncapacity(models.Model):
             _logger.info("Creando ausencia relacionada para incapacidad: %s", self.name)
             
             leave_type = self._get_default_holiday_status()
+            if not leave_type:
+                _logger.error("No se pudo encontrar o crear el tipo de ausencia para incapacidades")
+                return
+                
             _logger.info("Tipo de ausencia: %s", leave_type.name)
             
             # Convertir fechas a datetime para hr.leave
@@ -101,25 +107,25 @@ class HrIncapacity(models.Model):
                     'date_from': date_from,
                     'date_to': date_to,
                     'request_unit_hours': False,
-                    # No establecer el estado aquí, se establecerá automáticamente
+                    'state': 'confirm',  # Crear en estado "Por Aprobar" primero
                 }
                 
                 _logger.info("Valores para la ausencia: %s", leave_vals)
                 
-                # Crear la ausencia sin establecer el estado
+                # Crear la ausencia
                 leave = self.env['hr.leave'].create(leave_vals)
                 
-                # Ahora actualizar el estado según corresponda
-                if self.state == 'confirmed':
-                    leave.action_approve()
-                elif self.state == 'validated':
-                    leave.action_validate()
-                elif self.state == 'cancel':
-                    leave.action_refuse()
-                # Para 'draft' no necesitamos hacer nada, ya es el estado por defecto
+                # Si la incapacidad está aprobada, aprobar la ausencia también
+                if self.state == 'validate':
+                    # Usar sudo() para evitar problemas de permisos
+                    leave.sudo().action_approve()
+                    # Si requiere segunda aprobación
+                    if leave.state == 'validate1':
+                        leave.sudo().action_validate()
                 
                 self.leave_id = leave.id
-                _logger.info("Ausencia creada exitosamente: %s", leave.id)
+                _logger.info("Ausencia creada exitosamente: %s con estado: %s", leave.id, leave.state)
+                
         except Exception as e:
             _logger.error("Error al crear ausencia relacionada: %s", str(e))
             _logger.error("Traceback: %s", traceback.format_exc())
@@ -136,56 +142,70 @@ class HrIncapacity(models.Model):
                     date_from = date_from.replace(hour=8, minute=0, second=0)
                     date_to = date_to.replace(hour=17, minute=0, second=0)
                     
-                    # Actualizar solo los campos básicos
+                    # Actualizar los campos básicos
                     self.leave_id.write({
                         'employee_id': self.employee_id.id,
                         'date_from': date_from,
                         'date_to': date_to,
                     })
                     
-                    # Actualizar el estado usando los métodos apropiados
-                    if self.state == 'confirmed' and self.leave_id.state != 'confirm':
-                        self.leave_id.action_approve()
-                    elif self.state == 'validated' and self.leave_id.state != 'validate':
-                        self.leave_id.action_validate()
-                    elif self.state == 'cancel' and self.leave_id.state != 'refuse':
-                        self.leave_id.action_refuse()
+                    # Sincronizar estados usando sudo() para evitar problemas de permisos
+                    if self.state == 'validate' and self.leave_id.state != 'validate':
+                        self.leave_id.sudo().action_approve()
+                        if self.leave_id.state == 'validate1':
+                            self.leave_id.sudo().action_validate()
+                    elif self.state == 'refuse' and self.leave_id.state != 'refuse':
+                        self.leave_id.sudo().action_refuse(f'Rechazado desde incapacidad {self.name}')
+                    elif self.state == 'confirm' and self.leave_id.state not in ['confirm', 'validate1']:
+                        # Para volver a "Por Aprobar" necesitamos resetear
+                        if self.leave_id.state in ['validate', 'refuse']:
+                            self.leave_id.sudo().action_draft()
+                        self.leave_id.sudo().action_confirm()
                     elif self.state == 'draft' and self.leave_id.state != 'draft':
-                        self.leave_id.action_draft()
+                        self.leave_id.sudo().action_draft()
                         
             except Exception as e:
                 _logger.error("Error al actualizar ausencia relacionada: %s", str(e))
                 _logger.error("Traceback: %s", traceback.format_exc())
 
     def _get_default_holiday_status(self):
+        """Obtener o crear el tipo de ausencia para incapacidades"""
         # Buscar el tipo de ausencia para incapacidades
         leave_type = self.env.ref('hr_incapacity.hr_leave_type_incapacity', False)
         if not leave_type:
             # Si no existe, buscar por nombre
-            leave_type = self.env['hr.leave.type'].search([('name', '=', 'Incapacidad')], limit=1)
+            leave_type = self.env['hr.leave.type'].search([('name', 'ilike', 'incapacidad')], limit=1)
             if not leave_type:
-                leave_type = self.env['hr.leave.type'].create({
+                # Crear uno nuevo si no existe
+                leave_type = self.env['hr.leave.type'].sudo().create({
                     'name': 'Incapacidad',
                     'requires_allocation': 'no',
+                    'color_name': 'red',
                 })
         return leave_type
 
     def action_confirm(self):
+        """Mover a estado Por Aprobar"""
         self.write({'state': 'confirm'})
         if self.leave_id:
-            self.leave_id.action_approve()
+            self.leave_id.sudo().action_confirm()
 
     def action_validate(self):
+        """Aprobar la incapacidad"""
         self.write({'state': 'validate'})
         if self.leave_id:
-            self.leave_id.action_validate()
+            self.leave_id.sudo().action_approve()
+            if self.leave_id.state == 'validate1':
+                self.leave_id.sudo().action_validate()
 
     def action_refuse(self):
+        """Rechazar la incapacidad"""
         self.write({'state': 'refuse'})
         if self.leave_id:
-            self.leave_id.action_refuse()
+            self.leave_id.sudo().action_refuse(f'Rechazado desde incapacidad {self.name}')
 
     def action_draft(self):
+        """Volver a borrador"""
         self.write({'state': 'draft'})
         if self.leave_id:
-            self.leave_id.action_draft()
+            self.leave_id.sudo().action_draft()

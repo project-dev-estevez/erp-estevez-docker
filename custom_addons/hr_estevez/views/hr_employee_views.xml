@@ -382,7 +382,7 @@
 
 
                 <!-- Nueva página de Vacaciones -->
-                <xpath expr="//notebook/page[@name='loans']" position="after">
+                <xpath expr="//page[@name='loans']" position="after">
                     <page name="vacations" string="Vacaciones">
                         <group>
                             <group string="Resumen Vacaciones">
@@ -390,11 +390,18 @@
                                 <field name="entitled_days" readonly="1"/>
                                 <field name="vacation_days_taken" readonly="1"/>
                                 <field name="vacation_days_available" readonly="1"/>
+                                
+                                <!-- Botón para crear vacaciones -->
+                                <button name="action_create_vacation" 
+                                        type="object" 
+                                        string="Solicitar Vacaciones" 
+                                        class="oe_highlight" 
+                                        icon="fa-calendar-plus-o"
+                                        attrs="{'invisible': [('vacation_days_available', '&lt;=', 0)]}"/>
                             </group>
                         </group>
                         
                         <group string="Periodos de Vacaciones">
-                            <!-- Usar colspan para expandir la tabla -->
                             <field name="vacation_period_ids" 
                                 context="{'default_employee_id': id}"
                                 options="{'create': false}"
