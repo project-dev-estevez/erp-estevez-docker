@@ -20,11 +20,10 @@
                             <div invisible="not mimetype or mimetype != 'application/pdf'">
                                 <div style="border: 1px solid #dee2e6; border-radius: 8px;
                                     background: #f8f9fa; padding: 10px; margin: 20px 0; height: 80vh;">
-                                    <iframe src="[[ preview_url ]]" 
-                                        width="100%" 
-                                        height="100%" 
-                                        frameborder="0" 
-                                        style="border-radius: 8px;"/>
+                                    <field name="datas" widget="pdf_viewer"
+                                    style="max-width: 95vw; max-height: 70vh; width: auto; height: auto;
+                                    object-fit: contain; border: 1px solid #dee2e6; border-radius: 8px;
+                                    padding: 10px; background: white;"/>
                                 </div>
                             </div>
                             <!-- Otros tipos de archivo -->
