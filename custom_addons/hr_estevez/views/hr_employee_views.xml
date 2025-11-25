@@ -333,7 +333,7 @@
                         <list>
                             <field name="id" string="Código" readonly="1"/>
                             <field name="create_date" string="Fecha de Creación" readonly="1"/>                                
-                            <field name="administrative_type" string="Tipo de Acta"/>
+                            <field name="administrative_type" string="Tipo de Acta" width="200"/>
                             <field name="description" string="Descripción"/>
                             <field name="date" string="Fecha del Acta"/>
                             <button name="download_memorandum_report" type="object" string="Reporte" class="btn-secondary fa fa-download"/>

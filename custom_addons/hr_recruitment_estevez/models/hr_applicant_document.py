@@ -104,21 +104,25 @@ class HrApplicantDocument(models.Model):
     
 
     def action_view_document(self):
-        """ Abre el archivo adjunto en una nueva ventana """
         self.ensure_one()
-        # Buscar el archivo adjunto relacionado con este documento
         attachment = self.env['ir.attachment'].search([
             ('res_model', '=', 'hr.applicant'),
             ('res_id', '=', self.applicant_id.id),
             ('name', '=', self.name)
         ], limit=1)
+        
         if not attachment:
             raise UserError("No se encontró el archivo adjunto.")
-        # Abrir el archivo en una nueva ventana
+        
         return {
-            'type': 'ir.actions.act_url',
-            'url': f'/web/content/{attachment.id}?download=false',
+            'type': 'ir.actions.act_window',
+            'name': f'Vista Previa - {self.name}',
+            'res_model': 'ir.attachment',
+            'res_id': attachment.id,
+            'view_mode': 'form',
             'target': 'new',
+            'views': [(self.env.ref('hr_recruitment_estevez.view_attachment_image_form').id, 'form')],
+            'flags': {'mode': 'readonly'},
         }
 
     def action_download_document(self):

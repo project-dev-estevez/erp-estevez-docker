@@ -1,0 +1,179 @@
+<odoo>
+    <template id="report_memorandum_desempeño">            
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <div class="container">
+
+                            <div class="row mt-3">
+                                <div class="col-12 text-center">
+                                    <strong class="font-weight-bold">ACTA ADMINISTRATIVA</strong>
+                                </div>
+                            </div>
+
+                            <div class="row mt-3">
+                                <div class="col-12 text-justify">
+                                    <p style="text-align: justify;">
+                                        En Tlalnepantla, Estado de México, siendo <span class="text-dark"><t t-esc="doc.get_formatted_date()"/>,</span> 
+                                        estando legalmente constituidos en el domicilio que ocupa la empresa <strong>ESTEVEZ.JOR SERVICIOS, S.A. DE C.V.,</strong>
+                                        con domicilio en  Filiberto Gómez número 46 Colonia Centro Industrial Tlalnepantla, Municipio de Tlalnepantla de Baz, Estado de México,
+                                        Código Postal 54030, se levanta la presente acta administrativa con fundamento en la fracción primera del artículo <strong>132</strong> y <strong>134</strong> de la Ley Federal del Trabajo,
+                                        y clausula decima cuarta, decima quinta y decima octava del contrato individual de trabajo celebrado entre la empresa <strong>ESTEVEZ.JOR SERVICIOS, S.A. DE C.V.,</strong>
+                                        con el<strong class="text-dark">C. <t t-esc="doc.employee_id.name.upper()"/>,</strong>
+                                        para dejar constancia de los hechos y circunstancias que a continuación se mencionan.
+                                    </p>
+
+                                    <hr class="border-top border-dark border-2 my-2"/>
+                                </div>
+                            </div>
+
+                            <div class="row mt-3">
+                                <div class="col-12 text-justify">
+                                    <p style="text-align: justify;">
+                                        En la presente acta <strong><span class="text-decoration-underline">COMPARECE</span> EN REPRESENTACIÓN DE ESTEVEZ.JOR SERVICIOS, S.A DE C.V</strong> 
+                                        el Lic. <strong>EDWIN GONZALEZ SORIA,</strong> apoderado legal y la Lic.
+                                        <strong>TANIA ALEYDA FLORES CHAVEZ</strong> representante del área de recursos humanos, de la empresa
+                                        <strong>ESTEVEZ.JOR SERVICIOS, S.A. DE C.V.</strong>
+                                    </p>
+
+                                    <hr class="border-top border-dark border-2 my-2"/>
+                                </div>
+                            </div>
+
+                            <div class="row mt-3">
+                                <div class="col-12 text-justify">
+                                    <p style="text-align: justify;">
+                                        <strong class="text-decoration-underline">COMPARECE</strong> 
+                                        el Trabajador el <strong>C.</strong><strong class="text-dark"><t t-esc="doc.employee_id.name.upper()"/>,</strong> quien tiene la
+                                        categoría de <strong><t t-esc="doc.employee_id.job_id.name.upper()"/></strong>, de conformidad con lo establecido en la Clausula Tercera del Contrato individual de trabajo.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="row mt-3">
+                                <div class="col-12 text-justify">
+                                    <p style="text-align: justify;">
+                                        <strong class="text-decoration-underline">COMPARECEN</strong> 
+                                        Como Testigos Presenciales en la integración de esta acta administrativa, las <strong>C. JESSICA CARINA CALLEJAS VAZQUEZ</strong>
+                                        Y <strong>CASANDRA PAULINA GUTIERREZ AGUILAR.</strong>
+                                    </p>
+
+                                    <hr class="border-top border-dark border-2 my-2"/>
+                                </div>
+                            </div>
+
+                            <div class="row mt-3">
+                                <div class="col-12 text-justify">
+                                    <p style="text-align: justify;">
+                                        <strong>ACTO SEGUIDO,</strong> 
+                                        Se hace constar que la presente Acta se levanta de manera libre, espontánea,
+                                        sin que exista ningún tipo de presión, coacción, violencia, dolo y error, esta Acta se levanta a petición
+                                        de las partes que intervienen en la misma en presencia de los testigos antes mencionados que darán fe de dicho acto.
+                                    </p>
+                                    <div class="d-flex align-items-center my-2">
+                                        <hr class="flex-grow-1 border-top border-dark border-2"/>
+                                        <span class="mx-3 font-weight-bold">HECHOS</span>
+                                        <hr class="flex-grow-1 border-top border-dark border-2"/>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row mt-3">
+                                <div class="col-12 text-justify">
+                                    <p  style="text-align: justify;" 
+                                        class="text-dark">
+                                        <t t-raw="doc.description"/>
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="page">
+                                <div class="row mt-3"></div>
+                                <div class="col-12 text-justify">
+                                    <p style="text-align: justify;">
+                                        <strong>ACTO SEGUIDO,</strong> 
+                                        se le concede el uso de la palabra al Trabajador <strong>C.</strong><strong class="text-dark"><t t-esc="doc.employee_id.name.upper()"/></strong> 
+                                        para que de manera libre y espontanea y sin ningun tipo de presion
+                                        manifieste lo que a su derecho e intereses convenga: Manifiesta el Trabajador
+                                        <strong>C.</strong><strong class="text-dark"><t t-esc="doc.employee_id.name.upper()"/></strong> 
+                                    </p>
+                                    <hr class="border-top border-dark border-2 my-2"/>
+                                </div>
+                            </div>
+
+                            <div class="row mt-3"></div>
+                                <div class="col-12 text-justify">
+                                    <p style="text-align: justify;">
+                                        <strong>ACTO SEGUIDO,</strong> 
+                                        el <strong>C. JESSICA CARINA CALLEJAS VAZQUEZ</strong>, le informa al trabajador <strong class="text-dark"><t t-esc="doc.employee_id.name.upper()"/></strong> 
+                                        que la conducta que tuvo, misma que se ha narrado y que ha aceptado sera sancionada con fundamento en lo contenido en la Ley Federal del Trabajo en el Articulo 134 son 
+                                        obligaciones de los trabajadores.                                        
+                                    </p>
+                                    <hr class="border-top border-dark border-2 my-2"/>
+                                </div>
+
+                            <div class="row mt-3">
+                                <div class="col-12 text-justify">
+                                    <p style="text-align: justify;">
+                                        <strong>ACTO SEGUIDO,</strong> 
+                                        Siendo <span class="text-dark"><t t-esc="doc.get_formatted_date()"/></span>,
+                                         se da por terminada la presente acta administrativa,
+                                        dejando constancia de  todo lo actuado para los efectos legales a que haya lugar y firman al margen y calce de la misma los que en ella 
+                                        intervinieron y así quisieron hacerlo adjuntando copias de sus Identificaciones quedando en poder de cada uno de los comparecientes un ejemplar de esta acta administrativa
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="row" style="margin-top: 75px;">
+                                <div class="col-6 text-center">
+                                    <p class="mb-1"><strong></strong></p>
+                                    <p class="mb-1 mt-5"><strong>LIC. TANIA ALEYDA FLORES CHAVEZ</strong></p>
+                                    <p class="mb-1 mt-5"><strong>REPRESENTANTE DE RECURSOS </strong></p>
+                                    <p class="mb-1"><strong>HUMANOS DE ESTEVEZ.JOR</strong></p>
+                                    <p class="mb-1"><strong>SERVICIOS, S.A. DE C.V.</strong></p>
+                                </div>
+
+                                <div class="col-6 text-center">
+                                    <p class="mb-1"><strong></strong></p>
+                                    <p class="mb-1 mt-5"><strong>C.</strong><strong class="text-dark"><t t-esc="doc.employee_id.name.upper()"/></strong></p>
+                                    <p class="mb-1 mt-5"><strong>EL TRABAJADOR.</strong></p>
+                                </div>
+                            </div>
+
+                            <div class="row" style="margin-top: 75px;">
+                                <div class="col-6 text-center">
+                                    <p class="mb-1"><strong></strong></p>
+                                    <p class="mb-1 mt-5"><strong>C. JESSICA CARINA CALLEJAS VAZQUEZ</strong></p>
+                                    <p class="mb-1 mt-5"><strong>TESTIGO PRESENCIAL EN LA</strong></p>
+                                    <p class="mb-1"><strong>INTEGRACIÓN DE ESTA ACTA</strong></p>
+                                    <p class="mb-1"><strong>ADMINISTRATIVA</strong></p>
+                                </div>
+
+                                <div class="col-6 text-center">
+                                    <p class="mb-1"><strong></strong></p>
+                                    <p class="mb-1 mt-5"><strong>C. CASANDRA PAULINA GUTIERREZ AGUILAR</strong></p>
+                                    <p class="mb-1 mt-5"><strong>TESTIGO PRESENCIAL EN LA</strong></p>
+                                    <p class="mb-1"><strong>INTEGRACIÓN DE ESTA ACTA</strong></p>
+                                    <p class="mb-1"><strong>ADMINISTRATIVA</strong></p>
+                                </div>
+                            </div>
+
+                            <div class="row mt-5">
+                                <div class="col-12 text-center">
+                                    <strong class="font-weight-bold">LIC. EDWIN GONZALEZ SORIA</strong>
+                                </div>
+                            </div>
+
+                            <div class="row mt-3">
+                                <div class="col-12 text-center">
+                                    <strong class="font-weight-bold">REPRESENTANTE LEGAL DE ESTEVEZ.JOR SERVICIOS. S.A DE C.V.</strong>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </t>    
+    </template>
+</odoo>
