@@ -15,6 +15,7 @@ class HrMemorandum(models.Model):
     employee_id = fields.Many2one('hr.employee', string='Empleado', required=True, ondelete='cascade')
     date = fields.Datetime(string='Fecha del Acta', required=True)
     description = fields.Html(string='Descripción / Hechos', required=True, sanitize=True)   
+    fraction = fields.Char(string='Fraccion')
         # Campo SELECT con versiones cortas
     fraction_code = fields.Selection(
         [
