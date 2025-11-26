@@ -14,11 +14,11 @@
                                     <t t-esc="props.title"/>
                                 </h1>
                                 <small class="text-muted fw-medium text-uppercase opacity-75">
-                                    Panel de Control Ejecutivo
+                                    Visualización en Tiempo Real de KPIs y Métricas
                                 </small>
                             </div>
                         </div>
-                        <div class="d-flex gap-3 align-items-center">
+                        <!-- <div class="d-flex gap-3 align-items-center">
                             <div class="cursor-pointer">
                                 <label class="form-label mb-1 fw-medium text-muted small">Desde:</label>
                                 <div class="position-relative cursor-pointer" t-on-click="onDateContainerClick">
@@ -41,7 +41,7 @@
                                         t-att-min="props.startDate"/>
                                 </div>
                             </div>
-                        </div>
+                        </div> -->
                     </div>
                 </div>
             </div>
