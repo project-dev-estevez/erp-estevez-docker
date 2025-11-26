@@ -172,7 +172,7 @@
      <filter name="group_by_state"
             string="Estado"
             context="{
-                'group_by': 'state',
+                'group_by': 'estado_filtrado',
                 'search_default_hide_cancel': 1
             }"/>
 
