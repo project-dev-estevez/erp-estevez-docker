@@ -65,6 +65,31 @@ class HrContract(models.Model):
        store=True, 
        readonly=False)
 
+    estado_filtrado = fields.Selection(
+        selection=[
+            ('draft', 'Nuevo'),
+            ('open', 'En proceso'),
+            ('close', 'Vencido'),
+        ],
+        string='Estado',
+        compute="_compute_estado_filtrado",
+        store=True
+    )
+
+    @api.depends('state', 'contract_type_id')
+    def _compute_estado_filtrado(self):
+        for rec in self:
+            # Por defecto no entra al grupo
+            rec.estado_filtrado = False
+
+            # Nuevo / En proceso siempre pasan
+            if rec.state in ('draft', 'open'):
+                rec.estado_filtrado = rec.state
+
+            # Solo vencidos de tipo determinado
+            elif rec.state == 'close' and rec.contract_type_id.name == 'Determinado':
+                rec.estado_filtrado = 'close'
+
     @api.onchange('contract_duration', 'date_start')
     def _onchange_contract_duration(self):
         """Calcula automáticamente la fecha fin basado en la duración seleccionada"""

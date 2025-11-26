@@ -1,9 +1,39 @@
 <odoo>
-    <record id="action_report_hr_employee_memorandum" model="ir.actions.report">
-        <field name="name">Acta Administrativa</field>
+
+    <!-- Reporte general (velocidad) -->
+    <record id="action_report_memorandum_velocidad" model="ir.actions.report">
+        <field name="name">Acta - Velocidad</field>
         <field name="model">hr.memorandum</field>
         <field name="report_type">qweb-pdf</field>
-        <field name="report_name">hr_estevez.report_hr_employee_memorandum</field>
-        <field name="print_report_name">'Empleado - Acta Administrativa'</field>
+        <field name="report_name">hr_estevez.report_memorandum_velocidad</field>
+        <field name="print_report_name">'Acta Velocidad - %s' % (object.employee_id.name)</field>
     </record>
+
+    <!-- Reporte faltas -->
+    <record id="action_report_memorandum_faltas" model="ir.actions.report">
+        <field name="name">Acta - Faltas</field>
+        <field name="model">hr.memorandum</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">hr_estevez.report_memorandum_faltas</field>
+        <field name="print_report_name">'Acta Faltas - %s' % (object.employee_id.name)</field>
+    </record>
+
+    <!-- Reporte estado de ebriedad -->
+    <record id="action_report_memorandum_ebriedad" model="ir.actions.report">
+        <field name="name">Acta - Estado de Ebriedad</field>
+        <field name="model">hr.memorandum</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">hr_estevez.report_memorandum_ebriedad</field>
+        <field name="print_report_name">'Acta Ebriedad - %s' % (object.employee_id.name)</field>
+    </record>
+
+    <!-- Reporte por bajo desempeño -->
+    <record id="action_report_memorandum_desempeño" model="ir.actions.report">
+        <field name="name">Acta - Bajo desempeño</field>
+        <field name="model">hr.memorandum</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">hr_estevez.report_memorandum_desempeño</field>
+        <field name="print_report_name">'Acta Bajo Desempeño - %s' % (object.employee_id.name)</field>
+    </record>
+
 </odoo>

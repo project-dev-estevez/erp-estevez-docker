@@ -42,6 +42,10 @@
         'report/hr_employee_memorandum_report_templates.xml',
         'report/hr_employee_loan_report.xml',
         'report/hr_employee_loan_report_templates.xml',
+        'report/templates/report_memorandum_velocidad.xml',
+        'report/templates/report_memorandum_ebriedad.xml',
+        'report/templates/report_memorandum_faltas.xml',
+        'report/templates/report_memorandum_desempeño.xml',
 
         # Email Templates
         # 'data/email_template_contract_expired.xml',

@@ -362,9 +362,9 @@ class HrApplicant(models.Model):
                 [('res_model', '=', 'hr.applicant'), ('res_id', '=', record.id)])
     
     def action_open_documents(self):
-        self.env['hr.applicant.document'].search([]).unlink()
-        docs = self.env['hr.applicant.document'].create_required_documents(self.id)
-
+        self.ensure_one()
+        self.env['hr.applicant.document'].search([('applicant_id', '=', self.id)]).unlink()
+        self.env['hr.applicant.document'].create_required_documents(self.id)
         return {
             'name': _('Documentos del Aplicante'),
             'view_mode': 'kanban',
@@ -372,7 +372,8 @@ class HrApplicant(models.Model):
             'type': 'ir.actions.act_window',
             'target': 'new',
             'context': {'create': False},
-            'views': [(self.env.ref('hr_recruitment_estevez.view_hr_applicant_documents_kanban').id, 'kanban')],  # Asegúrate de usar la vista correcta
+            'domain': [('applicant_id', '=', self.id)],
+            'views': [(self.env.ref('hr_recruitment_estevez.view_hr_applicant_documents_kanban').id, 'kanban')],
         }
 
     def _format_phone_number(self, phone_number):

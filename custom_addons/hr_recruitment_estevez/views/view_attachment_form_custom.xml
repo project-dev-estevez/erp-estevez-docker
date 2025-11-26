@@ -1,0 +1,17 @@
+<odoo>
+    <record id="view_attachment_form_custom" model="ir.ui.view">
+        <field name="name">ir.attachment.form.custom</field>
+        <field name="model">ir.attachment</field>
+        <field name="inherit_id" ref="base.view_attachment_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form/sheet" position="replace">
+                <sheet>
+                    <group>
+                        <field name="name" readonly="1"/>
+                        <field name="datas" widget="binary" string="Seleccionar Archivo..."/>
+                    </group>
+                </sheet>
+            </xpath>
+        </field>
+    </record>
+</odoo>

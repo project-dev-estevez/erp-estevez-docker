@@ -114,7 +114,7 @@
         <field name="name">hr.contract.tree.inherit</field>
         <field name="model">hr.contract</field>
         <field name="inherit_id" ref="hr_contract.hr_contract_view_tree"/>
-        <field name="arch" type="xml">
+        <field name="arch" type="xml">       
         <field name="employee_id" position="attributes">
             <attribute name="width">200</attribute>
         </field>
@@ -154,6 +154,44 @@
                 <field name="create_uid" string="Creado por" widget="many2one_avatar_user" optional="hide" width="200"/>
             </xpath>                                            
         </field>
-    </record>             
-  
+    </record>
+
+<!-- Acción contratos SIN cancelados -->
+<record id="hr_contract.action_hr_contract" model="ir.actions.act_window">
+    <field name="domain">[('state', '!=', 'cancel')]</field>
+</record>
+
+<record id="view_hr_contract_search_inherit_remove_cancel" model="ir.ui.view">
+    <field name="name">hr.contract.search.inherit.remove.cancel</field>
+    <field name="model">hr.contract</field>
+    <field name="inherit_id" ref="hr_contract.hr_contract_view_search"/>
+    <field name="arch" type="xml">
+
+        <xpath expr="//filter[@name='group_by_state']" position="replace">
+
+     <filter name="group_by_state"
+            string="Estado"
+            context="{
+                'group_by': 'estado_filtrado',
+                'search_default_hide_cancel': 1
+            }"/>
+
+</xpath>
+<xpath expr="//search" position="inside">
+
+    <filter name="hide_cancel"
+            string="Excluir cancelados"
+            domain="[('state','!=','cancel')]"
+            invisible="1"/>
+
+</xpath>
+
+
+
+    </field>
+</record>
+
+
+
+
 </odoo>

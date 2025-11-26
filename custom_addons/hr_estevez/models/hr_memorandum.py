@@ -1,5 +1,6 @@
 from odoo import models, fields, api
 from datetime import datetime, timedelta
+from odoo.exceptions import UserError
 import logging
 import json
 import requests
@@ -14,6 +15,7 @@ class HrMemorandum(models.Model):
     employee_id = fields.Many2one('hr.employee', string='Empleado', required=True, ondelete='cascade')
     date = fields.Datetime(string='Fecha del Acta', required=True)
     description = fields.Html(string='Descripción / Hechos', required=True, sanitize=True)   
+    fraction = fields.Char(string='Fraccion')
         # Campo SELECT con versiones cortas
     fraction_code = fields.Selection(
         [
@@ -69,20 +71,36 @@ class HrMemorandum(models.Model):
         else:
             self.fraction_full_text = ''
     article = fields.Char(string='Artículo', default="47.- Son causas de rescisión de la relación de trabajo, sin responsabilidad para el patrón:")
-    administrative_type = fields.Char(string='Tipo Acta administrativa') 
+    administrative_type = fields.Selection(
+        [
+            ('velocidad', 'Velocidad'),
+            ('faltas', 'Faltas'),
+            ('estado_ebriedad', 'Estado de ebriedad'),
+            ('consumo', 'Consumo de sustancias'),
+            ('probidad', 'Falta de probidad'),
+            ('desempeño', 'Bajo desempeño'),
+        ],
+        string= "Tipo de Acta Administrativa"
+    )
 
     def download_memorandum_report(self):
-        """Generates a PDF report for the memorandum."""
-        self.ensure_one()  # Ensure only one record is processed
-        _logger.info("Downloading memorandum report for record: %s", self)
+        self.ensure_one()
 
-        return {
-            'type': 'ir.actions.report',
-            'report_name': 'hr_estevez.report_hr_employee_memorandum',
-            'report_type': 'qweb-pdf',
-            'model': self._name,
-            'res_id': self.id,
+        report_map = {
+            'velocidad': 'hr_estevez.action_report_memorandum_velocidad',
+            'faltas': 'hr_estevez.action_report_memorandum_faltas',
+            'estado_ebriedad': 'hr_estevez.action_report_memorandum_ebriedad',
+            'desempeño': 'hr_estevez.action_report_memorandum_desempeño',
+            # si agregas más tipos, solo los añades aquí
         }
+
+        report_action = report_map.get(self.administrative_type)
+
+        if not report_action:
+            raise UserError("No existe un formato definido para este tipo de acta.")
+
+        return self.env.ref(report_action).report_action(self)
+
 
     def action_save_memorandum(self):
         """Saves the memorandum and closes the modal."""
