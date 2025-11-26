@@ -18,7 +18,11 @@ export class ChartRendererApex extends Component {
     }
 
     renderChart() {
-        if (!this.props.config?.series) {
+        const config = this.props.config || {};
+        
+        // Verificar si hay series (puede venir directamente en config o en config.series)
+        const hasSeries = config.series || (config.chart && config.series !== undefined);
+        if (!hasSeries) {
             console.log("⚠️ No hay datos para renderizar ApexChart");
             return;
         }
@@ -26,44 +30,84 @@ export class ChartRendererApex extends Component {
         // Destruir instancia previa si existe
         this.destroyChart();
 
-        const config = this.props.config || {};
-
         // Determinar si es horizontal basado en el tipo
         const isHorizontal = this.props.type === 'bar-horizontal';
         const chartType = isHorizontal ? 'bar' : (this.props.type || 'bar');
 
-        // Configuración base de ApexCharts
-        const defaultOptions = {
+        // Obtener filename desde config o props
+        const filename = config.filename || this.props.filename || 'chart_export';
+
+        // Configuración base solo con título y toolbar
+        const titleAndToolbar = {
             chart: {
                 type: chartType,
-                height: this.props.height || 350,
-                width: '100%',
-                cursor: 'pointer',
                 toolbar: {
                     show: true,
+                    offsetX: 0,
+                    offsetY: 0,
+                    tools: {
+                        download: true,
+                        selection: false,
+                        zoom: false,
+                        zoomin: false,
+                        zoomout: false,
+                        pan: false,
+                        reset: false,
+                    },
+                    export: {
+                        csv: {
+                            filename: filename,
+                            columnDelimiter: ',',
+                            headerCategory: 'Categoría',
+                            headerValue: 'Valor',
+                        },
+                        svg: {
+                            filename: filename,
+                        },
+                        png: {
+                            filename: filename,
+                        }
+                    },
                 },
-                animations: {
-                    enabled: true,
-                },
             },
-            plotOptions: {
-                bar: {
-                    horizontal: isHorizontal,
-                },
+            title: {
+                text: this.props.title || '',
+                align: 'center',
+                style: {
+                    fontSize: '16px',
+                    fontWeight: 600,
+                    color: '#263238'
+                }
             },
-            dataLabels: {
-                enabled: true,
-            },
-            xaxis: {
-                categories: config.categories || [],
-            },
-            series: config.series || [],
         };
 
-        const options = Object.assign({}, defaultOptions, config);
+        // Merge: título/toolbar + config existente
+        const options = this.mergeDeep(titleAndToolbar, config);
 
         this.chartInstance = new window.ApexCharts(this.chartRef.el, options);
         this.chartInstance.render();
+    }
+
+    // Utility para hacer merge profundo de objetos
+    mergeDeep(target, source) {
+        const output = Object.assign({}, target);
+        if (this.isObject(target) && this.isObject(source)) {
+            Object.keys(source).forEach(key => {
+                if (this.isObject(source[key])) {
+                    if (!(key in target))
+                        Object.assign(output, { [key]: source[key] });
+                    else
+                        output[key] = this.mergeDeep(target[key], source[key]);
+                } else {
+                    Object.assign(output, { [key]: source[key] });
+                }
+            });
+        }
+        return output;
+    }
+
+    isObject(item) {
+        return item && typeof item === 'object' && !Array.isArray(item);
     }
 
     updateChart() {
