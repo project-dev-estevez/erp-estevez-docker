@@ -63,32 +63,7 @@ class HrContract(models.Model):
     ], string='Tipo de Nómina', 
        related='employee_id.payroll_type', 
        store=True, 
-       readonly=False)
-
-    estado_filtrado = fields.Selection(
-        selection=[
-            ('draft', 'Nuevo'),
-            ('open', 'En proceso'),
-            ('close', 'Vencido'),
-        ],
-        string='Estado',
-        compute="_compute_estado_filtrado",
-        store=True
-    )
-
-    @api.depends('state', 'contract_type_id')
-    def _compute_estado_filtrado(self):
-        for rec in self:
-            # Por defecto no entra al grupo
-            rec.estado_filtrado = False
-
-            # Nuevo / En proceso siempre pasan
-            if rec.state in ('draft', 'open'):
-                rec.estado_filtrado = rec.state
-
-            # Solo vencidos de tipo determinado
-            elif rec.state == 'close' and rec.contract_type_id.name == 'Determinado':
-                rec.estado_filtrado = 'close'
+       readonly=False)    
 
     @api.onchange('contract_duration', 'date_start')
     def _onchange_contract_duration(self):

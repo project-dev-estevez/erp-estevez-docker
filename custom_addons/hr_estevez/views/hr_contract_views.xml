@@ -7,14 +7,13 @@
         <field name="inherit_id" ref="hr_contract.hr_contract_view_form"/>
         <field name="arch" type="xml">
 
-        <!-- Agregar campo payroll_type después de structure_type_id -->
-        <xpath expr="//field[@name='structure_type_id']" position="after">
-            <field name="payroll_type"/>
-        </xpath>
-                
+            <!-- Agregar campo payroll_type después de structure_type_id -->
+            <xpath expr="//field[@name='structure_type_id']" position="after">
+                <field name="payroll_type"/>
+            </xpath>
+                    
             <!-- Add a new "Guardar" button in the header -->
             <xpath expr="//header" position="inside">
-
                 <button type="object"
                         string="Guardar"
                         class="btn-primary"
@@ -40,7 +39,6 @@
                         name="action_cancel_contract"
                         confirm="¿Está seguro de que desea cancelar el contrato actual?"
                         invisible="state == 'cancel'"/>
-
             </xpath>
 
             <!-- Columna de la izquierda -->
@@ -115,39 +113,39 @@
         <field name="model">hr.contract</field>
         <field name="inherit_id" ref="hr_contract.hr_contract_view_tree"/>
         <field name="arch" type="xml">       
-        <field name="employee_id" position="attributes">
-            <attribute name="width">200</attribute>
-        </field>
-        <field name="name" position="attributes">
-            <attribute name="width">200</attribute>
-        </field>
-        <field name="department_id" position="attributes">
-            <attribute name="width">300</attribute>
-        </field>
-        <field name="job_id" position="attributes">
-            <attribute name="width">200</attribute>
-        </field>
-        <field name="date_start" position="attributes">
-            <attribute name="width">200</attribute>
-        </field>                
-        <field name="date_end" position="attributes">
-            <attribute name="width">200</attribute>
-        </field>
-        <field name="contract_type_id" position="attributes">
-            <attribute name="width">150</attribute>
-        </field>
-        <field name="wage" position="attributes">
-            <attribute name="width">150</attribute>
-        </field>
-        <field name="resource_calendar_id" position="attributes">
-            <attribute name="width">200</attribute>
-        </field>
-        <field name="structure_type_id" position="attributes">
-            <attribute name="width">200</attribute>
-        </field>
-        <field name="company_id" position="attributes">
-            <attribute name="width">200</attribute>
-        </field>
+            <field name="employee_id" position="attributes">
+                <attribute name="width">200</attribute>
+            </field>
+            <field name="name" position="attributes">
+                <attribute name="width">200</attribute>
+            </field>
+            <field name="department_id" position="attributes">
+                <attribute name="width">300</attribute>
+            </field>
+            <field name="job_id" position="attributes">
+                <attribute name="width">200</attribute>
+            </field>
+            <field name="date_start" position="attributes">
+                <attribute name="width">200</attribute>
+            </field>                
+            <field name="date_end" position="attributes">
+                <attribute name="width">200</attribute>
+            </field>
+            <field name="contract_type_id" position="attributes">
+                <attribute name="width">150</attribute>
+            </field>
+            <field name="wage" position="attributes">
+                <attribute name="width">150</attribute>
+            </field>
+            <field name="resource_calendar_id" position="attributes">
+                <attribute name="width">200</attribute>
+            </field>
+            <field name="structure_type_id" position="attributes">
+                <attribute name="width">200</attribute>
+            </field>
+            <field name="company_id" position="attributes">
+                <attribute name="width">200</attribute>
+            </field>
             <xpath expr="//field[@name='date_start']" position="after">
                 <field name="create_date" string="Fecha de Creación" optional="hide" width="200"/>
                 <field name="days_to_expiry" string="Días Vencimiento" optional="hide" width="150"/>
@@ -156,42 +154,27 @@
         </field>
     </record>
 
-<!-- Acción contratos SIN cancelados -->
-<record id="hr_contract.action_hr_contract" model="ir.actions.act_window">
-    <field name="domain">[('state', '!=', 'cancel')]</field>
-</record>
+    <!-- Acción contratos SIN cancelados -->
+    <record id="hr_contract.action_hr_contract" model="ir.actions.act_window">
+        <field name="domain">[('state', '!=', 'cancel')]</field>
+    </record>
 
-<record id="view_hr_contract_search_inherit_remove_cancel" model="ir.ui.view">
-    <field name="name">hr.contract.search.inherit.remove.cancel</field>
-    <field name="model">hr.contract</field>
-    <field name="inherit_id" ref="hr_contract.hr_contract_view_search"/>
-    <field name="arch" type="xml">
-
-        <xpath expr="//filter[@name='group_by_state']" position="replace">
-
-     <filter name="group_by_state"
-            string="Estado"
-            context="{
-                'group_by': 'state',
-                'search_default_hide_cancel': 1
-            }"/>
-
-</xpath>
-<xpath expr="//search" position="inside">
-
-    <filter name="hide_cancel"
-            string="Excluir cancelados"
-            domain="[('state','!=','cancel')]"
-            invisible="1"/>
-
-</xpath>
-
-
-
-    </field>
-</record>
-
-
-
-
+    <!-- Vista de búsqueda corregida -->
+    <record id="view_hr_contract_search_inherit_remove_cancel" model="ir.ui.view">
+        <field name="name">hr.contract.search.inherit.remove.cancel</field>
+        <field name="model">hr.contract</field>
+        <field name="inherit_id" ref="hr_contract.hr_contract_view_search"/>
+        <field name="arch" type="xml">
+            <!-- Agregar filtro para Vencido (solo Determinado) -->
+            <xpath expr="//search" position="inside">
+                <filter name="vencido" string="Vencido"
+                        domain="[('state','=','close'), ('contract_type_id.name','=','Determinado')]"/>
+                
+                <filter name="hide_cancel"
+                        string="Excluir cancelados"
+                        domain="[('state','!=','cancel')]"
+                        invisible="1"/>
+            </xpath>
+        </field>
+    </record>
 </odoo>
