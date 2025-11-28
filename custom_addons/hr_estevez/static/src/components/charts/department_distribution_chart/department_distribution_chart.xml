@@ -18,6 +18,8 @@
                     t-key="state.chartKey"
                     config="state.apexConfig.options" 
                     type="'bar'"
+                    title="props.title || 'Distribución por Departamento'"
+                    height="props.height || 400"
                 />
             </div>
 

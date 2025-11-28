@@ -596,8 +596,7 @@
                 <group>            
                     <field name="bank_id" string="Banco" options="{'no_create': True, 'no_create_edit': True}"/>
                     <field name="clabe" string="CLABE" placeholder="18 dígitos" required="bank_id"/>
-                      <field name="clabe" string="CLABE" placeholder="18 dígitos"        
-       required="bank_id"/>
+                      <!--field name="clabe" string="CLABE" placeholder="18 dígitos" required="bank_id"/-->
     <field name="account_number" string="Número de Cuenta"/>          
                 </group>            
             </group>        

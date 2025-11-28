@@ -3,6 +3,7 @@
     <record id="action_hr_recruitment_dashboard" model="ir.actions.client">
         <field name="name">Dashboard de Reclutamiento</field>
         <field name="tag">recruitment.dashboard</field>
+        <field name="path">recruitment-dashboard</field>
     </record>
 
     <!-- Acción para abrir requisiciones -->

@@ -63,7 +63,7 @@ class HrContract(models.Model):
     ], string='Tipo de Nómina', 
        related='employee_id.payroll_type', 
        store=True, 
-       readonly=False)
+       readonly=False)    
 
     @api.onchange('contract_duration', 'date_start')
     def _onchange_contract_duration(self):
