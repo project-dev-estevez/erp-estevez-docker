@@ -394,7 +394,7 @@ class HrApplicantStageDrivingTest(models.Model):
         for record in self:
             if record.theoretical_exam_result:
                 # Calcular el 10% del resultado teórico
-                record.theoretical_exam_result_10 = (record.theoretical_exam_result * 10) / 100
+                record.theoretical_exam_result_10 = record.theoretical_exam_result
             else:
                 record.theoretical_exam_result_10 = 0.0
 
