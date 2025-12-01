@@ -530,7 +530,8 @@
                 </page>
             </xpath>
             <!-- Insertar Historial de Puestos antes de la Experiencia del Curriculum -->
-<xpath expr="//field[@name='resume_line_ids']" position="after">
+        <xpath expr="//div[hasclass('o_group_resume')]" position="before">
+
 
     <group string="Historial de Puestos" col="1">
         
