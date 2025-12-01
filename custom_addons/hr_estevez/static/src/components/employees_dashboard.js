@@ -9,6 +9,7 @@ import { chartsDummy } from "./chart_renderer_apex/charts_dummy.js";
 import { DepartmentDistributionChart } from "./charts/department_distribution_chart/department_distribution_chart.js";
 import { EmployeeStatusChart } from "./charts/employee_status_chart/employee_status_chart.js";
 import { JobDistributionChart } from "./charts/job_distribution_chart/job_distribution_chart.js";
+import { GenderDistributionChart } from "./charts/gender_distribution_chart/gender_distribution_chart.js";
 
 export class EmployeesDashboard extends Component {
     static template = "hr_estevez.EmployeesDashboard";
@@ -18,7 +19,8 @@ export class EmployeesDashboard extends Component {
         ChartRendererApex, 
         DepartmentDistributionChart,
         EmployeeStatusChart,
-        JobDistributionChart
+        JobDistributionChart,
+        GenderDistributionChart
     };
 
     setup() {

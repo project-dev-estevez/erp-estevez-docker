@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="hr_estevez.GenderDistributionChart" owl="1">
+        <div class="gender-distribution-chart h-100">
+            <!-- Loading State -->
+            <div t-if="state.isLoading" class="d-flex justify-content-center align-items-center h-100">
+                <div class="text-center">
+                    <div class="spinner-border text-primary mb-2" role="status">
+                        <span class="visually-hidden">Cargando...</span>
+                    </div>
+                    <p class="text-muted small">Cargando distribución por género...</p>
+                </div>
+            </div>
+
+            <!-- Chart Content -->
+            <div t-elif="state.hasData" class="h-100">
+                <ChartRendererApex 
+                    t-key="state.chartKey"
+                    config="state.apexConfig.options" 
+                    type="'donut'"
+                    title="props.title || 'Distribución por Género'"
+                    height="props.height || 400"
+                />
+            </div>
+
+            <!-- No Data State -->
+            <div t-else="" class="d-flex justify-content-center align-items-center h-100">
+                <div class="text-center text-muted p-4">
+                    <i class="fa fa-users fa-3x mb-3 opacity-50"></i>
+                    <h6 class="mb-2">Sin datos disponibles</h6>
+                    <p class="small mb-0">No se encontraron empleados activos</p>
+                </div>
+            </div>
+        </div>
+    </t>
+</templates>
