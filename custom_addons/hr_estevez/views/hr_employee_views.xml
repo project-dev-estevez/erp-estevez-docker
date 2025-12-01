@@ -529,7 +529,7 @@
                     </notebook>
                 </page>
             </xpath>            
-            <!--xpath expr="//field[@name='resume_line_ids']" position="before">
+            <xpath expr="//field[@name='employee_skill_ids']" position="before">
                 <group string="Historial de Puestos" col="1">        
                     <field name="job_history_ids" readonly="1" nolabel="1">                        
                         <kanban>                            
@@ -574,7 +574,7 @@
                     </field>            
                 </group>
                 <separator string="Experiencia"/>    
-            </xpath-->
+            </xpath>
 
 
             <!--xpath expr="//notebook/page[@name='assignments']" position="after">
