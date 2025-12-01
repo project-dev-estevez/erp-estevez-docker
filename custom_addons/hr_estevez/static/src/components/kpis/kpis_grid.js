@@ -182,7 +182,6 @@ export class KpisGrid extends Component {
             this.state.totalEmployees.series = series;
             this.state.totalEmployees.labels = labels; // ✅ NUEVO: Guardar las etiquetas
             this.state.totalEmployees.dates = dates; // ✅ NUEVO: Guardar las fechas
-            console.log(`📊 KPI Total Empleados: ${count}, Series: [${series.join(', ')}], Labels: [${labels.join(', ')}]`);
         } catch (error) {
             console.error("❌ KpisGrid HR: Error calculando Total Empleados:", error);
             this.state.totalEmployees.value = 0;
@@ -197,7 +196,6 @@ export class KpisGrid extends Component {
             // ✅ TODO: Implementar lógica real
             const count = await this.orm.searchCount("hr.employee", [["active", "=", true]]);
             this.state.activeEmployees.value = count;
-            console.log(`📊 KPI Empleados Activos: ${count}`);
         } catch (error) {
             console.error("❌ KpisGrid HR: Error calculando Empleados Activos:", error);
             this.state.activeEmployees.value = 0;
@@ -213,7 +211,6 @@ export class KpisGrid extends Component {
                 { context: { active_test: false } }
             );
             this.state.inactiveEmployees.value = count;
-            console.log(`📊 KPI Empleados Inactivos: ${count}`);
         } catch (error) {
             console.error("❌ KpisGrid HR: Error calculando Empleados Inactivos:", error);
             this.state.inactiveEmployees.value = 0;
@@ -253,7 +250,6 @@ export class KpisGrid extends Component {
             this.state.newThisMonth.startDate = firstDayStr;
             this.state.newThisMonth.endDate = lastDayStr;
             
-            console.log(`📊 KPI Nuevos este Mes: ${count} (${firstDayStr} a ${lastDayStr})`);
         } catch (error) {
             console.error("❌ KpisGrid HR: Error calculando Nuevos este Mes:", error);
             this.state.newThisMonth.value = 0;
@@ -306,7 +302,6 @@ export class KpisGrid extends Component {
             this.state.upcomingBirthdays.startDate = today.toISOString().slice(0, 10);
             this.state.upcomingBirthdays.endDate = endDate.toISOString().slice(0, 10);
             
-            console.log(`📊 KPI Cumpleaños Próximos: ${upcomingBirthdays.length} empleados en próximos 7 días`);
         } catch (error) {
             console.error("❌ KpisGrid HR: Error calculando Cumpleaños Próximos:", error);
             this.state.upcomingBirthdays.value = 0;
@@ -339,15 +334,7 @@ export class KpisGrid extends Component {
             this.state.expiringContracts.contracts = expiringContracts; // ✅ Guardar contratos para navegación
             this.state.expiringContracts.startDate = todayStr;
             this.state.expiringContracts.endDate = endDateStr;
-            
-            console.log(`📊 KPI Contratos por Vencer: ${expiringContracts.length} contratos en próximos 30 días`);
-            
-            // ✅ Log detallado para debug
-            if (expiringContracts.length > 0) {
-                console.log("📄 Contratos que vencen:", expiringContracts.map(c => 
-                    `${c.employee_id[1]} - Vence: ${c.date_end}`
-                ));
-            }
+
         } catch (error) {
             console.error("❌ KpisGrid HR: Error calculando Contratos por Vencer:", error);
             this.state.expiringContracts.value = 0;
@@ -380,15 +367,6 @@ export class KpisGrid extends Component {
             this.state.expiredContracts.contracts = expiredContracts; // ✅ Guardar contratos para navegación
             this.state.expiredContracts.startDate = startDateStr;
             this.state.expiredContracts.endDate = todayStr;
-            
-            console.log(`📊 KPI Contratos Vencidos: ${expiredContracts.length} contratos vencidos en últimos 90 días`);
-            
-            // ✅ Log detallado para debug
-            if (expiredContracts.length > 0) {
-                console.log("❌ Contratos vencidos:", expiredContracts.map(c => 
-                    `${c.employee_id[1]} - Venció: ${c.date_end} (Estado: ${c.state})`
-                ));
-            }
         } catch (error) {
             console.error("❌ KpisGrid HR: Error calculando Contratos Vencidos:", error);
             this.state.expiredContracts.value = 0;
