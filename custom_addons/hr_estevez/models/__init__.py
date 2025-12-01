@@ -19,3 +19,4 @@ from . import hr_vacation_allocation
 from . import hr_employee_document
 from . import hr_time_off_in_lieu
 from . import hr_study_tag
+from . import hr_employee_job_history

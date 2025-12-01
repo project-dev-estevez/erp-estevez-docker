@@ -14,3 +14,5 @@ access_hr_employee_history_user,access_hr_employee_history_user,model_hr_employe
 access_hr_vacation_allocation_user,access_hr_vacation_allocation_user,model_hr_vacation_allocation,base.group_user,1,1,1,1
 acces_hr_time_off_in_lieu_user,access_hr_time_off_in_lieu_user,model_hr_time_off_in_lieu,base.group_user,1,1,1,1
 access_hr_study_tag,access_hr_study_tag,model_hr_study_tag,,1,1,1,1
+access_hr_employee_job_history_user,hr.employee.job.history user,model_hr_employee_job_history,hr.group_hr_user,1,0,0,0
+access_hr_employee_job_history_manager,hr.employee.job.history manager,model_hr_employee_job_history,hr.group_hr_manager,1,1,1,0
