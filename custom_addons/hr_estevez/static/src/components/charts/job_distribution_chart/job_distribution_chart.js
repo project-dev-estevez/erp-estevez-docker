@@ -94,27 +94,6 @@ export class JobDistributionChart extends Component {
             // Convertir a array y ordenar por cantidad descendente
             let result = Object.values(jobCount).sort((a, b) => b.count - a.count);
 
-            // Top 10 + Otros
-            const TOP_LIMIT = 10;
-            if (result.length > TOP_LIMIT) {
-                const top10 = result.slice(0, TOP_LIMIT);
-                const others = result.slice(TOP_LIMIT);
-                
-                // Agrupar "Otros"
-                const othersCount = others.reduce((sum, job) => sum + job.count, 0);
-                const othersEmployeeIds = others.flatMap(job => job.employeeIds);
-                
-                result = [
-                    ...top10,
-                    {
-                        name: 'Otros Puestos',
-                        count: othersCount,
-                        employeeIds: othersEmployeeIds,
-                        isOthers: true
-                    }
-                ];
-            }
-
             // Agregar empleados sin puesto si los hay
             if (employeesWithoutJob > 0) {
                 // Obtener IDs de empleados sin job_id
@@ -137,7 +116,7 @@ export class JobDistributionChart extends Component {
                 percentage: total > 0 ? ((job.count / total) * 100).toFixed(1) : 0
             }));
 
-            console.log("💼 Distribución por puesto (Top 10 + Otros):", result);
+            console.log("💼 Distribución por puesto (Todos):", result);
             
             return result;
 
@@ -167,10 +146,13 @@ export class JobDistributionChart extends Component {
         const categories = jobData.map(job => job.name);
         
         // Configuración del gráfico tipo barras horizontales
+        // Altura dinámica: mínimo 350px, máximo según cantidad de puestos (40px por puesto)
+        const dynamicHeight = Math.max(350, jobData.length * 40);
+        
         const options = {
             chart: {
                 type: 'bar',
-                height: this.props.height || 350,
+                height: dynamicHeight,
                 fontFamily: 'inherit',
                 toolbar: {
                     show: true

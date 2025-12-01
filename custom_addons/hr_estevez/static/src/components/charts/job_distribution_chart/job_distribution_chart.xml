@@ -14,13 +14,15 @@
 
             <!-- Chart Content -->
             <div t-elif="state.hasData" class="h-100">
-                <ChartRendererApex 
-                    t-key="state.chartKey"
-                    config="state.apexConfig.options" 
-                    type="'bar'"
-                    title="props.title || 'Empleados por Puesto de Trabajo'"
-                    height="props.height || 400"
-                />
+                <div style="max-height: 500px; overflow-y: auto; overflow-x: hidden;">
+                    <ChartRendererApex 
+                        t-key="state.chartKey"
+                        config="state.apexConfig.options" 
+                        type="'bar'"
+                        title="props.title || 'Empleados por Puesto de Trabajo'"
+                        height="props.height || 400"
+                    />
+                </div>
             </div>
 
             <!-- No Data State -->
