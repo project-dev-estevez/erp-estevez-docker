@@ -75,6 +75,7 @@ export class GenderDistributionChart extends Component {
             const genderLabels = {
                 'male': 'Masculino',
                 'female': 'Femenino',
+                'indistinct': 'Indistinto',
                 'other': 'Otro'
             };
 
