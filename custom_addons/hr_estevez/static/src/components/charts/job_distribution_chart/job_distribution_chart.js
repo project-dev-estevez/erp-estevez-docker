@@ -68,8 +68,6 @@ export class JobDistributionChart extends Component {
                 ['job_id', 'name', 'id']
             );
 
-            console.log("👥 Total empleados activos:", employees.length);
-
             // Procesar datos por puesto
             const jobCount = {};
             let employeesWithoutJob = 0;
@@ -116,8 +114,6 @@ export class JobDistributionChart extends Component {
                 percentage: total > 0 ? ((job.count / total) * 100).toFixed(1) : 0
             }));
 
-            console.log("💼 Distribución por puesto (Todos):", result);
-            
             return result;
 
         } catch (error) {
@@ -231,8 +227,6 @@ export class JobDistributionChart extends Component {
     async onJobClick(dataPointIndex) {
         const selectedJob = this.state.jobsData[dataPointIndex];
         if (!selectedJob) return;
-
-        console.log(`💼 Click en puesto: ${selectedJob.name} (${selectedJob.count} empleados)`);
 
         let domain;
         let name = `Empleados - ${selectedJob.name}`;
