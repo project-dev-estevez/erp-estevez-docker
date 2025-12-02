@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="hr_estevez.EmployeeStatusChart" owl="1">
+        <div class="employee-status-chart h-100">
+            <!-- Loading State -->
+            <div t-if="state.isLoading" class="d-flex justify-content-center align-items-center h-100">
+                <div class="text-center">
+                    <div class="spinner-border text-primary mb-2" role="status">
+                        <span class="visually-hidden">Cargando...</span>
+                    </div>
+                    <p class="text-muted small">Cargando empleados por estado...</p>
+                </div>
+            </div>
+
+            <!-- Chart Content -->
+            <div t-elif="state.hasData" class="h-100">
+                <ChartRendererApex 
+                    t-key="state.chartKey"
+                    config="state.apexConfig.options" 
+                    type="'pie'"
+                    title="props.title || 'Estado Actual de Empleados'"
+                    height="props.height || 400"
+                    filename="state.apexConfig.filename"
+                />
+            </div>
+
+            <!-- No Data State -->
+            <div t-else="" class="d-flex justify-content-center align-items-center h-100">
+                <div class="text-center text-muted p-4">
+                    <i class="fa fa-chart-pie fa-3x mb-3 opacity-50"></i>
+                    <h6 class="mb-2">Sin datos disponibles</h6>
+                    <p class="small mb-0">No se encontraron empleados</p>
+                </div>
+            </div>
+        </div>
+    </t>
+</templates>

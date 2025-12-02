@@ -6,8 +6,10 @@ import { DashboardHeader } from "./dashboard_header/dashboard_header.js";
 import { KpisGrid } from "./kpis/kpis_grid.js";
 import { ChartRendererApex } from "./chart_renderer_apex/chart_renderer_apex.js";
 import { chartsDummy } from "./chart_renderer_apex/charts_dummy.js";
-// ✅ NUEVO: Importar gráfico de distribución por departamento
 import { DepartmentDistributionChart } from "./charts/department_distribution_chart/department_distribution_chart.js";
+import { EmployeeStatusChart } from "./charts/employee_status_chart/employee_status_chart.js";
+import { JobDistributionChart } from "./charts/job_distribution_chart/job_distribution_chart.js";
+import { GenderDistributionChart } from "./charts/gender_distribution_chart/gender_distribution_chart.js";
 
 export class EmployeesDashboard extends Component {
     static template = "hr_estevez.EmployeesDashboard";
@@ -15,7 +17,10 @@ export class EmployeesDashboard extends Component {
         DashboardHeader, 
         KpisGrid, 
         ChartRendererApex, 
-        DepartmentDistributionChart // ✅ NUEVO: Agregar componente
+        DepartmentDistributionChart,
+        EmployeeStatusChart,
+        JobDistributionChart,
+        GenderDistributionChart
     };
 
     setup() {

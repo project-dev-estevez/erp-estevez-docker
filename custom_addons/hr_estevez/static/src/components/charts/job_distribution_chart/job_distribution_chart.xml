@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="hr_estevez.JobDistributionChart" owl="1">
+        <div class="job-distribution-chart h-100">
+            <!-- Loading State -->
+            <div t-if="state.isLoading" class="d-flex justify-content-center align-items-center h-100">
+                <div class="text-center">
+                    <div class="spinner-border text-primary mb-2" role="status">
+                        <span class="visually-hidden">Cargando...</span>
+                    </div>
+                    <p class="text-muted small">Cargando distribución por puesto...</p>
+                </div>
+            </div>
+
+            <!-- Chart Content -->
+            <div t-elif="state.hasData" class="h-100">
+                <div style="max-height: 500px; overflow-y: auto; overflow-x: hidden;">
+                    <ChartRendererApex 
+                        t-key="state.chartKey"
+                        config="state.apexConfig.options" 
+                        type="'bar'"
+                        title="props.title || 'Empleados por Puesto de Trabajo'"
+                        height="props.height || 400"
+                    />
+                </div>
+            </div>
+
+            <!-- No Data State -->
+            <div t-else="" class="d-flex justify-content-center align-items-center h-100">
+                <div class="text-center text-muted p-4">
+                    <i class="fa fa-briefcase fa-3x mb-3 opacity-50"></i>
+                    <h6 class="mb-2">Sin datos disponibles</h6>
+                    <p class="small mb-0">No se encontraron empleados activos con puestos asignados</p>
+                </div>
+            </div>
+        </div>
+    </t>
+</templates>

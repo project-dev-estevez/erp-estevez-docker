@@ -292,6 +292,13 @@ class HrEmployee(models.Model):
         'employee_id', 
         string='Solicitudes de Tiempo por Tiempo'
     )
+
+    job_history_ids = fields.One2many(
+        'hr.employee.job.history',
+        'employee_id',
+        string="Historial de puestos"
+    )
+
     
     def _compute_ir_attachment_count(self):
         for employee in self:
@@ -624,51 +631,64 @@ class HrEmployee(models.Model):
         return employee
 
     def write(self, vals):
-        # Construir nombre completo si cambian los componentes
+        # ========== HISTORIAL DE CAMBIO DE PUESTO ==========
+        if 'job_id' in vals:
+            for rec in self:
+                new_job_id = vals.get('job_id')
+
+                if isinstance(new_job_id, (list, tuple)):
+                    new_job_id = new_job_id[0]
+
+                if rec.job_id.id != new_job_id:
+                    self.env['hr.employee.job.history'].create({
+                        'employee_id': rec.id,
+                        'old_job_id': rec.job_id.id,
+                        'new_job_id': new_job_id,
+                        'changed_by': self.env.user.id,
+                        'change_date': fields.Datetime.now(),
+                    })
+
+        # ========== NOMBRE COMPLETO ==========
         if 'name' not in vals and ('names' in vals or 'last_name' in vals or 'mother_last_name' in vals):
             names_val = vals.get('names', self.names) or ''
             last_name_val = vals.get('last_name', self.last_name) or ''
             mother_last_name_val = vals.get('mother_last_name', self.mother_last_name) or ''
             vals['name'] = f"{names_val} {last_name_val} {mother_last_name_val}".strip()
 
+        # ========== SINCRONIZAR BARCODE ==========
         if 'employee_number' in vals and 'barcode' not in vals:
             vals['barcode'] = vals['employee_number']
         elif 'barcode' in vals and 'employee_number' not in vals:
             vals['employee_number'] = vals['barcode']
-        
-        # Regenerar períodos solo si cambia la fecha de ingreso Y no hay días tomados
+
+        # ========== VACACIONES ==========
         if 'employment_start_date' in vals:
             for employee in self:
-                # Si se está estableciendo una fecha de ingreso vacía, eliminar períodos existentes
                 if not vals['employment_start_date']:
                     employee.vacation_period_ids.unlink()
                     continue
                     
-                # Verificar si hay días tomados antes de regenerar
                 if any(period.days_taken > 0 for period in employee.vacation_period_ids):
-                    raise UserError("No se puede cambiar la fecha de ingreso porque hay días de vacaciones ya tomados. Elimine manualmente los periodos existentes primero.")
-                
-                # Eliminar periodos existentes
+                    raise UserError("No se puede cambiar la fecha de ingreso porque hay días de vacaciones ya tomados.")
+
                 employee.vacation_period_ids.unlink()
 
-        # Llamar al write original
         res = super().write(vals)
-        
-        # Generar nuevos períodos después de guardar
+
         if 'employment_start_date' in vals:
             for employee in self:
                 if employee.employment_start_date:
                     employee.generate_vacation_periods()
-        
-        # Sincronizar con CodeIgniter después de guardar
+
+        # ========== SINCRONIZACIÓN CODEIGNITER ==========
         try:
             for employee in self:
-                _logger.info(f"Iniciando sincronización de actualización para {employee.name}")
                 employee._sync_codeigniter(employee, 'update')
         except Exception as e:
             _logger.error(f"Error en sincronización de actualización: {str(e)}")
 
         return res
+
 
     def _get_next_employee_number(self, company_id=False):
         """Obtener el siguiente número de empleado por empresa"""

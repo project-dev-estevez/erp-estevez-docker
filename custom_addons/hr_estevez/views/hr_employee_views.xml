@@ -44,14 +44,12 @@
                     class="btn-secondary"
                     icon="fa-history"
                     invisible="active"/>
-
                 <button name="action_reactivate_employee"
                     string="Dar de alta"
                     type="object"
                     class="btn-success"
                     invisible="active"/>  <!-- Solo visible si active=False -->
             </xpath>
-
             <!-- Botones en el header para reportes -->
             <xpath expr="//header" position="inside">
                 <button name="%(action_report_hr_employee_remision)d"
@@ -79,19 +77,14 @@
                     icon="fa-download"
                     invisible="not ir_attachment_count"/>
             </xpath>
-
             <!-- Eliminar el grupo managers de su ubicación actual -->
             <xpath expr="//group[@name='managers']" position="replace">
-                <!-- Eliminar el grupo managers -->
+            <!-- Eliminar el grupo managers -->
             </xpath>
-
             <!-- Insertar el grupo managers en la página hr_settings -->
             <xpath expr="//notebook/page[@name='hr_settings']" position="inside">
                 <group name="managers" string="Aprobadores" class="hide-group-if-empty" invisible="1"/>
             </xpath>
-
-
-
             <!-- Nombres, Apellidos, # empleado, Proyecto y Etiquetas -->
             <xpath expr="//group/group[field[@name='work_email']]" position="replace">
                 <group>
@@ -104,8 +97,7 @@
                         options="{'color_field': 'color', 'no_create_edit': True}"
                         placeholder="Tags" groups="hr.group_hr_user"/>                                                              
                 </group>
-            </xpath>
-                
+            </xpath>                
             <!-- Compañia, Dirección, Departamento, Area, Puesto de Trabajo, Jefe Inmediato -->
             <xpath expr="//group/group[field[@name='department_id']]" position="replace">
                 <group>
@@ -120,8 +112,7 @@
                     <field name="occupation_id" string="Ocupación" options="{'no_create': True}"/>
                     <field name="occupation_key" invisible="1"/> 
                 </group>
-            </xpath>
-                
+            </xpath>                
             <xpath expr="//group/group[field[@name='coach_id']]" position="after">
                 <div class="d-flex justify-content-end w-100 mt-4">                        
                     <button              
@@ -469,155 +460,127 @@
                                         colspan="6"/>
                                 </page>
                                 <page name="activo_fijo" string="Activo Fijo">
-                                    </page>
-                                    <page name="consumibles" string="Consumibles">
-                                        <field name="consumable_assignment_ids" 
-                                            view_id="stock_estevez.view_consumable_assignment_tree"
-                                            colspan="6"/>
-                                    </page>    
-
-                                </notebook>
-
-                            </page>
-                            <page name="alto_costo" string="Alto Costo">
-                                <notebook>
-                                    <page name="herramientas" string="herramientas">
-                                        
-                                    </page>
-
-                                    <page name="activo_fijo" string="Activo Fijo">
-                                    </page>
-
-                                    <page name="consumibles" string="Consumibles">
-
-                                    </page>    
-
-                                </notebook>
-                            </page>
-                            <page name="autos" string="Autos">
-                                <notebook>
-                                    <page name="herramientas" string="herramientas">
-                                        
-                                    </page>
-
-                                    <page name="activo_fijo" string="Activo Fijo">
-                                    </page>
-
-                                    <page name="consumibles" string="Consumibles">
-
-                                    </page>    
-
-                                </notebook>
-                            </page>
-                            <page name="ehs" string="EHS">
-                                <notebook>
-                                    <page name="herramientas" string="herramientas">
-                                        
-                                    </page>
-
-                                    <page name="activo_fijo" string="Activo Fijo">
-                                    </page>
-
-                                    <page name="consumibles" string="Consumibles">
-
-                                    </page>    
-
-                                </notebook>
-                            </page>
-                            <page name="insumos" string="Insumos">
-                                <notebook>
-                                    <page name="herramientas" string="herramientas">
-                                        
-                                    </page>
-
-                                    <page name="activo_fijo" string="Activo Fijo">
-                                    </page>
-
-                                    <page name="consumibles" string="Consumibles">
-
-                                    </page>    
-
-                                </notebook>
-                            </page>
-                            <page name="refacciones" string="Refacciones">
-                                <notebook>
-                                    <page name="herramientas" string="herramientas">
-                                        
-                                    </page>
-
-                                    <page name="activo_fijo" string="Activo Fijo">
-                                    </page>
-
-                                    <page name="consumibles" string="Consumibles">
-
-                                    </page>    
-
-                                </notebook>
-                            </page>
-                            <page name="sistemas" string="Sistemas">
-                                <notebook>
-                                    <page name="herramientas" string="herramientas">
-                                        
-                                    </page>
-
-                                    <page name="activo_fijo" string="Activo Fijo">
-                                    </page>
-
-                                    <page name="consumibles" string="Consumibles">
-
-                                    </page>    
-
-                                </notebook>
-                            </page>
-                            <page name="area_medica" string="Área Médica">
-                                <notebook>
-                                    <page name="herramientas" string="herramientas">
-                                        
-                                    </page>
-
-                                    <page name="activo_fijo" string="Activo Fijo">
-                                    </page>
-
-                                    <page name="consumibles" string="Consumibles">
-
-                                    </page>    
-
-                                </notebook>
-                            </page>
-                        </notebook>
-                    </page>
-</xpath>
+                                </page>
+                                <page name="consumibles" string="Consumibles">
+                                    <field name="consumable_assignment_ids" 
+                                        view_id="stock_estevez.view_consumable_assignment_tree"
+                                        colspan="6"/>
+                                </page>    
+                            </notebook>
+                        </page>
+                        <page name="alto_costo" string="Alto Costo">
+                            <notebook>
+                                <page name="herramientas" string="herramientas">                                        
+                                </page>
+                                <page name="activo_fijo" string="Activo Fijo">
+                                </page>
+                                <page name="consumibles" string="Consumibles">
+                                </page>    
+                            </notebook>
+                        </page>
+                        <page name="autos" string="Autos">
+                            <notebook>
+                                <page name="herramientas" string="herramientas">                                        
+                                </page>
+                                <page name="activo_fijo" string="Activo Fijo">
+                                </page>
+                                <page name="consumibles" string="Consumibles">
+                                </page>    
+                            </notebook>
+                        </page>
+                        <page name="ehs" string="EHS">
+                            <notebook>
+                                <page name="herramientas" string="herramientas">                                        
+                                </page>
+                                <page name="activo_fijo" string="Activo Fijo">
+                                </page>
+                                <page name="consumibles" string="Consumibles">
+                                </page>    
+                            </notebook>
+                        </page>
+                        <page name="insumos" string="Insumos">
+                            <notebook>
+                                <page name="herramientas" string="herramientas">                                        
+                                </page>
+                                <page name="activo_fijo" string="Activo Fijo">
+                                </page>
+                                <page name="consumibles" string="Consumibles">
+                                </page>    
+                            </notebook>
+                        </page>
+                        <page name="refacciones" string="Refacciones">
+                            <notebook>
+                                <page name="herramientas" string="herramientas">                                        
+                                </page>
+                                <page name="activo_fijo" string="Activo Fijo">
+                                </page>
+                                <page name="consumibles" string="Consumibles">
+                                </page>    
+                            </notebook>
+                        </page>
+                        <page name="sistemas" string="Sistemas">
+                            <notebook>
+                                <page name="herramientas" string="herramientas">                                        
+                                </page>
+                                <page name="activo_fijo" string="Activo Fijo">
+                                </page>
+                                <page name="consumibles" string="Consumibles">
+                                </page>    
+                            </notebook>
+                        </page>
+                        <page name="area_medica" string="Área Médica">
+                            <notebook>
+                                <page name="herramientas" string="herramientas">                                        
+                                </page>
+                                <page name="activo_fijo" string="Activo Fijo">
+                                </page>
+                                <page name="consumibles" string="Consumibles">
+                                </page>    
+                            </notebook>
+                        </page>
+                    </notebook>
+                </page>
+            </xpath>            
+           
 
 
-                <xpath expr="//page[@name='assignments']" position="attributes">
-    <attribute name="invisible">1</attribute>
-</xpath>         
-
-               <!-- Reemplazar el grupo UBICACIÓN actual por uno que incluya ambos grupos en la misma fila -->      
-        <xpath expr="//page[@name='public']/group[1]" position="replace">            
-            <group string="Ubicación">                
-                <group>            
-                    <field name="employment_start_date"/>
-                    <field name="address_id" context="{'show_address': 1}" options="{'highlight_first_line': True, 'no_edit': True, 'no_create': True, 'no_open': True}" domain="[('is_company', '=', True)]"/>
-                    <field name="work_location_id" string="Ubicación Laboral" context="{'default_address_id': address_id}" placeholder="e.g. Building 2, Remote, etc."/>
-                    <field name="patron" string="Patrón" widget="selection"/>
-                    <field name="establecimiento" string="Establecimiento" widget="selection"/>                
-                </group>                
-            </group>            
-            <group string="Información Bancaria">                
-                <group>            
-                    <field name="bank_id" string="Banco" options="{'no_create': True, 'no_create_edit': True}"/>
-                    <field name="clabe" string="CLABE" placeholder="18 dígitos" required="bank_id"/>
-                      <!--field name="clabe" string="CLABE" placeholder="18 dígitos" required="bank_id"/-->
-    <field name="account_number" string="Número de Cuenta"/>          
+            <!--xpath expr="//notebook/page[@name='assignments']" position="after">
+                <page name="job_history" string="Historial de Puestos">
+                    <field name="job_history_ids" readonly="1">
+                        <list>
+                            <field name="change_date"/>
+                            <field name="old_job_id"/>
+                            <field name="new_job_id"/>
+                            <field name="changed_by"/>
+                        </list>
+                    </field>
+                </page>
+            </xpath-->
+            <xpath expr="//page[@name='assignments']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>         
+            <!-- Reemplazar el grupo UBICACIÓN actual por uno que incluya ambos grupos en la misma fila -->      
+            <xpath expr="//page[@name='public']/group[1]" position="replace">            
+                <group string="Ubicación">                
+                    <group>            
+                        <field name="employment_start_date"/>
+                        <field name="address_id" context="{'show_address': 1}" options="{'highlight_first_line': True, 'no_edit': True, 'no_create': True, 'no_open': True}" domain="[('is_company', '=', True)]"/>
+                        <field name="work_location_id" string="Ubicación Laboral" context="{'default_address_id': address_id}" placeholder="e.g. Building 2, Remote, etc."/>
+                        <field name="patron" string="Patrón" widget="selection"/>
+                        <field name="establecimiento" string="Establecimiento" widget="selection"/>                
+                    </group>                
                 </group>            
-            </group>        
-             </xpath>
-      
-
-
-            </field>
-        </record>
+                <group string="Información Bancaria">                
+                    <group>            
+                        <field name="bank_id" string="Banco" options="{'no_create': True, 'no_create_edit': True}"/>
+                        <field name="clabe" string="CLABE" placeholder="18 dígitos" required="bank_id"/>
+                        <!--field name="clabe" string="CLABE" placeholder="18 dígitos" required="bank_id"/-->
+                        <field name="account_number" string="Número de Cuenta"/>          
+                    </group>            
+                </group>        
+            </xpath>    
+        </field>
+    </record>
 
         <!-- Heredar la vista de lista -->
         <record id="view_employee_list_inherit" model="ir.ui.view">
@@ -644,8 +607,5 @@
                 </xpath>
             </field>
         </record>
-    
-
-
     </data>
 </odoo>

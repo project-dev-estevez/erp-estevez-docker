@@ -8,8 +8,6 @@ export class DepartmentDistributionChart extends Component {
     static template = "hr_estevez.DepartmentDistributionChart";
     static components = { ChartRendererApex };
     static props = {
-        startDate: { type: String, optional: true },
-        endDate: { type: String, optional: true },
         title: { type: String, optional: true },
         height: { type: [String, Number], optional: true },
         onMounted: { type: Function, optional: true }
@@ -42,29 +40,17 @@ export class DepartmentDistributionChart extends Component {
                 this.props.onMounted(this);
             }
         });
-
-        // ✅ Detectar cambios en props (fechas)
-        onWillUpdateProps(async (nextProps) => {
-            if (this.props.startDate !== nextProps.startDate || 
-                this.props.endDate !== nextProps.endDate) {
-                await this.loadChart(nextProps.startDate, nextProps.endDate);
-            }
-        });
     }
 
-    async loadChart(startDate = null, endDate = null) {
+    async loadChart() {
         try {
             this.state.isLoading = true;
             
             // ✅ Obtener datos de empleados por departamento
-            const departmentData = await this.getDepartmentDistribution(
-                startDate || this.props.startDate,
-                endDate || this.props.endDate
-            );
+            const departmentData = await this.getDepartmentDistribution();
 
             // ✅ Configurar datos para ApexCharts
-            this.setupApexChart(departmentData);
-            
+            this.setupApexChart(departmentData);            
             this.state.hasData = departmentData.length > 0;
             this.state.isLoading = false;
             
@@ -75,13 +61,11 @@ export class DepartmentDistributionChart extends Component {
         }
     }
 
-    async getDepartmentDistribution(startDate, endDate) {
+    async getDepartmentDistribution() {
         try {
             // ✅ Para distribución por departamento, mostramos TODOS los empleados activos
             // Las fechas NO aplican aquí porque queremos la distribución actual
             let domain = [['active', '=', true]]; // Solo empleados activos
-            
-            console.log("🏢 Obteniendo distribución de departamentos para empleados activos...");
 
             // ✅ Obtener empleados agrupados por departamento
             const employees = await this.orm.searchRead(
@@ -89,9 +73,6 @@ export class DepartmentDistributionChart extends Component {
                 domain,
                 ['department_id', 'name'] // Agregamos name para debug
             );
-
-            console.log("👥 Total empleados encontrados:", employees.length);
-            console.log("👥 Muestra de empleados:", employees.slice(0, 3));
 
             // ✅ Procesar datos por departamento
             const departmentCount = {};
@@ -101,15 +82,10 @@ export class DepartmentDistributionChart extends Component {
                 if (employee.department_id && employee.department_id[0]) {
                     const deptName = employee.department_id[1];
                     departmentCount[deptName] = (departmentCount[deptName] || 0) + 1;
-                    console.log(`📊 Empleado ${employee.name} -> Departamento: ${deptName}`);
                 } else {
                     employeesWithoutDept++;
-                    console.log(`📊 Empleado ${employee.name} -> Sin departamento`);
                 }
             });
-
-            console.log("📈 Conteo por departamento:", departmentCount);
-            console.log("📈 Empleados sin departamento:", employeesWithoutDept);
 
             // ✅ Agregar empleados sin departamento si los hay
             if (employeesWithoutDept > 0) {
@@ -161,7 +137,7 @@ export class DepartmentDistributionChart extends Component {
                 height: this.props.height || 350,
                 fontFamily: 'inherit',
                 toolbar: {
-                    show: false
+                    show: true
                 },
                 events: {
                     dataPointSelection: (event, chartContext, config) => {
@@ -183,9 +159,7 @@ export class DepartmentDistributionChart extends Component {
             },
             dataLabels: {
                 enabled: true,
-                formatter: function(val) {
-                    return val + ' empleados';
-                },
+                formatter: (val) => `${val}`,
                 style: {
                     colors: ['#fff'],
                     fontSize: '12px',
@@ -229,6 +203,7 @@ export class DepartmentDistributionChart extends Component {
         this.state.apexConfig = {
             series: series,
             categories: categories,
+            filename: 'distribucion_departamentos',
             options: options
         };
 
