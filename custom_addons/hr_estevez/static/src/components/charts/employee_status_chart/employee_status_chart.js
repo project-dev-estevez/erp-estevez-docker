@@ -70,8 +70,6 @@ export class EmployeeStatusChart extends Component {
                 ['active', 'name', 'id']
             );
 
-            console.log("👥 Total empleados:", allEmployees.length);
-
             // Obtener empleados de vacaciones (ausencias validadas activas hoy marcadas como vacaciones)
             const now = luxon.DateTime.now();
             const todayStart = now.startOf('day').toUTC().toISO();
@@ -84,8 +82,6 @@ export class EmployeeStatusChart extends Component {
                 ['id']
             );
             const vacationTypeIds = vacationTypes.map(t => t.id);
-            
-            console.log("🏖️ Tipos de ausencia marcados como vacaciones:", vacationTypeIds);
             
             // Si no hay tipos marcados como vacaciones, buscar por nombre
             let vacationDomain;
@@ -118,8 +114,6 @@ export class EmployeeStatusChart extends Component {
                 vacationLeaves.map(leave => leave.employee_id[0])
             );
 
-            console.log("🏖️ Empleados en vacaciones:", employeesOnVacationIds.size);
-
             // Contar por estado
             let activeCount = 0;
             let inactiveCount = 0;
@@ -147,7 +141,6 @@ export class EmployeeStatusChart extends Component {
             // Solo incluir categorías con datos
             const filtered = result.filter(item => item.count > 0);
             
-            console.log("📊 Distribución por estado:", filtered);
             return filtered;
 
         } catch (error) {

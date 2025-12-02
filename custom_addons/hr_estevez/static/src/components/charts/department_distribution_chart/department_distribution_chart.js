@@ -101,8 +101,7 @@ export class DepartmentDistributionChart extends Component {
 
             // ✅ Ordenar por cantidad descendente
             const sortedResult = result.sort((a, b) => b.count - a.count);
-            console.log("📊 Resultado final para gráfico:", sortedResult);
-            
+
             return sortedResult;
 
         } catch (error) {

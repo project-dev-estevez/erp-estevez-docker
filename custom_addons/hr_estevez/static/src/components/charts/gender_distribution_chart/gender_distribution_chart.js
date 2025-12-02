@@ -69,8 +69,6 @@ export class GenderDistributionChart extends Component {
                 ['gender', 'name', 'id']
             );
 
-            console.log(" Total empleados activos:", employees.length);
-
             // Mapeo de valores técnicos a etiquetas legibles
             const genderLabels = {
                 'male': 'Masculino',
@@ -137,8 +135,6 @@ export class GenderDistributionChart extends Component {
                 ...gender,
                 percentage: total > 0 ? ((gender.count / total) * 100).toFixed(1) : 0
             }));
-
-            console.log(" Distribución por género:", result);
             
             return result;
 
