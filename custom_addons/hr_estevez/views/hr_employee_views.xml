@@ -375,6 +375,11 @@
                     </group>                                                                        
                     <group string="Periodos de Vacaciones">
                         <!-- Usar colspan para expandir la tabla -->
+                        <button name="action_create_vacation" 
+                                    type="object" 
+                                    string="Solicitar Vacaciones" 
+                                    class="oe_highlight" 
+                                    icon="fa-calendar-plus-o"/>
                         <field name="vacation_period_ids" 
                             context="{'default_employee_id': id}"
                             options="{'create': false}"
@@ -404,6 +409,13 @@
             <!-- Nueva página de Permisos -->              
             <xpath expr="//page[@name='vacations']" position="after">
                 <page name="permits" string="Permisos">
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_create_time_off_in_lieu" 
+                                string="Nueva Solicitud Permisos" 
+                                type="object" 
+                                class="btn-primary"
+                                icon="fa-calendar-plus-o"/>
+                    </div>
                     <field name="time_off_in_lieu_ids">
                         <list>
                             <field name="request_date" string="Fecha Registro"/>
