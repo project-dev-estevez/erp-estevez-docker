@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+
+        <record id="view_employee_form_inherit_skills_resume" model="ir.ui.view">
+            <field name="name">hr.employee.form.inherit.skills.resume</field>
+            <field name="model">hr.employee</field>
+            <field name="inherit_id" ref="hr.view_employee_form"/>
+            <field name="arch" type="xml">
+
+                <!-- Heredamos la pestaña Curriculum / Skills -->
+                 <xpath expr="//page[@name='skills_resume']" position="inside">
+                <group string="Historial de Puestos" col="1">        
+                    <field name="job_history_ids" readonly="1" nolabel="1">                        
+                        <kanban>                            
+                            <field name="change_date"/>
+                            <field name="old_job_id"/>
+                            <field name="new_job_id"/>
+                            <field name="changed_by"/>                
+                            <templates>
+                                <t t-name="kanban-box">                                
+                                    <div class="oe_kanban_global_click">
+                                        <div class="o_kanban_record_body">                                            
+                                            <div class="mb-2">
+                                                <strong class="text-primary">
+                                                    <field name="change_date" widget="date"/>
+                                                </strong>
+                                            </div>                                                                        
+                                            <div class="row mb-2">
+                                                <div class="col-6">
+                                                    <small class="text-muted">Anterior:</small>
+                                                    <div class="font-weight-bold">
+                                                        <field name="old_job_id"/>
+                                                    </div>
+                                                </div>
+                                                <div class="col-6">
+                                                    <small class="text-muted">Nuevo:</small>
+                                                    <div class="font-weight-bold text-success">
+                                                        <field name="new_job_id"/>
+                                                    </div>
+                                                </div>
+                                            </div>                                                                            
+                                            <div class="mt-2 pt-2 border-top">
+                                                <small class="text-muted">
+                                                    Modificado por: 
+                                                    <field name="changed_by"/>
+                                                </small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </t>
+                            </templates>
+                        </kanban>
+                    </field>            
+                </group>
+                <separator string="Experiencia"/>    
+            </xpath>
+
+            </field>
+        </record>
+
+    </data>
+</odoo>

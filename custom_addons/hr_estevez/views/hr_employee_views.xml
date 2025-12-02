@@ -366,6 +366,11 @@
                     </group>                                                                        
                     <group string="Periodos de Vacaciones">
                         <!-- Usar colspan para expandir la tabla -->
+                        <button name="action_create_vacation" 
+                                    type="object" 
+                                    string="Solicitar Vacaciones" 
+                                    class="oe_highlight" 
+                                    icon="fa-calendar-plus-o"/>
                         <field name="vacation_period_ids" 
                             context="{'default_employee_id': id}"
                             options="{'create': false}"
@@ -395,6 +400,13 @@
             <!-- Nueva página de Permisos -->              
             <xpath expr="//page[@name='vacations']" position="after">
                 <page name="permits" string="Permisos">
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_create_time_off_in_lieu" 
+                                string="Nueva Solicitud Permisos" 
+                                type="object" 
+                                class="btn-primary"
+                                icon="fa-calendar-plus-o"/>
+                    </div>
                     <field name="time_off_in_lieu_ids">
                         <list>
                             <field name="request_date" string="Fecha Registro"/>
@@ -528,69 +540,8 @@
                         </page>
                     </notebook>
                 </page>
-            </xpath>
-            <!-- Insertar Historial de Puestos antes de la Experiencia del Curriculum -->
-         <xpath expr="//page[@name='skills_resume']//field[@name='resume_line_ids']" position="after">
-
-
-    <group string="Historial de Puestos" col="1">
-        
-        <field name="job_history_ids" readonly="1" nolabel="1">
-            <!-- Vista Kanban -->
-            <kanban>
-                <!-- Estilo general del Kanban -->
-                <field name="change_date"/>
-                <field name="old_job_id"/>
-                <field name="new_job_id"/>
-                <field name="changed_by"/>
-                
-                <templates>
-                    <t t-name="kanban-box">
-                        <!-- Tarjeta individual -->
-                        <div class="oe_kanban_global_click">
-                            <div class="o_kanban_record_body">
-                                <!-- Fecha prominente -->
-                                <div class="mb-2">
-                                    <strong class="text-primary">
-                                        <field name="change_date" widget="date"/>
-                                    </strong>
-                                </div>
-                                
-                                <!-- Contenido principal -->
-                                <div class="row mb-2">
-                                    <div class="col-6">
-                                        <small class="text-muted">Anterior:</small>
-                                        <div class="font-weight-bold">
-                                            <field name="old_job_id"/>
-                                        </div>
-                                    </div>
-                                    <div class="col-6">
-                                        <small class="text-muted">Nuevo:</small>
-                                        <div class="font-weight-bold text-success">
-                                            <field name="new_job_id"/>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <!-- Información adicional -->
-                                <div class="mt-2 pt-2 border-top">
-                                    <small class="text-muted">
-                                        Modificado por: 
-                                        <field name="changed_by"/>
-                                    </small>
-                                </div>
-                            </div>
-                        </div>
-                    </t>
-                </templates>
-            </kanban>
-        </field>
-        
-    </group>
-
-    <separator string="Experiencia"/>
-
-</xpath>
+            </xpath>            
+           
 
 
             <!--xpath expr="//notebook/page[@name='assignments']" position="after">
@@ -656,8 +607,5 @@
                 </xpath>
             </field>
         </record>
-    
-
-
     </data>
 </odoo>

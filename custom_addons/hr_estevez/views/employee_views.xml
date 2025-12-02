@@ -12,8 +12,8 @@
                     <t t-if="record.work_phone.raw_value">
                         <field name="work_phone"/>
                     </t>
-                    <t t-elif="record.mobile_phone.raw_value">
-                        <field name="mobile_phone"/>
+                    <t t-elif="record.private_phone.raw_value">
+                        <field name="private_phone"/>
                     </t>
                 </field>
                 
@@ -25,8 +25,7 @@
                     <t t-elif="record.private_email.raw_value">
                         <field name="private_email"/>
                     </t>
-                </field>
-                
+                </field>                
             </field>
         </record>
     </data>
