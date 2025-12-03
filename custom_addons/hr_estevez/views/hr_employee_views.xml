@@ -142,7 +142,7 @@
                     </group>
                     <group string="Nómina">
                         <group>
-                            <field name="imss_registration_date"/>
+                            <!--field name="imss_registration_date"/-->
                             <field name="payment_type"/>
                             <field name="payroll_type"/>
                         </group>
