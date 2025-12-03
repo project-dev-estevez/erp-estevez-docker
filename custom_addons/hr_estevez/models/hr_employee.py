@@ -1237,3 +1237,91 @@ class HrEmployee(models.Model):
         
         # Mínimo 0.5 días si ha trabajado al menos un día
         return max(0.5, rounded_days) if days_worked > 0 else 0
+
+    def action_create_vacation(self):
+        """Abrir wizard para crear solicitud de vacaciones"""
+        self.ensure_one()
+        
+        # Verificar que tenga días disponibles
+        if self.vacation_days_available <= 0:
+            raise UserError("El empleado no tiene días de vacaciones disponibles.")
+        
+        # Buscar el tipo de ausencia para vacaciones
+        leave_type = self.env['hr.leave.type'].search([
+            ('name', 'ilike', 'Vacaciones'),
+            ('is_vacation', '=', 'true')
+        ], limit=1)
+        
+        if not leave_type:
+            # Si no existe, crear uno
+            leave_type = self.env['hr.leave.type'].create({
+                'name': 'Vacaciones',
+                'requires_allocation': 'yes',
+                'color_name': 'lightblue',
+            })
+        
+        # Crear y devolver la acción del wizard
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'Solicitar Vacaciones',
+            'res_model': 'hr.leave',
+            'view_mode': 'form',
+            'target': 'current',
+            'context': {
+                'default_employee_id': self.id,
+                'default_holiday_status_id': leave_type.id,
+                'default_state': 'confirm',
+            }
+        }
+    
+    def action_create_time_off_in_lieu(self):
+        """Acción para crear nueva solicitud de Tiempo por Tiempo desde el empleado"""
+        self.ensure_one()
+        
+        # Verificar que exista un tipo de ausencia para TXT
+        time_off_type = self.env['hr.leave.type'].search([
+            ('is_time_off_in_lieu', '=', True)
+        ], limit=1)
+        
+        if not time_off_type:
+            raise UserError("""
+                No se encontró un tipo de ausencia configurado para Tiempo por Tiempo.
+                Por favor, vaya a:
+                Tiempo → Configuración → Tipos de Ausencias
+                y marque la casilla 'Es Tiempo por Tiempo' en un tipo de ausencia.
+            """)
+        
+        # Crear el registro de Tiempo por Tiempo
+        txt_vals = {
+            'name': f'TXT - {self.name} - Nueva Solicitud',
+            'employee_id': self.id,
+            'request_date': fields.Date.today(),
+            'state': 'draft',
+        }
+        
+        # Abrir formulario de creación
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'Nueva Solicitud de Tiempo por Tiempo',
+            'res_model': 'hr.time.off.in.lieu',
+            'view_mode': 'form',
+            'target': 'current',
+            'context': {
+                'default_employee_id': self.id,
+                'default_name': f'TXT - {self.name} - {fields.Date.today()}',
+                'default_state': 'draft',
+                'create': True,
+            }
+        }
+    
+    def action_view_time_off_in_lieu(self):
+        """Ver todas las solicitudes de TXT del empleado"""
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'Solicitudes de Tiempo por Tiempo',
+            'res_model': 'hr.time.off.in.lieu',
+            'view_mode': 'tree,form',
+            'domain': [('employee_id', '=', self.id)],
+            'context': {'default_employee_id': self.id},
+        }
