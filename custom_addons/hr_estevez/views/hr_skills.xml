@@ -52,8 +52,7 @@
                             </templates>
                         </kanban>
                     </field>            
-                </group>
-                <separator string="Experiencia"/>    
+                </group>                  
             </xpath>
 
             </field>
