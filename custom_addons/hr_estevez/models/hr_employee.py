@@ -113,11 +113,14 @@ class HrEmployee(models.Model):
         ('weekly', 'Semanal'),
         ('biweekly', 'Quincenal'),
     ], string='Tipo de Pago')
+    
     payroll_type = fields.Selection([
         ('cash', 'Efectivo'),
         ('mixed', 'Mixto'),
         ('imss', 'IMSS'),
-    ], string='Tipo de Nómina')
+    ], string='Tipo de Nómina', store=True)
+
+
 
     patron = fields.Selection([
         ('estevezjor', 'EstevezJor Servicios S.A. de C.V.'),

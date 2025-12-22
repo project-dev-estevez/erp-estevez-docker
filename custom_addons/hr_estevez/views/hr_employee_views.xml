@@ -148,7 +148,7 @@
                     </group>
                     <group string="Nómina">
                         <group>
-                            <field name="imss_registration_date"/>
+                            <!--field name="imss_registration_date"/-->
                             <field name="payment_type"/>
                             <field name="payroll_type"/>
                         </group>
@@ -594,11 +594,53 @@
             <field name="model">hr.employee</field>
             <field name="inherit_id" ref="hr.view_employee_tree"/>
             <field name="arch" type="xml">
+                <field name="name" position="attributes">
+                    <attribute name="width">230</attribute>
+                </field>
+                <field name="work_phone" position="attributes">
+                    <attribute name="width">210</attribute>
+                </field>
+                <field name="work_email" position="attributes">
+                    <attribute name="width">230</attribute>
+                </field>
+                <field name="first_contract_date" position="attributes">
+                    <attribute name="width">210</attribute>
+                </field>
+                <field name="activity_user_id" position="attributes">
+                    <attribute name="width">160</attribute>
+                </field>
+                <field name="company_id" position="attributes">
+                    <attribute name="width">220</attribute>
+                </field>
+                <field name="department_id" position="attributes">
+                    <attribute name="width">220</attribute>
+                </field>
+                <field name="job_id" position="attributes">
+                    <attribute name="width">210</attribute>
+                </field>
+                <field name="parent_id" position="attributes">
+                    <attribute name="width">210</attribute>
+                </field>
+                <field name="work_location_id" position="attributes">
+                    <attribute name="width">210</attribute>
+                </field>
+                <field name="leave_manager_id" position="attributes">
+                    <attribute name="width">210</attribute>
+                </field>
+                <field name="coach_id" position="attributes">
+                    <attribute name="width">210</attribute>
+                </field>
+                <field name="category_ids" position="attributes">
+                    <attribute name="width">210</attribute>
+                </field>
+                <field name="country_id" position="attributes">
+                    <attribute name="width">210</attribute>
+                </field>
                 <field name="parent_id" position="attributes">
                     <attribute name="string">Jefe inmediato</attribute>
                 </field>
                 <field name="activity_ids" position="replace"/>
-                <field name="activity_date_deadline" position="replace"/>
+                <field name="activity_date_deadline" position="replace"/>                
             </field>
         </record>
 

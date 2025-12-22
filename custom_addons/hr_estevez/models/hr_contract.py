@@ -56,14 +56,12 @@ class HrContract(models.Model):
     document_file = fields.Binary(string="Archivo Adjunto", help="Adjunta un único documento relacionado con el contrato.")
     document_filename = fields.Char(string="Nombre del Archivo", compute="_compute_document_filename", store=True)
 
-    payroll_type = fields.Selection([
-        ('cash', 'Efectivo'),
-        ('mixed', 'Mixto'),
-        ('imss', 'IMSS'),
-    ], string='Tipo de Nómina', 
-       related='employee_id.payroll_type', 
-       store=True, 
-       readonly=False)    
+    payroll_type = fields.Selection(
+        related='employee_id.payroll_type',
+        readonly=True,
+        store=True
+    )
+ 
 
     @api.onchange('contract_duration', 'date_start')
     def _onchange_contract_duration(self):

@@ -77,7 +77,8 @@
         'views/hr_time_off_in_lieu_views.xml',       
         'views/employee_document_views.xml',
         'views/employee_views.xml',
-        'views/hr_skills.xml'
+        'views/hr_skills.xml',
+        'views/hr_employee_job_history_views.xml',
     ],
     # only loaded in demonstration mode
     'demo': [

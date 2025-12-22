@@ -93,7 +93,7 @@ export class KpisGrid extends Component {
                 onClick: () => this.viewNewThisMonth()
             },
             {
-                name: "Cumpleaños Próximos",
+                name: "Cumpleaños del Mes",
                 value: this.state.upcomingBirthdays.value,
                 secondaryValue: 0,
                 showSecondaryValue: false,
@@ -258,10 +258,9 @@ export class KpisGrid extends Component {
 
     async calculateUpcomingBirthdays() {
         try {
-            // ✅ Obtener fecha actual y fechas para los próximos 7 días
+            // ✅ Obtener el mes actual
             const today = new Date();
-            const endDate = new Date(today);
-            endDate.setDate(today.getDate() + 7); // Próximos 7 días
+            const currentMonth = today.getMonth(); // 0-indexed (Enero = 0)
             
             // ✅ Obtener todos los empleados activos con fecha de nacimiento
             const employees = await this.orm.searchRead(
@@ -273,59 +272,61 @@ export class KpisGrid extends Component {
                 ["id", "name", "birthday"]
             );
 
-            // ✅ Filtrar empleados que cumplan años en los próximos 7 días
-            let upcomingBirthdays = [];
+            // ✅ Filtrar empleados que cumplen años en el mes actual
+            let birthdaysThisMonth = [];
             
             employees.forEach(employee => {
                 if (employee.birthday) {
-                    // Obtener día y mes del cumpleaños
+                    // Obtener mes del cumpleaños
                     const birthday = new Date(employee.birthday);
-                    const birthdayThisYear = new Date(today.getFullYear(), birthday.getMonth(), birthday.getDate());
+                    const birthdayMonth = birthday.getMonth();
                     
-                    // Si ya pasó este año, calcular para el próximo año
-                    if (birthdayThisYear < today) {
-                        birthdayThisYear.setFullYear(today.getFullYear() + 1);
-                    }
-                    
-                    // Verificar si el cumpleaños está en los próximos 7 días
-                    if (birthdayThisYear >= today && birthdayThisYear <= endDate) {
-                        upcomingBirthdays.push({
+                    // Verificar si el cumpleaños es en el mes actual
+                    if (birthdayMonth === currentMonth) {
+                        birthdaysThisMonth.push({
                             ...employee,
-                            nextBirthday: birthdayThisYear
+                            birthdayDay: birthday.getDate()
                         });
                     }
                 }
             });
 
-            this.state.upcomingBirthdays.value = upcomingBirthdays.length;
-            this.state.upcomingBirthdays.employees = upcomingBirthdays; // ✅ Guardar empleados para navegación
-            this.state.upcomingBirthdays.startDate = today.toISOString().slice(0, 10);
-            this.state.upcomingBirthdays.endDate = endDate.toISOString().slice(0, 10);
+            // ✅ Ordenar por día del mes
+            birthdaysThisMonth.sort((a, b) => a.birthdayDay - b.birthdayDay);
+
+            // ✅ Calcular primer y último día del mes actual para las fechas
+            const firstDay = new Date(today.getFullYear(), currentMonth, 1);
+            const lastDay = new Date(today.getFullYear(), currentMonth + 1, 0);
+
+            this.state.upcomingBirthdays.value = birthdaysThisMonth.length;
+            this.state.upcomingBirthdays.employees = birthdaysThisMonth; // ✅ Guardar empleados para navegación
+            this.state.upcomingBirthdays.startDate = firstDay.toISOString().slice(0, 10);
+            this.state.upcomingBirthdays.endDate = lastDay.toISOString().slice(0, 10);
             
         } catch (error) {
-            console.error("❌ KpisGrid HR: Error calculando Cumpleaños Próximos:", error);
+            console.error("❌ KpisGrid HR: Error calculando Cumpleaños del Mes:", error);
             this.state.upcomingBirthdays.value = 0;
         }
     }
 
     async calculateExpiringContracts() {
         try {
-            // ✅ Obtener fecha actual y fecha límite (próximos 30 días)
+            // ✅ Obtener fecha actual y fecha límite (próximos 15 días)
             const today = new Date();
             const endDate = new Date(today);
-            endDate.setDate(today.getDate() + 30); // Próximos 30 días
+            endDate.setDate(today.getDate() + 15); // Próximos 15 días
 
             const todayStr = today.toISOString().slice(0, 10);
             const endDateStr = endDate.toISOString().slice(0, 10);
             
-            // ✅ Buscar contratos activos que vencen en los próximos 30 días
+            // ✅ Buscar contratos activos que vencen en los próximos 15 días
             const expiringContracts = await this.orm.searchRead(
                 "hr.contract",
                 [
                     ["state", "=", "open"], // Solo contratos activos
                     ["date_end", "!=", false], // Que tengan fecha de fin
                     ["date_end", ">=", todayStr], // Que no hayan vencido aún
-                    ["date_end", "<=", endDateStr] // Que venzan en los próximos 30 días
+                    ["date_end", "<=", endDateStr] // Que venzan en los próximos 15 días
                 ],
                 ["id", "name", "employee_id", "date_end", "state"]
             );
@@ -343,29 +344,25 @@ export class KpisGrid extends Component {
 
     async calculateExpiredContracts() {
         try {
-            // ✅ Obtener fecha actual y fecha de inicio (últimos 90 días para contratos vencidos)
+            // ✅ Obtener fecha actual
             const today = new Date();
-            const startDate = new Date(today);
-            startDate.setDate(today.getDate() - 90); // Últimos 90 días
-
             const todayStr = today.toISOString().slice(0, 10);
-            const startDateStr = startDate.toISOString().slice(0, 10);
             
-            // ✅ Buscar contratos que vencieron (pueden estar en cualquier estado)
+            // ✅ Buscar TODOS los contratos que vencieron (sin límite de fecha)
             const expiredContracts = await this.orm.searchRead(
                 "hr.contract",
                 [
+                    ["state", "=", "close"], // Solo contratos cerrados
                     ["date_end", "!=", false], // Que tengan fecha de fin
                     ["date_end", "<", todayStr], // Que hayan vencido (fecha de fin < hoy)
-                    ["date_end", ">=", startDateStr], // Vencidos en los últimos 90 días
-                    // ✅ No filtrar por estado - pueden estar en cualquier estado
+                    // ✅ No filtrar por rango de fechas - TODOS los vencidos con state=close
                 ],
                 ["id", "name", "employee_id", "date_end", "state"]
             );
 
             this.state.expiredContracts.value = expiredContracts.length;
             this.state.expiredContracts.contracts = expiredContracts; // ✅ Guardar contratos para navegación
-            this.state.expiredContracts.startDate = startDateStr;
+            this.state.expiredContracts.startDate = null; // No hay fecha de inicio
             this.state.expiredContracts.endDate = todayStr;
         } catch (error) {
             console.error("❌ KpisGrid HR: Error calculando Contratos Vencidos:", error);
@@ -397,7 +394,8 @@ export class KpisGrid extends Component {
                 context: {
                     active_test: false, // ✅ Mostrar activos e inactivos
                     search_default_group_by_department: 1, // ✅ Agrupar por departamento
-                }
+                },
+                clearBreadcrumbs: true
             });
         } catch (error) {
             console.error("❌ KpisGrid HR: Error en navegación por día:", error);
@@ -435,7 +433,8 @@ export class KpisGrid extends Component {
                 view_mode: "kanban,list,form",
                 context: {
                     search_default_group_by_department: 1,
-                }
+                },
+                clearBreadcrumbs: true
             });
         } catch (error) {
             console.error("❌ KpisGrid HR: Error en navegación Empleados Activos:", error);
@@ -454,7 +453,8 @@ export class KpisGrid extends Component {
                 context: {
                     active_test: false,
                     search_default_group_by_department: 1,
-                }
+                },
+                clearBreadcrumbs: true
             });
         } catch (error) {
             console.error("❌ KpisGrid HR: Error en navegación Empleados Inactivos:", error);
@@ -495,7 +495,8 @@ export class KpisGrid extends Component {
                     active_test: false, // ✅ Mostrar activos e inactivos
                     search_default_group_by_department: 1, // ✅ Agrupar por departamento
                     search_default_group_by_create_date: 1, // ✅ También agrupar por fecha de creación
-                }
+                },
+                clearBreadcrumbs: true
             });
         } catch (error) {
             console.error("❌ KpisGrid HR: Error en navegación Nuevos este Mes:", error);
@@ -504,14 +505,17 @@ export class KpisGrid extends Component {
 
     async viewUpcomingBirthdays() {
         try {
-            // ✅ Verificar que tenemos empleados con cumpleaños próximos
-            if (!this.state.upcomingBirthdays.employees || this.state.upcomingBirthdays.employees.length === 0) {
-                // ✅ Si no hay empleados específicos, crear filtro por fechas de cumpleaños
-                const today = new Date();
-                const endDate = new Date(today);
-                endDate.setDate(today.getDate() + 7);
+            // ✅ Obtener nombre del mes actual
+            const today = new Date();
+            const monthNames = [
+                'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+                'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
+            ];
+            const currentMonth = monthNames[today.getMonth()];
 
-                // ✅ Crear dominio más general para empleados activos con cumpleaños
+            // ✅ Verificar que tenemos empleados con cumpleaños en el mes
+            if (!this.state.upcomingBirthdays.employees || this.state.upcomingBirthdays.employees.length === 0) {
+                // ✅ Si no hay empleados específicos, crear filtro general
                 const domain = [
                     ["active", "=", true],
                     ["birthday", "!=", false]
@@ -519,20 +523,19 @@ export class KpisGrid extends Component {
 
                 await this.actionService.doAction({
                     type: "ir.actions.act_window",
-                    name: "🎂 Empleados con Cumpleaños Próximos (7 días)",
+                    name: `🎂 Cumpleaños de ${currentMonth}`,
                     res_model: "hr.employee",
                     domain: domain,
                     views: [[false, "kanban"], [false, "list"], [false, "form"]],
                     view_mode: "kanban,list,form",
                     context: {
                         search_default_group_by_department: 1,
-                        search_default_group_by_birthday: 1, // ✅ Agrupar por cumpleaños si existe
                     }
                 });
                 return;
             }
 
-            // ✅ Obtener IDs de empleados con cumpleaños próximos
+            // ✅ Obtener IDs de empleados con cumpleaños en el mes
             const employeeIds = this.state.upcomingBirthdays.employees.map(emp => emp.id);
 
             // ✅ Crear dominio con los IDs específicos
@@ -542,19 +545,18 @@ export class KpisGrid extends Component {
 
             await this.actionService.doAction({
                 type: "ir.actions.act_window",
-                name: `🎂 Cumpleaños Próximos (${this.state.upcomingBirthdays.value} empleados)`,
+                name: `🎂 Cumpleaños de ${currentMonth} (${this.state.upcomingBirthdays.value} empleados)`,
                 res_model: "hr.employee",
                 domain: domain,
                 views: [[false, "kanban"], [false, "list"], [false, "form"]],
                 view_mode: "kanban,list,form",
                 context: {
                     search_default_group_by_department: 1,
-                    // ✅ Filtros personalizados para vista de cumpleaños
                     default_view_kanban: 1,
                 }
             });
         } catch (error) {
-            console.error("❌ KpisGrid HR: Error en navegación Cumpleaños Próximos:", error);
+            console.error("❌ KpisGrid HR: Error en navegación Cumpleaños del Mes:", error);
         }
     }
 
@@ -565,7 +567,7 @@ export class KpisGrid extends Component {
                 // ✅ Si no hay contratos específicos, crear filtro general
                 const today = new Date();
                 const endDate = new Date(today);
-                endDate.setDate(today.getDate() + 30);
+                endDate.setDate(today.getDate() + 15); // Próximos 15 días
 
                 const todayStr = today.toISOString().slice(0, 10);
                 const endDateStr = endDate.toISOString().slice(0, 10);
@@ -574,12 +576,13 @@ export class KpisGrid extends Component {
                 const domain = [
                     ["state", "=", "open"],
                     ["date_end", "!=", false],
-                    ["date_end", ">=", todayStr]
+                    ["date_end", ">=", todayStr],
+                    ["date_end", "<=", endDateStr] // ✅ Límite: próximos 15 días
                 ];
 
                 await this.actionService.doAction({
                     type: "ir.actions.act_window",
-                    name: "📄 Contratos Activos con Fecha de Fin",
+                    name: "📄 Contratos por Vencer (próximos 15 días)",
                     res_model: "hr.contract",
                     domain: domain,
                     views: [[false, "list"], [false, "form"]],
@@ -587,7 +590,8 @@ export class KpisGrid extends Component {
                     context: {
                         search_default_group_by_employee: 1, // ✅ Agrupar por empleado
                         search_default_group_by_date_end: 1, // ✅ Agrupar por fecha de fin
-                    }
+                    },
+                    clearBreadcrumbs: true
                 });
                 return;
             }
@@ -602,7 +606,7 @@ export class KpisGrid extends Component {
 
             await this.actionService.doAction({
                 type: "ir.actions.act_window",
-                name: `📄 Contratos por Vencer (${this.state.expiringContracts.value} contratos - próximos 30 días)`,
+                name: `📄 Contratos por Vencer (${this.state.expiringContracts.value} contratos - próximos 15 días)`,
                 res_model: "hr.contract",
                 domain: domain,
                 views: [[false, "list"], [false, "form"]],
@@ -612,7 +616,8 @@ export class KpisGrid extends Component {
                     search_default_filter_expiring: 1, // ✅ Filtro por vencimiento si existe
                     // ✅ Ordenar por fecha de vencimiento
                     orderby: "date_end asc"
-                }
+                },
+                clearBreadcrumbs: true
             });
         } catch (error) {
             console.error("❌ KpisGrid HR: Error en navegación Contratos por Vencer:", error);
@@ -629,6 +634,7 @@ export class KpisGrid extends Component {
 
                 // ✅ Crear dominio general para contratos vencidos
                 const domain = [
+                    ["state", "=", "close"],
                     ["date_end", "!=", false],
                     ["date_end", "<", todayStr]
                 ];
@@ -659,14 +665,14 @@ export class KpisGrid extends Component {
 
             await this.actionService.doAction({
                 type: "ir.actions.act_window",
-                name: `❌ Contratos Vencidos (${this.state.expiredContracts.value} contratos - últimos 90 días)`,
+                name: `❌ Contratos Vencidos (${this.state.expiredContracts.value} contratos)`,
                 res_model: "hr.contract",
                 domain: domain,
                 views: [[false, "list"], [false, "form"]],
                 view_mode: "list,form",
                 context: {
-                    search_default_group_by_state: 1, // ✅ Agrupar por estado del contrato
-                    search_default_filter_expired: 1, // ✅ Filtro por vencidos si existe
+                    // search_default_group_by_state: 1, // ✅ Agrupar por estado del contrato
+                    // search_default_filter_expired: 1, // ✅ Filtro por vencidos si existe
                     // ✅ Ordenar por fecha de vencimiento descendente (más recientes primero)
                     orderby: "date_end desc"
                 }
