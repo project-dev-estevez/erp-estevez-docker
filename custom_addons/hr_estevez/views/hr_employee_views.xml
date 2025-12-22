@@ -85,12 +85,18 @@
             <xpath expr="//notebook/page[@name='hr_settings']" position="inside">
                 <group name="managers" string="Aprobadores" class="hide-group-if-empty" invisible="1"/>
             </xpath>
+
+            <xpath expr="//div[hasclass('oe_title')]//h1/field[@name='name']" position="replace">
+                <field name="display_name" placeholder="Nombre del empleado" required="True" 
+                    style="font-size: min(4vw, 2.6rem);" readonly="1"/>
+            </xpath>
+            
             <!-- Nombres, Apellidos, # empleado, Proyecto y Etiquetas -->
             <xpath expr="//group/group[field[@name='work_email']]" position="replace">
                 <group>
                     <field name="names"/>
                     <field name="last_name"/>
-                    <field name="mother_last_name"/>    
+                    <field name="mother_last_name"/>  
                     <field name="employee_number"/>
                     <field name="project"/>
                     <field name="category_ids" widget="many2many_tags"

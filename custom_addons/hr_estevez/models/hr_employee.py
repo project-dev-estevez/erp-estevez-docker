@@ -164,7 +164,22 @@ class HrEmployee(models.Model):
     work_phone = fields.Char(string='Work Phone', compute=False)
     # coach_id = fields.Many2one('hr.employee', string='Instructor', compute=False, store=False)
 
-    name = fields.Char(string='Nombre Completo', compute='_compute_full_name', store=True, readonly=True)
+    # Campo almacenado para búsquedas y referencias
+    name = fields.Char(
+        string='Nombre Completo',
+        compute='_compute_full_name',
+        inverse='_inverse_full_name',
+        store=True,
+        compute_sudo=True
+    )
+
+    # Campo para mostrar en vista (no almacenado)
+    display_name = fields.Char(
+        string='Nombre (Vista)',
+        compute='_compute_display_name',
+        store=False,
+        compute_sudo=True
+    )
     age = fields.Integer(string='Edad', compute='_compute_age')
 
     country_id = fields.Many2one('res.country', string='País', default=lambda self: self.env.ref('base.mx').id)
@@ -331,48 +346,128 @@ class HrEmployee(models.Model):
             
     @api.model_create_multi
     def create(self, vals_list):
-        # Combina los dos antiguos 'create' en uno solo (seguro y actualizado)
+        _logger.info("=== CREATE EMPLOYEE ===")
+        
         for vals in vals_list:
-            # --- Parte 1: número de empleado y código de barras ---
+            # CALCULAR EL NOMBRE COMPLETO AQUÍ
+            names = vals.get('names', '').strip()
+            last_name = vals.get('last_name', '').strip()
+            mother_last_name = vals.get('mother_last_name', '').strip()
+            
+            parts = []
+            for part in (names, last_name, mother_last_name):
+                if part:
+                    parts.append(part)
+            
+            full_name = ' '.join(parts) if parts else ''
+            vals['name'] = full_name  # ESTABLECER name DIRECTAMENTE
+            
+            _logger.info(f"CREATE: names={names}, last={last_name}, mother={mother_last_name}, name={full_name}")
+            
+            # Sincronización de barcode/employee_number
             if 'employee_number' in vals and vals['employee_number'] and not vals.get('barcode'):
                 vals['barcode'] = vals['employee_number']
             elif 'barcode' in vals and vals['barcode'] and not vals.get('employee_number'):
                 vals['employee_number'] = vals['barcode']
-
-            # --- Parte 2: construir nombre completo ---
-            if 'names' in vals or 'last_name' in vals or 'mother_last_name' in vals:
-                names = vals.get('names', '').strip()
-                last_name = vals.get('last_name', '').strip()
-                mother_last_name = vals.get('mother_last_name', '').strip()
-                vals['name'] = f"{names} {last_name} {mother_last_name}".strip()
-
-        # Crear empleado(s)
+            
+            if not vals.get('employee_number'):
+                company_id = vals.get('company_id', self.env.company.id)
+                next_number = self._get_next_employee_number(company_id)
+                vals['employee_number'] = next_number
+                if not vals.get('barcode'):
+                    vals['barcode'] = next_number
+        
         employees = super(HrEmployee, self).create(vals_list)
-
-        # --- Parte 3: acciones después de crear ---
+        
+        # Acciones post-creación
         for employee in employees:
             if employee.employment_start_date:
                 try:
                     employee.generate_vacation_periods()
                 except Exception as e:
                     _logger.error(f"Error generando períodos: {str(e)}")
-
+            
             try:
-                _logger.info("Intentando sincronizar con CodeIgniter")
-                self._sync_codeigniter(employee, 'create')
+                employee._sync_codeigniter(employee, 'create')
             except Exception as e:
                 _logger.error(f"Error en sincronización: {str(e)}")
-
+        
         return employees
 
+
     def write(self, vals):
-        # Si se actualiza barcode, sincronizar con employee_number
-        if 'barcode' in vals and vals['barcode']:
-            vals['employee_number'] = vals['barcode']
-        # Si se actualiza employee_number, sincronizar con barcode
-        elif 'employee_number' in vals and vals['employee_number']:
+        _logger.info(f"=== WRITE EMPLOYEE {self.ids} ===")
+        _logger.info(f"Valores a escribir: {vals}")
+        
+        # Calcular nuevo nombre si se actualizan campos relacionados
+        if any(field in vals for field in ['names', 'last_name', 'mother_last_name']):
+            for rec in self:
+                # Obtener valores nuevos o actuales
+                names = vals.get('names', rec.names or '')
+                last_name = vals.get('last_name', rec.last_name or '')
+                mother_last_name = vals.get('mother_last_name', rec.mother_last_name or '')
+                
+                # Calcular nombre completo
+                parts = []
+                for part in (names, last_name, mother_last_name):
+                    if part and str(part).strip():
+                        parts.append(str(part).strip())
+                
+                new_name = ' '.join(parts) if parts else ''
+                
+                # Agregar a valores a escribir
+                if 'name' not in vals:
+                    vals['name'] = new_name
+                
+                _logger.info(f"WRITE CALCULATION: names={names}, last={last_name}, mother={mother_last_name}, new_name={new_name}")
+                break  # Solo necesitamos calcular para el primer registro
+        
+        # Sincronizar barcode
+        if 'employee_number' in vals and 'barcode' not in vals:
             vals['barcode'] = vals['employee_number']
-        return super().write(vals)
+        elif 'barcode' in vals and 'employee_number' not in vals:
+            vals['employee_number'] = vals['barcode']
+        
+        # Resto de la lógica (historial, vacaciones, etc.)
+        if 'job_id' in vals:
+            for rec in self:
+                new_job_id = vals.get('job_id')
+                if isinstance(new_job_id, (list, tuple)):
+                    new_job_id = new_job_id[0]
+                if rec.job_id.id != new_job_id:
+                    self.env['hr.employee.job.history'].create({
+                        'employee_id': rec.id,
+                        'old_job_id': rec.job_id.id,
+                        'new_job_id': new_job_id,
+                        'changed_by': self.env.user.id,
+                        'change_date': fields.Datetime.now(),
+                    })
+        
+        if 'employment_start_date' in vals:
+            for employee in self:
+                if not vals['employment_start_date']:
+                    employee.vacation_period_ids.unlink()
+                    continue
+                if any(period.days_taken > 0 for period in employee.vacation_period_ids):
+                    raise UserError("No se puede cambiar la fecha de ingreso porque hay días de vacaciones ya tomados.")
+                employee.vacation_period_ids.unlink()
+        
+        # Ejecutar write
+        res = super().write(vals)
+        
+        # Acciones post-write
+        if 'employment_start_date' in vals:
+            for employee in self:
+                if employee.employment_start_date:
+                    employee.generate_vacation_periods()
+        
+        try:
+            for employee in self:
+                employee._sync_codeigniter(employee, 'update')
+        except Exception as e:
+            _logger.error(f"Error en sincronización: {str(e)}")
+        
+        return res
     
 
     def generate_random_barcode(self):
@@ -486,16 +581,76 @@ class HrEmployee(models.Model):
         for record in self:
             record.is_mexico = record.country_id.code == 'MX'
 
+
+    @api.depends('names', 'last_name', 'mother_last_name')
+    def _compute_display_name(self):
+        """Para mostrar en tiempo real en la vista"""
+        for rec in self:
+            parts = []
+            for part in (rec.names, rec.last_name, rec.mother_last_name):
+                if part and str(part).strip():
+                    parts.append(str(part).strip())
+            rec.display_name = ' '.join(parts) if parts else ''
+            _logger.info(f"DISPLAY_NAME: {rec.display_name}")
+
     @api.depends('names', 'last_name', 'mother_last_name')
     def _compute_full_name(self):
-        for record in self:
-            record.name = f"{record.names} {record.last_name} {record.mother_last_name}"
+        """Para almacenar en la base de datos"""
+        for rec in self:
+            # Si ya tiene un valor, no recalcular (evita conflicto)
+            if rec.name and not rec._origin:
+                _logger.info(f"SKIP COMPUTE: name ya tiene valor: {rec.name}")
+                continue
+                
+            parts = []
+            for part in (rec.names, rec.last_name, rec.mother_last_name):
+                if part and str(part).strip():
+                    parts.append(str(part).strip())
+            result = ' '.join(parts) if parts else ''
+            
+            # Solo asignar si es diferente
+            if rec.name != result:
+                rec.name = result
+                _logger.info(f"COMPUTE_FULL_NAME asignado: {result}")
+
+    def _inverse_full_name(self):
+        """
+        Inverse method para permitir escritura directa en 'name'
+        No es necesario implementar si no quieres editar directamente
+        """
+        pass
+
+    def debug_name_problem(self):
+        """Método para diagnosticar el problema del nombre"""
+        self.ensure_one()
+        
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': 'Debug del Nombre',
+                'message': f'''
+                Nombres: {self.names or "(vacío)"}
+                Apellido Paterno: {self.last_name or "(vacío)"}
+                Apellido Materno: {self.mother_last_name or "(vacío)"}
+                Nombre en BD (name): {self.name or "(vacío)"}
+                Nombre en Vista (display_name): {self.display_name or "(vacío)"}
+                
+                ¿Son iguales? {"SÍ" if self.name == self.display_name else "NO"}
+                ''',
+                'type': 'warning',
+                'sticky': True,
+            }
+        }
 
     @api.onchange('names', 'last_name', 'mother_last_name')
-    def _onchange_full_name(self):
+    def _onchange_name_fields(self):
+        """Forzar actualización inmediata en la vista"""
         for rec in self:
-            _logger.info("ONCHANGE: names=%r last_name=%r mother_last_name=%r", rec.names, rec.last_name, rec.mother_last_name)
-            rec.name = ' '.join(p for p in (rec.names, rec.last_name, rec.mother_last_name) if p) or False
+            # Forzar cálculo de ambos campos
+            rec._compute_display_name()
+            rec._compute_full_name()
+            _logger.info(f"ONCHANGE: names={rec.names}, last={rec.last_name}, mother={rec.mother_last_name}, name={rec.name}")
 
     def _sync_codeigniter(self, employee, operation='create'):
         api_url = self.env['ir.config_parameter'].get_param('codeigniter.api_url')
@@ -594,100 +749,6 @@ class HrEmployee(models.Model):
         except Exception as e:
             _logger.error(f"Error de conexión: {str(e)}")
             return False
-
-    @api.model
-    def create(self, vals):
-        # Construir nombre completo
-        if 'names' in vals or 'last_name' in vals or 'mother_last_name' in vals:
-            names = vals.get('names', '').strip()
-            last_name = vals.get('last_name', '').strip()
-            mother_last_name = vals.get('mother_last_name', '').strip()
-            vals['name'] = f"{names} {last_name} {mother_last_name}".strip()
-        
-        # Crear empleado
-        employee = super(HrEmployee, self).create(vals)
-        
-        # Generar períodos de vacaciones si hay fecha de ingreso
-        if vals.get('employment_start_date'):
-            employee.generate_vacation_periods()
-
-        if not vals.get('employee_number'):
-            # Obtener la empresa del contexto o de los valores
-            company_id = vals.get('company_id', self.env.company.id)
-            next_number = self._get_next_employee_number(company_id)
-            vals['employee_number'] = next_number
-        
-        # Sincronizar con barcode
-        if 'employee_number' in vals and not vals.get('barcode'):
-            vals['barcode'] = vals['employee_number']
-        
-        # Sincronizar con CodeIgniter
-        try:
-            _logger.info("Intentando sincronizar con CodeIgniter")
-            self._sync_codeigniter(employee, 'create')
-        except Exception as e:
-            _logger.error(f"Error en sincronización: {str(e)}")
-        
-        return employee
-
-    def write(self, vals):
-        # ========== HISTORIAL DE CAMBIO DE PUESTO ==========
-        if 'job_id' in vals:
-            for rec in self:
-                new_job_id = vals.get('job_id')
-
-                if isinstance(new_job_id, (list, tuple)):
-                    new_job_id = new_job_id[0]
-
-                if rec.job_id.id != new_job_id:
-                    self.env['hr.employee.job.history'].create({
-                        'employee_id': rec.id,
-                        'old_job_id': rec.job_id.id,
-                        'new_job_id': new_job_id,
-                        'changed_by': self.env.user.id,
-                        'change_date': fields.Datetime.now(),
-                    })
-
-        # ========== NOMBRE COMPLETO ==========
-        if 'name' not in vals and ('names' in vals or 'last_name' in vals or 'mother_last_name' in vals):
-            names_val = vals.get('names', self.names) or ''
-            last_name_val = vals.get('last_name', self.last_name) or ''
-            mother_last_name_val = vals.get('mother_last_name', self.mother_last_name) or ''
-            vals['name'] = f"{names_val} {last_name_val} {mother_last_name_val}".strip()
-
-        # ========== SINCRONIZAR BARCODE ==========
-        if 'employee_number' in vals and 'barcode' not in vals:
-            vals['barcode'] = vals['employee_number']
-        elif 'barcode' in vals and 'employee_number' not in vals:
-            vals['employee_number'] = vals['barcode']
-
-        # ========== VACACIONES ==========
-        if 'employment_start_date' in vals:
-            for employee in self:
-                if not vals['employment_start_date']:
-                    employee.vacation_period_ids.unlink()
-                    continue
-                    
-                if any(period.days_taken > 0 for period in employee.vacation_period_ids):
-                    raise UserError("No se puede cambiar la fecha de ingreso porque hay días de vacaciones ya tomados.")
-
-                employee.vacation_period_ids.unlink()
-
-        res = super().write(vals)
-
-        if 'employment_start_date' in vals:
-            for employee in self:
-                if employee.employment_start_date:
-                    employee.generate_vacation_periods()
-
-        # ========== SINCRONIZACIÓN CODEIGNITER ==========
-        try:
-            for employee in self:
-                employee._sync_codeigniter(employee, 'update')
-        except Exception as e:
-            _logger.error(f"Error en sincronización de actualización: {str(e)}")
-
-        return res
 
 
     def _get_next_employee_number(self, company_id=False):
