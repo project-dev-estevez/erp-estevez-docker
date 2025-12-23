@@ -1,0 +1,18 @@
+<odoo>
+    <record id="view_attachment_preview_form" model="ir.ui.view">
+        <field name="name">ir.attachment.preview.form</field>
+        <field name="model">ir.attachment</field>
+        <field name="arch" type="xml">
+            <form string="Vista previa" create="false" edit="false">
+                <sheet>
+                    <group>
+                        <field name="name" readonly="1"/>
+
+                        <!-- Vista previa del archivo -->
+                        <field name="datas" filename="name" readonly="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+</odoo>

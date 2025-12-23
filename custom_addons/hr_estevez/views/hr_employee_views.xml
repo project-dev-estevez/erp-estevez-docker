@@ -540,22 +540,7 @@
                         </page>
                     </notebook>
                 </page>
-            </xpath>            
-           
-
-
-            <!--xpath expr="//notebook/page[@name='assignments']" position="after">
-                <page name="job_history" string="Historial de Puestos">
-                    <field name="job_history_ids" readonly="1">
-                        <list>
-                            <field name="change_date"/>
-                            <field name="old_job_id"/>
-                            <field name="new_job_id"/>
-                            <field name="changed_by"/>
-                        </list>
-                    </field>
-                </page>
-            </xpath-->
+            </xpath>                       
             <xpath expr="//page[@name='assignments']" position="attributes">
                 <attribute name="invisible">1</attribute>
             </xpath>         
