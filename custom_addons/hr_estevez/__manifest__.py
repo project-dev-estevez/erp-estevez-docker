@@ -46,6 +46,7 @@
         'report/templates/report_memorandum_ebriedad.xml',
         'report/templates/report_memorandum_faltas.xml',
         'report/templates/report_memorandum_desempeño.xml',
+        'views/hr_employee_excel_wizard_view.xml',
 
         # Email Templates
         # 'data/email_template_contract_expired.xml',
@@ -62,6 +63,7 @@
         'views/hr_department_views.xml',
         'views/hr_area_views.xml',
         'views/hr_employee_menu.xml',
+        'views/hr_employee_excel_wizard_menu.xml',
         'views/hr_employee_views.xml',
         'views/hr_contract_views.xml',
         'views/hr_memorandum_views.xml',

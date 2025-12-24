@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Vista del wizard -->
+        <record id="view_hr_employee_excel_wizard_form" model="ir.ui.view">
+            <field name="name">hr.employee.excel.wizard.form</field>
+            <field name="model">hr.employee.excel.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Generar Reporte de Empleados en Excel">
+                    <sheet>
+                        <!-- Filtros principales -->
+                        <group string="Filtros" colspan="4">
+                            <group>
+                                <field name="employee_status" widget="radio" 
+                                       options="{'horizontal': true}" colspan="2"/>
+                            </group>
+                            <group>
+                                <field name="date_filter" widget="radio" 
+                                       options="{'horizontal': true}"/>
+                                <group invisible="date_filter != 'range'">
+                                    <field name="start_date"/>
+                                    <field name="end_date"/>
+                                </group>
+                            </group>
+                        </group>
+                        
+                        <!-- Campos seleccionables -->
+                        <group string="Campos a Incluir en el Reporte" colspan="4">
+                            <div class="alert alert-info" role="alert">
+                                <i class="fa fa-info-circle"></i>
+                                Selecciona los campos que deseas incluir en el reporte Excel
+                            </div>
+                            
+                            <!-- Botones para seleccionar/deseleccionar todo -->
+                            <div class="mb-3">
+                                <button name="select_all_fields" type="object" 
+                                        string="Seleccionar Todos" class="btn-secondary"/>
+                                <button name="clear_all_fields" type="object" 
+                                        string="Deseleccionar Todos" class="btn-secondary"/>
+                            </div>
+                            
+                            <!-- Campos agrupados -->
+                            <div class="row">
+                                <!-- Columna 1 -->
+                                <div class="col-md-4">
+                                    <group>
+                                        <field name="include_names"/>
+                                        <field name="include_last_name"/>
+                                        <field name="include_mother_last_name"/>
+                                        <field name="include_employee_number"/>
+                                        <field name="include_job_title"/>
+                                        <field name="include_department"/>
+                                        <field name="include_company"/>
+                                    </group>
+                                </div>
+                                
+                                <!-- Columna 2 -->
+                                <div class="col-md-4">
+                                    <group>
+                                        <field name="include_work_email"/>
+                                        <field name="include_work_phone"/>
+                                        <field name="include_private_phone"/>
+                                        <field name="include_birthday"/>
+                                        <field name="include_age"/>
+                                        <field name="include_gender"/>
+                                        <field name="include_marital"/>
+                                    </group>
+                                </div>
+                                
+                                <!-- Columna 3 -->
+                                <div class="col-md-4">
+                                    <group>
+                                        <field name="include_curp"/>
+                                        <field name="include_rfc"/>
+                                        <field name="include_nss"/>
+                                        <field name="include_infonavit"/>
+                                        <field name="include_employment_date"/>
+                                        <field name="include_years_service"/>
+                                        <field name="include_payment_type"/>
+                                        <field name="include_payroll_type"/>
+                                        <field name="include_bank"/>
+                                        <field name="include_clabe"/>
+                                        <field name="include_active"/>
+                                    </group>
+                                </div>
+                            </div>
+                        </group>
+                        
+                        <!-- Información adicional -->
+                        <group string="Información del Reporte" colspan="4">
+                            <div class="alert alert-success" role="alert" invisible="not excel_file">
+                                <i class="fa fa-check-circle"></i>
+                                Reporte generado exitosamente. 
+                                <field name="file_name" readonly="1"/>
+                                <field name="excel_file" filename="file_name" widget="binary" string="Descargar Reporte"/>
+                            </div>
+                        </group>
+                    </sheet>
+                    
+                    <footer>
+                        <button name="generate_excel_report" string="Generar Reporte Excel" 
+                                type="object" class="btn-primary"/>
+                        <button string="Cancelar" class="btn-secondary" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <!-- Acción para abrir el wizard -->
+        <record id="action_hr_employee_excel_wizard" model="ir.actions.act_window">
+            <field name="name">Reporte Excel de Empleados</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">hr.employee.excel.wizard</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+            <field name="context">{'create': False}</field>
+        </record>
+    </data>
+</odoo>

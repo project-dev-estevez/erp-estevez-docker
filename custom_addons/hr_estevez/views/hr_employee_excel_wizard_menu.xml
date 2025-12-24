@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Acción de ventana -->
+        <record id="action_hr_employee_excel_wizard_menu" model="ir.actions.act_window">
+            <field name="name">Reporte Excel de Empleados</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">hr.employee.excel.wizard</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+            <field name="context">{'create': False}</field>
+        </record>
+
+        
+        <menuitem id="menu_hr_employee_excel_report"
+                  name="Reporte Empleados"
+                  parent="hr.hr_menu_hr_reports"
+                  sequence="50"
+                  action="action_hr_employee_excel_wizard_menu"/>
+    </data>
+</odoo>
