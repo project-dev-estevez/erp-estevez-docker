@@ -7,20 +7,36 @@
             <field name="name">hr.employee.job.history.form</field>
             <field name="model">hr.employee.job.history</field>
             <field name="arch" type="xml">
-                <form string="Historial de puestos">
+                <form string="Recategorización">
                     <sheet>
                         <group>
                             <group>
                                 <field name="employee_id" readonly="1"/>
-                                <field name="old_job_id" readonly="1"/>
-                                <field name="changed_by" readonly="1"/>
+                                <field name="company_id" readonly="1"/>                                
+                                <field name="old_job_id" readonly="1"/>   
+                                <button class="btn btn-light border"
+                                        type="object"
+                                        name="action_attach_file"
+                                        title="Adjuntar documento">
+                                        <i class="fa fa-paperclip"></i> Adjuntar
+                                    </button>                                
+                                <button name="action_view_file"
+                                    type="object"
+                                    class="btn btn-light border"
+                                    string="Ver"/>
+
+                                <button name="action_download_file"
+                                    type="object"
+                                    class="btn btn-light border"
+                                    string="Descargar"/>                               
                             </group>
                             <group>
-                                <field name="new_job_id" readonly="1"/>
-                                <field name="change_date" readonly="1"/>
-                            </group>
+                                <field name="new_job_id" readonly="1"/> 
+                                <field name="change_date" readonly="1"/>                                
+                                <field name="end_date" readonly="1"/>
+                                <field name="changed_by" readonly="1"/>                                                                                              
+                            </group>                              
                         </group>                        
-
                     </sheet>
                     <footer>
                         <button string="Cerrar" class="btn-primary" special="cancel"/>

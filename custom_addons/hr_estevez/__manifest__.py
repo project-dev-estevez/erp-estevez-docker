@@ -54,7 +54,7 @@
         # Cron Jobs
         'data/cron_notify_expired_contracts.xml',
 
-        # Archivos de Vistas
+        # Archivos de Vistas        
         'views/hr_user_base_inherit_views.xml',
         'views/res_users_create_wizard_inherit.xml',
         'views/password_change_template.xml',
@@ -78,9 +78,13 @@
         'views/hr_vacation_period_views.xml',
         'views/hr_time_off_in_lieu_views.xml',       
         'views/employee_document_views.xml',
+        'views/hr_employee_job_change_wizard_view.xml',
         'views/employee_views.xml',
         'views/hr_skills.xml',
         'views/hr_employee_job_history_views.xml',
+        'views/view_attachment_preview_form.xml',
+        'views/attachment_preview.xml',        
+        #'views/job_history_wizard_views.xml'
     ],
     # only loaded in demonstration mode
     'demo': [
