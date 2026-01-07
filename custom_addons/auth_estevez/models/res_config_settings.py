@@ -12,7 +12,9 @@ class ResConfigSettings(models.TransientModel):
             ("boxed_right", "Boxed Right"),
             ("boxed_center", "Boxed Center")
         ],
-        config_parameter="auth_estevez.login_page_design"
+        config_parameter="auth_estevez.login_page_design",
+        default="fullscreen_left",
+        help="Elige el estilo de diseño para la página de inicio de sesión"
     )
 
     login_page_custom_background = fields.Boolean(
@@ -30,7 +32,8 @@ class ResConfigSettings(models.TransientModel):
 
     login_page_show_motto = fields.Boolean(
         string="Show Motto",
-        config_parameter="auth_estevez.login_page_show_motto"
+        config_parameter="auth_estevez.login_page_show_motto",
+        default=False
     )
 
     login_page_motto_text = fields.Char(
