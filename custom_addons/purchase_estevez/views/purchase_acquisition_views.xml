@@ -34,7 +34,6 @@
                                 <!--field name="proveedor_id"/-->
                             </group>
                             <group>
-                                <field name="direction_id"/>
                                 <field name="department_id"/>
                                 <field name="job_id"/>
                             </group>
