@@ -31,7 +31,7 @@
                                     string="Descargar"/>                               
                             </group>
                             <group>
-                                <field name="new_job_id" readonly="1"/> 
+                                <field name="new_job_id"/> 
                                 <field name="change_date" readonly="1"/>                                
                                 <field name="end_date" readonly="1"/>
                                 <field name="changed_by" readonly="1"/>                                                                                              
