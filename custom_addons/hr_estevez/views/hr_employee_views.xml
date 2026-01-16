@@ -579,9 +579,9 @@
             <field name="model">hr.employee</field>
             <field name="inherit_id" ref="hr.view_employee_tree"/>
             <field name="arch" type="xml">
-                <field name="name" position="attributes">
-                    <attribute name="width">230</attribute>
-                </field>
+                <xpath expr="//field[@name='name']" position="replace">
+            <field name="display_name" width="230"/>
+        </xpath>
                 <field name="work_phone" position="attributes">
                     <attribute name="width">210</attribute>
                 </field>
