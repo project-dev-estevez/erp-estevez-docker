@@ -1,10 +1,5 @@
-# Añade esto a tu hr_time_off_in_lieu.py
 from odoo import models, fields, api
 from odoo.exceptions import UserError
-import logging
-from datetime import datetime
-
-_logger = logging.getLogger(__name__)
 
 class HrTimeOffInLieu(models.Model):
     _name = 'hr.time.off.in.lieu'

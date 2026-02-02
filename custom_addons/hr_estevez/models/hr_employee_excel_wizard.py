@@ -2,7 +2,7 @@ import io
 import xlwt
 import base64
 from datetime import datetime, date
-from odoo import models, fields, api, _
+from odoo import models, fields, _
 from odoo.exceptions import UserError
 
 class HrEmployeeExcelWizard(models.TransientModel):
