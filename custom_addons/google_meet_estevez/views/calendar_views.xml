@@ -34,8 +34,7 @@
           widget="url"
           string="Enlace Meet"
           readonly="1"
-          invisible="not videocall_location"
-        />
+          invisible="not videocall_location"/>
       </xpath>
     </field>
   </record>
