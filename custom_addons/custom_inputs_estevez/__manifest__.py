@@ -28,13 +28,11 @@
             'custom_inputs_estevez/static/src/js/custom_spinner.js',
             'custom_inputs_estevez/static/img/odoo-icon-192x192.png',
             'custom_inputs_estevez/static/img/odoo-icon-512x512.png',
+            'custom_inputs_estevez/static/src/js/remove_test_paragraphs.js',
         ],
         "web.assets_frontend": [
             'custom_inputs_estevez/static/img/favicon.ico',
-        ],
-        "web.assets_qweb": [
-            'custom_inputs_estevez/views/mail_message_patch.xml'
-        ],
+        ]
     },
     'installable': True,
     'application': False,
