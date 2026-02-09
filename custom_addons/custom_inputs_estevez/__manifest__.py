@@ -19,7 +19,7 @@
     """,
     'author': 'Estevez',
     'website': '',
-    'depends': ['web'],
+    'depends': ['mail', 'web'],
     'data': [],
     'assets': {
         'web.assets_backend': [
@@ -31,6 +31,9 @@
         ],
         "web.assets_frontend": [
             'custom_inputs_estevez/static/img/favicon.ico',
+        ],
+        "web.assets_qweb": [
+            'custom_inputs_estevez/views/mail_message_patch.xml'
         ],
     },
     'installable': True,
