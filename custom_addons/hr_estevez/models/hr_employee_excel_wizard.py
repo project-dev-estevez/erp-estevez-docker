@@ -51,6 +51,12 @@ class HrEmployeeExcelWizard(models.TransientModel):
     include_bank = fields.Boolean(string='Banco')
     include_clabe = fields.Boolean(string='CLABE')
     include_active = fields.Boolean(string='Estado (Activo/Inactivo)', default=True)
+    include_work_location = fields.Boolean(string='Lugar de Trabajo')
+    include_patron = fields.Boolean(string='Patrón')
+    include_establecimiento = fields.Boolean(string='Establecimiento')
+    include_resource_calendar = fields.Boolean(string='Horario Laboral')
+    include_account_number = fields.Boolean(string='Número de Cuenta')
+    include_address = fields.Boolean(string='Dirección Laboral')
     
     # Campo para archivo generado
     excel_file = fields.Binary(string='Archivo Excel')
@@ -148,6 +154,18 @@ class HrEmployeeExcelWizard(models.TransientModel):
             headers.append('CLABE')
         if self.include_active:
             headers.append('Estado')
+        if self.include_work_location:
+            headers.append('Lugar de Trabajo')
+        if self.include_patron:
+            headers.append('Patrón')
+        if self.include_establecimiento:
+            headers.append('Establecimiento')
+        if self.include_resource_calendar:
+            headers.append('Horario Laboral')
+        if self.include_account_number:
+            headers.append('Número de Cuenta')
+        if self.include_address:
+            headers.append('Dirección Laboral')
         
         # Escribir encabezados
         for col, header in enumerate(headers):
@@ -330,6 +348,30 @@ class HrEmployeeExcelWizard(models.TransientModel):
             if self.include_active:
                 worksheet.write(row, col, 'Activo' if employee.active else 'Inactivo', data_style)
                 col += 1
+
+            if self.include_work_location:
+                worksheet.write(row, col, employee.work_location_id.name if employee.work_location_id else '', data_style)
+                col += 1
+
+            if self.include_patron:
+                worksheet.write(row, col, employee.patron if employee.patron else '', data_style)
+                col += 1
+            
+            if self.include_establecimiento:
+                worksheet.write(row, col, employee.establecimiento if employee.establecimiento else '', data_style)
+                col += 1
+
+            if self.include_resource_calendar:
+                worksheet.write(row, col, employee.resource_calendar_id.name if employee.resource_calendar_id else '', data_style)
+                col += 1
+
+            if self.include_account_number:
+                worksheet.write(row, col, employee.account_number or '', data_style)
+                col += 1
+
+            if self.include_address:
+                worksheet.write(row, col, employee.address_id.name if employee.address_id else '', data_style)
+                col += 1
             
             row += 1
         
@@ -388,6 +430,12 @@ class HrEmployeeExcelWizard(models.TransientModel):
             'include_bank': True,
             'include_clabe': True,
             'include_active': True,
+            'include_work_location': True,
+            'include_patron': True,
+            'include_establecimiento': True,
+            'include_resource_calendar': True,
+            'include_account_number': True,
+            'include_address': True,
         })
         # Devuelve una acción para recargar el wizard
         return {
@@ -427,6 +475,12 @@ class HrEmployeeExcelWizard(models.TransientModel):
             'include_bank': False,
             'include_clabe': False,
             'include_active': False,
+            'include_work_location': False,
+            'include_patron': False,
+            'include_establecimiento': False,
+            'include_resource_calendar': False,
+            'include_account_number': False,
+            'include_address': False,
         })
         # Devuelve una acción para recargar el wizard
         return {

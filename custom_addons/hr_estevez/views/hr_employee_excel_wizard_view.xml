@@ -51,12 +51,17 @@
                                         <field name="include_job_title"/>
                                         <field name="include_department"/>
                                         <field name="include_company"/>
+                                        <field name="include_work_location"/>
+                                        <field name="include_patron"/>
+                                        <field name="include_establecimiento"/>
+                                        <field name="include_resource_calendar"/>
                                     </group>
                                 </div>
                                 
                                 <!-- Columna 2 -->
                                 <div class="col-md-4">
                                     <group>
+                                        <field name="include_address"/>
                                         <field name="include_work_email"/>
                                         <field name="include_work_phone"/>
                                         <field name="include_private_phone"/>
@@ -79,6 +84,7 @@
                                         <field name="include_payment_type"/>
                                         <field name="include_payroll_type"/>
                                         <field name="include_bank"/>
+                                        <field name="include_account_number"/>
                                         <field name="include_clabe"/>
                                         <field name="include_active"/>
                                     </group>
