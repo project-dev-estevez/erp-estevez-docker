@@ -85,9 +85,6 @@ class HrEmployee(models.Model):
         help='Selecciona el estatus academico del empleado.',
     )
 
-
-
-
     gender = fields.Selection([
         ('male', 'Masculino'),
         ('female', 'Femenino'),
@@ -699,8 +696,7 @@ class HrEmployee(models.Model):
         }
 
         try:
-            import json
-             # 1. Crear la sesión primero
+            # 1. Crear la sesión primero
             session = requests.Session()
             session.verify = False
             

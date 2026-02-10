@@ -1,4 +1,4 @@
-from odoo import api, models, fields, exceptions, _
+from odoo import api, models, fields, _
 from datetime import date, datetime
 from dateutil.relativedelta import relativedelta 
 import logging

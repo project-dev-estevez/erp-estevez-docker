@@ -1,6 +1,4 @@
 from odoo import models, fields, api
-from odoo.exceptions import UserError
-
 
 class HrEmployeeJobChangeWizard(models.TransientModel):
     _name = 'hr.employee.job.change.wizard'

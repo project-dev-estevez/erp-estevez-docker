@@ -1,5 +1,4 @@
-from odoo import models, fields, api
-from datetime import datetime, timedelta
+from odoo import models, fields
 import logging
 from odoo.exceptions import UserError
 
