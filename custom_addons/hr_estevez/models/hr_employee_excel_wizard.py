@@ -57,6 +57,13 @@ class HrEmployeeExcelWizard(models.TransientModel):
     include_resource_calendar = fields.Boolean(string='Horario Laboral')
     include_account_number = fields.Boolean(string='Número de Cuenta')
     include_address = fields.Boolean(string='Dirección Laboral')
+    include_private_colonia = fields.Boolean(string='Colonia')
+    include_municipality = fields.Boolean(string='Municipio')
+    include_state = fields.Boolean(string='Estado')
+    include_private_street2 = fields.Boolean(string='Numero')
+    include_private_zip = fields.Boolean(string='Código Postal')
+    include_private_email = fields.Boolean(string='Email Personal')
+    include_license_number = fields.Boolean(string='Número de Licencia')
     
     # Campo para archivo generado
     excel_file = fields.Binary(string='Archivo Excel')
@@ -166,6 +173,20 @@ class HrEmployeeExcelWizard(models.TransientModel):
             headers.append('Número de Cuenta')
         if self.include_address:
             headers.append('Dirección Laboral')
+        if self.include_private_colonia:
+            headers.append('Colonia')
+        if self.include_municipality:
+            headers.append('Municipio')
+        if self.include_state:
+            headers.append('Estado')
+        if self.include_private_street2:
+            headers.append('Numero')
+        if self.include_private_zip:
+            headers.append('Código Postal')
+        if self.include_private_email:
+            headers.append('Email Personal')
+        if self.include_license_number:
+            headers.append('Número de Licencia')
         
         # Escribir encabezados
         for col, header in enumerate(headers):
@@ -372,6 +393,34 @@ class HrEmployeeExcelWizard(models.TransientModel):
             if self.include_address:
                 worksheet.write(row, col, employee.address_id.name if employee.address_id else '', data_style)
                 col += 1
+
+            if self.include_private_colonia:
+                worksheet.write(row, col, employee.private_colonia or '', data_style)
+                col += 1
+
+            if self.include_municipality:
+                worksheet.write(row, col, employee.municipality_id.name or '', data_style)
+                col += 1
+
+            if self.include_state:
+                worksheet.write(row, col, employee.state_id.name or '', data_style)
+                col += 1
+
+            if self.include_private_street2:
+                worksheet.write(row, col, employee.private_street2 or '', data_style)
+                col += 1
+
+            if self.include_private_zip:
+                worksheet.write(row, col, employee.private_zip or '', data_style)
+                col += 1
+
+            if self.include_private_email:
+                worksheet.write(row, col, employee.private_email or '', data_style)
+                col += 1
+
+            if self.include_license_number:
+                worksheet.write(row, col, employee.license_number or '', data_style)
+                col += 1
             
             row += 1
         
@@ -436,6 +485,13 @@ class HrEmployeeExcelWizard(models.TransientModel):
             'include_resource_calendar': True,
             'include_account_number': True,
             'include_address': True,
+            'include_private_colonia': True,
+            'include_municipality': True,
+            'include_state': True,
+            'include_private_street2': True,
+            'include_private_zip': True,
+            'include_private_email': True,
+            'include_license_number': True,
         })
         # Devuelve una acción para recargar el wizard
         return {
@@ -481,6 +537,13 @@ class HrEmployeeExcelWizard(models.TransientModel):
             'include_resource_calendar': False,
             'include_account_number': False,
             'include_address': False,
+            'include_private_colonia': False,
+            'include_municipality': False,
+            'include_state': False,
+            'include_private_street2': False,
+            'include_private_zip': False,
+            'include_private_email': False,
+            'include_license_number': False,
         })
         # Devuelve una acción para recargar el wizard
         return {

@@ -69,6 +69,13 @@
                                         <field name="include_age"/>
                                         <field name="include_gender"/>
                                         <field name="include_marital"/>
+                                        <field name="include_private_colonia"/> 
+                                        <field name="include_municipality"/>
+                                        <field name="include_state"/>
+                                        <field name="include_private_street2"/>
+                                        <field name="include_private_zip"/>
+                                        <field name="include_private_email"/>
+                                        <field name="include_license_number"/>
                                     </group>
                                 </div>
                                 
