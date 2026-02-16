@@ -64,6 +64,12 @@ class HrEmployeeExcelWizard(models.TransientModel):
     include_private_zip = fields.Boolean(string='Código Postal')
     include_private_email = fields.Boolean(string='Email Personal')
     include_license_number = fields.Boolean(string='Número de Licencia')
+    include_study_field_new = fields.Boolean(string='Campo de Estudio')
+    include_study_tags = fields.Boolean(string='Etiquetas de Estudio')
+    include_study_school = fields.Boolean(string='Institución de Estudio')
+    include_estudios = fields.Boolean(string='Estudios')
+    include_documento = fields.Boolean(string='Documento')
+    include_institucion = fields.Boolean(string='Institución')
     
     # Campo para archivo generado
     excel_file = fields.Binary(string='Archivo Excel')
@@ -187,6 +193,18 @@ class HrEmployeeExcelWizard(models.TransientModel):
             headers.append('Email Personal')
         if self.include_license_number:
             headers.append('Número de Licencia')
+        if self.include_study_field_new:
+            headers.append('Campo de Estudio')
+        if self.include_study_tags:
+            headers.append('Estatus académico')
+        if self.include_study_school:
+            headers.append('Escuela')
+        if self.include_estudios:
+            headers.append('Nivel de estudios')
+        if self.include_documento:
+            headers.append('Documento probatorio')
+        if self.include_institucion:
+            headers.append('Institución')
         
         # Escribir encabezados
         for col, header in enumerate(headers):
@@ -421,6 +439,31 @@ class HrEmployeeExcelWizard(models.TransientModel):
             if self.include_license_number:
                 worksheet.write(row, col, employee.license_number or '', data_style)
                 col += 1
+
+            if self.include_study_field_new:
+                worksheet.write(row, col, employee.study_field_new or '', data_style)
+                col += 1
+
+            if self.include_study_tags:
+                tags = ', '.join(employee.study_tag_ids.name.mapped('name')) if employee.study_tag_ids else ''
+                worksheet.write(row, col, tags, data_style)
+                col += 1
+
+            if self.include_study_school:
+                worksheet.write(row, col, employee.study_school or '', data_style)
+                col += 1
+
+            if self.include_estudios:
+                worksheet.write(row, col, employee.estudios_id.name if employee.estudios_id else '', data_style)
+                col += 1
+
+            if self.include_documento:
+                worksheet.write(row, col, employee.documento_id.name if employee.documento_id else '', data_style)
+                col += 1
+
+            if self.include_institucion:
+                worksheet.write(row, col, employee.institucion_id.name if employee.institucion_id else '', data_style)
+                col += 1
             
             row += 1
         
@@ -492,6 +535,12 @@ class HrEmployeeExcelWizard(models.TransientModel):
             'include_private_zip': True,
             'include_private_email': True,
             'include_license_number': True,
+            'include_study_field_new': True,
+            'include_study_tags': True,
+            'include_study_school': True,
+            'include_estudios': True,
+            'include_documento': True,
+            'include_institucion': True,
         })
         # Devuelve una acción para recargar el wizard
         return {
@@ -544,6 +593,12 @@ class HrEmployeeExcelWizard(models.TransientModel):
             'include_private_zip': False,
             'include_private_email': False,
             'include_license_number': False,
+            'include_study_field_new': False,
+            'include_study_tags': False,
+            'include_study_school': False,
+            'include_estudios': False,
+            'include_documento': False,
+            'include_institucion': False,
         })
         # Devuelve una acción para recargar el wizard
         return {

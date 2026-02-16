@@ -55,6 +55,12 @@
                                         <field name="include_patron"/>
                                         <field name="include_establecimiento"/>
                                         <field name="include_resource_calendar"/>
+                                        <field name="include_study_field_new"/>
+                                        <field name="include_study_tags"/>
+                                        <field name="include_study_school"/>
+                                        <field name="include_estudios"/>
+                                        <field name="include_documento"/>
+                                        <field name="include_institucion"/>
                                     </group>
                                 </div>
                                 
