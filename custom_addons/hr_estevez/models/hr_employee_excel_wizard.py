@@ -444,10 +444,7 @@ class HrEmployeeExcelWizard(models.TransientModel):
                 worksheet.write(row, col, employee.study_field_new or '', data_style)
                 col += 1
 
-            if self.include_study_tags:
-                tags = ', '.join(employee.study_tag_ids.name.mapped('name')) if employee.study_tag_ids else ''
-                worksheet.write(row, col, tags, data_style)
-                col += 1
+            
 
             if self.include_study_school:
                 worksheet.write(row, col, employee.study_school or '', data_style)
