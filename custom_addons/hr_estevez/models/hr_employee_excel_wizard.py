@@ -459,7 +459,7 @@ class HrEmployeeExcelWizard(models.TransientModel):
                 col += 1
 
             if self.include_institucion:
-                worksheet.write(row, col, employee.institucion_id.name if employee.institucion_id else '', data_style)
+                worksheet.write(row, col, employee.institucion_id.description if employee.institucion_id else '', data_style)
                 col += 1
             
             row += 1
