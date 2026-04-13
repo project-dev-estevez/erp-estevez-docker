@@ -16,38 +16,38 @@ class HrEmployee(models.Model):
     area_id = fields.Many2one('hr.area', string='Area')
 
     @api.onchange('first_name', 'last_name', 'mother_last_name')
-    def _onchange_name_fields(self):
+    def _onchange_recruitment_name_fields(self):
         for rec in self:
-            full_name = ' '.join(filter(None, [rec.first_name, rec.last_name, rec.mother_last_name]))
-            rec.name = full_name.strip()
+            rec.names = rec.first_name
+            rec.name = rec._compose_recruitment_full_name(
+                first_name=rec.first_name,
+                last_name=rec.last_name,
+                mother_last_name=rec.mother_last_name,
+            )
 
-    def _compute_full_name(self):
-        # Filtrar campos None y strings vacíos, excluyendo "Sin especificar"
+    def _compose_recruitment_full_name(self, first_name=None, last_name=None, mother_last_name=None):
         name_parts = []
-        for field_value in [self.first_name, self.last_name, self.mother_last_name]:
+        for field_value in [first_name, last_name, mother_last_name]:
             if field_value and field_value != "Sin especificar":
                 name_parts.append(field_value)
         return ' '.join(name_parts).strip()
 
     @api.model
     def create(self, vals):
-        # Solo usar valores reales, no los placeholder
-        name_parts = []
-        for field in ['first_name', 'last_name', 'mother_last_name']:
-            if vals.get(field) and vals[field] != "Sin especificar":
-                name_parts.append(vals[field])
-        
-        if name_parts and not vals.get('name'):
-            vals['name'] = ' '.join(name_parts).strip()
-        
+        if vals.get('first_name') and not vals.get('names'):
+            vals['names'] = vals['first_name']
+        elif vals.get('names') and not vals.get('first_name'):
+            vals['first_name'] = vals['names']
+
         return super().create(vals)
 
     def write(self, vals):
-        res = super().write(vals)
-        if any(k in vals for k in ['first_name', 'last_name', 'mother_last_name']):
-            for rec in self:
-                rec.name = rec._compute_full_name()
-        return res
+        if 'first_name' in vals and 'names' not in vals:
+            vals['names'] = vals['first_name']
+        elif 'names' in vals and 'first_name' not in vals:
+            vals['first_name'] = vals['names']
+
+        return super().write(vals)
 
     def action_open_documents(self):
         self.env['hr.applicant.document'].search([]).unlink()

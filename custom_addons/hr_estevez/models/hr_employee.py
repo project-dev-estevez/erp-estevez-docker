@@ -7,6 +7,7 @@ from dateutil.relativedelta import relativedelta
 import re
 import requests
 import math
+from odoo.osv import expression
 
 _logger = logging.getLogger(__name__)
 
@@ -170,7 +171,8 @@ class HrEmployee(models.Model):
         compute='_compute_full_name',
         inverse='_inverse_full_name',
         store=True,
-        compute_sudo=True
+        compute_sudo=True,
+        search='_search_employee_name'
     )
 
     # Campo para mostrar en vista (no almacenado)
@@ -613,12 +615,36 @@ class HrEmployee(models.Model):
                 rec.name = result
                 _logger.info(f"COMPUTE_FULL_NAME asignado: {result}")
 
+    @api.model
+    def _search_employee_name(self, operator, value):
+        if not value:
+            return [('name', operator, value)]
+
+        return expression.OR([
+            [('name', operator, value)],
+            [('names', operator, value)],
+            [('last_name', operator, value)],
+            [('mother_last_name', operator, value)],
+            [('first_name', operator, value)],
+        ])
+
     def _inverse_full_name(self):
         """
         Inverse method para permitir escritura directa en 'name'
         No es necesario implementar si no quieres editar directamente
         """
         pass
+
+    def _get_effective_full_name(self):
+        self.ensure_one()
+
+        first_name = self.names or getattr(self, 'first_name', False)
+        parts = []
+        for part in (first_name, self.last_name, self.mother_last_name):
+            if part and str(part).strip():
+                parts.append(str(part).strip())
+
+        return ' '.join(parts) if parts else (self.name or '')
 
     def debug_name_problem(self):
         """Método para diagnosticar el problema del nombre"""
@@ -887,6 +913,7 @@ class HrEmployee(models.Model):
         - Sin work_email (solo employee_number): Contraseña por defecto con cambio obligatorio
         """
         self.ensure_one()
+        employee_full_name = self._get_effective_full_name()
         
         # Validar si ya tiene usuario
         if self.user_id:
@@ -905,7 +932,7 @@ class HrEmployee(models.Model):
                 '  ✓ Correo Corporativo (Email de Trabajo)\n'
                 '  ✓ Número de Empleado\n\n'
                 '📝 Por favor complete alguno de estos campos e intente nuevamente.'
-            ) % self.name)
+            ) % employee_full_name)
         
         if not has_email:
             # Sin email: marcar para contraseña por defecto + cambio obligatorio
@@ -913,7 +940,7 @@ class HrEmployee(models.Model):
             context['no_reset_password'] = True  # Evitar envío de email
             
             _logger.info(
-                f"🔐 Usuario {self.name} (ID: {self.id}) será creado SIN EMAIL - "
+                f"🔐 Usuario {employee_full_name} (ID: {self.id}) será creado SIN EMAIL - "
                 f"Se asignará contraseña temporal '12345678' con cambio obligatorio en primer login"
             )
         else:
@@ -921,12 +948,12 @@ class HrEmployee(models.Model):
             context['no_reset_password'] = False
             
             _logger.info(
-                f"📧 Usuario {self.name} (ID: {self.id}) será creado CON EMAIL - "
+                f"📧 Usuario {employee_full_name} (ID: {self.id}) será creado CON EMAIL - "
                 f"Se enviará invitación a: {self.work_email}"
             )
         
         _logger.info(
-            f"Creando usuario para empleado {self.name} (ID: {self.id}) - "
+            f"Creando usuario para empleado {employee_full_name} (ID: {self.id}) - "
             f"Email: {has_email}, Número: {has_employee_number}"
         )
         
@@ -940,7 +967,7 @@ class HrEmployee(models.Model):
             'target': 'new',
             'context': dict(context, **{
                 'default_create_employee_id': self.id,
-                'default_name': self.name,
+                'default_name': employee_full_name,
                 'default_phone': self.work_phone,
                 'default_mobile': self.mobile_phone,
                 'default_login': self.work_email or self.employee_number,
