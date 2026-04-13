@@ -1,5 +1,6 @@
 from odoo import models, fields, api
 import logging
+from ..tools import strip_accents_keep_enye
 
 _logger = logging.getLogger(__name__)
 
@@ -16,13 +17,21 @@ class HRCandidate(models.Model):
 
     @api.onchange('first_name', 'last_name', 'mother_last_name')
     def _onchange_fill_partner_name(self):
-        for record in self:            
-            # Construir partner_name con los tres campos separados
-            parts = filter(None, [record.first_name, record.last_name, record.mother_last_name])
+        for record in self:
+            parts = filter(None, [
+                strip_accents_keep_enye(record.first_name),
+                strip_accents_keep_enye(record.last_name),
+                strip_accents_keep_enye(record.mother_last_name),
+            ])
             record.partner_name = ' '.join(parts)
 
     @api.model
     def create(self, vals):
+        # Normalizar nombres: quitar tildes preservando ñ/Ñ
+        for field in ('first_name', 'last_name', 'mother_last_name'):
+            if vals.get(field):
+                vals[field] = strip_accents_keep_enye(vals[field])
+
         # Si no se asigna partner_id, y hay partner_name, crea un res.partner automáticamente
         if not vals.get('partner_name'):
             first_name = vals.get('first_name', '')
@@ -41,6 +50,11 @@ class HRCandidate(models.Model):
         return super().create(vals)
 
     def write(self, vals):
+        # Normalizar nombres: quitar tildes preservando ñ/Ñ
+        for field in ('first_name', 'last_name', 'mother_last_name'):
+            if vals.get(field):
+                vals[field] = strip_accents_keep_enye(vals[field])
+
         # Actualizar partner_name si cambian los campos de nombre
         if any(field in vals for field in ['first_name', 'last_name', 'mother_last_name']):
             for record in self:

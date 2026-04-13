@@ -4,8 +4,10 @@ from datetime import timedelta, date
 import werkzeug
 import logging
 import re
+from ..tools import strip_accents_keep_enye
 
 _logger = logging.getLogger(__name__)
+
 
 class HrApplicant(models.Model):
     _inherit = 'hr.applicant'
@@ -240,8 +242,13 @@ class HrApplicant(models.Model):
     @api.model
     def create(self, vals):
         if 'user_id' not in vals or not vals['user_id']:
-            vals['user_id'] = self.env.user.id  # Asigna el usuario logueado por defecto        
-        
+            vals['user_id'] = self.env.user.id  # Asigna el usuario logueado por defecto
+
+        # Normalizar nombres: quitar tildes preservando ñ/Ñ
+        for field in ('first_name', 'last_name', 'mother_last_name'):
+            if vals.get(field):
+                vals[field] = strip_accents_keep_enye(vals[field])
+
         # Crear el applicant
         applicant = super(HrApplicant, self).create(vals)
         
@@ -256,7 +263,12 @@ class HrApplicant(models.Model):
         return applicant
         
 
-    def write(self, vals):              
+    def write(self, vals):
+        # Normalizar nombres: quitar tildes preservando ñ/Ñ
+        for field in ('first_name', 'last_name', 'mother_last_name'):
+            if vals.get(field):
+                vals[field] = strip_accents_keep_enye(vals[field])
+
         # Validar si el postulante está bloqueado
         if 'stage_id' in vals and any(applicant.kanban_state == 'blocked' for applicant in self):
             raise UserError(_("El postulante está bloqueado y no puede avanzar en el proceso hasta que el bloqueo sea resuelto o eliminado manualmente por un usuario autorizado."))
