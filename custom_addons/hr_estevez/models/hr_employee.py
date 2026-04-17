@@ -467,7 +467,7 @@ class HrEmployee(models.Model):
             sync_ok = employee._sync_codeigniter(employee, 'update')
             if not sync_ok:
                 raise ValidationError(
-                    _("No se pudo sincronizar la actualización del empleado '%s' con CodeIgniter.") % (employee.name or employee.id)
+                    _("No se pudo sincronizar la actualización del empleado '%s' con System ERP.") % (employee.name or employee.id)
                 )
         
         return res
