@@ -15,12 +15,14 @@ class HrEmployee(models.Model):
     direction_id = fields.Many2one('hr.direction', string='Dirección')
     area_id = fields.Many2one('hr.area', string='Area')
 
-    @api.onchange('first_name', 'last_name', 'mother_last_name')
+    @api.onchange('first_name', 'names', 'last_name', 'mother_last_name')
     def _onchange_recruitment_name_fields(self):
         for rec in self:
-            rec.names = rec.first_name
+            effective_first_name = (rec.first_name or rec.names or '').strip()
+            rec.first_name = effective_first_name
+            rec.names = effective_first_name
             rec.name = rec._compose_recruitment_full_name(
-                first_name=rec.first_name,
+                first_name=effective_first_name,
                 last_name=rec.last_name,
                 mother_last_name=rec.mother_last_name,
             )
