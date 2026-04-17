@@ -1,4 +1,3 @@
-import json
 import logging
 from odoo import api, models, fields, _
 from odoo.exceptions import UserError, ValidationError
@@ -388,11 +387,12 @@ class HrEmployee(models.Model):
                     employee.generate_vacation_periods()
                 except Exception as e:
                     _logger.error(f"Error generando períodos: {str(e)}")
-            
-            try:
-                employee._sync_codeigniter(employee, 'create')
-            except Exception as e:
-                _logger.error(f"Error en sincronización: {str(e)}")
+
+            sync_ok = employee._sync_codeigniter(employee, 'create')
+            if not sync_ok:
+                raise ValidationError(
+                    _("No se pudo sincronizar el empleado '%s' con System.") % (employee.name or employee.id)
+                )
         
         return employees
 
@@ -463,11 +463,12 @@ class HrEmployee(models.Model):
                 if employee.employment_start_date:
                     employee.generate_vacation_periods()
         
-        try:
-            for employee in self:
-                employee._sync_codeigniter(employee, 'update')
-        except Exception as e:
-            _logger.error(f"Error en sincronización: {str(e)}")
+        for employee in self:
+            sync_ok = employee._sync_codeigniter(employee, 'update')
+            if not sync_ok:
+                raise ValidationError(
+                    _("No se pudo sincronizar la actualización del empleado '%s' con CodeIgniter.") % (employee.name or employee.id)
+                )
         
         return res
     
@@ -683,8 +684,15 @@ class HrEmployee(models.Model):
         api_token = self.env['ir.config_parameter'].get_param('codeigniter.api_token')
         
         if not api_url or not api_token:
-            _logger.error("Configuración de API para CodeIgniter faltante")
+            _logger.error("Configuración de API para System faltante")
             return False
+
+        if operation == 'create' and not employee.birthday:
+            raise ValidationError(
+                _("No se puede crear en System sin fecha de nacimiento. Completa 'Fecha de nacimiento' e intenta nuevamente.")
+            )
+
+        employees_endpoint = f"{api_url.rstrip('/')}/empleados"
         
 
         # Asegurar valores no nulos
@@ -704,7 +712,7 @@ class HrEmployee(models.Model):
             'odoo_id': employee.id,
             'payment_type': employee.payment_type or '',
             'work_phone': employee.work_phone or '',
-            'working_hours': employee.resource_calendar_id.display_name or '',
+            'working_hours': employee.resource_calendar_id.display_name if employee.resource_calendar_id else '',
             'private_street': employee.private_street or '',
             'private_street2': employee.private_street2 or '',
             'private_colonia': employee.private_colonia or '',
@@ -722,40 +730,25 @@ class HrEmployee(models.Model):
         }
 
         try:
-            # 1. Crear la sesión primero
             session = requests.Session()
             session.verify = False
             
-            # 2. Preparar headers comunes
             headers = {
                 'Authorization': f'Bearer {api_token}',
                 'Content-Type': 'application/json; charset=utf-8'
             }
-            json_payload = json.dumps(payload, ensure_ascii=False)
-        
-            # Codificar a bytes UTF-8 explícitamente
-            utf8_payload = json_payload.encode('utf-8')
-            
-            _logger.info(f"Longitud UTF-8: {len(utf8_payload)} bytes")
-            _logger.info(f"Contenido: {json_payload[:100]}...")  # Muestra inicio
-            
-            # Enviar como bytes
-            endpoint = api_url
+
+            endpoint = employees_endpoint
             if operation == 'update':
-                endpoint = f"{api_url}/empleados/{employee.id}"
-                http_method = requests.put
+                endpoint = f"{employees_endpoint}/{employee.id}"
+                http_method = session.put
             else:
-                http_method = requests.post
-            
-            # Enviar con el método adecuado
+                http_method = session.post
+
             response = http_method(
                 endpoint,
-                data=utf8_payload,
-                headers={
-                    'Authorization': f'Bearer {api_token}',
-                    'Content-Type': 'application/json; charset=utf-8',
-                    'Content-Length': str(len(utf8_payload))
-                },
+                json=payload,
+                headers=headers,
                 timeout=30,
                 verify=False
             )
@@ -768,11 +761,18 @@ class HrEmployee(models.Model):
                 _logger.info(f"Sincronización exitosa para empleado {employee.id}")
                 return True
             else:
-                _logger.error(f"Error en CI: {response.status_code} - {response.text}")
+                _logger.error(
+                    "Error en CI para empleado %s op=%s endpoint=%s status=%s body=%s",
+                    employee.id,
+                    operation,
+                    endpoint,
+                    response.status_code,
+                    response.text,
+                )
                 return False
                         
         except Exception as e:
-            _logger.error(f"Error de conexión: {str(e)}")
+            _logger.exception("Error de conexión sincronizando empleado %s", employee.id)
             return False
 
 
