@@ -378,7 +378,8 @@ class HrEmployee(models.Model):
                 if not vals.get('barcode'):
                     vals['barcode'] = next_number
         
-        employees = super(HrEmployee, self).create(vals_list)
+        # Evita sincronizaciones de write() disparadas internamente durante create.
+        employees = super(HrEmployee, self.with_context(skip_codeigniter_sync=True)).create(vals_list)
         
         # Acciones post-creación
         for employee in employees:
@@ -400,6 +401,9 @@ class HrEmployee(models.Model):
     def write(self, vals):
         _logger.info(f"=== WRITE EMPLOYEE {self.ids} ===")
         _logger.info(f"Valores a escribir: {vals}")
+
+        if self.env.context.get('skip_codeigniter_sync'):
+            return super().write(vals)
         
         # Calcular nuevo nombre si se actualizan campos relacionados
         if any(field in vals for field in ['names', 'last_name', 'mother_last_name']):
@@ -692,7 +696,12 @@ class HrEmployee(models.Model):
                 _("No se puede crear en System sin fecha de nacimiento. Completa 'Fecha de nacimiento' e intenta nuevamente.")
             )
 
-        employees_endpoint = f"{api_url.rstrip('/')}/empleados"
+        normalized_api_url = api_url.rstrip('/')
+        employees_endpoint = (
+            normalized_api_url
+            if normalized_api_url.endswith('/empleados')
+            else f"{normalized_api_url}/empleados"
+        )
         
 
         # Asegurar valores no nulos
@@ -756,11 +765,8 @@ class HrEmployee(models.Model):
             
             _logger.info(f"Respuesta de CodeIgniter: {response.status_code} - {response.text}")
             
-            if (operation == 'create' and response.status_code == 201) or \
-            (operation == 'update' and response.status_code in (200, 204)):
-                _logger.info(f"Sincronización exitosa para empleado {employee.id}")
-                return True
-            else:
+            success_status_codes = {200, 201, 204}
+            if response.status_code not in success_status_codes:
                 _logger.error(
                     "Error en CI para empleado %s op=%s endpoint=%s status=%s body=%s",
                     employee.id,
@@ -770,6 +776,9 @@ class HrEmployee(models.Model):
                     response.text,
                 )
                 return False
+
+            _logger.info(f"Sincronización exitosa para empleado {employee.id}")
+            return True
                         
         except Exception as e:
             _logger.exception("Error de conexión sincronizando empleado %s", employee.id)
