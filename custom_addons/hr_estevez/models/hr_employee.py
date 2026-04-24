@@ -389,10 +389,15 @@ class HrEmployee(models.Model):
                 except Exception as e:
                     _logger.error(f"Error generando períodos: {str(e)}")
 
-            sync_ok = employee._sync_codeigniter(employee, 'create')
-            if not sync_ok:
-                raise ValidationError(
-                    _("No se pudo sincronizar el empleado '%s' con System.") % (employee.name or employee.id)
+            if not self.env.context.get('from_recruitment'):
+                sync_ok = employee._sync_codeigniter(employee, 'create')
+                if not sync_ok:
+                    raise ValidationError(
+                        _("No se pudo sincronizar el empleado '%s' con System.") % (employee.name or employee.id)
+                    )
+            else:
+                _logger.info(
+                    "Creación desde reclutamiento: se omite sincronización con System en el flujo de creación inicial."
                 )
         
         return employees
