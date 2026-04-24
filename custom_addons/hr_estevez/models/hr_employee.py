@@ -124,8 +124,6 @@ class HrEmployee(models.Model):
         ('corporativo_comunicacion', 'Corporativo en Comunicacion Digital del Futuro, S.A. de C.V.'),
         ('planta_ambientalista', 'Planta Ambientalista EESZ S.A. de C.V.'),
         ('herrajes', 'Herrajes Estevez S.A. de C.V.'),
-        ('pnk', 'PNK & Ble Strategies, S.A. de C.V.'),
-        ('voch', 'Voch Especialistas de México, S.A. de C.V.'),
         ('rastreo', 'Rastreo Satelital de México J&J S.A. de C.V.'),
         ('grupo_back', 'Grupo Back Bone de México S.A. de C.V.')
     ], string='Patrón Fiscal')
