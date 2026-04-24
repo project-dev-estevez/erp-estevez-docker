@@ -609,9 +609,6 @@
                 <field name="work_location_id" position="attributes">
                     <attribute name="width">210</attribute>
                 </field>
-                <field name="leave_manager_id" position="attributes">
-                    <attribute name="width">210</attribute>
-                </field>
                 <field name="coach_id" position="attributes">
                     <attribute name="width">210</attribute>
                 </field>
