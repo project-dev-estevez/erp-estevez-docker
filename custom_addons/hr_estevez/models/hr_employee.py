@@ -691,7 +691,7 @@ class HrEmployee(models.Model):
             _logger.error("Configuración de API para System faltante")
             return False
 
-        if operation == 'create' and not employee.birthday:
+        if operation == 'create' and not employee.birthday and not self.env.context.get('from_recruitment'):
             raise ValidationError(
                 _("No se puede crear en System sin fecha de nacimiento. Completa 'Fecha de nacimiento' e intenta nuevamente.")
             )
