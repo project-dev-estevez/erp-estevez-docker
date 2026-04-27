@@ -522,6 +522,7 @@ class HrApplicant(models.Model):
             'names': first_name,
             'last_name': last_name,
             'mother_last_name': mother_last_name,
+            'birthday': getattr(candidate, 'birthday', None) or fields.Date.today(),
             'job_id': self.job_id.id,
             'job_title': self.job_id.name,
             'direction_id': direction_id,
