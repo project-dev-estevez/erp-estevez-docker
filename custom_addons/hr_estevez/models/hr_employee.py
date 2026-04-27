@@ -124,8 +124,6 @@ class HrEmployee(models.Model):
         ('corporativo_comunicacion', 'Corporativo en Comunicacion Digital del Futuro, S.A. de C.V.'),
         ('planta_ambientalista', 'Planta Ambientalista EESZ S.A. de C.V.'),
         ('herrajes', 'Herrajes Estevez S.A. de C.V.'),
-        ('pnk', 'PNK & Ble Strategies, S.A. de C.V.'),
-        ('voch', 'Voch Especialistas de México, S.A. de C.V.'),
         ('rastreo', 'Rastreo Satelital de México J&J S.A. de C.V.'),
         ('grupo_back', 'Grupo Back Bone de México S.A. de C.V.')
     ], string='Patrón Fiscal')
@@ -389,10 +387,15 @@ class HrEmployee(models.Model):
                 except Exception as e:
                     _logger.error(f"Error generando períodos: {str(e)}")
 
-            sync_ok = employee._sync_codeigniter(employee, 'create')
-            if not sync_ok:
-                raise ValidationError(
-                    _("No se pudo sincronizar el empleado '%s' con System.") % (employee.name or employee.id)
+            if not self.env.context.get('from_recruitment'):
+                sync_ok = employee._sync_codeigniter(employee, 'create')
+                if not sync_ok:
+                    raise ValidationError(
+                        _("No se pudo sincronizar el empleado '%s' con System.") % (employee.name or employee.id)
+                    )
+            else:
+                _logger.info(
+                    "Creación desde reclutamiento: se omite sincronización con System en el flujo de creación inicial."
                 )
         
         return employees
@@ -691,7 +694,7 @@ class HrEmployee(models.Model):
             _logger.error("Configuración de API para System faltante")
             return False
 
-        if operation == 'create' and not employee.birthday:
+        if operation == 'create' and not employee.birthday and not self.env.context.get('from_recruitment'):
             raise ValidationError(
                 _("No se puede crear en System sin fecha de nacimiento. Completa 'Fecha de nacimiento' e intenta nuevamente.")
             )
