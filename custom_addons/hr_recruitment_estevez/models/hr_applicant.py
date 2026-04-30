@@ -534,7 +534,7 @@ class HrApplicant(models.Model):
         }
 
         # Crear empleado directamente
-        employee = self.env['hr.employee'].with_context(from_recruitment=True).create(employee_vals)
+        employee = self.env['hr.employee'].create(employee_vals)
         self.employee_id = employee.id
 
         # Transferir categorías

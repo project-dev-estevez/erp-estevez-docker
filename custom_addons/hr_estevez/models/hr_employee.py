@@ -387,15 +387,10 @@ class HrEmployee(models.Model):
                 except Exception as e:
                     _logger.error(f"Error generando períodos: {str(e)}")
 
-            if not self.env.context.get('from_recruitment'):
-                sync_ok = employee._sync_codeigniter(employee, 'create')
-                if not sync_ok:
-                    raise ValidationError(
-                        _("No se pudo sincronizar el empleado '%s' con System.") % (employee.name or employee.id)
-                    )
-            else:
-                _logger.info(
-                    "Creación desde reclutamiento: se omite sincronización con System en el flujo de creación inicial."
+            sync_ok = employee._sync_codeigniter(employee, 'create')
+            if not sync_ok:
+                raise ValidationError(
+                    _("No se pudo sincronizar el empleado '%s' con System.") % (employee.name or employee.id)
                 )
         
         return employees
@@ -694,7 +689,7 @@ class HrEmployee(models.Model):
             _logger.error("Configuración de API para System faltante")
             return False
 
-        if operation == 'create' and not employee.birthday and not self.env.context.get('from_recruitment'):
+        if operation == 'create' and not employee.birthday:
             raise ValidationError(
                 _("No se puede crear en System sin fecha de nacimiento. Completa 'Fecha de nacimiento' e intenta nuevamente.")
             )
