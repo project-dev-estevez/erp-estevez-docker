@@ -7,6 +7,7 @@ import re
 import requests
 import math
 from odoo.osv import expression
+import unicodedata
 
 _logger = logging.getLogger(__name__)
 
@@ -120,7 +121,7 @@ class HrEmployee(models.Model):
 
 
     patron = fields.Selection([
-        ('estevezjor', 'EstevezJor Servicios S.A. de C.V.'),
+        ('estevezjor', 'Estevez.Jor Servicios S.A. de C.V.'),
         ('corporativo_comunicacion', 'Corporativo en Comunicacion Digital del Futuro, S.A. de C.V.'),
         ('planta_ambientalista', 'Planta Ambientalista EESZ S.A. de C.V.'),
         ('herrajes', 'Herrajes Estevez S.A. de C.V.'),
@@ -466,7 +467,7 @@ class HrEmployee(models.Model):
                     employee.generate_vacation_periods()
         
         for employee in self:
-            sync_ok = employee._sync_codeigniter(employee, 'update')
+            sync_ok = employee._sync_codeigniter(employee, 'update', vals=vals)
             if not sync_ok:
                 raise ValidationError(
                     _("No se pudo sincronizar la actualización del empleado '%s' con System ERP.") % (employee.name or employee.id)
@@ -681,7 +682,100 @@ class HrEmployee(models.Model):
             rec._compute_full_name()
             _logger.info(f"ONCHANGE: names={rec.names}, last={rec.last_name}, mother={rec.mother_last_name}, name={rec.name}")
 
-    def _sync_codeigniter(self, employee, operation='create'):
+    
+    def normalize_text(self, text):
+        if not text:
+            return ''
+        
+        text = unicodedata.normalize('NFKD', text)
+        text = text.encode('ascii', 'ignore').decode('utf-8')
+        
+        return text.upper().strip()
+
+    def _sync_codeigniter(self, employee, operation='create', vals=None):
+
+        if vals is None:
+            vals = {}
+        
+        _logger.info("=== INICIANDO DEBUG DE MUNICIPIOS ===")
+
+        # 1. Intentar obtener IDs
+        s_id = vals.get('state_id') or employee.state_id.id
+        m_id = vals.get('municipality_id') or employee.municipality_id.id
+        _logger.info(f"IDs detectados -> Estado: {s_id}, Municipio: {m_id}")
+
+        estado_nombre = ""
+        municipio_nombre = ""
+
+        try:
+            if s_id:
+                # Usamos sudo() por si es un tema de permisos
+                estado_nombre = self.env['hr.state'].sudo().browse(s_id).name or ""
+            
+            if m_id:
+                municipio_nombre = self.env['hr.municipality'].sudo().browse(m_id).name or ""
+                
+            _logger.info(f"Nombres extraídos -> Estado: {estado_nombre}, Municipio: {municipio_nombre}")
+        except Exception as e:
+            _logger.error(f"ERROR EXTRAYENDO NOMBRES: {str(e)}")
+
+        sexo_map = {
+            'male': 'Masculino',
+            'female': 'Femenino',
+            'indistinct': 'Indistinto',
+            'other': 'Otro'
+        }
+        sexo_traducido = sexo_map.get(employee.gender, 'Otro')
+
+        # 2. Homologación de Estado Civil
+        civil_map = {
+            'single': 'Soltero(a)',
+            'married': 'Casado(a)',
+            'cohabitant': 'Unión libre',
+            'widower': 'Viudo(a)',
+            'divorced': 'Divorciado(a)'
+        }
+        civil_traducido = civil_map.get(employee.marital, 'Soltero(a)')
+
+        # 3. Homologación de Tipo de Nómina
+        nomina_map = {
+            'cash': 'Efectivo',
+            'mixed': 'Mixto',
+            'imss': 'IMSS'
+        }
+        nomina_traducido = nomina_map.get(employee.payroll_type, '')
+    
+        # Buscamos el valor en vals (lo nuevo) o en el objeto (lo que ya estaba)
+        pareja = vals.get('spouse_complete_name', employee.spouse_complete_name or '')
+        horario = employee.resource_calendar_id.display_name if employee.resource_calendar_id else ''
+
+        # Prioridad a vals si se acaba de cambiar el país, si no, del objeto
+        nacionalidad = ''
+        if 'country_id' in vals:
+            # Buscamos el nombre del país usando el ID que viene en vals
+            country = self.env['res.country'].browse(vals['country_id'])
+            nacionalidad = country.name
+        else:
+            nacionalidad = employee.country_id.name if employee.country_id else ''
+
+        # 2. Lugar de nacimiento (Texto simple)
+        lugar_nacimiento = ''
+        if 'country_of_birth' in vals:
+            # Buscamos el nombre del país usando el ID que viene en vals
+            country = self.env['res.country'].browse(vals['country_of_birth'])
+            lugar_nacimiento = country.name
+        else:
+            lugar_nacimiento = employee.country_id.name if employee.country_id else ''
+
+        # 3. Fecha de nacimiento (Fecha)
+        # Odoo envía las fechas como objetos date o strings 'YYYY-MM-DD'. 
+        # Lo forzamos a string para que PHP lo reciba sin problemas.
+        fecha_nacimiento = vals.get('birthday') or employee.birthday
+        if fecha_nacimiento:
+            fecha_nacimiento = str(fecha_nacimiento)
+        else:
+            fecha_nacimiento = ''
+
         api_url = self.env['ir.config_parameter'].get_param('codeigniter.api_url')
         api_token = self.env['ir.config_parameter'].get_param('codeigniter.api_token')
         
@@ -701,40 +795,144 @@ class HrEmployee(models.Model):
             else f"{normalized_api_url}/empleados"
         )
         
+        state_obj = getattr(employee, 'state_id', False)
+        if state_obj:
+            estado_nombre = state_obj.name or ""
+
+        mun_obj = getattr(employee, 'municipality_id', False)
+        if mun_obj:
+            municipio_nombre = mun_obj.name or ""
+
+        banco_nombre = ""
+        banco_id = vals.get('bank_id') or employee.bank_id.id
+        if banco_id:
+            # El modelo de bancos en Odoo suele ser res.bank
+            banco_nombre = self.env['res.bank'].sudo().browse(banco_id).name or ""
+
+        # 2. Dirección, Departamento y Puesto (Many2one)
+        # Extraemos el nombre de la relación para buscar el ID en System
+        direccion_nom = employee.direction_id.name if employee.direction_id else ""
+        depto_nom     = employee.department_id.name if employee.department_id else ""
+        area_nom      = employee.area_id.name if employee.area_id else ""
+        perfil_nom    = employee.job_id.name if employee.job_id else ""
+
+        # 1. Grado de estudios (Many2one) - Enviamos el nombre para homologar IDs
+        escolaridad_nombre = ""
+        estudios_id = vals.get('estudios_id') or employee.estudios_id.id
+        if estudios_id:
+            escolaridad_nombre = self.env['hr.estudios'].sudo().browse(estudios_id).name or ""
+
+        # 2. Título / Carrera (Selection) - Extraemos la etiqueta legible
+        titulo_profesional = dict(employee._fields['study_field_new'].selection).get(employee.study_field_new) or ""
+
+        patron_nombre = ""
+        if employee.patron:
+            patron_nombre = dict(employee._fields['patron'].selection).get(employee.patron) or ""
+
+        establecimiento_nombre = ""
+        if employee.establecimiento:
+            establecimiento_nombre = dict(employee._fields['establecimiento'].selection).get(employee.establecimiento) or ""
+
+        ocupacion_nombre = ""
+        ocupacion_id = vals.get('occupation_id') or employee.occupation_id.id
+        if ocupacion_id:
+            ocupacion_nombre = self.env['hr.occupation'].sudo().browse(ocupacion_id).name or ""
+
+        documento_aprob = ""
+        aprobatorio_id = vals.get('documento_id') or employee.documento_id.id
+        if aprobatorio_id:
+            documento_aprob = self.env['hr.probatorio'].sudo().browse(aprobatorio_id).name or ""
+
+        institucion = ""
+        institucion_id = vals.get('institucion_id') or employee.institucion_id.id
+        if institucion_id:
+            institucion = self.env['hr.institucion'].sudo().browse(institucion_id).description or ""
+
+        company_name = ""
+        id_company = vals.get('company_id') or employee.company_id.id
+        if id_company:
+            company_name = self.env['res.company'].sudo().browse(id_company).name or ""
+
+        # fuente_nombre = ""
+        # applicant = self.env['hr.applicant'].sudo().search([('candidate_id', '=', employee.id)], limit=1)
+
+        # if applicant and applicant.source_id:
+        #     fuente_nombre = applicant.source_id.name
+        # elif employee.source_id: # En algunas configuraciones de Odoo el campo se hereda al empleado
+        #     fuente_nombre = employee.source_id.name
 
         # Asegurar valores no nulos
         payload = {
             'nombre': employee.names or '',
             'apellido_paterno': employee.last_name or '',
             'apellido_materno': employee.mother_last_name or '',
-            'curp': employee.curp or '',
-            'email': employee.work_email or '',
-            'sexo': employee.gender or 'other',
             'numero_empleado': employee.employee_number or '',
-            'nss': employee.nss or '',
-            'fecha_nacimiento': employee.birthday.strftime('%Y-%m-%d') if employee.birthday else None,
-            'imss_registration_date': employee.imss_registration_date.strftime('%Y-%m-%d') if employee.imss_registration_date else None,
-            'nacionalidad': 'Mexico',
-            'clave_elector': employee.voter_key or '',
             'odoo_id': employee.id,
-            'payment_type': employee.payment_type or '',
-            'work_phone': employee.work_phone or '',
-            'working_hours': employee.resource_calendar_id.display_name if employee.resource_calendar_id else '',
+            'fecha_ingreso': employee.create_date.strftime('%Y-%m-%d %H:%M:%S') if employee.create_date else fields.Datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+            'estatus': 1, # Siempre activo
+            'sexo': sexo_traducido,
+            'marital': civil_traducido,
+            'payroll_type': nomina_traducido,
+            'curp': employee.curp or '',
+            'rfc': str(employee.rfc) if employee.rfc else '',
+            'email': employee.work_email or '',
+            'nacionalidad': nacionalidad,
+            'lugar_nacimiento': lugar_nacimiento,
+            'fecha_nacimiento': fecha_nacimiento,
+            'nss': employee.nss or '',
+            'imss_registration_date': employee.imss_registration_date.strftime('%Y-%m-%d') if employee.imss_registration_date else None,
+            
+            # --- NUEVOS CAMPOS DETECTADOS ---
+            # Ubicación
+            'estado_sync': self.normalize_text(estado_nombre),
+            'municipio_sync': self.normalize_text(municipio_nombre),
             'private_street': employee.private_street or '',
             'private_street2': employee.private_street2 or '',
             'private_colonia': employee.private_colonia or '',
             'private_zip': employee.private_zip or '',
             'fiscal_zip': employee.fiscal_zip or '',
+            
+            # Contacto
             'private_email': employee.private_email or '',
-            'private_phone': employee.private_phone or '',
+            'private_phone': employee.private_phone or '', # Teléfono celular
+            'work_phone': employee.work_phone or '',       # Teléfono empresa/fijo
+            
+            # Datos Bancarios y Nómina
+            'banco_sync': banco_nombre,
+            'cuenta_bancaria': employee.account_number or '',
+            'clabe': employee.clabe or '',
             'infonavit': bool(employee.infonavit),
+            'payment_type': employee.payment_type or '',
+            
+            # Emergencias
+            'persona_contacto': employee.emergency_contact or '',
+            'telefono_contacto': employee.emergency_phone or '',
+            'nombre_pareja': pareja,
+            
+            'patron_sync': patron_nombre,
+            'establecimiento': establecimiento_nombre,
+            'direccion_sync': direccion_nom,
+            'departamento_sync': depto_nom,
+            'area_sync': area_nom,
+            'perfil_sync': perfil_nom,
+            'ocupacion_sync': ocupacion_nombre,
+            'proyecto_sync': employee.project or '',
+            
+            # Otros
+            'clave_elector': employee.voter_key or '',
             'license_number': employee.license_number or '',
-            'study_field': employee.study_field or '',
-            'study_school': employee.study_school or '',
-            'marital': employee.marital or '',
             'children': employee.children or 0,
-            'job_title': employee.job_title or ''
+            'horario': horario,
+
+            'escolaridad_sync': escolaridad_nombre,
+            'titulo_profesional': titulo_profesional,
+            'documento_aprobatorio_sync': documento_aprob,
+            'institucion_sync': institucion,
+            'company_sync': company_name,
+            # 'fuente_reclutamiento_sync': fuente_nombre,
         }
+
+        _logger.info(f"PAYLOAD FINAL A ENVIAR: {payload}")
 
         try:
             session = requests.Session()
