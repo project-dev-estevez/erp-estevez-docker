@@ -5,8 +5,7 @@ class IrAttachment(models.Model):
 
     @api.model
     def create(self, vals):
-        # Si se está creando un archivo adjunto desde el contexto de un documento requerido,
-        # forzar el nombre del archivo adjunto a ser igual al nombre del documento requerido.
-        if 'default_name' in self._context:
+        # Solo forzar nombre en el flujo explícito de adjuntar documento requerido.
+        if self._context.get('force_document_name') and self._context.get('default_name'):
             vals['name'] = self._context.get('default_name')
         return super(IrAttachment, self).create(vals)

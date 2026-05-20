@@ -660,7 +660,11 @@ class HrApplicant(models.Model):
                         'res_model': 'hr.employee',
                         'res_id': employee.id,
                     }
-                    app_att.with_context(skip_attachment_bidirectional_sync=True).copy({
+                    app_att.with_context(
+                        skip_attachment_bidirectional_sync=True,
+                        default_name=False,
+                        force_document_name=False,
+                    ).copy({
                         **copy_vals,
                     })
                     _logger.info(
@@ -677,7 +681,11 @@ class HrApplicant(models.Model):
                         'res_model': 'hr.employee',
                         'res_id': employee.id,
                     }
-                    app_att.with_context(skip_attachment_bidirectional_sync=True).copy({
+                    app_att.with_context(
+                        skip_attachment_bidirectional_sync=True,
+                        default_name=False,
+                        force_document_name=False,
+                    ).copy({
                         **copy_vals,
                     })
                     _logger.info(
@@ -718,7 +726,11 @@ class HrApplicant(models.Model):
                         'res_model': 'hr.applicant',
                         'res_id': self.id,
                     }
-                    emp_att.with_context(skip_attachment_bidirectional_sync=True).copy({
+                    emp_att.with_context(
+                        skip_attachment_bidirectional_sync=True,
+                        default_name=False,
+                        force_document_name=False,
+                    ).copy({
                         **copy_vals,
                     })
                     _logger.info(
@@ -735,7 +747,11 @@ class HrApplicant(models.Model):
                         'res_model': 'hr.applicant',
                         'res_id': self.id,
                     }
-                    emp_att.with_context(skip_attachment_bidirectional_sync=True).copy({
+                    emp_att.with_context(
+                        skip_attachment_bidirectional_sync=True,
+                        default_name=False,
+                        force_document_name=False,
+                    ).copy({
                         **copy_vals,
                     })
                     _logger.info(

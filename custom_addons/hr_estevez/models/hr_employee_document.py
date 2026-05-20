@@ -95,7 +95,8 @@ class HrEmployeeDocument(models.Model):
             'context': {
                 'default_res_model': 'hr.employee',
                 'default_res_id': self.employee_id.id,
-                'default_name': self.name
+                'default_name': self.name,
+                'force_document_name': True,
             },
         }
 

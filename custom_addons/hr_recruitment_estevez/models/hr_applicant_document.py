@@ -52,7 +52,8 @@ class HrApplicantDocument(models.Model):
             'context': {
                 'default_res_model': 'hr.applicant',
                 'default_res_id': self.applicant_id.id,
-                'default_name': self.name
+                'default_name': self.name,
+                'force_document_name': True,
             },
         }   
 
