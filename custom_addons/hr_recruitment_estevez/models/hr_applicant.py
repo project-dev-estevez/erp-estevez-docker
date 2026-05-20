@@ -719,20 +719,28 @@ class IrAttachmentSync(models.Model):
                     except Exception as e:
                         _logger.error(f"Error sync APPLICANT→EMPLOYEE: {e}")
             
-            # ✅ NUEVO: De EMPLOYEE → APPLICANT  
+            # ✅ De EMPLOYEE → APPLICANT  
             elif attachment.res_model == 'hr.employee' and attachment.res_id:
                 employee = self.env['hr.employee'].browse(attachment.res_id)
                 if employee.exists():
+                    _logger.info(f"🔍 Buscando applicant para employee {employee.id} (name: {employee.name})")
+                    
                     # Buscar el applicant relacionado con este employee
                     applicant = self.env['hr.applicant'].search([
                         ('employee_id', '=', employee.id)
                     ], limit=1)
+                    
                     if applicant:
+                        _logger.info(f"✅ Applicant encontrado: {applicant.id} - {applicant.partner_name}")
                         try:
                             applicant.sync_attachment_changes(employee.id, 'employee_to_applicant')
-                            _logger.info(f"Sync EMPLOYEE→APPLICANT para employee {employee.id}")
+                            _logger.info(f"✅ Sync EMPLOYEE→APPLICANT completado para employee {employee.id} → applicant {applicant.id}")
                         except Exception as e:
-                            _logger.error(f"Error sync EMPLOYEE→APPLICANT: {e}")
+                            _logger.error(f"❌ Error sync EMPLOYEE→APPLICANT: {str(e)}")
+                            import traceback
+                            _logger.error(traceback.format_exc())
+                    else:
+                        _logger.warning(f"⚠️  No se encontró applicant con employee_id={employee.id}")
         
         return result
 
@@ -751,19 +759,26 @@ class IrAttachmentSync(models.Model):
                     except Exception as e:
                         _logger.error(f"Error CREATE sync APPLICANT→EMPLOYEE: {e}")
             
-            # ✅ NUEVO: De EMPLOYEE → APPLICANT
+            # ✅ De EMPLOYEE → APPLICANT
             elif record.res_model == 'hr.employee' and record.res_id:
                 employee = self.env['hr.employee'].browse(record.res_id)
                 if employee.exists():
+                    _logger.info(f"🔍 [CREATE] Buscando applicant para employee {employee.id} (name: {employee.name})")
+                    
                     applicant = self.env['hr.applicant'].search([
                         ('employee_id', '=', employee.id)
                     ], limit=1)
+                    
                     if applicant:
+                        _logger.info(f"✅ [CREATE] Applicant encontrado: {applicant.id} - {applicant.partner_name}")
                         try:
                             applicant.sync_attachment_changes(employee.id, 'employee_to_applicant')
-                            _logger.info(f"CREATE Sync EMPLOYEE→APPLICANT para employee {employee.id}")
+                            _logger.info(f"✅ [CREATE] Sync EMPLOYEE→APPLICANT completado para employee {employee.id} → applicant {applicant.id}")
                         except Exception as e:
-                            _logger.error(f"Error CREATE sync EMPLOYEE→APPLICANT: {e}")
+                            _logger.error(f"❌ [CREATE] Error sync EMPLOYEE→APPLICANT: {str(e)}")
+                            import traceback
+                            _logger.error(traceback.format_exc())
+                    else:
+                        _logger.warning(f"⚠️  [CREATE] No se encontró applicant con employee_id={employee.id}")
         
         return records
-    
