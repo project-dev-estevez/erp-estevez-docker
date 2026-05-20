@@ -75,7 +75,7 @@ class HrEmployeeDocument(models.Model):
             ('res_model', '=', 'hr.employee'),
             ('res_id', '=', self.employee_id.id),
             ('name', '=', self.name)
-        ], limit=1)
+        ])
         if existing_attachment:
             existing_attachment.unlink()
         return {
@@ -98,7 +98,7 @@ class HrEmployeeDocument(models.Model):
             ('res_model', '=', 'hr.employee'),
             ('res_id', '=', self.employee_id.id),
             ('name', '=', self.name)
-        ], limit=1)
+        ], order='write_date desc, id desc', limit=1)
         
         if not attachment:
             raise UserError("No se encontró el archivo adjunto.")
@@ -120,7 +120,7 @@ class HrEmployeeDocument(models.Model):
             ('res_model', '=', 'hr.employee'),
             ('res_id', '=', self.employee_id.id),
             ('name', '=', self.name)
-        ], limit=1)
+        ], order='write_date desc, id desc', limit=1)
         if not attachment:
             raise UserError("No se encontró el archivo adjunto.")
         return {
