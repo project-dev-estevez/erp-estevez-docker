@@ -591,9 +591,13 @@ class HrApplicant(models.Model):
             attachment.type,
             attachment.checksum or False,
             attachment.url or False,
-            attachment.name or False,
+            self._normalize_attachment_name(attachment.name),
             attachment.mimetype or False,
         )
+
+    def _normalize_attachment_name(self, name):
+        normalized = (name or '').strip().lower()
+        return ' '.join(normalized.split())
 
     def _latest_attachments_by_name(self, res_model, res_id):
         attachments = self.env['ir.attachment'].search([
@@ -604,8 +608,9 @@ class HrApplicant(models.Model):
         latest_by_name = {}
         duplicates = 0
         for attachment in attachments:
-            if attachment.name not in latest_by_name:
-                latest_by_name[attachment.name] = attachment
+            normalized_name = self._normalize_attachment_name(attachment.name)
+            if normalized_name not in latest_by_name:
+                latest_by_name[normalized_name] = attachment
             else:
                 duplicates += 1
 
@@ -643,11 +648,13 @@ class HrApplicant(models.Model):
                 emp_att = employee_files.get(app_name)
                 if emp_att and self._attachment_signature(app_att) != self._attachment_signature(emp_att):
                     # Reemplazo completo para evitar inconsistencias por cache/adjuntos duplicados.
-                    to_replace = self.env['ir.attachment'].search([
+                    employee_attachments = self.env['ir.attachment'].search([
                         ('res_model', '=', 'hr.employee'),
                         ('res_id', '=', employee.id),
-                        ('name', '=', app_name),
                     ])
+                    to_replace = employee_attachments.filtered(
+                        lambda att: self._normalize_attachment_name(att.name) == app_name
+                    )
                     to_replace.unlink()
                     copy_vals = {
                         'res_model': 'hr.employee',
@@ -658,7 +665,7 @@ class HrApplicant(models.Model):
                     })
                     _logger.info(
                         "Sync applicant_to_employee: documento reemplazado name=%s applicant_att_id=%s employee_old_ids=%s",
-                        app_name,
+                        app_att.name,
                         app_att.id,
                         to_replace.ids,
                     )
@@ -675,7 +682,7 @@ class HrApplicant(models.Model):
                     })
                     _logger.info(
                         "Sync applicant_to_employee: documento nuevo copiado name=%s applicant_att_id=%s",
-                        app_name,
+                        app_att.name,
                         app_att.id,
                     )
             
@@ -699,11 +706,13 @@ class HrApplicant(models.Model):
                 app_att = applicant_files.get(emp_name)
                 if app_att and self._attachment_signature(emp_att) != self._attachment_signature(app_att):
                     # Reemplazo completo para evitar inconsistencias por cache/adjuntos duplicados.
-                    to_replace = self.env['ir.attachment'].search([
+                    applicant_attachments = self.env['ir.attachment'].search([
                         ('res_model', '=', 'hr.applicant'),
                         ('res_id', '=', self.id),
-                        ('name', '=', emp_name),
                     ])
+                    to_replace = applicant_attachments.filtered(
+                        lambda att: self._normalize_attachment_name(att.name) == emp_name
+                    )
                     to_replace.unlink()
                     copy_vals = {
                         'res_model': 'hr.applicant',
@@ -714,7 +723,7 @@ class HrApplicant(models.Model):
                     })
                     _logger.info(
                         "Sync employee_to_applicant: documento reemplazado name=%s employee_att_id=%s applicant_old_ids=%s",
-                        emp_name,
+                        emp_att.name,
                         emp_att.id,
                         to_replace.ids,
                     )
@@ -731,7 +740,7 @@ class HrApplicant(models.Model):
                     })
                     _logger.info(
                         "Sync employee_to_applicant: documento nuevo copiado name=%s employee_att_id=%s",
-                        emp_name,
+                        emp_att.name,
                         emp_att.id,
                     )
 
@@ -795,6 +804,43 @@ class HrApplicant(models.Model):
 class IrAttachmentSync(models.Model):
     _inherit = 'ir.attachment'
 
+    def _sync_employee_to_all_applicants(self, employee, log_prefix=''):
+        applicants = self.env['hr.applicant'].search([
+            ('employee_id', '=', employee.id)
+        ], order='create_date desc, id desc')
+
+        if not applicants:
+            _logger.warning("%sNo se encontró applicant con employee_id=%s", log_prefix, employee.id)
+            return
+
+        _logger.info(
+            "%sApplicants encontrados para employee_id=%s: total=%s ids=%s",
+            log_prefix,
+            employee.id,
+            len(applicants),
+            applicants.ids,
+        )
+
+        for applicant in applicants:
+            try:
+                applicant.sync_attachment_changes(employee.id, 'employee_to_applicant')
+                _logger.info(
+                    "%sSync EMPLOYEE→APPLICANT completado para employee %s → applicant %s",
+                    log_prefix,
+                    employee.id,
+                    applicant.id,
+                )
+            except Exception as e:
+                _logger.error(
+                    "%sError sync EMPLOYEE→APPLICANT para employee %s → applicant %s: %s",
+                    log_prefix,
+                    employee.id,
+                    applicant.id,
+                    str(e),
+                )
+                import traceback
+                _logger.error(traceback.format_exc())
+
     def write(self, vals):
         if self.env.context.get('skip_attachment_bidirectional_sync'):
             return super(IrAttachmentSync, self).write(vals)
@@ -817,32 +863,7 @@ class IrAttachmentSync(models.Model):
                 employee = self.env['hr.employee'].browse(attachment.res_id)
                 if employee.exists():
                     _logger.info(f"🔍 Buscando applicant para employee {employee.id} (name: {employee.name})")
-
-                    # Buscar el applicant relacionado con este employee, priorizando el más reciente.
-                    applicants = self.env['hr.applicant'].search([
-                        ('employee_id', '=', employee.id)
-                    ], order='create_date desc, id desc')
-                    applicant = applicants[:1]
-
-                    if len(applicants) > 1:
-                        _logger.warning(
-                            "Se encontraron multiples applicants para employee_id=%s. Se usara applicant_id=%s. Candidates=%s",
-                            employee.id,
-                            applicant.id,
-                            applicants.ids,
-                        )
-                    
-                    if applicant:
-                        _logger.info(f"✅ Applicant encontrado: {applicant.id} - {applicant.partner_name}")
-                        try:
-                            applicant.sync_attachment_changes(employee.id, 'employee_to_applicant')
-                            _logger.info(f"✅ Sync EMPLOYEE→APPLICANT completado para employee {employee.id} → applicant {applicant.id}")
-                        except Exception as e:
-                            _logger.error(f"❌ Error sync EMPLOYEE→APPLICANT: {str(e)}")
-                            import traceback
-                            _logger.error(traceback.format_exc())
-                    else:
-                        _logger.warning(f"⚠️  No se encontró applicant con employee_id={employee.id}")
+                    self._sync_employee_to_all_applicants(employee)
         
         return result
 
@@ -869,30 +890,6 @@ class IrAttachmentSync(models.Model):
                 employee = self.env['hr.employee'].browse(record.res_id)
                 if employee.exists():
                     _logger.info(f"🔍 [CREATE] Buscando applicant para employee {employee.id} (name: {employee.name})")
-
-                    applicants = self.env['hr.applicant'].search([
-                        ('employee_id', '=', employee.id)
-                    ], order='create_date desc, id desc')
-                    applicant = applicants[:1]
-
-                    if len(applicants) > 1:
-                        _logger.warning(
-                            "[CREATE] Se encontraron multiples applicants para employee_id=%s. Se usara applicant_id=%s. Candidates=%s",
-                            employee.id,
-                            applicant.id,
-                            applicants.ids,
-                        )
-                    
-                    if applicant:
-                        _logger.info(f"✅ [CREATE] Applicant encontrado: {applicant.id} - {applicant.partner_name}")
-                        try:
-                            applicant.sync_attachment_changes(employee.id, 'employee_to_applicant')
-                            _logger.info(f"✅ [CREATE] Sync EMPLOYEE→APPLICANT completado para employee {employee.id} → applicant {applicant.id}")
-                        except Exception as e:
-                            _logger.error(f"❌ [CREATE] Error sync EMPLOYEE→APPLICANT: {str(e)}")
-                            import traceback
-                            _logger.error(traceback.format_exc())
-                    else:
-                        _logger.warning(f"⚠️  [CREATE] No se encontró applicant con employee_id={employee.id}")
+                    self._sync_employee_to_all_applicants(employee, log_prefix='[CREATE] ')
         
         return records

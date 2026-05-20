@@ -11,27 +11,33 @@ class HrApplicantDocument(models.Model):
     applicant_id = fields.Many2one('hr.applicant', string="Aplicante", required=True)
     attached = fields.Boolean(string="Adjunto", compute="_compute_attached")
 
+    def _normalize_doc_name(self, name):
+        normalized = (name or '').strip().lower()
+        return ' '.join(normalized.split())
+
     @api.depends('name', 'applicant_id')
     def _compute_attached(self):
         for record in self:
-            # Buscar archivos adjuntos relacionados con este documento requerido
-            existing_docs = self.env['ir.attachment'].search_count([
+            # Comparar por nombre normalizado para soportar variaciones de acentos/espacios.
+            attachments = self.env['ir.attachment'].search([
                 ('res_model', '=', 'hr.applicant'),
                 ('res_id', '=', record.applicant_id.id),
-                ('name', '=', record.name)  # Buscar coincidencias exactas en el nombre del archivo
             ])
-            # Actualizar el campo attached
-            record.attached = bool(existing_docs)
+            target_name = self._normalize_doc_name(record.name)
+            record.attached = any(self._normalize_doc_name(att.name) == target_name for att in attachments)
 
     def action_attach_document(self):
         self.ensure_one()
 
-        # Buscar y eliminar el documento existente con el mismo nombre
-        existing_attachment = self.env['ir.attachment'].search([
+        # Buscar y eliminar documentos previos con nombre equivalente normalizado.
+        attachments = self.env['ir.attachment'].search([
             ('res_model', '=', 'hr.applicant'),
             ('res_id', '=', self.applicant_id.id),
-            ('name', '=', self.name)
         ])
+        target_name = self._normalize_doc_name(self.name)
+        existing_attachment = attachments.filtered(
+            lambda att: self._normalize_doc_name(att.name) == target_name
+        )
         
         if existing_attachment:
             existing_attachment.unlink()
@@ -88,10 +94,13 @@ class HrApplicantDocument(models.Model):
         ])
 
         # Verificar cuáles documentos ya están adjuntos
+        normalized_existing = {
+            self._normalize_doc_name(doc.name)
+            for doc in existing_docs
+        }
         docs_data = []
         for doc_name in required_documents:
-            # Verificar si hay un archivo adjunto con un nombre que coincida
-            attached = any(doc_name == doc.name for doc in existing_docs)
+            attached = self._normalize_doc_name(doc_name) in normalized_existing
             _logger.info(f"Documento: {doc_name}, Adjunto: {attached}")  # Depuración
             docs_data.append({
                 'name': doc_name,
@@ -105,11 +114,14 @@ class HrApplicantDocument(models.Model):
 
     def action_view_document(self):
         self.ensure_one()
-        attachment = self.env['ir.attachment'].search([
+        attachments = self.env['ir.attachment'].search([
             ('res_model', '=', 'hr.applicant'),
             ('res_id', '=', self.applicant_id.id),
-            ('name', '=', self.name)
-        ], order='write_date desc, id desc', limit=1)
+        ], order='write_date desc, id desc')
+        target_name = self._normalize_doc_name(self.name)
+        attachment = attachments.filtered(
+            lambda att: self._normalize_doc_name(att.name) == target_name
+        )[:1]
         
         if not attachment:
             raise UserError("No se encontró el archivo adjunto.")
@@ -129,11 +141,14 @@ class HrApplicantDocument(models.Model):
         """ Descarga el archivo adjunto """
         self.ensure_one()
         # Buscar el archivo adjunto relacionado con este documento
-        attachment = self.env['ir.attachment'].search([
+        attachments = self.env['ir.attachment'].search([
             ('res_model', '=', 'hr.applicant'),
             ('res_id', '=', self.applicant_id.id),
-            ('name', '=', self.name)
-        ], order='write_date desc, id desc', limit=1)
+        ], order='write_date desc, id desc')
+        target_name = self._normalize_doc_name(self.name)
+        attachment = attachments.filtered(
+            lambda att: self._normalize_doc_name(att.name) == target_name
+        )[:1]
         if not attachment:
             raise UserError("No se encontró el archivo adjunto.")
         # Descargar el archivo

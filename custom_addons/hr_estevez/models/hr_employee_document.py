@@ -14,6 +14,10 @@ class HrEmployeeDocument(models.Model):
         compute="_compute_preview_url",
     )
 
+    def _normalize_doc_name(self, name):
+        normalized = (name or '').strip().lower()
+        return ' '.join(normalized.split())
+
     def _compute_preview_url(self):
         for rec in self:
             if rec.id:
@@ -25,12 +29,12 @@ class HrEmployeeDocument(models.Model):
     @api.depends('name', 'employee_id')
     def _compute_attached(self):
         for record in self:
-            existing_docs = self.env['ir.attachment'].search_count([
+            attachments = self.env['ir.attachment'].search([
                 ('res_model', '=', 'hr.employee'),
                 ('res_id', '=', record.employee_id.id),
-                ('name', '=', record.name)
             ])
-            record.attached = bool(existing_docs)
+            target_name = self._normalize_doc_name(record.name)
+            record.attached = any(self._normalize_doc_name(att.name) == target_name for att in attachments)
 
     @api.model
     def create_required_documents(self, employee_id):
@@ -71,11 +75,14 @@ class HrEmployeeDocument(models.Model):
 
     def action_attach_document(self):
         self.ensure_one()
-        existing_attachment = self.env['ir.attachment'].search([
+        attachments = self.env['ir.attachment'].search([
             ('res_model', '=', 'hr.employee'),
             ('res_id', '=', self.employee_id.id),
-            ('name', '=', self.name)
         ])
+        target_name = self._normalize_doc_name(self.name)
+        existing_attachment = attachments.filtered(
+            lambda att: self._normalize_doc_name(att.name) == target_name
+        )
         if existing_attachment:
             existing_attachment.unlink()
         return {
@@ -94,11 +101,14 @@ class HrEmployeeDocument(models.Model):
 
     def action_view_document(self):
         self.ensure_one()
-        attachment = self.env['ir.attachment'].search([
+        attachments = self.env['ir.attachment'].search([
             ('res_model', '=', 'hr.employee'),
             ('res_id', '=', self.employee_id.id),
-            ('name', '=', self.name)
-        ], order='write_date desc, id desc', limit=1)
+        ], order='write_date desc, id desc')
+        target_name = self._normalize_doc_name(self.name)
+        attachment = attachments.filtered(
+            lambda att: self._normalize_doc_name(att.name) == target_name
+        )[:1]
         
         if not attachment:
             raise UserError("No se encontró el archivo adjunto.")
@@ -116,11 +126,14 @@ class HrEmployeeDocument(models.Model):
 
     def action_download_document(self):
         self.ensure_one()
-        attachment = self.env['ir.attachment'].search([
+        attachments = self.env['ir.attachment'].search([
             ('res_model', '=', 'hr.employee'),
             ('res_id', '=', self.employee_id.id),
-            ('name', '=', self.name)
-        ], order='write_date desc, id desc', limit=1)
+        ], order='write_date desc, id desc')
+        target_name = self._normalize_doc_name(self.name)
+        attachment = attachments.filtered(
+            lambda att: self._normalize_doc_name(att.name) == target_name
+        )[:1]
         if not attachment:
             raise UserError("No se encontró el archivo adjunto.")
         return {
