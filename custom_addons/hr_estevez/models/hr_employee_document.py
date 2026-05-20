@@ -7,7 +7,7 @@ class HrEmployeeDocument(models.Model):
 
     name = fields.Char(string="Nombre del Documento", required=True)
     employee_id = fields.Many2one('hr.employee', string="Empleado", required=True)
-    attached = fields.Boolean(string="Adjunto", compute="_compute_attached", store=True)
+    attached = fields.Boolean(string="Adjunto", compute="_compute_attached")
 
     preview_url = fields.Char(
         string="Vista previa",
@@ -25,7 +25,7 @@ class HrEmployeeDocument(models.Model):
     @api.depends('name', 'employee_id')
     def _compute_attached(self):
         for record in self:
-            existing_docs = self.env['ir.attachment'].search([
+            existing_docs = self.env['ir.attachment'].search_count([
                 ('res_model', '=', 'hr.employee'),
                 ('res_id', '=', record.employee_id.id),
                 ('name', '=', record.name)

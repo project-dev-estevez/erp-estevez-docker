@@ -9,13 +9,13 @@ class HrApplicantDocument(models.Model):
 
     name = fields.Char(string="Nombre del Documento", required=True)
     applicant_id = fields.Many2one('hr.applicant', string="Aplicante", required=True)
-    attached = fields.Boolean(string="Adjunto", compute="_compute_attached", store=True)
+    attached = fields.Boolean(string="Adjunto", compute="_compute_attached")
 
     @api.depends('name', 'applicant_id')
     def _compute_attached(self):
         for record in self:
             # Buscar archivos adjuntos relacionados con este documento requerido
-            existing_docs = self.env['ir.attachment'].search([
+            existing_docs = self.env['ir.attachment'].search_count([
                 ('res_model', '=', 'hr.applicant'),
                 ('res_id', '=', record.applicant_id.id),
                 ('name', '=', record.name)  # Buscar coincidencias exactas en el nombre del archivo
