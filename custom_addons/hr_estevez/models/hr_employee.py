@@ -266,28 +266,6 @@ class HrEmployee(models.Model):
     ], string='Estado Civil', tracking=True)
     emergency_phone_2 = fields.Char(string="Teléfono del Segundo Contacto")
 
-    #Campos para asignaciones
-    asset_assignment_ids = fields.One2many(
-        'stock.assignment',
-        'recipient_id',
-        string='Activos Fijos',
-        domain=[('category_type', '=', 'asset')]
-    )
-    
-    tool_assignment_ids = fields.One2many(
-        'stock.assignment',
-        'recipient_id',
-        string='Herramientas',
-        domain=[('category_type', '=', 'tool')]
-    )
-    
-    consumable_assignment_ids = fields.One2many(
-        'stock.assignment',
-        'recipient_id',
-        string='Consumibles',
-        domain=[('category_type', '=', 'consumable')]
-    )
-
     employment_start_date = fields.Date(string='Fecha de Ingreso', tracking=True)
 
     years_of_service = fields.Float(compute='_compute_years_of_service', string='Años de servicio', store=True)
@@ -299,7 +277,7 @@ class HrEmployee(models.Model):
 
     ir_attachment_count = fields.Integer(
         string="Cantidad de Documentos",
-        compute="_compute_ir_attachment_count"
+        compute="_compute_ir_attachment_count" 
     )
 
     time_off_in_lieu_ids = fields.One2many(

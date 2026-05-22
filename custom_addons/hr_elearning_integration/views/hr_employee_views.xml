@@ -6,7 +6,7 @@
         <field name="inherit_id" ref="hr.view_employee_form"/>
         <field name="arch" type="xml">
                         
-            <xpath expr="//notebook/page[@name='assignments']" position="after">
+            <xpath expr="//notebook/page[@name='public']" position="after">
                 <page name="courses" string="Cursos">                    
                                         
                     <field name="course_ids">
