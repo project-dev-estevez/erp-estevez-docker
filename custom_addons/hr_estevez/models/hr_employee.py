@@ -366,10 +366,12 @@ class HrEmployee(models.Model):
                 except Exception as e:
                     _logger.error(f"Error generando períodos: {str(e)}")
 
-            sync_ok = employee._sync_codeigniter(employee, 'create')
+            sync_ok, error_msg = employee._sync_codeigniter(employee, 'create')
+            
             if not sync_ok:
                 raise ValidationError(
-                    _("No se pudo sincronizar el empleado '%s' con System.") % (employee.name or employee.id)
+                    f"No se pudo sincronizar el empleado '{employee.name or employee.id}' con System.\n\n"
+                    f"Detalle del servidor destino: {error_msg}"
                 )
         
         return employees
@@ -949,14 +951,19 @@ class HrEmployee(models.Model):
                     response.status_code,
                     response.text,
                 )
-                return False
+                # AQUÍ ESTÁ EL CAMBIO CLAVE: Devolvemos False Y el texto del error
+                return False, response.text
+                
+            # IMPORTANTE: Al final de la función (o en el bloque de éxito), 
+            # asegúrate de devolver dos valores también para mantener la consistencia:
+            return True, ""
 
             _logger.info(f"Sincronización exitosa para empleado {employee.id}")
-            return True
+            return True, ""
                         
         except Exception as e:
             _logger.exception("Error de conexión sincronizando empleado %s", employee.id)
-            return False
+            return False, str(e)
 
 
     def _get_next_employee_number(self, company_id=False):
