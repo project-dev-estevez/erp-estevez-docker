@@ -1,8 +1,7 @@
 <odoo>
     <template id="report_hr_employee_carta_patronal">
-        <t t-call="web.html_container">
-            <t t-foreach="docs" t-as="doc">
-                <t t-call="web.external_layout">
+        <t t-foreach="docs" t-as="doc">
+            <t t-call="web.basic_layout">
                     <div class="page">
                         <div class="container">
                             <!-- Fecha y foto -->
@@ -71,14 +70,14 @@
                                     <div class="row">
                                         <div class="col-6"><strong>DOMICILIO PARTICULAR:</strong></div>
                                         <div class="col-6">
-                                            <t t-esc="'%s %s, %s %s, %s C.P. %s' % (
-                                                doc.private_street or '',
-                                                doc.private_street2 or '',
-                                                doc.private_colonia or '',
-                                                doc.private_city or '',
-                                                doc.private_state_id.name or '',
-                                                doc.private_zip or 'N/A'
-                                            )"/>
+                                            <t t-esc="(
+                                                (doc.private_street or '') +
+                                                (' ' + doc.private_street2 if doc.private_street2 else '') +
+                                                (', ' + doc.private_colonia if doc.private_colonia else '') +
+                                                (', ' + doc.private_city if doc.private_city else '') +
+                                                (', ' + doc.private_state_id.name if doc.private_state_id else '') +
+                                                (', C.P. ' + doc.private_zip if doc.private_zip else '')
+                                            ).strip(' ,') or 'N/A'"/>
                                         </div>
                                     </div>
                                 </div>
@@ -95,8 +94,8 @@
                                     </div>
                                     <div class="row">
                                         <div class="col-6"><strong>DOMICILIO DE LA EMPRESA:</strong></div>
-                                        <div class="col-6">  
-                                            <t t-esc="doc.company_id.partner_id.contact_address"/>
+                                        <div class="col-6">
+                                            <span t-field="doc.company_id.partner_id" t-options='{"widget": "contact", "fields": ["address"], "no_marker": true}'/>
                                         </div>
                                     </div>
                                 </div>                            
@@ -107,7 +106,7 @@
                                     <div class="row">
                                         <div class="col-6"><strong>RFC:</strong></div>
                                         <div class="col-6">
-                                            <t t-esc="doc.company_id.vat or 'N/A'"/>
+                                            <t t-esc="doc.company_id.vat or 'No configurado'"/>
                                         </div>
                                     </div>
                                     <div class="row">
@@ -125,19 +124,12 @@
 
                             <div class="row mt-4">
                                 <p class="text-center">
-                                    LIC. EDWIN GONZALEZ SORIA
-                                </p>
-                            </div>
-
-                            <div class="row">
-                                <p class="text-center">
-                                    APODERADO LEGAL
+                                    DEPARTAMENTO RECURSOS HUMANOS
                                 </p>
                             </div>
 
                         </div>
                     </div>
-                </t>
             </t>
         </t>
     </template>
