@@ -2,7 +2,8 @@
     <template id="report_hr_employee_convenio_salida">
         <t t-call="web.html_container">
             <t t-foreach="docs" t-as="doc">
-                <t t-call="web.external_layout">
+                <t t-set="company" t-value="doc.company_id or res_company"/>
+                <t t-call="hr_estevez.external_layout_standard_no_header">
                     <div class="page">
 
                         <div class="container">
@@ -150,13 +151,7 @@
                                             <tr>
                                                 <th class="text-left"><strong>CATEGORÍA</strong></th>
                                                 <td class="text-left">
-                                                    <t t-esc="doc.job_id.name.upper() or 'N/A'"/>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <th class="text-left"><strong>HORARIO DE LABORES</strong></th>
-                                                <td class="text-left">
-                                                    LUNES A VIERNES DE 8:00 A 18:00. SABADO MEDIO DIA.
+                                                    <t t-esc="(doc.job_id.name or 'N/A').upper()"/>
                                                 </td>
                                             </tr>
                                         </tbody>

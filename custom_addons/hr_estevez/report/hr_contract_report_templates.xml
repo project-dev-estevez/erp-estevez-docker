@@ -2,7 +2,8 @@
     <template id="report_hr_contract">
         <t t-call="web.html_container">
             <t t-foreach="docs" t-as="doc">
-                <t t-call="web.external_layout">
+                <t t-set="company" t-value="doc.company_id or res_company"/>
+                <t t-call="hr_estevez.external_layout_standard_no_header">
                     <div class="page">
                         <div class="container">
 
@@ -1344,9 +1345,7 @@
                                             DEL CONTENIDO Y CONSCIENTES DE LAS OBLIGACIONES QUE SE
                                             GENERAN, ASÍ COMO LAS QUE LA LEY IMPONE, LAS PARTES LO
                                             RATIFICAN EN TODAS Y CADA UNA DE SUS PARTES Y LO
-                                            SUSCRIBEN POR DUPLICADO EL <t
-                                                t-esc="doc.date_start.strftime('%d de').upper()" /> <t
-                                                t-esc="doc.date_start.strftime('%B').capitalize().replace('April', 'Abril').replace('January', 'Enero').replace('February', 'Febrero').replace('March', 'Marzo').replace('May', 'Mayo').replace('June', 'Junio').replace('July', 'Julio').replace('August', 'Agosto').replace('September', 'Septiembre').replace('October', 'Octubre').replace('November', 'Noviembre').replace('December', 'Diciembre').upper()" />
+                                            SUSCRIBEN POR DUPLICADO EL <t t-esc="doc.get_formatted_date_start_full()"/>
                                             , QUEDANDO UN EJEMPLAR EN PODER DE CADA PARTE.</span>
                                     </p>
                                 </div>
@@ -1466,8 +1465,7 @@
                                 <div class="col-12 text-center">
                                     <strong class="font-weight-bold text-decoration-underline">ESTADO
                                         DE MEXICO A 
-                                        <t t-esc="doc.date_start.strftime('%d de').upper()" /> 
-                                        <t t-esc="doc.date_start.strftime('%B').capitalize().replace('April', 'Abril').replace('January', 'Enero').replace('February', 'Febrero').replace('March', 'Marzo').replace('May', 'Mayo').replace('June', 'Junio').replace('July', 'Julio').replace('August', 'Agosto').replace('September', 'Septiembre').replace('October', 'Octubre').replace('November', 'Noviembre').replace('December', 'Diciembre').upper()" />
+                                        <t t-esc="doc.get_formatted_date_start_full()"/>
                                     </strong>
                                 </div>
                             </div>
@@ -1564,8 +1562,7 @@
                                     <div class="text-right"
                                         style="text-align: right; margin-top: 50px;">
                                         <strong class="font-weight-bold text-right">
-                                            <t t-esc="doc.date_start.strftime('%d de').upper()" /> 
-                                            <t t-esc="doc.date_start.strftime('%B').capitalize().replace('April', 'Abril').replace('January', 'Enero').replace('February', 'Febrero').replace('March', 'Marzo').replace('May', 'Mayo').replace('June', 'Junio').replace('July', 'Julio').replace('August', 'Agosto').replace('September', 'Septiembre').replace('October', 'Octubre').replace('November', 'Noviembre').replace('December', 'Diciembre').upper()" />
+                                            <t t-esc="doc.get_formatted_date_start_full()"/>
                                         </strong>
                                     </div>
                                 </div>
