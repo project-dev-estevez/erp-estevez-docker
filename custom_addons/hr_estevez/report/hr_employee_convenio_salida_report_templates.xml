@@ -154,12 +154,6 @@
                                                     <t t-esc="(doc.job_id.name or 'N/A').upper()"/>
                                                 </td>
                                             </tr>
-                                            <tr>
-                                                <th class="text-left"><strong>HORARIO DE LABORES</strong></th>
-                                                <td class="text-left">
-                                                    LUNES A VIERNES DE 8:00 A 18:00. SABADO MEDIO DIA.
-                                                </td>
-                                            </tr>
                                         </tbody>
                                     </table>
                                 </div>

@@ -264,6 +264,29 @@ class HrContract(models.Model):
         }
         current_month = datetime.now().strftime('%B')
         return months.get(current_month, current_month)
+
+    def get_formatted_date_start_full(self):
+        """Return date_start formatted as 'DD DE MES YYYY' in uppercase Spanish."""
+        self.ensure_one()
+        if not self.date_start:
+            return ''
+
+        months = {
+            1: 'ENERO',
+            2: 'FEBRERO',
+            3: 'MARZO',
+            4: 'ABRIL',
+            5: 'MAYO',
+            6: 'JUNIO',
+            7: 'JULIO',
+            8: 'AGOSTO',
+            9: 'SEPTIEMBRE',
+            10: 'OCTUBRE',
+            11: 'NOVIEMBRE',
+            12: 'DICIEMBRE',
+        }
+
+        return f"{self.date_start.day:02d} DE {months.get(self.date_start.month, '')} {self.date_start.year}"
     
     def notify_expired_contracts(self):
         """Notifica a los empleados del área de gestión de talento sobre contratos vencidos."""
