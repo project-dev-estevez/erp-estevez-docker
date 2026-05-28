@@ -53,7 +53,7 @@
             <!-- Botones en el header para reportes -->
             <xpath expr="//header" position="inside">
                 <button name="%(action_report_hr_employee_remision)d"
-                    string="Oficio Remis"
+                    string="Oficio de Remisión"
                     type="action"
                     class="oe_highlight"
                     icon="fa-file-pdf-o"/>
