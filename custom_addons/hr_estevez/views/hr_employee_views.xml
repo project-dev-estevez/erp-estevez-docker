@@ -70,6 +70,24 @@
                     class="oe_highlight"
                     icon="fa-file-pdf-o"/>
 
+                <button name="action_download_carta_patronal_docx"
+                    string="Carta Patronal (DOCX)"
+                    type="object"
+                    class="oe_highlight"
+                    icon="fa-file-word-o"/>
+
+                <button name="action_download_convenio_salida_docx"
+                    string="Convenio de Salida (DOCX)"
+                    type="object"
+                    class="oe_highlight"
+                    icon="fa-file-word-o"/>
+
+                <button name="action_download_remision_docx"
+                    string="Oficio de Remisión (DOCX)"
+                    type="object"
+                    class="oe_highlight"
+                    icon="fa-file-word-o"/>
+
                 <button name="action_download_employee_documents"
                     string="Descargar Documentos"
                     type="object"

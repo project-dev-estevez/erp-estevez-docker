@@ -4,4 +4,5 @@ USER root
 RUN apt-get update && apt-get install -y python3-pandas
 RUN apt-get update && apt-get install -y python3-xlsxwriter
 RUN apt-get update && apt-get install -y python3-holidays
+RUN apt-get update && apt-get install -y python3-docx
 USER odoo
