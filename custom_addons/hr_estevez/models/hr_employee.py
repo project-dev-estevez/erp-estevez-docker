@@ -1602,3 +1602,4 @@ class HrEmployee(models.Model):
             'domain': [('employee_id', '=', self.id)],
             'context': {'default_employee_id': self.id},
         }
+
