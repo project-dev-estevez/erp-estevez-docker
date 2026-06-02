@@ -26,6 +26,7 @@
     'data': [
         # Archivos de datos
         'security/ir.model.access.csv',
+        'data/employee.study.field.csv',
 
         # Archivos de informes
         'report/hr_report_common_layout_templates.xml',
@@ -74,7 +75,8 @@
         'views/hr_skills.xml',
         'views/hr_employee_job_history_views.xml',
         'views/view_attachment_preview_form.xml',
-        'views/attachment_preview.xml',        
+        'views/attachment_preview.xml',
+        'views/res_company_views.xml',        
         #'views/job_history_wizard_views.xml'
     ],
     # only loaded in demonstration mode

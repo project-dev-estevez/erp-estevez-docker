@@ -441,7 +441,7 @@ class HrEmployeeExcelWizard(models.TransientModel):
                 col += 1
 
             if self.include_study_field_new:
-                worksheet.write(row, col, employee.study_field_new or '', data_style)
+                worksheet.write(row, col, employee.study_field_new_id.name or '', data_style)
                 col += 1
 
             

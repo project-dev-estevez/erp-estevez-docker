@@ -22,4 +22,5 @@ from . import hr_study_tag
 from . import hr_employee_job_history
 from . import hr_employee_excel_wizard
 from . import hr_employee_job_change_wizard
+from . import res_company
 from . import hr_docx_reports
