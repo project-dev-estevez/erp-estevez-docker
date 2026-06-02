@@ -147,6 +147,16 @@ class _DocxBuilder:
         return buf.getvalue()
 
     @staticmethod
+    def apply_default_typography(doc):
+      """Apply a consistent base typography across all DOCX reports."""
+      normal = doc.styles['Normal']
+      normal.font.name = 'Times New Roman'
+      normal.font.size = Pt(12)
+      normal.paragraph_format.space_before = Pt(0)
+      normal.paragraph_format.space_after = Pt(2)
+      normal.paragraph_format.line_spacing = 1.15
+
+    @staticmethod
     def circular_image_bytes(image_b64, size=320):
         """Return a circular PNG without zoom-cropping the original image."""
         img = Image.open(io.BytesIO(base64.b64decode(image_b64))).convert('RGBA')
@@ -204,12 +214,7 @@ class HrEmployeeDocxReports(models.Model):
         self.ensure_one()
         b = _DocxBuilder
         doc = Document()
-        normal = doc.styles['Normal']
-        normal.font.name = 'Times New Roman'
-        normal.font.size = Pt(12)
-        normal.paragraph_format.space_before = Pt(0)
-        normal.paragraph_format.space_after = Pt(2)
-        normal.paragraph_format.line_spacing = 1.15
+        b.apply_default_typography(doc)
 
         for sec in doc.sections:
             sec.top_margin = Inches(0.8)
@@ -286,6 +291,11 @@ class HrEmployeeDocxReports(models.Model):
         job = (self.job_id.name or 'N/A').upper()
 
         doc = Document()
+        b.apply_default_typography(doc)
+        # Convenio uses a different typography by business request.
+        convenio_style = doc.styles['Normal']
+        convenio_style.font.name = 'Calibri'
+        convenio_style.font.size = Pt(10)
         for sec in doc.sections:
             sec.top_margin = Inches(1)
             sec.bottom_margin = Inches(1)
@@ -477,7 +487,7 @@ class HrEmployeeDocxReports(models.Model):
         )
 
         return b.download(self.env, 'hr.employee', self.id,
-                          f'{self.name} - Convenio de Salida.docx',
+                          f'Convenio de Salida - {self.name}.docx',
                           b.to_bytes(doc))
 
     # --- Oficio de Remisión ---
@@ -490,6 +500,7 @@ class HrEmployeeDocxReports(models.Model):
         today = b.fmt_today()
 
         doc = Document()
+        b.apply_default_typography(doc)
         for sec in doc.sections:
             sec.top_margin = Inches(1)
             sec.bottom_margin = Inches(1)
@@ -626,6 +637,7 @@ class HrContractDocxReports(models.Model):
         address = b.emp_address(emp) if emp else 'N/A'
 
         doc = Document()
+        b.apply_default_typography(doc)
         for sec in doc.sections:
             sec.top_margin = Inches(0.5)
             sec.bottom_margin = Inches(0.5)
@@ -1025,6 +1037,7 @@ class HrContractDocxReports(models.Model):
         mes = _DocxBuilder.MESES_ES[today.month].lower().capitalize()
 
         doc = Document()
+        b.apply_default_typography(doc)
         for sec in doc.sections:
             sec.top_margin = Inches(1)
             sec.bottom_margin = Inches(1)

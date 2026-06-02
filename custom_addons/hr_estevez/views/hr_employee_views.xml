@@ -52,18 +52,6 @@
             </xpath>
             <!-- Botones en el header para reportes -->
             <xpath expr="//header" position="inside">
-                <button name="%(action_report_hr_employee_remision)d"
-                    string="Oficio de Remisión"
-                    type="action"
-                    class="oe_highlight"
-                    icon="fa-file-pdf-o"/>
-
-                <button name="%(action_report_hr_employee_convenio_salida)d"
-                    string="Convenio de Salida"
-                    type="action"
-                    class="oe_highlight"
-                    icon="fa-file-pdf-o"/>
-
                 <button name="action_download_carta_patronal_docx"
                     string="Carta Patronal"
                     type="object"
@@ -71,13 +59,13 @@
                     icon="fa-file-word-o"/>
 
                 <button name="action_download_convenio_salida_docx"
-                    string="Convenio de Salida (DOCX)"
+                    string="Convenio de Salida"
                     type="object"
                     class="oe_highlight"
                     icon="fa-file-word-o"/>
 
                 <button name="action_download_remision_docx"
-                    string="Oficio de Remisión (DOCX)"
+                    string="Oficio de Remisión"
                     type="object"
                     class="oe_highlight"
                     icon="fa-file-word-o"/>
