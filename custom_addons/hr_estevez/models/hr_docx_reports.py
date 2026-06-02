@@ -8,6 +8,7 @@ import io
 import base64
 import logging
 from datetime import date, datetime
+from PIL import Image, ImageDraw, ImageOps
 
 from docx import Document
 from docx.shared import Inches, Pt
@@ -146,6 +147,24 @@ class _DocxBuilder:
         return buf.getvalue()
 
     @staticmethod
+    def circular_image_bytes(image_b64, size=320):
+        """Return a PNG stream with a centered circular crop and transparent corners."""
+        img = Image.open(io.BytesIO(base64.b64decode(image_b64))).convert('RGBA')
+        img = ImageOps.fit(img, (size, size), method=Image.Resampling.LANCZOS, centering=(0.5, 0.5))
+
+        mask = Image.new('L', (size, size), 0)
+        draw = ImageDraw.Draw(mask)
+        draw.ellipse((0, 0, size - 1, size - 1), fill=255)
+
+        out = Image.new('RGBA', (size, size), (255, 255, 255, 0))
+        out.paste(img, (0, 0), mask)
+
+        stream = io.BytesIO()
+        out.save(stream, format='PNG')
+        stream.seek(0)
+        return stream
+
+    @staticmethod
     def download(env, model, rec_id, filename, raw_bytes):
         att = env['ir.attachment'].create({
             'name': filename,
@@ -178,27 +197,34 @@ class HrEmployeeDocxReports(models.Model):
         self.ensure_one()
         b = _DocxBuilder
         doc = Document()
+        normal = doc.styles['Normal']
+        normal.font.name = 'Times New Roman'
+        normal.font.size = Pt(12)
+        normal.paragraph_format.space_before = Pt(0)
+        normal.paragraph_format.space_after = Pt(2)
+        normal.paragraph_format.line_spacing = 1.15
+
         for sec in doc.sections:
-            sec.top_margin = Inches(1)
-            sec.bottom_margin = Inches(1)
-            sec.left_margin = Inches(1.2)
-            sec.right_margin = Inches(1.2)
+            sec.top_margin = Inches(0.8)
+            sec.bottom_margin = Inches(0.8)
+            sec.left_margin = Inches(0.9)
+            sec.right_margin = Inches(0.9)
 
         b.p(doc, [(f'TLALNEPANTLA DE BAZ A {b.fmt_today()}', True)], align=R)
 
         if self.image_1920:
-            try:
-                img_stream = io.BytesIO(base64.b64decode(self.image_1920))
-                para = doc.add_paragraph()
-                para.alignment = R
-                para.add_run().add_picture(img_stream, width=Inches(1.5))
-            except Exception:
-                pass
+          try:
+            img_stream = b.circular_image_bytes(self.image_1920)
+            para = doc.add_paragraph()
+            para.alignment = R
+            para.add_run().add_picture(img_stream, width=Inches(1.65))
+          except Exception:
+            pass
 
         doc.add_paragraph()
         b.p(doc, [('A QUIEN CORRESPONDA', True)])
         b.p(doc, [('PRESENTE:', True)])
-        doc.add_paragraph()
+
         b.p(doc, [
             ('ME PERMITO INFORMAR A USTED, LOS DATOS QUE TENEMOS REGISTRADOS '
              'EN EL EXPEDIENTE DE EL C. ', False),
@@ -206,7 +232,6 @@ class HrEmployeeDocxReports(models.Model):
             (' EL CUAL LABORA PARA LA EMPRESA Y CONTAMOS CON LOS SIGUIENTES '
              'DATOS EN NUESTROS REGISTROS:', False),
         ], align=J)
-        doc.add_paragraph()
 
         t1 = doc.add_table(rows=5, cols=2)
         b.remove_borders(t1)
@@ -233,8 +258,7 @@ class HrEmployeeDocxReports(models.Model):
             b.cell_left(t2.rows[i].cells[0], label, bold=True)
             b.cell_left(t2.rows[i].cells[1], val)
 
-        b.p(doc, [('ATENTAMENTE', False)], align=C, space_before=80)
-        doc.add_paragraph()
+        b.p(doc, [('ATENTAMENTE', False)], align=C, space_before=42)
         b.p(doc, [('DEPARTAMENTO RECURSOS HUMANOS', False)], align=C)
 
         return b.download(self.env, 'hr.employee', self.id,

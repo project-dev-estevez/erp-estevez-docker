@@ -64,14 +64,8 @@
                     class="oe_highlight"
                     icon="fa-file-pdf-o"/>
 
-                <button name="%(action_report_hr_employee_carta_patronal)d"
-                    string="Carta Patronal"
-                    type="action"
-                    class="oe_highlight"
-                    icon="fa-file-pdf-o"/>
-
                 <button name="action_download_carta_patronal_docx"
-                    string="Carta Patronal (DOCX)"
+                    string="Carta Patronal"
                     type="object"
                     class="oe_highlight"
                     icon="fa-file-word-o"/>
