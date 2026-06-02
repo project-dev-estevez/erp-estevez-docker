@@ -100,14 +100,55 @@ class _DocxBuilder:
         run.bold = bold
 
     @staticmethod
-    def p(doc, runs, align=J, space_before=0):
+    def add_cell_bottom_border(cell, size=6, color='000000'):
+      tc = cell._tc
+      tc_pr = tc.get_or_add_tcPr()
+      tc_borders = tc_pr.find(qn('w:tcBorders'))
+      if tc_borders is None:
+        tc_borders = OxmlElement('w:tcBorders')
+        tc_pr.append(tc_borders)
+      bottom = tc_borders.find(qn('w:bottom'))
+      if bottom is None:
+        bottom = OxmlElement('w:bottom')
+        tc_borders.append(bottom)
+      bottom.set(qn('w:val'), 'single')
+      bottom.set(qn('w:sz'), str(size))
+      bottom.set(qn('w:space'), '0')
+      bottom.set(qn('w:color'), color)
+
+    @staticmethod
+    def add_cell_right_border(cell, size=6, color='000000'):
+      tc = cell._tc
+      tc_pr = tc.get_or_add_tcPr()
+      tc_borders = tc_pr.find(qn('w:tcBorders'))
+      if tc_borders is None:
+        tc_borders = OxmlElement('w:tcBorders')
+        tc_pr.append(tc_borders)
+      right = tc_borders.find(qn('w:right'))
+      if right is None:
+        right = OxmlElement('w:right')
+        tc_borders.append(right)
+      right.set(qn('w:val'), 'single')
+      right.set(qn('w:sz'), str(size))
+      right.set(qn('w:space'), '0')
+      right.set(qn('w:color'), color)
+
+    @staticmethod
+    def p(doc, runs, align=J, space_before=0, space_after=None,
+          left_indent=0, first_line_indent=0):
         """Add a paragraph with mixed bold/normal runs.
         runs: list of (text, bold) tuples.
         """
         para = doc.add_paragraph()
         para.alignment = align
+        if left_indent:
+            para.paragraph_format.left_indent = Pt(left_indent)
+        if first_line_indent:
+            para.paragraph_format.first_line_indent = Pt(first_line_indent)
         if space_before:
             para.paragraph_format.space_before = Pt(space_before)
+        if space_after is not None:
+            para.paragraph_format.space_after = Pt(space_after)
         for text, bold in runs:
             r = para.add_run(str(text) if text else '')
             r.bold = bold
@@ -670,24 +711,29 @@ class HrContractDocxReports(models.Model):
             'male': 'MASCULINO', 'female': 'FEMENINO', 'indistinct': 'INDISTINTO',
         }
         marital_map = {
-            'single': 'SOLTERO', 'married': 'CASADO', 'cohabitant': 'UNIÓN LIBRE',
+          'single': 'SOLTERO(A)', 'married': 'CASADO(A)', 'cohabitant': 'UNIÓN LIBRE',
             'widower': 'VIUDO', 'divorced': 'DIVORCIADO',
         }
         gender = gender_map.get(emp.gender, 'N/A') if emp else 'N/A'
         marital = marital_map.get(emp.marital, 'N/A') if emp else 'N/A'
         age = str(emp.age) if emp and emp.age else 'N/A'
-        nationality = emp.get_nationality() if emp else 'N/A'
+        nationality = (emp.get_nationality() or 'N/A').upper() if emp else 'N/A'
         curp = emp.curp or 'N/A'
         rfc = emp.rfc or 'N/A'
-        address = b.emp_address(emp) if emp else 'N/A'
+        address = (b.emp_address(emp) or 'N/A').upper() if emp else 'N/A'
 
         doc = Document()
         b.apply_default_typography(doc)
+        contract_style = doc.styles['Normal']
+        contract_style.font.name = 'Arial'
+        contract_style.font.size = Pt(8)
+        contract_style.paragraph_format.space_after = Pt(2)
+        contract_style.paragraph_format.line_spacing = 1.15
         for sec in doc.sections:
             sec.top_margin = Inches(0.5)
             sec.bottom_margin = Inches(0.5)
-            sec.left_margin = Inches(0.7)
-            sec.right_margin = Inches(0.7)
+            sec.left_margin = Inches(0.8)
+            sec.right_margin = Inches(0.8)
 
         b.heading(doc, 'CONTRATO INDIVIDUAL DE TRABAJO')
         b.p(doc, [
@@ -706,10 +752,10 @@ class HrContractDocxReports(models.Model):
              'DENOMINARÁ ', False),
             ('"EL TRABAJADOR"', True),
             (', AL TENOR DE LAS SIGUIENTES DECLARACIONES Y CLÁUSULAS:', False),
-        ], align=J)
+        ], align=J, space_after=3)
 
-        b.heading(doc, 'DECLARACIONES:')
-        b.p(doc, [('A. ', False), ('DE "EL PATRON":', True)])
+        b.heading(doc, 'DECLARACIONES:', space_before=10)
+        b.p(doc, [('A. ', False), ('DE "EL PATRON":', True)], space_after=1)
 
         patron_decl = [
             ('1.', ' QUE ES UNA SOCIEDAD ANÓNIMA DE CAPITAL VARIABLE '
@@ -740,40 +786,67 @@ class HrContractDocxReports(models.Model):
               'RELACIONADOS CON EL OBJETO SOCIAL DE LA EMPRESA.'),
         ]
         for num, txt in patron_decl:
-            b.p(doc, [(num, True), (txt, False)], align=J)
+          b.p(doc, [(num, True), (txt, False)], align=J,
+            left_indent=14, first_line_indent=-12, space_after=1)
 
-        b.p(doc, [('B. ', False), ('DE "EL TRABAJADOR":', True)], space_before=6)
+        b.p(doc, [('B. ', False), ('DE "EL TRABAJADOR":', True)], space_before=6,
+          space_after=1)
         b.p(doc, [
             ('1.', True),
             (f' QUE CUENTA CON LA DISPOSICIÓN NECESARIA PARA DESEMPEÑAR LOS '
              f'SERVICIOS EN EL PUESTO REQUERIDO, DE: ', False),
             (job, True),
-        ], align=J)
-        b.p(doc, [('2.', True), (' QUE SUS GENERALES SON LOS SIGUIENTES:', False)], align=J)
+        ], align=J, left_indent=14, first_line_indent=-12, space_after=1)
+        b.p(doc, [('2.', True), (' QUE SUS GENERALES SON LOS SIGUIENTES:', False)],
+          align=J, left_indent=14, first_line_indent=-12, space_after=1)
 
         # Generales table
         doc.add_paragraph()
         gen_tbl = doc.add_table(rows=7, cols=2)
+        gen_tbl.autofit = False
+        gen_tbl.columns[0].width = Inches(1.25)
+        gen_tbl.columns[1].width = Inches(5.85)
+        b.remove_borders(gen_tbl)
         for i, (lbl, val) in enumerate([
             ('NACIONALIDAD', nationality),
-            ('EDAD', f'{age} Años'),
+            ('EDAD', age),
             ('SEXO', gender),
             ('ESTADO CIVIL', marital),
             ('CURP', curp),
             ('RFC', rfc),
             ('DOMICILIO', address),
         ]):
-            b.cell_left(gen_tbl.rows[i].cells[0], lbl, bold=True)
-            b.cell_left(gen_tbl.rows[i].cells[1], val)
+            left_cell = gen_tbl.rows[i].cells[0]
+            right_cell = gen_tbl.rows[i].cells[1]
+            b.cell_left(left_cell, lbl, bold=True)
+            b.cell_left(right_cell, val)
+
+            left_para = left_cell.paragraphs[0]
+            right_para = right_cell.paragraphs[0]
+            left_para.alignment = WD_ALIGN_PARAGRAPH.LEFT
+            right_para.alignment = WD_ALIGN_PARAGRAPH.LEFT
+            left_para.paragraph_format.space_before = Pt(0)
+            left_para.paragraph_format.space_after = Pt(0)
+            right_para.paragraph_format.space_before = Pt(0)
+            right_para.paragraph_format.space_after = Pt(0)
+
+            # Keep horizontal separators like the sample image.
+            if i < 6:
+                b.add_cell_bottom_border(left_cell)
+                b.add_cell_bottom_border(right_cell)
+            # Keep a clear column separator between labels and values.
+            b.add_cell_right_border(left_cell)
         doc.add_paragraph()
 
         b.p(doc, [('3.', True), (' QUE BAJO PROTESTA DE DECIR VERDAD, DECLARA '
             'QUE TODA LA INFORMACIÓN QUE HA PROPORCIONADO DE MANERA ORAL O '
-            'ESCRITA A "EL PATRÓN" ES CORRECTA Y FIDEDIGNA.', False)], align=J)
+          'ESCRITA A "EL PATRÓN" ES CORRECTA Y FIDEDIGNA.', False)], align=J,
+          left_indent=14, first_line_indent=-12, space_after=1)
         b.p(doc, [('4.', True), (' QUE LE HAN ENTERADO Y EXPLICADO LAS '
             'CONDICIONES DE TRABAJO Y COMO CONSECUENCIA ES SU EXPRESA VOLUNTAD '
             'CELEBRAR EL PRESENTE CONTRATO EN LOS TÉRMINOS Y CONDICIONES '
-            'DESCRITOS EN EL CUERPO DEL PRESENTE INSTRUMENTO.', False)], align=J)
+          'DESCRITOS EN EL CUERPO DEL PRESENTE INSTRUMENTO.', False)], align=J,
+          left_indent=14, first_line_indent=-12, space_after=1)
 
         b.p(doc, [('EXPUESTAS LAS ANTERIORES DECLARACIONES, AMBAS PARTES SE '
             'SOMETEN A LAS SIGUIENTES:', False)], align=J)
@@ -954,7 +1027,8 @@ class HrContractDocxReports(models.Model):
               'ESTADO DE MEXICO, COMO PRIMERA OPCIÓN.'),
         ]
         for num, txt in clausulas:
-            b.p(doc, [(num, True), (txt, False)], align=J)
+          b.p(doc, [(num, True), (txt, False)], align=J,
+            left_indent=14, first_line_indent=-12, space_after=1)
 
         b.p(doc, [
             (f'LEÍDO QUE FUE POR LAS PARTES EL DOCUMENTO E IMPUESTOS DEL '
