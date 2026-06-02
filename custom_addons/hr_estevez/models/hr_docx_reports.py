@@ -1083,6 +1083,10 @@ class HrContractDocxReports(models.Model):
 
         doc = Document()
         b.apply_default_typography(doc)
+        # Business request: Addendum must use Arial 10.
+        addendum_style = doc.styles['Normal']
+        addendum_style.font.name = 'Arial'
+        addendum_style.font.size = Pt(10)
         for sec in doc.sections:
             sec.top_margin = Inches(1)
             sec.bottom_margin = Inches(1)
@@ -1090,6 +1094,7 @@ class HrContractDocxReports(models.Model):
             sec.right_margin = Inches(1.2)
 
         b.heading(doc, 'ADDENDUM AL CONTRATO INDIVIDUAL DE TRABAJO')
+        doc.add_paragraph()
 
         b.p(doc, [
             ('ADDENDUM AL CONTRATO INDIVIDUAL DE TRABAJO EL QUE CELEBRAN POR '
@@ -1101,6 +1106,7 @@ class HrContractDocxReports(models.Model):
              'PUDIENDO REFERIR A AMBOS COMO LAS "PARTES" AL TENOR DE LAS '
              'SIGUIENTES DECLARACIONES Y CLAUSULAS:', False),
         ], align=J)
+        doc.add_paragraph()
 
         b.heading(doc, 'DECLARACIONES')
         b.p(doc, [('A.', True),
@@ -1190,14 +1196,47 @@ class HrContractDocxReports(models.Model):
         for num, txt in clausulas:
             b.p(doc, [(num, True), (txt, False)], align=J)
 
-        b.p(doc, [('EL "TRABAJADOR"', True)], align=C, space_before=50)
+        doc.add_paragraph()
 
-        LINE = '_' * 48
-        b.sig_table(doc,
-            left_lines=[(LINE, False), ('POR SU PROPIO DERECHO', False)],
-            right_lines=[(LINE, False), (emp_name, True)],
-            space_pt=50,
-        )
+        signature_table = doc.add_table(rows=2, cols=2)
+        b.remove_borders(signature_table)
+
+        top_left = signature_table.rows[0].cells[0].paragraphs[0]
+        top_left.alignment = C
+        top_left.add_run('EL "PATRÓN"')
+
+        top_right = signature_table.rows[0].cells[1].paragraphs[0]
+        top_right.alignment = C
+        top_right.add_run('EL "TRABAJADOR"')
+
+        # Keep signature line short enough to avoid wrapping into a second line.
+        line_text = '_' * 38
+
+        bottom_left = signature_table.rows[1].cells[0].paragraphs[0]
+        bottom_left.alignment = C
+        bottom_left.paragraph_format.space_before = Pt(58)
+        bottom_left.paragraph_format.space_after = Pt(4)
+        bottom_left.add_run(line_text)
+
+        bottom_left_name = signature_table.rows[1].cells[0].add_paragraph()
+        bottom_left_name.alignment = C
+        left_name_run = bottom_left_name.add_run('LIC. EDWIN GONZALEZ SORIA')
+        left_name_run.bold = True
+
+        bottom_left_role = signature_table.rows[1].cells[0].add_paragraph()
+        bottom_left_role.alignment = C
+        bottom_left_role.add_run('APODERADO LEGAL')
+
+        bottom_right = signature_table.rows[1].cells[1].paragraphs[0]
+        bottom_right.alignment = C
+        bottom_right.paragraph_format.space_before = Pt(58)
+        bottom_right.paragraph_format.space_after = Pt(4)
+        bottom_right.add_run(line_text)
+
+        bottom_right_name = signature_table.rows[1].cells[1].add_paragraph()
+        bottom_right_name.alignment = C
+        right_name_run = bottom_right_name.add_run(emp_name)
+        right_name_run.bold = True
 
         return b.download(self.env, 'hr.contract', self.id,
                           f'Addendum - {self.employee_id.name}.docx',

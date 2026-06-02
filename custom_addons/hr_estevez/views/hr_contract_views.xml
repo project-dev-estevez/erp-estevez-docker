@@ -15,12 +15,6 @@
                         icon="fa-save"
                         name="action_save"/>
 
-                <button name="%(action_report_hr_contract_addendum)d"
-                        type="action"
-                        string="Addendum"
-                        class="btn-primary"
-                        icon="fa-file-pdf-o"/>
-
                 <button name="%(action_report_hr_contract)d"
                         type="action"
                         string="Generar Contrato"
@@ -29,7 +23,7 @@
 
                 <button name="action_download_addendum_docx"
                         type="object"
-                        string="Addendum (DOCX)"
+                        string="Addendum"
                         class="btn-primary"
                         icon="fa-file-word-o"/>
 

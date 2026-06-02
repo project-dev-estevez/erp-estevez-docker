@@ -29,8 +29,6 @@
 
         # Archivos de informes
         'report/hr_report_common_layout_templates.xml',
-        'report/hr_contract_addendum_report.xml',
-        'report/hr_contract_addendum_report_templates.xml',
         'report/hr_contract_report.xml',
         'report/hr_contract_report_templates.xml',
         'report/hr_employee_memorandum_report.xml',
