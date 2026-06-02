@@ -148,16 +148,23 @@ class _DocxBuilder:
 
     @staticmethod
     def circular_image_bytes(image_b64, size=320):
-        """Return a PNG stream with a centered circular crop and transparent corners."""
+        """Return a circular PNG without zoom-cropping the original image."""
         img = Image.open(io.BytesIO(base64.b64decode(image_b64))).convert('RGBA')
-        img = ImageOps.fit(img, (size, size), method=Image.Resampling.LANCZOS, centering=(0.5, 0.5))
+
+        # Keep the full image visible by fitting inside the square canvas.
+        fitted = ImageOps.contain(img, (size, size), method=Image.Resampling.LANCZOS)
+        x = (size - fitted.width) // 2
+        y = (size - fitted.height) // 2
+
+        canvas = Image.new('RGBA', (size, size), (255, 255, 255, 0))
+        canvas.paste(fitted, (x, y), fitted)
 
         mask = Image.new('L', (size, size), 0)
         draw = ImageDraw.Draw(mask)
         draw.ellipse((0, 0, size - 1, size - 1), fill=255)
 
         out = Image.new('RGBA', (size, size), (255, 255, 255, 0))
-        out.paste(img, (0, 0), mask)
+        out.paste(canvas, (0, 0), mask)
 
         stream = io.BytesIO()
         out.save(stream, format='PNG')
@@ -213,17 +220,18 @@ class HrEmployeeDocxReports(models.Model):
         b.p(doc, [(f'TLALNEPANTLA DE BAZ A {b.fmt_today()}', True)], align=R)
 
         if self.image_1920:
-          try:
-            img_stream = b.circular_image_bytes(self.image_1920)
-            para = doc.add_paragraph()
-            para.alignment = R
-            para.add_run().add_picture(img_stream, width=Inches(1.65))
-          except Exception:
-            pass
+            try:
+                img_stream = b.circular_image_bytes(self.image_1920)
+                para = doc.add_paragraph()
+                para.alignment = R
+                para.add_run().add_picture(img_stream, width=Inches(1.65))
+            except Exception:
+                pass
 
         doc.add_paragraph()
         b.p(doc, [('A QUIEN CORRESPONDA', True)])
         b.p(doc, [('PRESENTE:', True)])
+        doc.add_paragraph()
 
         b.p(doc, [
             ('ME PERMITO INFORMAR A USTED, LOS DATOS QUE TENEMOS REGISTRADOS '
@@ -232,6 +240,7 @@ class HrEmployeeDocxReports(models.Model):
             (' EL CUAL LABORA PARA LA EMPRESA Y CONTAMOS CON LOS SIGUIENTES '
              'DATOS EN NUESTROS REGISTROS:', False),
         ], align=J)
+        doc.add_paragraph()
 
         t1 = doc.add_table(rows=5, cols=2)
         b.remove_borders(t1)
