@@ -497,36 +497,46 @@ class HrEmployeeDocxReports(models.Model):
         b = _DocxBuilder
         emp = self.name.upper()
         co = self.company_id.name.upper()
-        today = b.fmt_today()
+        today = f"{date.today().day} DE {b.MESES_ES[date.today().month]} DE {date.today().year}"
 
         doc = Document()
         b.apply_default_typography(doc)
+        remision_style = doc.styles['Normal']
+        remision_style.font.name = 'Arial'
+        remision_style.font.size = Pt(10)
+        remision_style.paragraph_format.space_before = Pt(0)
+        remision_style.paragraph_format.space_after = Pt(0)
+        remision_style.paragraph_format.line_spacing = 1.0
         for sec in doc.sections:
-            sec.top_margin = Inches(1)
-            sec.bottom_margin = Inches(1)
-            sec.left_margin = Inches(1.2)
-            sec.right_margin = Inches(1.2)
+            sec.top_margin = Inches(0.55)
+            sec.bottom_margin = Inches(0.55)
+            sec.left_margin = Inches(0.9)
+            sec.right_margin = Inches(0.9)
 
-        # Header: blank left / info right
-        tbl = doc.add_table(rows=1, cols=2)
+        # Header + addressed block to emulate the visual distribution in the sample.
+        tbl = doc.add_table(rows=2, cols=2)
         b.remove_borders(tbl)
+        tbl.autofit = False
+        tbl.columns[0].width = Inches(3.05)
+        tbl.columns[1].width = Inches(2.95)
+
         right = tbl.rows[0].cells[1]
         for i, (label, val, bold_val) in enumerate([
             ('Empresa:', co, True),
             ('Trabajador:', emp, True),
             ('Actividad De La Empresa:', 'Instalación de Fibra Óptica', False),
-            ('Domicilio:', b.company_address(self.company_id), False),
+            ('Domicilio:', b.company_address(self.company_id).upper(), False),
         ]):
             para = right.paragraphs[0] if i == 0 else right.add_paragraph()
+            para.alignment = J
+            para.paragraph_format.line_spacing = 1.0
             r1 = para.add_run(f'{label} ')
             r1.bold = True
             r2 = para.add_run(val)
             r2.bold = bold_val
 
-        doc.add_paragraph()
-
-        # Addressed to
-        for line in [
+        left = tbl.rows[1].cells[0]
+        for i, (text, bold) in enumerate([
             ('H. PRIMER TRIBUNAL LABORAL', True),
             ('DE LA REGION JUDICIAL', True),
             ('TLALNEPANTLA.', True),
@@ -535,25 +545,33 @@ class HrEmployeeDocxReports(models.Model):
             ('CON SEDE EN TLALNEPANTLA ESTADO', True),
             ('DE MEXICO.', True),
             ('P R E S E N T E.', True),
-        ]:
-            b.p(doc, [line])
+        ]):
+            para = left.paragraphs[0] if i == 0 else left.add_paragraph()
+            para.alignment = J
+            para.paragraph_format.line_spacing = 1.0
+            run = para.add_run(text)
+            run.bold = bold
 
         doc.add_paragraph()
+        doc.add_paragraph()
 
-        b.p(doc, [
+        p1 = b.p(doc, [
             ('LIC. EDWIN GONZALEZ SORIA,', True),
             (' en mi carácter de Apoderado Legal ', False),
-            (co, True), (' DE C.V., y el C. ', True),
+            (co, True),
+            (', y el C. ', False),
             (emp, True),
             (', en mi carácter de trabajador, AMBOS señalando como domicilio '
-             'para oír y recibir notificaciones el ubicado en Filiberto Gómez '
-             'número 46 interior 101 (jurídico), Colonia Centro Industrial '
-             'Tlalnepantla, Municipio de Tlalnepantla de Baz, Estado de México, '
-             'Código Postal 54030, ante usted respetuosamente comparecemos a '
+             'para oír y recibir notificaciones el ubicado en FILIBERTO GOMEZ '
+             'NÚMERO 46 INTERIOR 101 (JURÍDICO), COLONIA CENTRO INDUSTRIAL '
+             'TLALNEPANTLA, MUNICIPIO DE TLALNEPANTLA DE BAZ, ESTADO DE MÉXICO, '
+             'CÓDIGO POSTAL 54030, ante usted respetuosamente comparecemos a '
              'exponer:', False),
         ], align=J)
+        p1.paragraph_format.line_spacing = 1.0
+        p1.paragraph_format.space_after = Pt(18)
 
-        b.p(doc, [
+        p2 = b.p(doc, [
             ('Que, por medio del presente ocurso, venimos a presentar el '
              'convenio que hemos celebrado por medio del cual y de común '
              'acuerdo damos por terminada la relación y/o vínculo laboral que '
@@ -563,40 +581,67 @@ class HrEmployeeDocxReports(models.Model):
             (', con el C. ', False), (emp, False),
             (', en su carácter de trabajador.', True),
         ], align=J)
+        p2.paragraph_format.line_spacing = 1.0
+        p2.paragraph_format.space_after = Pt(18)
 
-        b.p(doc, [
+        p3 = b.p(doc, [
             ('Ambas partes nos comprometemos a ratificar el convenio que se '
              'anexa el día y hora que esta autoridad nos señale fecha para tal '
              'efecto.', False),
         ], align=J)
+        p3.paragraph_format.line_spacing = 1.0
+        p3.paragraph_format.space_after = Pt(20)
 
-        b.p(doc, [
+        p4 = b.p(doc, [
             ('Por lo anteriormente expuesto, a este H. Tribunal, atentamente '
              'solicito.', False),
         ], align=C)
+        p4.paragraph_format.line_spacing = 1.0
 
-        b.p(doc, [
+        p5 = b.p(doc, [
             ('Único. -', True),
             (' Tenernos por presentado en términos del presente escrito.',
              False),
         ], align=C)
+        p5.paragraph_format.line_spacing = 1.0
+        p5.paragraph_format.space_after = Pt(12)
 
-        b.p(doc, [
+        p6 = b.p(doc, [
             (f'Tlalnepantla de Baz Estado De México, a ', False),
             (today, True),
         ], align=C)
+        p6.paragraph_format.line_spacing = 1.0
 
-        b.sig_table(doc,
-            left_lines=[
-                ('LIC. EDWIN GONZALEZ SORIA', True),
-                ('APODERADO LEGAL', True),
-                ('ESTEVEZ.JOR SERVICIOS, S.A. DE C.V.', True),
-            ],
-            right_lines=[
-                (f'EL C. {emp}', True),
-                ('Trabajador', False),
-            ],
-        )
+        spacer = doc.add_paragraph()
+        spacer.paragraph_format.space_before = Pt(34)
+        sig_tbl = doc.add_table(rows=1, cols=2)
+        b.remove_borders(sig_tbl)
+        sig_tbl.autofit = False
+        sig_tbl.columns[0].width = Inches(3.05)
+        sig_tbl.columns[1].width = Inches(2.95)
+
+        left_sig = sig_tbl.rows[0].cells[0]
+        for i, (text, bold) in enumerate([
+            ('LIC. EDWIN GONZALEZ SORIA', True),
+            ('APODERADO LEGAL', True),
+            ('ESTEVEZ.JOR SERVICIOS, S.A. DE C.V.', True),
+        ]):
+            para = left_sig.paragraphs[0] if i == 0 else left_sig.add_paragraph()
+            para.alignment = C
+            para.paragraph_format.line_spacing = 1.0
+            run = para.add_run(text)
+            run.bold = bold
+
+        right_sig = sig_tbl.rows[0].cells[1]
+        for i, (text, bold) in enumerate([
+            (f'EL C {emp}.', True),
+            ('Trabajador', False),
+        ]):
+            para = right_sig.paragraphs[0] if i == 0 else right_sig.add_paragraph()
+            para.alignment = C
+            para.paragraph_format.line_spacing = 1.0
+            run = para.add_run(text)
+            run.bold = bold
 
         return b.download(self.env, 'hr.employee', self.id,
                           f'{self.name} - Oficio de Remisión.docx',
