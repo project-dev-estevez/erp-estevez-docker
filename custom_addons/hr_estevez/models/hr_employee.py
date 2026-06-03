@@ -821,7 +821,7 @@ class HrEmployee(models.Model):
         banco_id = vals.get('bank_id') or employee.bank_id.id
         if banco_id:
             # El modelo de bancos en Odoo suele ser res.bank
-            banco_nombre = self.env['res.bank'].sudo().browse(banco_id).name or ""SELECT id, name FROM res_bank;
+            banco_nombre = self.env['res.bank'].sudo().browse(banco_id).name or ""
         
         # Dirección
         direccion_nom = ""
