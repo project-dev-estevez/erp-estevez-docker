@@ -2,7 +2,6 @@
 
 from . import res_users 
 from . import hr_direction
-from . import res_company
 from . import hr_employee
 from . import hr_area
 from . import hr_department
@@ -23,4 +22,5 @@ from . import hr_study_tag
 from . import hr_employee_job_history
 from . import hr_employee_excel_wizard
 from . import hr_employee_job_change_wizard
+from . import res_company
 from . import hr_docx_reports
