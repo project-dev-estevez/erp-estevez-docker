@@ -11,6 +11,16 @@ import unicodedata
 
 _logger = logging.getLogger(__name__)
 
+class EmployeeStudyField(models.Model):
+    _name = 'employee.study.field'
+    _description = 'Campo de Estudio del Empleado'
+    _order = 'name'
+
+    name = fields.Char(string='Nombre', required=True, translate=True)
+    code = fields.Char(string='Código')
+    active = fields.Boolean(string='Activo', default=True)
+
+
 class HrEmployee(models.Model):
     _inherit = 'hr.employee'
 
@@ -33,49 +43,12 @@ class HrEmployee(models.Model):
     institucion_id = fields.Many2one('hr.institucion', string="Institución", ondelete='set null')
     institucion_key = fields.Char(compute='_compute_institucion_key', store=True)
 
-    study_field_new = fields.Selection([
-        ('administracion', 'Administración'),
-        ('contaduria', 'Contaduría'),
-        ('derecho', 'Derecho'),
-        ('psicologia', 'Psicología'),
-        ('medicina', 'Medicina'),
-        ('enfermeria', 'Enfermería'),
-        ('arquitectura', 'Arquitectura'),
-        ('ingenieria_civil', 'Ingeniería Civil'),
-        ('ingenieria_industrial', 'Ingeniería Industrial'),
-        ('ingenieria_sistemas', 'Ingeniería en Sistemas Computacionales'),
-        ('ingenieria_electronica', 'Ingeniería Electrónica'),
-        ('ingenieria_mecanica', 'Ingeniería Mecánica'),
-        ('ingenieria_quimica', 'Ingeniería Química'),
-        ('biologia', 'Biología'),
-        ('biotecnologia', 'Biotecnología'),
-        ('mercadotecnia', 'Mercadotecnia'),
-        ('comunicacion', 'Ciencias de la Comunicación'),
-        ('educacion', 'Ciencias de la Educación'),
-        ('pedagogia', 'Pedagogía'),
-        ('sociologia', 'Sociología'),
-        ('trabajo_social', 'Trabajo Social'),
-        ('diseno_grafico', 'Diseño Gráfico'),
-        ('diseno_industrial', 'Diseño Industrial'),
-        ('turismo', 'Turismo'),
-        ('gastronomia', 'Gastronomía'),
-        ('ingenieria_ambiental', 'Ingeniería Ambiental'),
-        ('ingenieria_en_software', 'Ingeniería en Software'),
-        ('matematicas', 'Matemáticas'),
-        ('fisica', 'Física'),
-        ('quimica', 'Química'),
-        ('veterinaria', 'Medicina Veterinaria y Zootecnia'),
-        ('agronomia', 'Agronomía'),
-        ('relaciones_internacionales', 'Relaciones Internacionales'),
-        ('economia', 'Economía'),
-        ('finanzas', 'Finanzas'),
-        ('arte', 'Artes Visuales'),
-        ('musica', 'Música'),
-        ('teatro', 'Teatro'),
-        ('filosofia', 'Filosofía'),
-        ('historia', 'Historia'),
-        ('ciencias_politicas', 'Ciencias Políticas'),
-    ], string="Campo de estudio", help="Selecciona la carrera universitaria del empleado")
+    study_field_new_id = fields.Many2one(
+        'employee.study.field',
+        string="Campo de estudio",
+        ondelete='set null',
+        help="Selecciona la carrera universitaria del empleado",
+    )
 
     study_tag_ids = fields.Many2many(
         'hr.study.tag', 
@@ -101,7 +74,7 @@ class HrEmployee(models.Model):
 
     # Segunda Columna en la Vista de Empleados 
     #company_id = fields.Many2one('res.company', string='Company', compute='_compute_company', store=True, readonly=True)
-    company_id = fields.Many2one('res.company', string='Compañía', default=lambda self: self.env.company)
+    #company_id = fields.Many2one('res.company', string='Compañía', default=lambda self: self.env.company)
     direction_id = fields.Many2one('hr.direction', string='Dirección')
     area_id = fields.Many2one('hr.area', string='Área')
 
@@ -118,16 +91,65 @@ class HrEmployee(models.Model):
         ('imss', 'IMSS'),
     ], string='Tipo de Nómina', store=True)
 
+    # patron = fields.Selection([
+    #     ('estevezjor', 'Estevez.Jor Servicios, S.A. de C.V.'),
+    #     ('corporativo_comunicacion', 'Corporativo en Comunicacion Digital del Futuro, S.A. de C.V.'),
+    #     ('planta_ambientalista', 'Planta Ambientalista EESZ S.A. de C.V.'),
+    #     ('herrajes', 'Herrajes Estevez, S.A. de C.V.'),
+    #     ('rastreo', 'Rastreo Satelital de México J&J S.A. de C.V.'),
+    #     ('grupo_back', 'Grupo Back Bone de México S.A. de C.V.')
+    # ], string='Patrón Fiscal')
 
+    # @api.onchange('company_id')
+    # def _onchange_company_id_sync_fields(self):
+    #     # Mapeo: Nombre exacto de la compañía en Odoo -> Clave técnica de tu Selección
+    #     mapping_patron = {
+    #         'Estevez.Jor Servicios, S.A. de C.V.': 'estevezjor',
+    #         'Corporativo en Comunicacion Digital del Futuro, S.A. de C.V.': 'corporativo_comunicacion',
+    #         'Planta Ambientalista EESZ S.A. de C.V.': 'planta_ambientalista',
+    #         'Herrajes Estevez, S.A. de C.V.': 'herrajes',
+    #         'Rastreo Satelital de México J&J S.A. de C.V.': 'rastreo',
+    #         'Grupo Back Bone de México S.A. de C.V.': 'grupo_back'
+    #     }
+
+    #     for employee in self:
+    #         if employee.company_id:
+    #             # 1. Mapear address_id: se asigna el ID del partner de la compañía seleccionada
+    #             employee.address_id = employee.company_id.partner_id.id
+
+    #             # 2. Mapear patron: buscamos el nombre de la compañía en nuestro diccionario
+    #             company_name = employee.company_id.name
+    #             if company_name in mapping_patron:
+    #                 employee.patron = mapping_patron[company_name]
+    #             else:
+    #                 # Si no coincide con ninguna clave, puedes dejarlo vacío o definir un comportamiento por defecto
+    #                 employee.patron = False
+    #         else:
+    #             # Limpieza de campos si el usuario borra la compañía del formulario
+    #             employee.address_id = False
+    #             employee.patron = False
 
     patron = fields.Selection([
-        ('estevezjor', 'Estevez.Jor Servicios, S.A. de C.V.'),
-        ('corporativo_comunicacion', 'Corporativo en Comunicacion Digital del Futuro, S.A. de C.V.'),
+        ('estevezjor', 'Estevez.Jor Servicios S.A de C.V.'),
+        ('corporativo_comunicacion', 'Corporativo en Comunicación Digital del Futuro S.A de C.V.'),
         ('planta_ambientalista', 'Planta Ambientalista EESZ S.A. de C.V.'),
-        ('herrajes', 'Herrajes Estevez, S.A. de C.V.'),
-        ('rastreo', 'Rastreo Satelital de México J&J S.A. de C.V.'),
-        ('grupo_back', 'Grupo Back Bone de México S.A. de C.V.')
-    ], string='Patrón Fiscal')
+        ('herrajes', 'Herrajes Estevez S.A de C.V.'),
+        ('rastreo', 'Rastreo Satelital de México J&J S.A de C.V.'),
+        ('grupo_back', 'Grupo Back Bone de México S.A DE C.V.')
+    ], related='company_id.patron', store=True, string='Patrón Fiscal')
+
+    @api.onchange('company_id')
+    def _onchange_company_id_sync_fields(self):
+        for employee in self:
+            if employee.company_id:
+                # Se asigna la dirección laboral
+                employee.address_id = employee.company_id.partner_id.id
+                
+                # Se copia automáticamente el patrón fiscal configurado en la empresa
+                employee.patron = employee.company_id.patron
+            else:
+                employee.address_id = False
+                employee.patron = False
 
     establecimiento = fields.Selection([
         ('estevezjor', 'Estevez.Jor Servicios'),
@@ -447,10 +469,13 @@ class HrEmployee(models.Model):
                     employee.generate_vacation_periods()
         
         for employee in self:
-            sync_ok = employee._sync_codeigniter(employee, 'update', vals=vals)
+            # CORRECCIÓN: Desempaquetar ambos valores
+            sync_ok, error_msg = employee._sync_codeigniter(employee, 'update', vals=vals)
+            
             if not sync_ok:
                 raise ValidationError(
-                    _("No se pudo sincronizar la actualización del empleado '%s' con System ERP.") % (employee.name or employee.id)
+                    f"No se pudo sincronizar la actualización del empleado '{employee.name or employee.id}' con System ERP.\n\n"
+                    f"Detalle: {error_msg}"
                 )
         
         return res
@@ -724,9 +749,18 @@ class HrEmployee(models.Model):
             'imss': 'IMSS'
         }
         nomina_traducido = nomina_map.get(employee.payroll_type, '')
+
+        # Homologación de Tipo de Pago (payment_type)
+        payment_map = {
+            'weekly': 'Semanal',
+            'biweekly': 'Quincenal'
+        }
+        pago_traducido = payment_map.get(employee.payment_type, '')
     
         # Buscamos el valor en vals (lo nuevo) o en el objeto (lo que ya estaba)
-        pareja = vals.get('spouse_complete_name', employee.spouse_complete_name or '')
+        pareja_actual = getattr(employee, 'spouse_name', getattr(employee, 'spouse_complete_name', ''))
+        pareja = vals.get('spouse_name', pareja_actual)
+
         horario = employee.resource_calendar_id.display_name if employee.resource_calendar_id else ''
 
         # Prioridad a vals si se acaba de cambiar el país, si no, del objeto
@@ -788,13 +822,33 @@ class HrEmployee(models.Model):
         if banco_id:
             # El modelo de bancos en Odoo suele ser res.bank
             banco_nombre = self.env['res.bank'].sudo().browse(banco_id).name or ""
+        
+        # Dirección
+        direccion_nom = ""
+        dir_id = vals.get('direction_id') or employee.direction_id.id
+        if dir_id:
+            direccion_nom = self.env['hr.direction'].sudo().browse(dir_id).name or ""
 
-        # 2. Dirección, Departamento y Puesto (Many2one)
-        # Extraemos el nombre de la relación para buscar el ID en System
-        direccion_nom = employee.direction_id.name if employee.direction_id else ""
-        depto_nom     = employee.department_id.name if employee.department_id else ""
-        area_nom      = employee.area_id.name if employee.area_id else ""
-        perfil_nom    = employee.job_id.name if employee.job_id else ""
+        # Departamento
+        depto_nom = ""
+        dep_id = vals.get('department_id') or employee.department_id.id
+        if dep_id:
+            depto_nom = self.env['hr.department'].sudo().browse(dep_id).name or ""
+
+        # Área (El campo que está fallando)
+        area_nom = ""
+        a_id = vals.get('area_id') or employee.area_id.id
+        if a_id:
+            # Revisa que el modelo sea hr.area (si tu modelo custom se llama diferente, ajústalo aquí)
+            area_nom = self.env['hr.area'].sudo().browse(a_id).name or ""
+
+        # Perfil / Puesto
+        perfil_nom = ""
+        j_id = vals.get('job_id') or employee.job_id.id
+        if j_id:
+            perfil_nom = self.env['hr.job'].sudo().browse(j_id).name or ""
+            
+        _logger.info(f"DEBUG ESTRUCTURA ORG -> Dir: {direccion_nom}, Depto: {depto_nom}, Area: {area_nom}, Puesto: {perfil_nom}")
 
         # 1. Grado de estudios (Many2one) - Enviamos el nombre para homologar IDs
         escolaridad_nombre = ""
@@ -802,16 +856,29 @@ class HrEmployee(models.Model):
         if estudios_id:
             escolaridad_nombre = self.env['hr.estudios'].sudo().browse(estudios_id).name or ""
 
-        # 2. Título / Carrera (Selection) - Extraemos la etiqueta legible
-        titulo_profesional = dict(employee._fields['study_field_new'].selection).get(employee.study_field_new) or ""
+        # patron_nombre = ""
+        # if employee.patron:
+        #     patron_nombre = dict(employee._fields['patron'].selection).get(employee.patron) or ""
 
-        patron_nombre = ""
-        if employee.patron:
-            patron_nombre = dict(employee._fields['patron'].selection).get(employee.patron) or ""
+        # establecimiento_nombre = ""
+        # if employee.establecimiento:
+        #     establecimiento_nombre = dict(employee._fields['establecimiento'].selection).get(employee.establecimiento) or ""
 
-        establecimiento_nombre = ""
-        if employee.establecimiento:
-            establecimiento_nombre = dict(employee._fields['establecimiento'].selection).get(employee.establecimiento) or ""
+        # Función auxiliar segura para extraer etiquetas de campos Selection (nativos o related)
+        def get_selection_label(field_name, value):
+            if not value:
+                return ""
+            selection = employee._fields[field_name].selection
+            # Si Odoo convirtió el selection en una función (por ser related), la ejecutamos primero
+            if callable(selection):
+                selection = selection(employee)
+            return dict(selection).get(value, "")
+
+        # 2. Título / Carrera (Many2one)
+        titulo_profesional = employee.study_field_new_id.name or ""
+        
+        patron_nombre = get_selection_label('patron', employee.patron)
+        establecimiento_nombre = get_selection_label('establecimiento', employee.establecimiento)
 
         ocupacion_nombre = ""
         ocupacion_id = vals.get('occupation_id') or employee.occupation_id.id
@@ -848,7 +915,7 @@ class HrEmployee(models.Model):
             'apellido_materno': employee.mother_last_name or '',
             'numero_empleado': employee.employee_number or '',
             'odoo_id': employee.id,
-            'fecha_ingreso': employee.create_date.strftime('%Y-%m-%d %H:%M:%S') if employee.create_date else fields.Datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+            'fecha_ingreso': employee.employment_start_date.strftime('%Y-%m-%d %H:%M:%S') if employee.employment_start_date else fields.Datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
             'estatus': 1, # Siempre activo
             'sexo': sexo_traducido,
             'marital': civil_traducido,
@@ -882,7 +949,7 @@ class HrEmployee(models.Model):
             'cuenta_bancaria': employee.account_number or '',
             'clabe': employee.clabe or '',
             'infonavit': bool(employee.infonavit),
-            'payment_type': employee.payment_type or '',
+            'payment_type': pago_traducido,
             
             # Emergencias
             'persona_contacto': employee.emergency_contact or '',
