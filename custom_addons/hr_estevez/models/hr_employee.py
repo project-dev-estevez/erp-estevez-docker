@@ -749,13 +749,6 @@ class HrEmployee(models.Model):
             'imss': 'IMSS'
         }
         nomina_traducido = nomina_map.get(employee.payroll_type, '')
-
-        # Homologación de Tipo de Pago (payment_type)
-        payment_map = {
-            'weekly': 'Semanal',
-            'biweekly': 'Quincenal'
-        }
-        pago_traducido = payment_map.get(employee.payment_type, '')
     
         # Buscamos el valor en vals (lo nuevo) o en el objeto (lo que ya estaba)
         pareja_actual = getattr(employee, 'spouse_name', getattr(employee, 'spouse_complete_name', ''))
@@ -949,7 +942,7 @@ class HrEmployee(models.Model):
             'cuenta_bancaria': employee.account_number or '',
             'clabe': employee.clabe or '',
             'infonavit': bool(employee.infonavit),
-            'payment_type': pago_traducido,
+            'payment_type': employee.payment_type or '',
             
             # Emergencias
             'persona_contacto': employee.emergency_contact or '',
