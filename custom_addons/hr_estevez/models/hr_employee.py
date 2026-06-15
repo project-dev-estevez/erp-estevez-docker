@@ -951,7 +951,7 @@ class HrEmployee(models.Model):
             
             # 'patron_sync': patron_nombre,
             'establecimiento': establecimiento_nombre,
-            # 'direccion_sync': direccion_nom,
+            'direccion_sync': direccion_nom,
             'departamento_sync': depto_nom,
             'area_sync': area_nom,
             'perfil_sync': perfil_nom,
