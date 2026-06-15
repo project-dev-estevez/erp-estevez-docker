@@ -949,9 +949,9 @@ class HrEmployee(models.Model):
             'telefono_contacto': employee.emergency_phone or '',
             'nombre_pareja': pareja,
             
-            'patron_sync': patron_nombre,
+            # 'patron_sync': patron_nombre,
             'establecimiento': establecimiento_nombre,
-            'direccion_sync': direccion_nom,
+            # 'direccion_sync': direccion_nom,
             'departamento_sync': depto_nom,
             'area_sync': area_nom,
             'perfil_sync': perfil_nom,
@@ -968,7 +968,7 @@ class HrEmployee(models.Model):
             'titulo_profesional': titulo_profesional,
             'documento_aprobatorio_sync': documento_aprob,
             'institucion_sync': institucion,
-            'company_sync': company_name,
+            # 'company_sync': company_name,
             # 'fuente_reclutamiento_sync': fuente_nombre,
         }
 
