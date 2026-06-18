@@ -1,37 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <record id="view_hr_job_form_inherit" model="ir.ui.view">
-            <field name="name">hr.job.form.inherit</field>
-            <field name="model">hr.job</field>
-            <field name="inherit_id" ref="hr.view_hr_job_form"/>
-            <field name="arch" type="xml">
-                <xpath expr="//div[hasclass('oe_title')]" position="after">
-                    <group>
-                        <field name="company_id"/>
-                        <field name="direction_id"/>
-                        <field name="department_id"/>
-                        <field name="area_id"/>
-                    </group>
-                </xpath>
-            </field>
-        </record>
+        <field name="name">hr.job.form.inherit</field>
+        <field name="model">hr.job</field>
+        <field name="inherit_id" ref="hr.view_hr_job_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[hasclass('oe_title')]" position="after">
+                <group>
+                    <field name="company_id"/>
+                    <field name="direction_id"/>
+                    <field name="department_id" string="Área"/>
+                    <field name="area_id" string="Departamento"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
 
-        <record id="view_hr_job_tree_inherit" model="ir.ui.view">
-            <field name="name">hr.job.list.inherit</field>
-            <field name="model">hr.job</field>
-            <field name="inherit_id" ref="hr.view_hr_job_tree"/>
-            <field name="arch" type="xml">
-                <xpath expr="//field[@name='name']" position="after">
-                    <field name="area_id"/>
-                </xpath>
-            </field>
-        </record>
+    <record id="view_hr_job_tree_inherit" model="ir.ui.view">
+        <field name="name">hr.job.list.inherit</field>
+        <field name="model">hr.job</field>
+        <field name="inherit_id" ref="hr.view_hr_job_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='department_id']" position="attributes">
+                <attribute name="string">Área</attribute>
+            </xpath>
+            
+            <xpath expr="//field[@name='department_id']" position="after">
+                <field name="area_id" string="Departamento"/>
+            </xpath>
+        </field>
+    </record>
 
-        <!-- Definir la acción para Puestos de trabajo -->
-        <record id="action_hr_job_custom" model="ir.actions.act_window">
-            <field name="name">Puestos de trabajo</field>
-            <field name="res_model">hr.job</field>
-            <field name="view_mode">list,form</field>
-            <field name="view_id" ref="hr.view_hr_job_tree"/>
-        </record>
+    <record id="action_hr_job_custom" model="ir.actions.act_window">
+        <field name="name">Puestos de trabajo</field>
+        <field name="res_model">hr.job</field>
+        <field name="view_mode">list,form</field>
+        <field name="view_id" ref="hr.view_hr_job_tree"/>
+    </record>
 </odoo>
