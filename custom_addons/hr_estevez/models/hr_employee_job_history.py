@@ -7,6 +7,8 @@ class HrEmployeeJobHistory(models.Model):
     _description = 'Historial de Cambios de Puesto'
     _order = 'change_date desc'
 
+    active = fields.Boolean(string='Activo', default=True)
+
     employee_id = fields.Many2one(
         'hr.employee',
         string="Empleado",
@@ -67,14 +69,16 @@ class HrEmployeeJobHistory(models.Model):
             ('res_id', '=', self.id),
         ], limit=1)
 
-        if existing_attachment:
-            existing_attachment.unlink()
+        # Buscamos explícitamente la nueva vista de carga que creamos en el XML
+        upload_view = self.env.ref('hr_estevez.attachment_upload_view')
 
-        return {
+        action = {
             'type': 'ir.actions.act_window',
             'name': 'Adjuntar Archivo',
             'res_model': 'ir.attachment',
             'view_mode': 'form',
+            # Forzamos a Odoo a usar UNICAMENTE la vista de carga/reemplazo
+            'views': [(upload_view.id, 'form')],
             'target': 'new',
             'context': {
                 'default_res_model': self._name,
@@ -82,6 +86,11 @@ class HrEmployeeJobHistory(models.Model):
                 'default_name': f"Historial_{self.id}",
             },
         }
+
+        if existing_attachment:
+            action['res_id'] = existing_attachment.id
+
+        return action
 
     def action_view_file(self):
         self.ensure_one()
@@ -94,6 +103,7 @@ class HrEmployeeJobHistory(models.Model):
         if not attachment:
             raise UserError("No se encontró el archivo adjunto.")
 
+        # Buscamos explícitamente la vista del visor PDF
         preview_view = self.env.ref('hr_estevez.attachment_preview')
 
         return {
@@ -102,6 +112,7 @@ class HrEmployeeJobHistory(models.Model):
             'res_model': 'ir.attachment',
             'res_id': attachment.id,
             'view_mode': 'form',
+            # Forzamos a Odoo a usar UNICAMENTE la vista con el visor de PDF
             'views': [(preview_view.id, 'form')],
             'target': 'new',
         }
