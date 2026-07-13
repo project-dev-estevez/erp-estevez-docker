@@ -20,7 +20,7 @@
     'version': '0.2',
 
     # any module necessary for this one to work correctly
-    'depends': ['base', 'hr', 'hr_holidays', 'hr_skills', 'hr_contract', 'custom_training_extension', 'web'],
+    'depends': ['base', 'hr', 'hr_holidays', 'hr_skills', 'hr_contract', 'custom_training_extension', 'web', 'hr_elearning_integration'],
 
     # always loaded
     'data': [

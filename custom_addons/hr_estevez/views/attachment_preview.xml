@@ -1,6 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
     <data>
+        <record id="attachment_upload_view" model="ir.ui.view">
+            <field name="name">attachment.upload.form</field>
+            <field name="model">ir.attachment</field>
+            <field name="arch" type="xml">
+                <form string="Adjuntar Archivo">
+                    <sheet>
+                        <group>
+                            <field name="name" invisible="1"/>
+                            <field name="datas" filename="name" widget="binary" string="Seleccione el archivo"/>
+                        </group>
+                    </sheet>
+                    <footer>
+                        <button string="Guardar" class="btn-primary" special="save"/>
+                        <button string="Cancelar" class="btn-secondary" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
         <record id="attachment_preview" model="ir.ui.view">
             <field name="name">attachment.preview</field>
             <field name="model">ir.attachment</field>
@@ -9,21 +28,12 @@
                     <sheet>
                         <group>
                             <field name="name" invisible="1"/>
-
-                            <!-- Vista previa SOLO para imágenes -->
-                            <field name="datas"
-                                   widget="image"
-                                   options="{'zoom': true}"
-                                   style="max-width: 100vw; max-height: 100vh; width: auto; height: auto;
-                                    object-fit: contain; border: 1px solid #dee2e6; border-radius: 8px;
-                                    padding: 10px; background: white;"
-                                   invisible="not mimetype or not ('image/' in mimetype)"/>
-                                   
-                            <!-- Campo binario normal para NO imágenes -->
-                            <field name="datas"
-                                   invisible="mimetype"/>
+                            <field name="datas" filename="name" widget="pdf_viewer" readonly="1" string="Documento"/>
                         </group>
                     </sheet>
+                    <footer>
+                        <button string="Cerrar" class="btn-primary" special="cancel"/>
+                    </footer>
                 </form>
             </field>
         </record>

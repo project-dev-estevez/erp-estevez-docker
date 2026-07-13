@@ -12,7 +12,7 @@
                 <xpath expr="//page[@name='skills_resume']" position="inside">
                     <group string="Historial de Puestos" col="1">                          
                         <field name="job_history_ids" nolabel="1">                        
-                            <kanban>                            
+                            <kanban create="false">                            
                                 <field name="change_date"/>
                                 <field name="old_job_id"/>
                                 <field name="new_job_id"/>
@@ -20,6 +20,7 @@
                                 <templates>
                                     <t t-name="kanban-box">                                
                                         <div class="oe_kanban_global_click">
+                                            <button name="action_archive" type="object" class="btn btn-link float-end" style="padding: 0; color: #6c757d;" icon="fa-archive" title="Archivar registro (Ocultar)"/>
                                             <div class="o_kanban_record_body">                                            
                                                 <div class="mb-2">
                                                     <strong class="text-primary">
