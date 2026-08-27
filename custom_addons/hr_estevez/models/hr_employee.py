@@ -23,7 +23,7 @@ VIGILINER_APP_URL_DEFAULT = 'https://vigiliner.mx'
 
 # Campos que, si cambian mientras is_driver sigue en True, ameritan reenviar el upsert
 VIGILINER_TRACKED_FIELDS = {
-    'name', 'mobile_phone', 'work_phone', 'work_email',
+    'name', 'mobile_phone', 'work_phone', 'private_phone', 'work_email',
     'license_number', 'license_expiration_date', 'image_512', 'active',
 }
 
@@ -754,7 +754,7 @@ class HrEmployee(models.Model):
         """Arma el payload de 'upsert' para el webhook de Vigiliner a partir del empleado actual."""
         self.ensure_one()
 
-        phone = self.mobile_phone or self.work_phone or None
+        phone = self.mobile_phone or self.work_phone or self.private_phone or None
 
         photo = self.image_512
         if photo:
