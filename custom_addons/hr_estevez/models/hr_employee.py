@@ -178,6 +178,7 @@ class HrEmployee(models.Model):
     nss = fields.Char(string='NSS', help='Número de Seguridad Social', size=11)
     voter_key = fields.Char(string='Clave Elector', size=18 )
     license_number = fields.Char(string='Número de Licencia')
+    license_expiration_date = fields.Date(string='Fecha de Vencimiento de Licencia')
     is_driver = fields.Boolean(
         string='Puede conducir (Vigiliner)',
         store=True,
