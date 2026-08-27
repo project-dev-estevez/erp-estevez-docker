@@ -21,11 +21,8 @@
         <field name="model">hr.job</field>
         <field name="inherit_id" ref="hr.view_hr_job_tree"/>
         <field name="arch" type="xml">
-            <xpath expr="//field[@name='department_id']" position="attributes">
-                <attribute name="string">Área</attribute>
-            </xpath>
-            
-            <xpath expr="//field[@name='department_id']" position="after">
+            <xpath expr="//field[@name='name']" position="after">
+                <field name="department_id" string="Área"/>
                 <field name="area_id" string="Departamento"/>
             </xpath>
         </field>
