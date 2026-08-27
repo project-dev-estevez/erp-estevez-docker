@@ -228,6 +228,7 @@
                                 <field name="voter_key" placeholder="18 dígitos"/>
                                 <field name="infonavit"/>
                                 <field name="license_number"/>
+                                <field name="is_driver"/>
                             </group>
                         </group>
                         <group>

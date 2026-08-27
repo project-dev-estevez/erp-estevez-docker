@@ -178,6 +178,13 @@ class HrEmployee(models.Model):
     nss = fields.Char(string='NSS', help='Número de Seguridad Social', size=11)
     voter_key = fields.Char(string='Clave Elector', size=18 )
     license_number = fields.Char(string='Número de Licencia')
+    is_driver = fields.Boolean(
+        string='Puede conducir (Vigiliner)',
+        store=True,
+        index=True,
+        default=False,
+        help='Indica si el empleado es apto como conductor. Se usa para integrar con Vigiliner vía gRPC.'
+    )
     infonavit = fields.Boolean(string='Infonavit', default=False)
     private_colonia = fields.Char(string="Colonia")
     fiscal_zip = fields.Char(string="Fiscal ZIP")
