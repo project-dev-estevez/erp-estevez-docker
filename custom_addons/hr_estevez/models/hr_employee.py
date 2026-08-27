@@ -11,6 +11,22 @@ import unicodedata
 
 _logger = logging.getLogger(__name__)
 
+# Notificación en tiempo real a Vigiliner (rastreo de flotas) cuando cambia un conductor
+VIGILINER_WEBHOOK_URL_PARAM = 'vigiliner.webhook_url'
+VIGILINER_WEBHOOK_SECRET_PARAM = 'vigiliner.webhook_secret'
+VIGILINER_COMPANY_ID_PARAM = 'vigiliner.company_id'
+VIGILINER_APP_URL_PARAM = 'vigiliner.app_url'
+
+VIGILINER_WEBHOOK_URL_DEFAULT = 'https://wmhbtmzfmrputjkgkrzi.supabase.co/functions/v1/odoo-employee-webhook'
+VIGILINER_COMPANY_ID_DEFAULT = 'ef40c46a-a6e7-4bbe-bae3-ee28e11e31da'
+VIGILINER_APP_URL_DEFAULT = 'https://vigiliner.mx'
+
+# Campos que, si cambian mientras is_driver sigue en True, ameritan reenviar el upsert
+VIGILINER_TRACKED_FIELDS = {
+    'name', 'mobile_phone', 'work_phone', 'work_email',
+    'license_number', 'license_expiration_date', 'image_512', 'active',
+}
+
 class EmployeeStudyField(models.Model):
     _name = 'employee.study.field'
     _description = 'Campo de Estudio del Empleado'
@@ -397,13 +413,16 @@ class HrEmployee(models.Model):
                     _logger.error(f"Error generando períodos: {str(e)}")
 
             sync_ok, error_msg = employee._sync_codeigniter(employee, 'create')
-            
+
             if not sync_ok:
                 raise ValidationError(
                     f"No se pudo sincronizar el empleado '{employee.name or employee.id}' con System.\n\n"
                     f"Detalle del servidor destino: {error_msg}"
                 )
-        
+
+            if employee.is_driver:
+                employee._vigiliner_notify_upsert()
+
         return employees
 
 
@@ -466,27 +485,53 @@ class HrEmployee(models.Model):
                 if any(period.days_taken > 0 for period in employee.vacation_period_ids):
                     raise UserError("No se puede cambiar la fecha de ingreso porque hay días de vacaciones ya tomados.")
                 employee.vacation_period_ids.unlink()
-        
+
+        # Vigiliner: snapshot de is_driver antes de escribir, para saber si hay que
+        # notificar un upsert/remove después de aplicar los cambios.
+        vigiliner_relevant = 'is_driver' in vals or bool(VIGILINER_TRACKED_FIELDS & set(vals.keys()))
+        vigiliner_before = {employee.id: employee.is_driver for employee in self} if vigiliner_relevant else {}
+
         # Ejecutar write
         res = super().write(vals)
-        
+
         # Acciones post-write
         if 'employment_start_date' in vals:
             for employee in self:
                 if employee.employment_start_date:
                     employee.generate_vacation_periods()
-        
+
         for employee in self:
             # CORRECCIÓN: Desempaquetar ambos valores
             sync_ok, error_msg = employee._sync_codeigniter(employee, 'update', vals=vals)
-            
+
             if not sync_ok:
                 raise ValidationError(
                     f"No se pudo sincronizar la actualización del empleado '{employee.name or employee.id}' con System ERP.\n\n"
                     f"Detalle: {error_msg}"
                 )
-        
+
+        if vigiliner_relevant:
+            changed_tracked_fields = bool(VIGILINER_TRACKED_FIELDS & set(vals.keys()))
+            for employee in self:
+                was_driver = vigiliner_before.get(employee.id, False)
+                is_driver = employee.is_driver
+                if not was_driver and is_driver:
+                    employee._vigiliner_notify_upsert()
+                elif was_driver and not is_driver:
+                    employee._vigiliner_notify_remove(employee.id)
+                elif was_driver and is_driver and changed_tracked_fields:
+                    if employee.active:
+                        employee._vigiliner_notify_upsert()
+                    else:
+                        employee._vigiliner_notify_remove(employee.id)
+
         return res
+
+    def unlink(self):
+        drivers_to_remove = self.filtered('is_driver')
+        for employee in drivers_to_remove:
+            employee._vigiliner_notify_remove(employee.id)
+        return super().unlink()
     
 
     def generate_random_barcode(self):
@@ -704,6 +749,94 @@ class HrEmployee(models.Model):
         text = text.encode('ascii', 'ignore').decode('utf-8')
         
         return text.upper().strip()
+
+    def _vigiliner_build_payload(self):
+        """Arma el payload de 'upsert' para el webhook de Vigiliner a partir del empleado actual."""
+        self.ensure_one()
+
+        phone = self.mobile_phone or self.work_phone or None
+
+        photo = self.image_512
+        if photo:
+            # El ORM ya entrega image_512 en base64; solo hace falta decodificar los bytes a str.
+            photo_base64 = photo.decode('utf-8') if isinstance(photo, bytes) else photo
+        else:
+            photo_base64 = None
+
+        icp = self.env['ir.config_parameter'].sudo()
+        company_id = icp.get_param(VIGILINER_COMPANY_ID_PARAM, VIGILINER_COMPANY_ID_DEFAULT)
+
+        return {
+            'event': 'upsert',
+            'company_id': company_id,
+            'odoo_employee_id': self.id,
+            'full_name': self.name or '',
+            'phone': phone,
+            'email': self.work_email or None,
+            'license_number': self.license_number or None,
+            'license_expires_at': (
+                self.license_expiration_date.strftime('%Y-%m-%d')
+                if self.license_expiration_date else None
+            ),
+            'photo_base64': photo_base64,
+        }
+
+    def _vigiliner_send(self, payload):
+        """POSTea el payload al webhook de Vigiliner. Nunca debe bloquear ni fallar una operación de RRHH."""
+        icp = self.env['ir.config_parameter'].sudo()
+        webhook_url = icp.get_param(VIGILINER_WEBHOOK_URL_PARAM, VIGILINER_WEBHOOK_URL_DEFAULT)
+        webhook_secret = icp.get_param(VIGILINER_WEBHOOK_SECRET_PARAM)
+
+        if not webhook_secret:
+            _logger.warning(
+                "Vigiliner: falta configurar el parámetro del sistema '%s'; se omite la notificación del evento '%s' para el empleado %s.",
+                VIGILINER_WEBHOOK_SECRET_PARAM, payload.get('event'), payload.get('odoo_employee_id'),
+            )
+            return
+
+        try:
+            response = requests.post(
+                webhook_url,
+                json=payload,
+                headers={
+                    'Content-Type': 'application/json',
+                    'x-odoo-webhook-secret': webhook_secret,
+                },
+                timeout=8,
+            )
+            if response.status_code not in (200, 201, 204):
+                _logger.warning(
+                    "Vigiliner: respuesta inesperada (%s) al notificar evento '%s' del empleado %s: %s",
+                    response.status_code, payload.get('event'), payload.get('odoo_employee_id'), response.text,
+                )
+        except Exception as exc:
+            _logger.warning(
+                "Vigiliner: no se pudo notificar el evento '%s' del empleado %s: %s",
+                payload.get('event'), payload.get('odoo_employee_id'), exc,
+            )
+
+    def _vigiliner_notify_upsert(self):
+        self.ensure_one()
+        self._vigiliner_send(self._vigiliner_build_payload())
+
+    def _vigiliner_notify_remove(self, employee_id):
+        icp = self.env['ir.config_parameter'].sudo()
+        company_id = icp.get_param(VIGILINER_COMPANY_ID_PARAM, VIGILINER_COMPANY_ID_DEFAULT)
+        self._vigiliner_send({
+            'event': 'remove',
+            'company_id': company_id,
+            'odoo_employee_id': employee_id,
+        })
+
+    def action_open_in_vigiliner(self):
+        self.ensure_one()
+        icp = self.env['ir.config_parameter'].sudo()
+        app_url = icp.get_param(VIGILINER_APP_URL_PARAM, VIGILINER_APP_URL_DEFAULT).rstrip('/')
+        return {
+            'type': 'ir.actions.act_url',
+            'url': f"{app_url}/app/drivers/internal?odoo_employee_id={self.id}",
+            'target': 'new',
+        }
 
     def _sync_codeigniter(self, employee, operation='create', vals=None):
 

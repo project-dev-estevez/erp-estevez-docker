@@ -27,6 +27,7 @@
         # Archivos de datos
         'security/ir.model.access.csv',
         'data/employee.study.field.csv',
+        'data/vigiliner_config_parameter.xml',
 
         # Archivos de informes
         'report/hr_report_common_layout_templates.xml',

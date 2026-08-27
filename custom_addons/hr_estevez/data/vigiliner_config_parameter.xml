@@ -1,0 +1,33 @@
+<odoo>
+    <!--
+        Parámetros de configuración para la integración con Vigiliner (webhook en tiempo real).
+        noupdate="1": se cargan una sola vez en la instalación; si el usuario los edita
+        desde Ajustes > Técnico > Parámetros del sistema, una actualización del módulo no los pisa.
+
+        vigiliner.webhook_secret se crea con un valor placeholder ("*****"): hay que
+        reemplazarlo a mano por el secreto real desde Ajustes > Técnico > Parámetros
+        del sistema. Mientras quede en "*****", las notificaciones a Vigiliner van a
+        fallar por secreto inválido (401/403), no por falta de configuración.
+    -->
+    <data noupdate="1">
+        <record id="vigiliner_webhook_secret_param" model="ir.config_parameter">
+            <field name="key">vigiliner.webhook_secret</field>
+            <field name="value">*****</field>
+        </record>
+
+        <record id="vigiliner_webhook_url_param" model="ir.config_parameter">
+            <field name="key">vigiliner.webhook_url</field>
+            <field name="value">https://wmhbtmzfmrputjkgkrzi.supabase.co/functions/v1/odoo-employee-webhook</field>
+        </record>
+
+        <record id="vigiliner_company_id_param" model="ir.config_parameter">
+            <field name="key">vigiliner.company_id</field>
+            <field name="value">ef40c46a-a6e7-4bbe-bae3-ee28e11e31da</field>
+        </record>
+
+        <record id="vigiliner_app_url_param" model="ir.config_parameter">
+            <field name="key">vigiliner.app_url</field>
+            <field name="value">https://vigiliner.mx</field>
+        </record>
+    </data>
+</odoo>
