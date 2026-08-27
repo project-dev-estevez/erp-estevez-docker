@@ -106,19 +106,19 @@
         </field>
     </record>
 
-    <!-- Ocultar el botón de API Key en el perfil de usuario -->
+    <!-- Botón de API Key: visible solo para Administración (Ajustes técnicos) -->
     <record id="hr_res_users_view_form_profile_inherit_hide_api_key" model="ir.ui.view">
         <field name="name">hr.res.users.view.form.profile.inherit.hide.api.key.estevez</field>
         <field name="model">res.users</field>
         <field name="inherit_id" ref="base.view_users_form_simple_modif"/>
         <field name="arch" type="xml">
             <xpath expr="//button[@name='api_key_wizard']" position="attributes">
-                <attribute name="invisible">1</attribute>
+                <attribute name="groups">base.group_system</attribute>
             </xpath>
         </field>
     </record>
 
-    <!-- Renombrar la página de información de trabajo y agregar campos adicionales -->
+<!-- Renombrar la página de información de trabajo y agregar campos adicionales -->
     <record id="hr_res_users_view_form_profile_inherit_work_info" model="ir.ui.view">
         <field name="name">hr.res.users.view.form.profile.inherit.work.info.estevez</field>
         <field name="model">res.users</field>
