@@ -228,7 +228,8 @@
                                 <field name="voter_key" placeholder="18 dígitos"/>
                                 <field name="infonavit"/>
                                 <field name="license_number"/>
-                                <field name="license_expiration_date"/>
+                                <field name="license_permanent"/>
+                                <field name="license_expiration_date" invisible="license_permanent"/>
                                 <field name="is_driver"/>
                                 <button name="action_open_in_vigiliner" type="object" string="Ver en Vigiliner" class="btn-secondary" invisible="not is_driver"/>
                             </group>

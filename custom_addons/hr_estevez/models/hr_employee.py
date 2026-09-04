@@ -24,7 +24,7 @@ VIGILINER_APP_URL_DEFAULT = 'https://vigiliner.mx'
 # Campos que, si cambian mientras is_driver sigue en True, ameritan reenviar el upsert
 VIGILINER_TRACKED_FIELDS = {
     'name', 'mobile_phone', 'work_phone', 'private_phone', 'work_email',
-    'license_number', 'license_expiration_date', 'image_512', 'active',
+    'license_number', 'license_expiration_date', 'license_permanent', 'image_512', 'active',
 }
 
 class EmployeeStudyField(models.Model):
@@ -194,6 +194,11 @@ class HrEmployee(models.Model):
     nss = fields.Char(string='NSS', help='Número de Seguridad Social', size=11)
     voter_key = fields.Char(string='Clave Elector', size=18 )
     license_number = fields.Char(string='Número de Licencia')
+    license_permanent = fields.Boolean(
+        string='Licencia Permanente',
+        default=False,
+        help='Marca la licencia como permanente (sin fecha de vencimiento).'
+    )
     license_expiration_date = fields.Date(string='Fecha de Vencimiento de Licencia')
     is_driver = fields.Boolean(
         string='Puede conducir (Vigiliner)',
@@ -774,8 +779,11 @@ class HrEmployee(models.Model):
             'phone': phone,
             'email': self.work_email or None,
             'license_number': self.license_number or None,
+            'license_permanent': self.license_permanent,
             'license_expires_at': (
-                self.license_expiration_date.strftime('%Y-%m-%d')
+                None
+                if self.license_permanent
+                else self.license_expiration_date.strftime('%Y-%m-%d')
                 if self.license_expiration_date else None
             ),
             'photo_base64': photo_base64,
@@ -804,6 +812,10 @@ class HrEmployee(models.Model):
                 },
                 timeout=8,
             )
+
+            # AGREGA ESTAS DOS LÍNEAS TEMPORALMENTE:
+            print(">>> STATUS VIGILINER:", response.status_code)
+            print(">>> RESPUESTA VIGILINER:", response.text)
             if response.status_code not in (200, 201, 204):
                 _logger.warning(
                     "Vigiliner: respuesta inesperada (%s) al notificar evento '%s' del empleado %s: %s",
@@ -1274,6 +1286,19 @@ class HrEmployee(models.Model):
     def _onchange_emergency_phone_2(self):
         if self.emergency_phone_2:
             self.emergency_phone_2 = self._format_phone_number(self.emergency_phone_2)
+
+    @api.onchange('license_permanent')
+    def _onchange_license_permanent(self):
+        if self.license_permanent:
+            self.license_expiration_date = False
+
+    @api.constrains('license_permanent', 'license_expiration_date')
+    def _check_license_permanent(self):
+        for employee in self:
+            if employee.license_permanent and employee.license_expiration_date:
+                raise ValidationError(
+                    "Una licencia permanente no puede tener fecha de vencimiento."
+                )
 
     def action_open_whatsapp(self):
         for employee in self:
