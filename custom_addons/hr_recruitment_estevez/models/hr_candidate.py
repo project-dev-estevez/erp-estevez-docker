@@ -80,9 +80,8 @@ class HrCandidate(models.Model):
                 raise UserError("The applicant does not have a phone number.")
 
     def _format_phone_number(self, phone_number):
-        if phone_number and not phone_number.startswith('+52'):
-            phone_number = '+52 ' + re.sub(r'(\d{3})(\d{3})(\d{4})', r'\1 \2 \3', phone_number)
-        return phone_number
+        from odoo.addons.hr_estevez.models.hr_employee import normalize_mx_phone
+        return normalize_mx_phone(phone_number)
 
     @api.onchange('partner_phone')
     def _onchange_partner_phone(self):

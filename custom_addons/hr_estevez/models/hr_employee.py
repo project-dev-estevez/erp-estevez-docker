@@ -11,6 +11,67 @@ import unicodedata
 
 _logger = logging.getLogger(__name__)
 
+# Campos telefónicos del empleado que se normalizan a formato internacional
+# antes de persistirse en Odoo (y por lo tanto antes de sincronizarse a System).
+EMPLOYEE_PHONE_FIELDS = ('work_phone', 'private_phone', 'emergency_phone', 'emergency_phone_2')
+
+
+def normalize_mx_phone(raw):
+    """Normaliza un número telefónico a formato internacional con espacios.
+
+    Reglas:
+      * Se elimina cualquier carácter que no sea dígito (recordando si venía con '+').
+      * Un número de 10 dígitos sin prefijo se asume de México -> se antepone '+52'.
+      * '52' + 10 dígitos (con o sin '+') también se interpreta como México.
+      * El número nacional de 10 dígitos se agrupa como 'NNN NNN NNNN'
+        (ej. '+52 561 610 2081').
+      * Números de otros países (con '+') se conservan tal cual.
+
+    Es idempotente: aplicarla sobre un valor ya normalizado devuelve el mismo valor.
+    Si el valor es falsy (False/None/'') se devuelve sin cambios.
+    """
+    if raw in (False, None, ''):
+        return raw
+
+    text = str(raw).strip()
+    if not text:
+        return text
+
+    had_plus = text.startswith('+')
+    digits = re.sub(r'\D', '', text)
+    if not digits:
+        return ''
+
+    country_code = None
+    national = digits
+
+    if had_plus:
+        if digits.startswith('52'):
+            country_code, national = '52', digits[2:]
+    else:
+        if len(digits) == 10:
+            country_code, national = '52', digits
+        elif len(digits) == 12 and digits.startswith('52'):
+            country_code, national = '52', digits[2:]
+
+    if country_code is None:
+        if had_plus:
+            # País distinto de México: se respeta el número internacional tal cual
+            # (solo se colapsan espacios repetidos), sin forzar reglas de MX.
+            return re.sub(r'\s+', ' ', text)
+        # Sin '+' y con longitud inesperada: se asume México de todos modos.
+        country_code, national = '52', digits
+
+    national = national.lstrip('0')
+
+    if len(national) == 10:
+        grouped = f'{national[0:3]} {national[3:6]} {national[6:10]}'
+    else:
+        grouped = ' '.join(national[i:i + 3] for i in range(0, len(national), 3))
+
+    return f'+{country_code} {grouped}'.strip()
+
+
 # Notificación en tiempo real a Vigiliner (rastreo de flotas) cuando cambia un conductor
 VIGILINER_WEBHOOK_URL_PARAM = 'vigiliner.webhook_url'
 VIGILINER_WEBHOOK_SECRET_PARAM = 'vigiliner.webhook_secret'
@@ -211,6 +272,12 @@ class HrEmployee(models.Model):
     private_colonia = fields.Char(string="Colonia")
     fiscal_zip = fields.Char(string="Fiscal ZIP")
 
+    # 'work_phone' se redefine como un Char simple, almacenado e independiente.
+    # En el estándar de Odoo este campo es calculado (_compute_phones a partir de
+    # address_id.phone; en otras versiones desde work_contact_id.phone, la MISMA
+    # fuente que private_phone), lo que hace que el teléfono personal termine
+    # copiado en el teléfono laboral. Al quitar el compute, work_phone y
+    # private_phone quedan totalmente desacoplados desde su captura.
     work_phone = fields.Char(string='Work Phone', compute=False)
     # coach_id = fields.Many2one('hr.employee', string='Instructor', compute=False, store=False)
 
@@ -392,7 +459,13 @@ class HrEmployee(models.Model):
             vals['name'] = full_name  # ESTABLECER name DIRECTAMENTE
             
             _logger.info(f"CREATE: names={names}, last={last_name}, mother={mother_last_name}, name={full_name}")
-            
+
+            # Normalización de teléfonos a formato internacional (+52 NNN NNN NNNN).
+            # work_phone y private_phone se tratan de forma independiente.
+            for phone_field in EMPLOYEE_PHONE_FIELDS:
+                if vals.get(phone_field):
+                    vals[phone_field] = normalize_mx_phone(vals[phone_field])
+
             # Sincronización de barcode/employee_number
             if 'employee_number' in vals and vals['employee_number'] and not vals.get('barcode'):
                 vals['barcode'] = vals['employee_number']
@@ -434,6 +507,13 @@ class HrEmployee(models.Model):
     def write(self, vals):
         _logger.info(f"=== WRITE EMPLOYEE {self.ids} ===")
         _logger.info(f"Valores a escribir: {vals}")
+
+        # Normalización de teléfonos a formato internacional. Se aplica SIEMPRE
+        # (incluso en sincronizaciones internas con skip_codeigniter_sync) para
+        # que Odoo y System guarden exactamente el mismo formato.
+        for phone_field in EMPLOYEE_PHONE_FIELDS:
+            if vals.get(phone_field):
+                vals[phone_field] = normalize_mx_phone(vals[phone_field])
 
         if self.env.context.get('skip_codeigniter_sync'):
             return super().write(vals)
@@ -1262,10 +1342,18 @@ class HrEmployee(models.Model):
             else:
                 record.age = 0
 
+    def _compute_phones(self):
+        """Neutraliza el cómputo nativo de Odoo para 'work_phone'.
+
+        En el estándar, este método recalcula work_phone desde address_id.phone
+        (misma fuente que private_phone en varias versiones). Aquí work_phone es
+        un campo simple e independiente, así que el cómputo no debe hacer nada.
+        """
+        return
+
     def _format_phone_number(self, phone_number):
-        if phone_number and not phone_number.startswith('+52'):
-            phone_number = '+52 ' + re.sub(r'(\d{3})(\d{3})(\d{4})', r'\1 \2 \3', phone_number)
-        return phone_number
+        """Compat: delega en la normalización internacional centralizada."""
+        return normalize_mx_phone(phone_number)
 
     @api.onchange('work_phone')
     def _onchange_work_phone(self):

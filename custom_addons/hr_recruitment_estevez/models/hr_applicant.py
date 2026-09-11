@@ -389,9 +389,8 @@ class HrApplicant(models.Model):
         }
 
     def _format_phone_number(self, phone_number):
-        if phone_number and not phone_number.startswith('+52'):
-            phone_number = '+52 ' + re.sub(r'(\d{3})(\d{3})(\d{4})', r'\1 \2 \3', phone_number)
-        return phone_number
+        from odoo.addons.hr_estevez.models.hr_employee import normalize_mx_phone
+        return normalize_mx_phone(phone_number)
 
     @api.onchange('partner_phone')
     def _onchange_partner_phone(self):
@@ -529,7 +528,11 @@ class HrApplicant(models.Model):
             'department_id': department_id,
             'area_id': area_id,
             'private_email': self.email_from or candidate.email or (self.department_id.company_id.email if self.department_id and self.department_id.company_id else False),
-            'work_phone': self.department_id.company_id.phone or self.partner_phone or candidate.phone,
+            # El teléfono del candidato es un dato PERSONAL: va a private_phone.
+            # work_phone solo se llena con el teléfono corporativo (si existe).
+            'private_phone': self.partner_phone or candidate.phone or False,
+            'work_phone': (self.department_id.company_id.phone
+                           if self.department_id and self.department_id.company_id else False),
             'project': self.project_id.name,
         }
 
