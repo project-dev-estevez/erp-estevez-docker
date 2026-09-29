@@ -2,6 +2,7 @@
 
 from unittest.mock import patch
 
+from odoo.exceptions import ValidationError
 from odoo.tests.common import TransactionCase
 
 from odoo.addons.hr_estevez.models.hr_employee import normalize_mx_phone
@@ -52,3 +53,25 @@ class TestPhoneNormalization(TransactionCase):
             # private_phone se actualiza y normaliza; work_phone NO se toca.
             self.assertEqual(employee.private_phone, '+52 559 988 7766')
             self.assertEqual(employee.work_phone, '+52 554 433 2211')
+
+    def test_telefono_fijo_format(self):
+        with patch.object(
+            type(self.env['hr.employee']), '_sync_codeigniter', return_value=(True, '')
+        ):
+            employee = self.env['hr.employee'].create({
+                'names': 'Empleado',
+                'last_name': 'Test',
+                'mother_last_name': 'Fijo',
+                'marital': 'single',
+                'telefono_fijo': '+52 555 123 4567',
+            })
+            self.assertEqual(employee.telefono_fijo, '+52 555 123 4567')
+
+            # 10 dígitos sin formato se normalizan antes de validarse.
+            employee.write({'telefono_fijo': '5551234568'})
+            self.assertEqual(employee.telefono_fijo, '+52 555 123 4568')
+
+            # Longitud incorrecta o lada distinta a +52 -> ValidationError.
+            for invalid in ('12345678', '+1 202 555 0143', '+52 555 123 456'):
+                with self.assertRaises(ValidationError):
+                    employee.write({'telefono_fijo': invalid})

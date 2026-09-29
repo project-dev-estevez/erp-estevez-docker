@@ -217,6 +217,7 @@
                                 </div>
                                 <field name="private_email" string="Correo Electronico personal" placeholder="myprivateemail@example.com"/>
                                 <field name="private_phone" string="Telefono Personal" widget="phone" class="o_force_ltr"/>
+                                <field name="telefono_fijo" widget="phone" class="o_force_ltr" placeholder="+52 XXX XXX XXXX"/>
                                 <field name="gender"/>
                             </group>
                             <group>

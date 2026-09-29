@@ -13,7 +13,10 @@ _logger = logging.getLogger(__name__)
 
 # Campos telefónicos del empleado que se normalizan a formato internacional
 # antes de persistirse en Odoo (y por lo tanto antes de sincronizarse a System).
-EMPLOYEE_PHONE_FIELDS = ('work_phone', 'private_phone', 'emergency_phone', 'emergency_phone_2')
+EMPLOYEE_PHONE_FIELDS = ('work_phone', 'private_phone', 'emergency_phone', 'emergency_phone_2', 'telefono_fijo')
+
+# Formato obligatorio del teléfono fijo: '+52 XXX XXX XXXX'.
+TELEFONO_FIJO_PATTERN = re.compile(r'^\+52 \d{3} \d{3} \d{4}$')
 
 
 def normalize_mx_phone(raw):
@@ -279,6 +282,10 @@ class HrEmployee(models.Model):
     # copiado en el teléfono laboral. Al quitar el compute, work_phone y
     # private_phone quedan totalmente desacoplados desde su captura.
     work_phone = fields.Char(string='Work Phone', compute=False)
+    telefono_fijo = fields.Char(
+        string='Teléfono Fijo',
+        help='Teléfono fijo capturado en la solicitud de empleo. Formato: +52 XXX XXX XXXX'
+    )
     # coach_id = fields.Many2one('hr.employee', string='Instructor', compute=False, store=False)
 
     # Campo almacenado para búsquedas y referencias
@@ -1168,7 +1175,8 @@ class HrEmployee(models.Model):
             # Contacto
             'private_email': employee.private_email or '',
             'private_phone': employee.private_phone or '', # Teléfono celular
-            'work_phone': employee.work_phone or '',       # Teléfono empresa/fijo
+            'work_phone': employee.work_phone or '',       # Teléfono empresa
+            'telefono_fijo': employee.telefono_fijo or '', # Teléfono fijo (solicitud de empleo)
             
             # Datos Bancarios y Nómina
             'banco_sync': banco_nombre,
@@ -1374,6 +1382,22 @@ class HrEmployee(models.Model):
     def _onchange_emergency_phone_2(self):
         if self.emergency_phone_2:
             self.emergency_phone_2 = self._format_phone_number(self.emergency_phone_2)
+
+    @api.onchange('telefono_fijo')
+    def _onchange_telefono_fijo(self):
+        if self.telefono_fijo:
+            self.telefono_fijo = self._format_phone_number(self.telefono_fijo)
+
+    @api.constrains('telefono_fijo')
+    def _check_telefono_fijo(self):
+        for employee in self:
+            if employee.telefono_fijo and not TELEFONO_FIJO_PATTERN.match(employee.telefono_fijo):
+                raise ValidationError(
+                    f"El teléfono fijo '{employee.telefono_fijo}' no tiene un formato válido.\n"
+                    "Debe capturarse exactamente como: +52 XXX XXX XXXX "
+                    "(lada 52, seguido de 10 dígitos agrupados 3-3-4 separados por espacios).\n"
+                    "Ejemplo: +52 555 123 4567"
+                )
 
     @api.onchange('license_permanent')
     def _onchange_license_permanent(self):
