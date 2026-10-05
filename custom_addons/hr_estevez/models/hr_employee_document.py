@@ -7,6 +7,7 @@ class HrEmployeeDocument(models.Model):
 
     name = fields.Char(string="Nombre del Documento", required=True)
     employee_id = fields.Many2one('hr.employee', string="Empleado", required=True)
+    company_id = fields.Many2one('res.company', string='Empresa', related='employee_id.company_id', store=True, index=True, readonly=True)
     attached = fields.Boolean(string="Adjunto", compute="_compute_attached")
 
     preview_url = fields.Char(

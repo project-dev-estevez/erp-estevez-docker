@@ -5,6 +5,7 @@ class HrEmployeeHistory(models.Model):
     _description = 'Historial de Altas y Bajas'
 
     employee_id = fields.Many2one('hr.employee', string='Empleado', required=True)
+    company_id = fields.Many2one('res.company', string='Empresa', related='employee_id.company_id', store=True, index=True, readonly=True)
     date = fields.Datetime(string='Fecha', required=True)
     status = fields.Selection([
         ('alta', 'Alta'),

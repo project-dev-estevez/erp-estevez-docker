@@ -8,7 +8,7 @@ class HrDirection(models.Model):
     director_id = fields.Many2one('hr.employee', string='Director')
     parent_id = fields.Many2one('hr.direction', string='Dirección Padre')
     child_ids = fields.One2many('hr.direction', 'parent_id', string='Direcciones Hijas')
-    company_id = fields.Many2one('res.company', string='Empresa', ondelete='set null')
+    company_id = fields.Many2one('res.company', string='Empresa', ondelete='set null', default=lambda self: self.env.company)
     department_ids = fields.One2many('hr.department', 'direction_id', string='Departamentos')
     total_departments = fields.Integer(string='Total Departamentos', compute='_compute_total_departments')
 

@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+        <record id="hr_loan_company_rule" model="ir.rule">
+            <field name="name">Préstamos: multiempresa</field>
+            <field name="model_id" ref="model_hr_loan"/>
+            <field name="global" eval="True"/>
+            <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+        </record>
+
+        <record id="hr_memorandum_company_rule" model="ir.rule">
+            <field name="name">Actas administrativas: multiempresa</field>
+            <field name="model_id" ref="model_hr_memorandum"/>
+            <field name="global" eval="True"/>
+            <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+        </record>
+
+        <record id="hr_employee_document_company_rule" model="ir.rule">
+            <field name="name">Documentos de empleado: multiempresa</field>
+            <field name="model_id" ref="model_hr_employee_document"/>
+            <field name="global" eval="True"/>
+            <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+        </record>
+
+        <record id="hr_employee_history_company_rule" model="ir.rule">
+            <field name="name">Historial de empleado: multiempresa</field>
+            <field name="model_id" ref="model_hr_employee_history"/>
+            <field name="global" eval="True"/>
+            <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+        </record>
+
+        <record id="hr_vacation_period_company_rule" model="ir.rule">
+            <field name="name">Periodos de vacaciones: multiempresa</field>
+            <field name="model_id" ref="model_hr_vacation_period"/>
+            <field name="global" eval="True"/>
+            <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+        </record>
+
+        <record id="hr_vacation_allocation_company_rule" model="ir.rule">
+            <field name="name">Asignaciones de vacaciones: multiempresa</field>
+            <field name="model_id" ref="model_hr_vacation_allocation"/>
+            <field name="global" eval="True"/>
+            <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+        </record>
+
+        <record id="hr_time_off_in_lieu_company_rule" model="ir.rule">
+            <field name="name">Días compensatorios: multiempresa</field>
+            <field name="model_id" ref="model_hr_time_off_in_lieu"/>
+            <field name="global" eval="True"/>
+            <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+        </record>
+
+        <record id="hr_direction_company_rule" model="ir.rule">
+            <field name="name">Direcciones: multiempresa</field>
+            <field name="model_id" ref="model_hr_direction"/>
+            <field name="global" eval="True"/>
+            <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+        </record>
+
+        <record id="hr_area_company_rule" model="ir.rule">
+            <field name="name">Áreas: multiempresa</field>
+            <field name="model_id" ref="model_hr_area"/>
+            <field name="global" eval="True"/>
+            <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+        </record>
+    </data>
+</odoo>

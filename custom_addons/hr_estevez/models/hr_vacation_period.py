@@ -10,6 +10,7 @@ class HrVacationPeriod(models.Model):
     
     display_name = fields.Char(compute='_compute_display_name', store=True)
     employee_id = fields.Many2one('hr.employee', required=True, ondelete='cascade')
+    company_id = fields.Many2one('res.company', string='Empresa', related='employee_id.company_id', store=True, index=True, readonly=True)
     period = fields.Char(string="Periodo", compute='_compute_period', store=True)
     year_start = fields.Date(string="Inicio", required=True)
     year_end = fields.Date(string="Fin", required=True)

@@ -5,6 +5,7 @@ class HrEmployeeCourse(models.Model):
     _description = 'Relación Empleado - Curso'
 
     employee_id = fields.Many2one('hr.employee', string="Empleado", required=True)
+    company_id = fields.Many2one('res.company', string='Empresa', related='employee_id.company_id', store=True, index=True, readonly=True)
     course_id = fields.Many2one('slide.channel', string="Curso", required=True)
     date_completed = fields.Date(string="Fecha de finalización")
     score = fields.Float(string="Calificación")

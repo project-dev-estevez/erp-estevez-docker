@@ -333,7 +333,7 @@ patch(kioskAttendanceApp.prototype, {
     },
     async loadLabeledImages(){
         var self = this;
-        await rpc('/hr_attendance_controls_adv/loadLabeledImages/').then(async function (data) {            
+        await rpc('/hr_attendance_controls_adv/loadLabeledImages/', {'token': this.props.token}).then(async function (data) {            
             self.labeledFaceDescriptors = await Promise.all(
                 data.map((data, i) => {  
                 const descriptors = [];

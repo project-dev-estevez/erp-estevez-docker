@@ -7,6 +7,7 @@
         <field name="arch" type="xml">
             <xpath expr="//field[@name='vat']" position="after">
                 <field name="patron"/>
+                <field name="employee_number_start"/>
             </xpath>
         </field>
     </record>

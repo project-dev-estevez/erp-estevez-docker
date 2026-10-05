@@ -26,6 +26,7 @@
     'data': [
         # Archivos de datos
         'security/ir.model.access.csv',
+        'security/multi_company_rules.xml',
         'data/employee.study.field.csv',
         'data/vigiliner_config_parameter.xml',
 

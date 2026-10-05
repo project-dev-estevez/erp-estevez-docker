@@ -8,4 +8,5 @@ class HrVacationAllocation(models.Model):
     period_id = fields.Many2one('hr.vacation.period', string="Período", required=True, ondelete='cascade')
     days = fields.Float(string="Días Asignados", required=True)
     employee_id = fields.Many2one('hr.employee', related='leave_id.employee_id', store=True)
+    company_id = fields.Many2one('res.company', string='Empresa', related='employee_id.company_id', store=True, index=True, readonly=True)
     leave_state = fields.Selection(related='leave_id.state', string="Estado de la Solicitud", store=True)

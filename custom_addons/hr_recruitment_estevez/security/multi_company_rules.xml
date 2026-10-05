@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+        <record id="hr_applicant_document_company_rule" model="ir.rule">
+            <field name="name">Documentos de candidato: multiempresa</field>
+            <field name="model_id" ref="model_hr_applicant_document"/>
+            <field name="global" eval="True"/>
+            <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+        </record>
+
+        <record id="hr_applicant_stage_history_company_rule" model="ir.rule">
+            <field name="name">Historial de etapas de candidato: multiempresa</field>
+            <field name="model_id" ref="model_hr_applicant_stage_history"/>
+            <field name="global" eval="True"/>
+            <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+        </record>
+
+        <record id="hr_requisition_company_rule" model="ir.rule">
+            <field name="name">Requisiciones de personal: multiempresa</field>
+            <field name="model_id" ref="model_hr_requisition"/>
+            <field name="global" eval="True"/>
+            <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+        </record>
+    </data>
+</odoo>

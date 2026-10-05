@@ -40,7 +40,7 @@
                                 <div class="col-12 text-justify">
                                     <p style="text-align: justify;">
                                         De acuerdo a los estatutos y reglamentos de la empresa 
-                                        <strong>ESTEVEZ.JOR SERVICIOS S.A. DE C.V.,</strong> su servidor (a) y colaborador (a)
+                                        <strong><t t-esc="doc.employee_id.company_id.name.upper()"/>,</strong> su servidor (a) y colaborador (a)
                                         “<strong>
                                             <t t-esc="doc.employee_id.name.upper()"/>
                                         </strong>”
@@ -107,7 +107,7 @@
                                 <div class="col-12 text-justify">
                                     <p style="text-align: justify;">
                                         Para amortizar la deuda autorizo a la empresa 
-                                        <strong>ESTEVEZ.JOR SERVICIOS S.A. DE C.V.,</strong> 
+                                        <strong><t t-esc="doc.employee_id.company_id.name.upper()"/>,</strong> 
                                         que inicie a cobrarme de manera 
                                         (<t t-if="doc.discount_type == 'weekly'">SEMANAL</t>
                                         <t t-elif="doc.discount_type == 'biweekly'">QUINCENAL</t>), 
@@ -154,7 +154,7 @@
                                         <strong>LEGAL DE</strong>
                                     </p>
                                     <p style="margin-bottom: 2px;">
-                                        <strong>ESTEVEZ.JOR SERVICIOS, S.A. DE C.V.</strong>
+                                        <strong><t t-esc="doc.employee_id.company_id.name.upper()"/></strong>
                                     </p>
                                 </div>
 
@@ -162,7 +162,7 @@
                                     <br />
                                     <p>______________________________________________</p>
                                     <p class="margin-bottom: 2px;">
-                                        <strong>ESTEVEZ JOR SERVICIOS, S.A.</strong>
+                                        <strong><t t-esc="doc.employee_id.company_id.name.upper()"/></strong>
                                     </p>
                                     <p class="margin-bottom: 2px;">
                                         <strong>DE C.V</strong>

@@ -5,7 +5,7 @@ class HrArea(models.Model):
     _description = 'Area'
 
     name = fields.Char('Nombre', required=True)
-    company_id = fields.Many2one('res.company', string='Empresa', ondelete='set null', readonly=True)
+    company_id = fields.Many2one('res.company', string='Empresa', ondelete='set null', readonly=True, default=lambda self: self.env.company)
     department_id = fields.Many2one('hr.department', string='Departamento')
     employee_ids = fields.One2many('hr.employee', 'area_id', string='Empleados')
     coordinator_id = fields.Many2one('hr.employee', string='Coordinador')
@@ -22,9 +22,10 @@ class HrArea(models.Model):
     @api.model_create_multi
     def create(self, vals_list):
         for vals in vals_list:
-            if 'department_id' in vals:
-             department = self.env['hr.department'].browse(vals['department_id'])
-             vals['company_id'] = department.company_id.id
+            if vals.get('department_id'):
+                department = self.env['hr.department'].browse(vals['department_id'])
+                if department.company_id:
+                    vals['company_id'] = department.company_id.id
         return super(HrArea, self).create(vals_list)
 
     def write(self, vals):

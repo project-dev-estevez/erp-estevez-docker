@@ -8,6 +8,7 @@
     'depends': ['base', 'hr', 'website_slides'],
     'data': [
         'security/ir.model.access.csv',        
+        'security/multi_company_rules.xml',
         'views/hr_state_views.xml',
         'views/hr_municipality_views.xml',
         'views/hr_establecimientos_views.xml',

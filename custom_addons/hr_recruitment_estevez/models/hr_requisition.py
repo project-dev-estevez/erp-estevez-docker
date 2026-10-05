@@ -9,6 +9,7 @@ class HrRequisition(models.Model):
     _description = 'Requisición de Personal'
     _inherit = ['mail.thread', 'mail.activity.mixin']
     _rec_name = 'name'
+    _check_company_auto = True
 
     name = fields.Char(string="Nombre", compute="_compute_name", store=True)
     workstation_job_id = fields.Many2one('hr.job', string="Puesto")
@@ -33,7 +34,7 @@ class HrRequisition(models.Model):
     requisition_number = fields.Char(string='Formato de Solicitud', readonly=True, default='DA-F0-TH-006')
     # Información del solicitante
     requestor_id = fields.Many2one('res.users', string="Solicitante", default=lambda self: self.env.user, readonly=True)
-    company_id = fields.Many2one('res.company', string="Empresa", related='requestor_id.company_id', readonly=True, store=False)
+    company_id = fields.Many2one('res.company', string="Empresa", required=True, index=True, readonly=True, default=lambda self: self.env.company)
     direction_id = fields.Many2one('hr.direction', string="Dirección", related='requestor_id.employee_id.direction_id', readonly=True, store=False)
     department_id = fields.Many2one('hr.department', string="Departamento", related='requestor_id.employee_id.department_id', readonly=True, store=False)
     job_id = fields.Many2one('hr.job', string="Puesto Solicitante", related='requestor_id.employee_id.job_id', readonly=True, store=False)
