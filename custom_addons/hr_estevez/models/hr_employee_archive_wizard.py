@@ -26,26 +26,32 @@ class HrEmployeeArchiveWizard(models.TransientModel):
     def confirm_archive(self):
         """Confirma la baja del empleado."""
         self.ensure_one()
-        # Archivar empleado
-        self.employee_id.write({
+
+        # skip_codeigniter_sync suprime el PUT de actualización que write() dispararía
+        # normalmente; la única notificación a CI3 es la llamada explícita de abajo.
+        self.employee_id.with_context(skip_codeigniter_sync=True).write({
             'active': False,
         })
-        
-        # Registrar la baja en el historial
+
+        # Registrar la baja en el historial de Odoo
         self.env['hr.employee.history'].create({
-            'employee_id': self.employee_id.id,
-            'date': self.termination_date,
-            'status': 'baja',
-            'reason': self.reason,
-            'possible_rehire': self.possible_rehire,
+            'employee_id':      self.employee_id.id,
+            'date':             self.termination_date,
+            'status':           'baja',
+            'reason':           self.reason,
+            'possible_rehire':  self.possible_rehire,
             'termination_type': self.termination_type,
         })
-        
-        # Sincronizar con CodeIgniter
+
+        # Sincronizar con CodeIgniter pasando los datos capturados por el wizard
         try:
-            self.employee_id._sync_codeigniter_archive()
+            self.employee_id._sync_codeigniter_archive(
+                termination_type=self.termination_type,
+                reason=self.reason,
+                termination_date=self.termination_date,
+                possible_rehire=self.possible_rehire,
+            )
         except Exception as e:
-            _logger.error(f"Error en sincronización de baja: {str(e)}")
-            # No detener el proceso, solo registrar error
-            
+            _logger.error(f"Error en sincronización de baja (empleado {self.employee_id.id}): {e}")
+
         return True

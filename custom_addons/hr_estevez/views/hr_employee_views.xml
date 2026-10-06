@@ -473,6 +473,7 @@
                                readonly="1" 
                                force_save="1"/>
                             <field name="establecimiento" string="Establecimiento" widget="selection"/>
+                            <field name="registro_patronal" string="Registro Patronal" widget="selection"/>
                         </group>
                     </group>
                     <group string="Información Bancaria">

@@ -23,4 +23,4 @@ class HrEmployeeHistory(models.Model):
         ('dismissal_misconduct', 'Despido por Faltas Injustificadas'),
         ('dismissal_performance', 'Despido por Bajo Desempeño'),
         ('dismissal_probity', 'Despido por Falta de Probidad'),
-    ], string='Tipo de Baja', required=True)
+    ], string='Tipo de Baja')

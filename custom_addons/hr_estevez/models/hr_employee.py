@@ -91,6 +91,17 @@ VIGILINER_TRACKED_FIELDS = {
     'license_number', 'license_expiration_date', 'license_permanent', 'image_512', 'active',
 }
 
+# Mapeo de claves internas de Odoo a los valores exactos del select tipo_baja en CI3
+# (fuente: application/views/personal/detalle-personal.php, línea 4747-4753)
+_TERMINATION_TYPE_MAP = {
+    'voluntary_resignation': 'Renuncia voluntaria',
+    'contract_end':          'Término de contrato',
+    'abandonment':           'Abandono',
+    'dismissal_misconduct':  'Despido faltas injustificadas',
+    'dismissal_performance': 'Despido bajo desempeño',
+    'dismissal_probity':     'Despido falta de probidad',
+}
+
 class EmployeeStudyField(models.Model):
     _name = 'employee.study.field'
     _description = 'Campo de Estudio del Empleado'
@@ -237,8 +248,14 @@ class HrEmployee(models.Model):
         ('grupo_back', 'Grupo BackBone'),
         ('kuali', 'Kuali Digital'),
         ('makili', 'Makili'),
-        ('vigiliner', 'Vigiliner')                
+        ('vigiliner', 'Vigiliner')
     ], string='Establecimiento')
+
+    registro_patronal = fields.Selection([
+        ('C5350000100', 'C5350000100 - Tlalnepantla de Baz, Edo. Méx'),
+        ('E4673824104', 'E4673824104 - Los Mochis, Sinaloa'),
+        ('H0814082104', 'H0814082104 - Zacatecas'),
+    ], string='Registro Patronal', required=False)
 
     bank_id = fields.Many2one('res.bank', string='Banco')
     clabe = fields.Char(
@@ -1112,6 +1129,7 @@ class HrEmployee(models.Model):
         
         patron_nombre = get_selection_label('patron', employee.patron)
         establecimiento_nombre = get_selection_label('establecimiento', employee.establecimiento)
+        registro_patronal_label = get_selection_label('registro_patronal', employee.registro_patronal)
 
         ocupacion_nombre = ""
         ocupacion_id = vals.get('occupation_id') or employee.occupation_id.id
@@ -1192,6 +1210,7 @@ class HrEmployee(models.Model):
             
             # 'patron_sync': patron_nombre,
             'establecimiento': establecimiento_nombre,
+            'registro_patronal': registro_patronal_label,
             'direccion_sync': direccion_nom,
             'departamento_sync': depto_nom,
             'area_sync': area_nom,
@@ -1618,93 +1637,101 @@ class HrEmployee(models.Model):
             
         }
     
-    def _sync_codeigniter_archive(self):
-        """Sincroniza el archivado del empleado con CodeIgniter"""
+    def _sync_codeigniter_archive(self, termination_type=None, reason=None, termination_date=None, possible_rehire=None):
+        """Sincroniza el archivado del empleado con CodeIgniter.
+
+        Los parámetros opcionales los provee el wizard de baja; cuando se llama
+        desde action_archive() (botón estándar) se omiten y el payload queda vacío
+        en esos campos, lo cual CI3 acepta sin error.
+        """
         api_url = self.env['ir.config_parameter'].get_param('codeigniter.api_url')
         api_token = self.env['ir.config_parameter'].get_param('codeigniter.api_token')
-        
+
         if not api_url or not api_token:
             _logger.error("Configuración de API para CodeIgniter faltante")
             return False
 
-        # Preparar payload
+        # Construir base_url eliminando el sufijo /empleados si está presente,
+        # ya que archive_employee es un endpoint distinto en el mismo controlador.
+        normalized = api_url.rstrip('/')
+        base_url = normalized[:-len('/empleados')] if normalized.endswith('/empleados') else normalized
+        endpoint = f"{base_url}/archive_employee/{self.id}"
+
+        tipo_baja_ci3 = _TERMINATION_TYPE_MAP.get(termination_type, termination_type or '')
+        fecha_str = (
+            termination_date.strftime('%Y-%m-%d %H:%M:%S')
+            if termination_date
+            else fields.Datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        )
+
+        _REHIRE_MAP = {'viable': 1, 'inviable': 0}
+        termino = _REHIRE_MAP.get(possible_rehire, 0)
+
         payload = {
-            'action': 'archive',
-            'odoo_id': self.id,
+            'odoo_id':   self.id,
+            'tipo_baja': tipo_baja_ci3,
+            'motivo':    reason or '',
+            'fecha':     fecha_str,
+            'termino':   termino,
         }
 
         try:
-            endpoint = f"{api_url}/empleados/{self.id}/archive"
-            headers = {
-                'Authorization': f'Bearer {api_token}',
-                'Content-Type': 'application/json'
-            }
-            
             response = requests.post(
                 endpoint,
                 json=payload,
-                headers=headers,
+                headers={
+                    'Authorization': f'Bearer {api_token}',
+                    'Content-Type': 'application/json',
+                },
                 timeout=30,
-                verify=False
+                verify=False,
             )
-            
-            _logger.info(f"Respuesta CI para archivado: {response.status_code} - {response.text}")
-            
+            _logger.info(f"Respuesta CI (archive) empleado {self.id}: {response.status_code} - {response.text}")
             if response.status_code == 200:
                 return True
-            else:
-                _logger.error(f"Error CI: {response.status_code} - {response.text}")
-                return False
-                    
+            _logger.error(f"Error CI (archive) empleado {self.id}: {response.status_code} - {response.text}")
+            return False
         except Exception as e:
-            _logger.error(f"Error de conexión con CodeIgniter: {str(e)}")
+            _logger.error(f"Error de conexión CI (archive) empleado {self.id}: {e}")
             return False
 
     def _sync_codeigniter_unarchive(self):
-        """Sincroniza la reactivación del empleado con CodeIgniter"""
+        """Sincroniza la reactivación del empleado con CodeIgniter."""
         api_url = self.env['ir.config_parameter'].get_param('codeigniter.api_url')
         api_token = self.env['ir.config_parameter'].get_param('codeigniter.api_token')
-        
+
         if not api_url or not api_token:
             _logger.error("Configuración de API para CodeIgniter faltante")
             return False
 
-        payload = {
-            'action': 'unarchive',
-            'odoo_id': self.id,
-        }
+        normalized = api_url.rstrip('/')
+        base_url = normalized[:-len('/empleados')] if normalized.endswith('/empleados') else normalized
+        endpoint = f"{base_url}/unarchive_employee/{self.id}"
 
         try:
-            endpoint = f"{api_url}/empleados/{self.id}/unarchive"
-            headers = {
-                'Authorization': f'Bearer {api_token}',
-                'Content-Type': 'application/json'
-            }
-            
             response = requests.post(
                 endpoint,
-                json=payload,
-                headers=headers,
+                json={'odoo_id': self.id},
+                headers={
+                    'Authorization': f'Bearer {api_token}',
+                    'Content-Type': 'application/json',
+                },
                 timeout=30,
-                verify=False
+                verify=False,
             )
-            
-            _logger.info(f"Respuesta CI para reactivación: {response.status_code} - {response.text}")
-            
+            _logger.info(f"Respuesta CI (unarchive) empleado {self.id}: {response.status_code} - {response.text}")
             if response.status_code == 200:
                 return True
-            else:
-                _logger.error(f"Error CI: {response.status_code} - {response.text}")
-                return False
-                    
+            _logger.error(f"Error CI (unarchive) empleado {self.id}: {response.status_code} - {response.text}")
+            return False
         except Exception as e:
-            _logger.error(f"Error de conexión con CodeIgniter: {str(e)}")
+            _logger.error(f"Error de conexión CI (unarchive) empleado {self.id}: {e}")
             return False
 
     # Sobrescribir métodos estándar para manejar archivado/desarchivado directo
     def action_archive(self):
         _logger.info(f"Archivando empleados: {self.ids}")
-        res = super(HrEmployee, self).action_archive()
+        res = super(HrEmployee, self.with_context(skip_codeigniter_sync=True)).action_archive()
         for employee in self:
             try:
                 employee._sync_codeigniter_archive()
@@ -1714,7 +1741,7 @@ class HrEmployee(models.Model):
 
     def action_unarchive(self):
         
-        res = super(HrEmployee, self).action_unarchive()
+        res = super(HrEmployee, self.with_context(skip_codeigniter_sync=True)).action_unarchive()
         for employee in self:
             try:
                 employee._sync_codeigniter_unarchive()
