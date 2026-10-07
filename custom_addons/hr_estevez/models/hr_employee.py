@@ -1210,7 +1210,7 @@ class HrEmployee(models.Model):
             'telefono_contacto': employee.emergency_phone or '',
             'nombre_pareja': pareja,
             
-            # 'patron_sync': patron_nombre,
+            'patron_sync': patron_nombre,
             'establecimiento': establecimiento_nombre,
             'registro_patronal': registro_patronal_label,
             'direccion_sync': direccion_nom,
