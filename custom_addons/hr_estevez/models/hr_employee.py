@@ -257,6 +257,7 @@ class HrEmployee(models.Model):
         ('H0814082104', 'H0814082104 - Zacatecas'),
         ('H4814883107', 'H4814883107 - Kuali'),
         ('C5361185106', 'C5361185106 - Vigiliner / Grupo BackBone'),
+        ('B3613675108', 'B3613675108'),
     ], string='Registro Patronal', required=False)
 
     bank_id = fields.Many2one('res.bank', string='Banco')
