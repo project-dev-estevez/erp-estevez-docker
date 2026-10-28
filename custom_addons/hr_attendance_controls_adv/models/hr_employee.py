@@ -83,6 +83,7 @@ class HrEmployeeFaces(models.Model):
     descriptor = fields.Text(string='Face Descriptor')
     has_descriptor = fields.Boolean(string="Has Face Descriptor",default=False, compute='_compute_has_descriptor', readonly=True, store=True)
     employee_id = fields.Many2one("hr.employee", "User", index=True, ondelete='cascade')
+    company_id = fields.Many2one('res.company', string='Empresa', related='employee_id.company_id', store=True, index=True, readonly=True)
 
     @api.depends('descriptor')
     def _compute_has_descriptor(self):

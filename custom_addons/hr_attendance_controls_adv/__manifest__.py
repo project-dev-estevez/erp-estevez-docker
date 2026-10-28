@@ -50,6 +50,7 @@
     ],
     "data": [
         "security/ir.model.access.csv",
+        "security/multi_company_rules.xml",
         "data/geolocation_data.xml",
         "views/res_config_settings.xml",
         "views/hr_attendance_reasons_view.xml",

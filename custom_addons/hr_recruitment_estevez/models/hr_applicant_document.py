@@ -9,6 +9,7 @@ class HrApplicantDocument(models.Model):
 
     name = fields.Char(string="Nombre del Documento", required=True)
     applicant_id = fields.Many2one('hr.applicant', string="Aplicante", required=True)
+    company_id = fields.Many2one('res.company', string='Empresa', related='applicant_id.company_id', store=True, index=True, readonly=True)
     attached = fields.Boolean(string="Adjunto", compute="_compute_attached")
 
     def _normalize_doc_name(self, name):

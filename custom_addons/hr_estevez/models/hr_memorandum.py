@@ -12,6 +12,7 @@ class HrMemorandum(models.Model):
     _order = 'create_date desc'
 
     employee_id = fields.Many2one('hr.employee', string='Empleado', required=True, ondelete='cascade')
+    company_id = fields.Many2one('res.company', string='Empresa', related='employee_id.company_id', store=True, index=True, readonly=True)
     date = fields.Datetime(string='Fecha del Acta', required=True)
     description = fields.Html(string='Descripción / Hechos', required=True, sanitize=True)   
     fraction = fields.Char(string='Fraccion')

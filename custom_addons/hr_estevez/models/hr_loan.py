@@ -10,6 +10,7 @@ class HrLoan(models.Model):
     _order = 'create_date desc'
 
     employee_id = fields.Many2one('hr.employee', string='Empleado', required=True, ondelete='cascade')
+    company_id = fields.Many2one('res.company', string='Empresa', related='employee_id.company_id', store=True, index=True, readonly=True)
     request_date = fields.Date(string='Fecha de Solicitud del Préstamo', required=True)
     application_date = fields.Date(string='Fecha de Aplicación del Préstamo', required=True)
     start_payment_date = fields.Date(string='Fecha de Inicio de Cobro', required=True)

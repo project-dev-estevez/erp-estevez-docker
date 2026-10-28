@@ -16,6 +16,7 @@
         "security/hr_recruitment_security.xml",
         "security/hr_recruitment_driving_test_security.xml",
         "security/ir.model.access.csv",
+        "security/multi_company_rules.xml",
         
         # Archivos de datos
         "data/hr_requisition_uniform_data.xml",

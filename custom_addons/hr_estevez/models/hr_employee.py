@@ -1290,32 +1290,32 @@ class HrEmployee(models.Model):
 
 
     def _get_next_employee_number(self, company_id=False):
-        """Obtener el siguiente número de empleado por empresa"""
+        """Obtener el siguiente número de empleado por empresa, solo dígitos.
+
+        CodeIgniter guarda el número como INT(11), así que no lleva letras. Las empresas se
+        separan por rangos: cada una arranca en su base (Kuali → 300700, Estevez → 00001, ver
+        `res.company._get_employee_number_base`) y continúa desde su número más alto.
+        """
         # Si no se proporciona company_id, usar la compañía actual del entorno
         if not company_id:
             company_id = self.env.company.id
+        company = self.env['res.company'].sudo().browse(company_id)
 
-        # Buscar el último empleado por empresa
-        last_employee = self.search([
+        # sudo + archivados: el consecutivo no debe depender de lo que el usuario puede ver
+        numbers = self.sudo().with_context(active_test=False).search([
             ('company_id', '=', company_id),
             ('employee_number', '!=', False)
-        ], order='id desc', limit=1)
+        ]).mapped('employee_number')
 
-        if last_employee and last_employee.employee_number:
-            # Intentar extraer el número y incrementar
-            try:
-                # Asumimos que el employee_number es un string numérico
-                last_number = int(last_employee.employee_number)
-                next_number = last_number + 1
-            except (ValueError, TypeError):
-                # Si no es numérico, empezar desde 1
-                next_number = 1
-        else:
-            # Primer empleado en la empresa
-            next_number = 1
+        last_number = company._get_employee_number_base()
+        for number in numbers:
+            # Tolera números viejos con prefijo de letra (ej. K00003) al calcular el máximo
+            match = re.fullmatch(r'[A-Za-z]*(\d+)', number.strip())
+            if match:
+                last_number = max(last_number, int(match.group(1)))
 
-        # Formatear con ceros a la izquierda (5 dígitos)
-        return str(next_number).zfill(5)
+        # Formatear con ceros a la izquierda (mínimo 5 dígitos)
+        return str(last_number + 1).zfill(5)
     
     def generate_random_barcode(self):
         """Sobrescribir el método de generar barcode para usar nuestro número por empresa"""

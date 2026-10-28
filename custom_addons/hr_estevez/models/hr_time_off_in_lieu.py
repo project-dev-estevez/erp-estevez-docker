@@ -8,6 +8,7 @@ class HrTimeOffInLieu(models.Model):
     
     name = fields.Char(string="Descripción", required=True)
     employee_id = fields.Many2one('hr.employee', string="Empleado", required=True, ondelete='cascade')
+    company_id = fields.Many2one('res.company', string='Empresa', related='employee_id.company_id', store=True, index=True, readonly=True)
     request_date = fields.Date(string="Fecha de Solicitud", default=fields.Date.today, required=True)
     request_date_from = fields.Date(string="Fecha Inicio", required=True)
     request_date_to = fields.Date(string="Fecha Fin", required=True)

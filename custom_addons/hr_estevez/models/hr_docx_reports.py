@@ -461,8 +461,8 @@ class HrEmployeeDocxReports(models.Model):
               f'C. {emp}, DURANTE LA RELACIÓN LABORAL QUE SE DA POR TERMINADA '
               f'EL DÍA {today}.'),
             ('SÉPTIMA.', f' DECLARAN: EL C. {emp}, QUE ESTA CONFORME CON LA '
-              f'CANTIDAD Y CONCEPTOS CITADOS POR LA EMPRESA ESTEVEZ.JOR '
-              f'SERVICIOS, S.A. DE C.V., EN LA CLÁUSULA ANTERIOR YA QUE EN '
+              f'CANTIDAD Y CONCEPTOS CITADOS POR LA EMPRESA {co}, '
+              f'EN LA CLÁUSULA ANTERIOR YA QUE EN '
               f'SU OPORTUNIDAD SIEMPRE RECIBIÓ DE MANERA ININTERRUMPIDA EL '
               f'PAGO DE LOS SÉPTIMOS DÍAS, DÍAS FESTIVOS, Y HORAS EXTRAS, '
               f'LOS SALARIOS DEVENGADOS, ASÍ COMO LAS VACACIONES, PRIMA '
@@ -665,7 +665,7 @@ class HrEmployeeDocxReports(models.Model):
         for i, (text, bold) in enumerate([
             ('LIC. EDWIN GONZALEZ SORIA', True),
             ('APODERADO LEGAL', True),
-            ('ESTEVEZ.JOR SERVICIOS, S.A. DE C.V.', True),
+            (co, True),
         ]):
             para = left_sig.paragraphs[0] if i == 0 else left_sig.add_paragraph()
             para.alignment = C
@@ -963,8 +963,8 @@ class HrContractDocxReports(models.Model):
               'O AL PERSONAL DE "EL PATRON".'),
             ('VIGESIMA CUARTA.', ' "EL TRABAJADOR" MANIFIESTA CONOCER '
               'PERFECTAMENTE EL ALCANCE Y PROCEDIMIENTOS DEL AVISO DE '
-              'PRIVACIDAD QUE OPERA EN LA EMPRESA ESTEVEZ.JOR SERVICIOS S.A '
-              'DE C.V PARA EFECTOS DE QUE SE VEA SALVAGUARDADA LA INFORMACION '
+              f'PRIVACIDAD QUE OPERA EN LA EMPRESA {co} '
+              'PARA EFECTOS DE QUE SE VEA SALVAGUARDADA LA INFORMACION '
               'DE SUS DATOS PERSONALES.'),
             ('VIGESIMA QUINTA.', ' "LAS PARTES" ESTABLECEN QUE "EL PATRON" '
               'RESPETA PLENAMENTE LA DIGNIDAD HUMANA, PROPICIA EL TRABAJO '
@@ -1107,7 +1107,7 @@ class HrContractDocxReports(models.Model):
 
         b.p(doc, [
             ('El suscripto de la presente es trabajador de la empresa '
-             'ESTEVEZ.JOR SERVICIOS, S.A. DE C.V., toda vez que tiene '
+             f'{co}, toda vez que tiene '
              'celebrado contrato individual del trabajo por tiempo CERO DIAS '
              'con esa empresa, mismo contrato que a la fecha se encuentra '
              'vigente.', False),
@@ -1115,7 +1115,7 @@ class HrContractDocxReports(models.Model):
 
         b.p(doc, [
             ('Manifiesto que se me ha dado a conocer el Plan de Previsión '
-             'Social de la empresa ESTEVEZ.JOR SERVICIOS, S.A. DE C.V., y '
+             f'Social de la empresa {co}, y '
              'estoy enterado de las condiciones del mismo; de manera voluntaria '
              'solicito participar de los beneficios previstos en el Plan a '
              'partir de esta fecha.', False),
@@ -1132,8 +1132,8 @@ class HrContractDocxReports(models.Model):
         b.p(doc, [
             ('Por medio del presente escrito y de conformidad a la solicitud '
              'presentada por usted para participar de los beneficios previstos '
-             'en el Plan de Previsión Social de la empresa ESTEVEZ.JOR '
-             'SERVICIOS, S.A. DE C.V. y, toda vez que usted cumple con los '
+             f'en el Plan de Previsión Social de la empresa {co} '
+             'y, toda vez que usted cumple con los '
              'requisitos de elegibilidad establecidos en el referido Plan, '
              'comunico a usted que ha sido aceptado para gozar de los '
              'beneficios de dicho Plan con el carácter de participante.', False),
@@ -1152,6 +1152,7 @@ class HrContractDocxReports(models.Model):
         self.ensure_one()
         b = _DocxBuilder
         emp_name = self.employee_id.name.upper() if self.employee_id else 'N/A'
+        co = (self.company_id.name or '').upper()
         today = date.today()
         mes = _DocxBuilder.MESES_ES[today.month].lower().capitalize()
 
@@ -1172,8 +1173,8 @@ class HrContractDocxReports(models.Model):
 
         b.p(doc, [
             ('ADDENDUM AL CONTRATO INDIVIDUAL DE TRABAJO EL QUE CELEBRAN POR '
-             'UNA PARTE LA SOCIEDAD DENOMINADA "ESTEVEZ.JOR SERVICIOS S.A. DE '
-             'C.V..", EN ADELANTE EL "PATRÓN", REPRESENTADA EN ESTE ACTO POR '
+             f'UNA PARTE LA SOCIEDAD DENOMINADA "{co}", '
+             'EN ADELANTE EL "PATRÓN", REPRESENTADA EN ESTE ACTO POR '
              'EL C. EDWIN GONZALEZ SORIA Y POR OTRA PARTE EL C. ', False),
             (emp_name, True),
             (' A QUIEN EN LO SUCESIVO SE LE DENOMINARA EL "TRABAJADOR" '

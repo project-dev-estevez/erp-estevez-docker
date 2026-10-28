@@ -23,16 +23,33 @@ class ResUsers(models.Model):
         """
         # Primero intenta el dominio normal (por login)
         domain = super()._get_login_domain(login)
-        
-        # Buscar por employee_number si no se encuentra por login
+
+        # Solo se acepta el employee_number si identifica a un único empleado; con
+        # empresas que repiten numeración el login quedaría ambiguo.
+        if self._find_employee_by_number(login) is None:
+            return domain
+
         # Usamos un OR para buscar tanto por login como por employee_number
-        employee_domain = [
+        return [
             '|',
             ('login', '=', login),
             ('employee_ids.employee_number', '=', login)
         ]
-        
-        return employee_domain
+
+    @api.model
+    def _find_employee_by_number(self, employee_number):
+        """Empleado con ese número, o None si no existe o hay colisión entre empresas."""
+        if not employee_number:
+            return None
+        employees = self.env['hr.employee'].sudo().search([
+            ('employee_number', '=', employee_number)
+        ], limit=2)
+        if len(employees) > 1:
+            _logger.warning(
+                "Login rechazado: el número de empleado %s está repetido en las empresas %s",
+                employee_number, ', '.join(employees.mapped('company_id.name')))
+            return None
+        return employees or None
 
     @classmethod
     def _login(cls, db, credential, user_agent_env):
@@ -50,10 +67,8 @@ class ResUsers(models.Model):
             with cls.pool.cursor() as cr:
                 self = api.Environment(cr, 1, {})[cls._name]  # SUPERUSER_ID = 1
                 
-                # Buscar empleado por número de empleado
-                employee = self.env['hr.employee'].sudo().search([
-                    ('employee_number', '=', login)
-                ], limit=1)
+                # Buscar empleado por número de empleado (aborta si hay colisión)
+                employee = self._find_employee_by_number(login)
                 
                 if not employee or not employee.user_id:
                     _logger.info("Login failed: no employee or user found for employee_number %s", login)

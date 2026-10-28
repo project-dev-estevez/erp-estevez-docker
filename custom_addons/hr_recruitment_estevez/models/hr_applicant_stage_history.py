@@ -20,6 +20,7 @@ class HrApplicantStageHistory(models.Model):
         index=True,
         help='Candidato al que pertenece este registro de historial'
     )
+    company_id = fields.Many2one('res.company', string='Empresa', related='applicant_id.company_id', store=True, index=True, readonly=True)
     
     stage_id = fields.Many2one(
         'hr.recruitment.stage', 
