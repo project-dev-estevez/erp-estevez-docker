@@ -1,0 +1,29 @@
+<odoo>
+    <!-- Registros patronales iniciales; después se administran desde Configuración > Registros Patronales -->
+    <data noupdate="1">
+        <record id="registro_patronal_C5350000100" model="hr.registro.patronal">
+            <field name="code">C5350000100</field>
+            <field name="name">Tlalnepantla de Baz, Edo. Méx</field>
+        </record>
+        <record id="registro_patronal_E4673824104" model="hr.registro.patronal">
+            <field name="code">E4673824104</field>
+            <field name="name">Los Mochis, Sinaloa</field>
+        </record>
+        <record id="registro_patronal_H0814082104" model="hr.registro.patronal">
+            <field name="code">H0814082104</field>
+            <field name="name">Zacatecas</field>
+        </record>
+        <record id="registro_patronal_H4814883107" model="hr.registro.patronal">
+            <field name="code">H4814883107</field>
+            <field name="name">Kuali</field>
+        </record>
+        <record id="registro_patronal_C5361185106" model="hr.registro.patronal">
+            <field name="code">C5361185106</field>
+            <field name="name">Vigiliner / Grupo BackBone</field>
+        </record>
+        <record id="registro_patronal_B3613675108" model="hr.registro.patronal">
+            <field name="code">B3613675108</field>
+            <field name="name">Durango</field>
+        </record>
+    </data>
+</odoo>

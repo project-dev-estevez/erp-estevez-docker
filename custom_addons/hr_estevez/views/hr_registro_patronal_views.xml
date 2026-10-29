@@ -1,0 +1,71 @@
+<odoo>
+    <data>
+
+        <record id="view_hr_registro_patronal_list" model="ir.ui.view">
+            <field name="name">hr.registro.patronal.list</field>
+            <field name="model">hr.registro.patronal</field>
+            <field name="arch" type="xml">
+                <list string="Registros Patronales">
+                    <field name="code"/>
+                    <field name="name"/>
+                    <field name="employee_count"/>
+                    <field name="active" column_invisible="True"/>
+                </list>
+            </field>
+        </record>
+
+        <record id="view_hr_registro_patronal_form" model="ir.ui.view">
+            <field name="name">hr.registro.patronal.form</field>
+            <field name="model">hr.registro.patronal</field>
+            <field name="arch" type="xml">
+                <form string="Registro Patronal">
+                    <sheet>
+                        <div class="oe_button_box" name="button_box">
+                            <button name="action_view_employees" type="object" class="oe_stat_button" icon="fa-users">
+                                <field name="employee_count" widget="statinfo" string="Empleados"/>
+                            </button>
+                        </div>
+                        <widget name="web_ribbon" title="Archivado" bg_color="text-bg-danger" invisible="active"/>
+                        <group>
+                            <group>
+                                <field name="code" placeholder="e.g. C5350000100"/>
+                                <field name="name" placeholder="e.g. Tlalnepantla de Baz, Edo. Méx"/>
+                                <field name="active" invisible="1"/>
+                            </group>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="view_hr_registro_patronal_search" model="ir.ui.view">
+            <field name="name">hr.registro.patronal.search</field>
+            <field name="model">hr.registro.patronal</field>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="code"/>
+                    <field name="name"/>
+                    <filter name="archived" string="Archivados" domain="[('active', '=', False)]"/>
+                </search>
+            </field>
+        </record>
+
+        <record id="action_hr_registro_patronal" model="ir.actions.act_window">
+            <field name="name">Registros Patronales</field>
+            <field name="res_model">hr.registro.patronal</field>
+            <field name="view_mode">list,form</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">Crea un nuevo registro patronal</p>
+                <p>Los registros patronales aparecen como opciones en la ficha del empleado.</p>
+            </field>
+        </record>
+
+        <menuitem id="menu_hr_registro_patronal"
+                  name="Registros Patronales"
+                  action="action_hr_registro_patronal"
+                  parent="hr.menu_config_employee"
+                  sequence="7"
+                  groups="hr.group_hr_user"/>
+
+    </data>
+</odoo>
