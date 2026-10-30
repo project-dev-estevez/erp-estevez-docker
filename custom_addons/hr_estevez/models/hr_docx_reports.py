@@ -8,14 +8,15 @@ import io
 import base64
 import logging
 from datetime import date, datetime
+from xml.sax.saxutils import escape as xml_escape
 from PIL import Image, ImageDraw, ImageOps
 
 from docx import Document
-from docx.shared import Inches, Pt
+from docx.shared import Inches, Pt, Twips
 from docx.enum.table import WD_TABLE_ALIGNMENT
 from docx.enum.text import WD_ALIGN_PARAGRAPH
-from docx.oxml.ns import qn
-from docx.oxml import OxmlElement
+from docx.oxml.ns import nsdecls, qn
+from docx.oxml import OxmlElement, parse_xml
 
 from odoo import fields, models
 from odoo.tools.misc import file_path
@@ -338,9 +339,15 @@ class HrEmployeeDocxReports(models.Model):
             for attr in list(lang.attrib):
                 del lang.attrib[attr]
             lang.set(qn('w:val'), 'es-MX')
+        # Espaciado 0 e interlineado sencillo explícitos: sin esto Word aplica su espaciado
+        # por defecto y la carta (igual que la del sistema anterior) se pasaba a una 2.ª hoja
         ppr_default = defaults.find(qn('w:pPrDefault'))
         if ppr_default is not None:
             defaults.remove(ppr_default)
+        defaults.append(parse_xml(
+            f'<w:pPrDefault {nsdecls("w")}><w:pPr>'
+            '<w:spacing w:before="0" w:after="0" w:line="240" w:lineRule="auto"/>'
+            '</w:pPr></w:pPrDefault>'))
 
     @staticmethod
     def _carta_patronal_table(doc, widths):
@@ -493,9 +500,6 @@ class HrEmployeeDocxReports(models.Model):
     def _convenio_setup_document(doc):
         """Replica estilos y página del convenio anterior: Calibri 10 pt en
         docDefaults, sin espaciado entre párrafos, carta y márgenes de 1"."""
-        from docx.oxml import parse_xml
-        from docx.oxml.ns import nsdecls
-        from docx.shared import Twips
         styles = doc.styles.element
         old = styles.find(qn('w:docDefaults'))
         new = parse_xml(
@@ -546,7 +550,6 @@ class HrEmployeeDocxReports(models.Model):
 
     @staticmethod
     def _convenio_cell_par(text, bold=False, align=None, after=10):
-        from xml.sax.saxutils import escape as xml_escape
         jc = f'<w:jc w:val="{align}"/>' if align else ''
         rpr = '<w:rPr><w:b/><w:bCs/></w:rPr>' if bold else ''
         return (
@@ -559,7 +562,6 @@ class HrEmployeeDocxReports(models.Model):
         """Tabla FECHA DE INGRESO / CATEGORÍA / HORARIO: sangría de 720,
         etiqueta con borde derecho e inferior, valor con borde izquierdo e
         inferior (igual que el documento anterior)."""
-        from docx.oxml.ns import nsdecls
         border = '<w:{side} w:val="single" w:sz="5" w:space="0" w:color="000000"/>'
         trs = ''
         for i, (label, value) in enumerate(rows):
@@ -589,7 +591,6 @@ class HrEmployeeDocxReports(models.Model):
     @classmethod
     def _convenio_firmas_table(cls, doc, empresa, empleado):
         """Bloque de firmas: tabla 2x4 sin bordes, como el documento anterior."""
-        from docx.oxml.ns import nsdecls
         p = cls._convenio_cell_par
 
         def tc(content, valign=False):
@@ -617,7 +618,6 @@ class HrEmployeeDocxReports(models.Model):
 
     @staticmethod
     def _convenio_append_table(doc, tbl_xml):
-        from docx.oxml import parse_xml
         body = doc.element.body
         tbl = parse_xml(tbl_xml)
         sect = body.find(qn('w:sectPr'))
@@ -651,7 +651,6 @@ class HrEmployeeDocxReports(models.Model):
     def _convenio_fecha_terminacion(self, today):
         """Fecha de la última baja registrada; si el último movimiento no es
         una baja, la fecha de hoy (zona horaria del usuario)."""
-        from odoo import fields
         last = self.env['hr.employee.history'].search(
             [('employee_id', '=', self.id)], order='date desc, id desc', limit=1)
         if last and last.status == 'baja' and last.date:
@@ -675,7 +674,6 @@ class HrEmployeeDocxReports(models.Model):
         return ', '.join(filter(None, [calle, zona, estado])).upper() or 'N/A'
 
     def action_download_convenio_salida_docx(self):
-        from odoo import fields
         self.ensure_one()
         emp = (self.name or '').upper()
         co = self._convenio_empresa()
