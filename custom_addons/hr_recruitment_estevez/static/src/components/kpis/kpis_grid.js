@@ -299,9 +299,9 @@ export class KpisGrid extends Component {
 
     async calculatePendingRequisitions() {
         try {
-            // ✅ Contar requisiciones en estado 'to_approve' (por aprobar)
+            // Requisiciones esperando aprobación (Dirección o final)
             let domain = [
-                ["state", "=", "to_approve"]  // Estado por aprobar
+                ["state", "in", ["to_approve", "first_approval"]]
             ];
             
             // ✅ Si quieres aplicar filtros de fecha, puedes usar:
@@ -421,7 +421,7 @@ export class KpisGrid extends Component {
             name: "📋 Requisiciones por Aprobar",
             res_model: "hr.requisition",
             domain: [
-                ["state", "=", "to_approve"]
+                ["state", "in", ["to_approve", "first_approval"]]
             ],
             views: [[false, "list"], [false, "form"]],
             context: {
