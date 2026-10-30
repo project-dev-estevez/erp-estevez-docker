@@ -1,9 +1,18 @@
+import re
+
 from odoo import api, models, fields, _
+from odoo.exceptions import UserError
 from datetime import date, datetime
 from dateutil.relativedelta import relativedelta 
 import logging
 
 _logger = logging.getLogger(__name__)
+
+# Nombres automáticos: "Contrato Inicial" (el primero), "Contrato N" (renovaciones) y
+# "Contrato Final" (tipo de contrato indeterminado). Un nombre escrito a mano no se toca.
+INITIAL_CONTRACT_NAME = 'Contrato Inicial'
+FINAL_CONTRACT_NAME = 'Contrato Final'
+_AUTO_CONTRACT_NAME_RE = re.compile(r'^Contrato (Inicial|Final|\d+)$')
 
 class HrContract(models.Model):
     
@@ -136,25 +145,95 @@ class HrContract(models.Model):
             # Generar el nombre del archivo dinámicamente
             record.document_filename = f"Contrato {record.id or 'nuevo'}.pdf"
 
-    def create(self, vals):
-        employee_id = vals.get('employee_id')
-        if employee_id:
-            # Contar contratos previos del empleado
-            contract_count = self.env['hr.contract'].search_count([
-                ('employee_id', '=', employee_id)
-            ])
-            vals['name'] = f"Contrato {contract_count + 1}"
-            employee = self.env['hr.employee'].browse(employee_id)
-            vals['work_location'] = employee.work_location_id.name if employee.work_location_id else ''
-            vals['work_direction'] = employee.direction_id.name if employee.direction_id else ''
-            vals['work_area'] = employee.area_id.name if employee.area_id else ''
-            vals['department_id'] = employee.department_id.id if employee.department_id else False
-            vals['job_id'] = employee.job_id.id if employee.job_id else False
+    @api.model_create_multi
+    def create(self, vals_list):
+        for vals in vals_list:
+            employee_id = vals.get('employee_id')
+            if employee_id:
+                self._check_can_create_contract(employee_id)
+                contract_type = self.env['hr.contract.type'].browse(vals.get('contract_type_id'))
+                vals['name'] = self._get_auto_contract_name(employee_id, contract_type)
+                employee = self.env['hr.employee'].browse(employee_id)
+                vals['work_location'] = employee.work_location_id.name if employee.work_location_id else ''
+                vals['work_direction'] = employee.direction_id.name if employee.direction_id else ''
+                vals['work_area'] = employee.area_id.name if employee.area_id else ''
+                vals['department_id'] = employee.department_id.id if employee.department_id else False
+                vals['job_id'] = employee.job_id.id if employee.job_id else False
 
-        # Determinar el estado inicial usando función separada
-        vals['state'] = self._get_initial_state(vals)
+            # Determinar el estado inicial usando función separada
+            vals['state'] = self._get_initial_state(vals)
 
-        return super(HrContract, self).create(vals)
+        return super(HrContract, self).create(vals_list)
+
+    def write(self, vals):
+        res = super().write(vals)
+        # Al cambiar el tipo de contrato se actualiza el nombre automático (p. ej. a "Contrato Final")
+        if 'contract_type_id' in vals and 'name' not in vals:
+            for contract in self.filtered(lambda c: c.employee_id and c._has_auto_name()):
+                name = contract._get_auto_contract_name(
+                    contract.employee_id.id, contract.contract_type_id, before_id=contract.id)
+                if contract.name != name:
+                    super(HrContract, contract).write({'name': name})
+        return res
+
+    @api.model
+    def _is_indefinite_contract_type(self, contract_type):
+        """Tipo de contrato "Indeterminado" (en cualquier idioma en que se haya capturado)."""
+        if not contract_type:
+            return False
+        names = {contract_type.name, contract_type.with_context(lang='en_US').name}
+        return any('indetermin' in (name or '').lower() for name in names)
+
+    @api.model
+    def _get_auto_contract_name(self, employee_id, contract_type, before_id=None):
+        """Inicial para el primer contrato del empleado, Final si es indeterminado y
+        "Contrato N" para los demás. ``before_id``: id del contrato ya guardado, para contar
+        solo los anteriores a él."""
+        if self._is_indefinite_contract_type(contract_type):
+            return FINAL_CONTRACT_NAME
+        domain = [('employee_id', '=', employee_id)]
+        if before_id:
+            domain.append(('id', '<', before_id))
+        previous = self.with_context(active_test=False).search_count(domain)
+        return INITIAL_CONTRACT_NAME if not previous else f"Contrato {previous + 1}"
+
+    def _has_auto_name(self):
+        self.ensure_one()
+        return not self.name or bool(_AUTO_CONTRACT_NAME_RE.match(self.name))
+
+    @api.model
+    def _get_blocking_contract(self, employee_id):
+        """Contrato que impide crear uno nuevo: uno en borrador o en proceso, o el más
+        reciente si está vencido. Solo se puede crear un contrato nuevo cuando el actual
+        está cancelado."""
+        contracts = self.with_context(active_test=False).search(
+            [('employee_id', '=', employee_id)], order='date_start desc, id desc')
+        pending = contracts.filtered(lambda c: c.state in ('draft', 'open'))
+        if pending:
+            return pending[0]
+        if contracts[:1].state == 'close':
+            return contracts[:1]
+        return self.browse()
+
+    @api.model
+    def _check_can_create_contract(self, employee_id):
+        if self.env.context.get('skip_contract_creation_check'):
+            return
+        blocking = self._get_blocking_contract(employee_id)
+        if blocking:
+            state = {'draft': 'en borrador', 'open': 'en proceso', 'close': 'vencido'}[blocking.state]
+            raise UserError(_(
+                "No se puede crear un contrato nuevo para %(employee)s: su contrato actual "
+                "«%(contract)s» está %(state)s.\n\nCancela ese contrato primero y después crea el nuevo.",
+                employee=blocking.employee_id.name, contract=blocking.name, state=state,
+            ))
+
+    @api.onchange('contract_type_id')
+    def _onchange_contract_type_name(self):
+        for contract in self:
+            if contract.employee_id and contract._has_auto_name():
+                contract.name = self._get_auto_contract_name(
+                    contract.employee_id.id, contract.contract_type_id, before_id=contract._origin.id)
     
     @api.onchange('employee_id')
     def _onchange_employee_id_copy_bank_data(self):
@@ -214,11 +293,9 @@ class HrContract(models.Model):
                 res['bank'] = last_contract.bank
                 res['bank_account'] = last_contract.bank_account
                 res['clabe'] = last_contract.clabe
-            # Asignar nombre consecutivo
-            contract_count = self.env['hr.contract'].search_count([
-                ('employee_id', '=', employee_id)
-            ])
-            res['name'] = f"Contrato {contract_count + 1}"
+            # Avisar antes de llenar el formulario si el contrato actual no está cancelado
+            self._check_can_create_contract(employee_id)
+            res['name'] = self._get_auto_contract_name(employee_id, self.env['hr.contract.type'])
             employee = self.env['hr.employee'].browse(employee_id)
             res['work_location'] = employee.work_location_id.name if employee.work_location_id else ''
             res['work_direction'] = employee.direction_id.name if employee.direction_id else ''
@@ -240,11 +317,9 @@ class HrContract(models.Model):
                 self.bank = last_contract.bank
                 self.bank_account = last_contract.bank_account
                 self.clabe = last_contract.clabe
-            # Asignar nombre consecutivo
-            contract_count = self.env['hr.contract'].search_count([
-                ('employee_id', '=', self.employee_id.id)
-            ])
-            self.name = f"Contrato {contract_count + 1}"
+            # Asignar nombre automático (Inicial / Contrato N / Final)
+            self.name = self._get_auto_contract_name(
+                self.employee_id.id, self.contract_type_id, before_id=self._origin.id)
     
     def action_save(self):
         """Manually save the record."""

@@ -95,6 +95,7 @@
             'hr_estevez/static/src/components/**/*.xml',
             'hr_estevez/static/src/components/**/*.scss',
             'hr_estevez/static/src/scss/employee_form.scss',
+            'hr_estevez/static/src/scss/contract_form.scss',
         ],
     },
 }

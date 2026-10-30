@@ -23,8 +23,9 @@ class TestEmployeeTermination(TransactionCase):
             'employee_number': f'BAJA{n:03d}', 'barcode': f'BAJA{n:03d}',
         })
         # hr.contract.create fija el estado según la fecha de fin (vencido → close, si no → open),
-        # así que el borrador se crea antes que el vigente y se pasa a draft
-        Contract = self.env['hr.contract']
+        # así que el borrador se crea antes que el vigente y se pasa a draft. Este escenario
+        # (varios contratos sin cancelar) solo se puede armar saltándose la regla de creación.
+        Contract = self.env['hr.contract'].with_context(skip_contract_creation_check=True)
         expired = Contract.create({'name': 'Vencido', 'employee_id': employee.id, 'wage': 1000,
                                    'date_start': self.today - timedelta(days=400),
                                    'date_end': self.today - timedelta(days=40)})
