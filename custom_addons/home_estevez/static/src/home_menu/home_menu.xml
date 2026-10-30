@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<templates xml:space="preserve">
+
+    <!-- Se aplica después de muk_web_theme.NavBar.AppsMenu (depends) -->
+    <t t-name="home_estevez.NavBar.AppsMenu" t-inherit="web.NavBar.AppsMenu" t-inherit-mode="extension">
+        <xpath expr="//AppsMenu" position="attributes">
+            <attribute name="menuClass">'mk_app_menu o_estevez_home'</attribute>
+        </xpath>
+        <xpath expr="//AppsMenu/t[@t-set-slot='content']" position="replace">
+            <t t-set-slot="content">
+                <div class="o_estevez_home_hero">
+                    <div class="o_estevez_home_hello">
+                        <img class="o_estevez_home_logo" src="/home_estevez/static/img/logo.png" alt="Estevez.Jor"/>
+                        <div>
+                            <h1 t-esc="homeGreeting"/>
+                            <p t-esc="homeDate"/>
+                        </div>
+                    </div>
+                    <div class="o_estevez_home_search_box">
+                        <i class="fa fa-search"/>
+                        <input type="text"
+                               class="o_estevez_home_search"
+                               placeholder="¿Qué quieres abrir hoy?"
+                               t-model="homeState.query"
+                               t-on-keydown="onHomeSearchKeydown"/>
+                    </div>
+                </div>
+                <div class="o_estevez_home_apps">
+                    <DropdownItem
+                        t-foreach="homeApps"
+                        t-as="app"
+                        t-key="app.id"
+                        class="'o_app'"
+                        attrs="{ href: app.href, 'data-menu-xmlid': app.xmlid, 'data-section': app.id, style: '--o-home-i: ' + app_index }"
+                        onSelected="() => this.onNavBarDropdownItemSelection(app)"
+                        closingMode="'none'"
+                    >
+                        <a class="o_estevez_home_card" t-att-href="app.href" t-on-click.prevent="">
+                            <img class="mk_app_icon" t-att-src="app.webIconData or '/base/static/description/icon.png'"/>
+                            <span class="mk_app_name" t-out="app.name"/>
+                        </a>
+                    </DropdownItem>
+                    <div t-if="!homeApps.length" class="o_estevez_home_empty">
+                        <i class="fa fa-search-minus"/>
+                        No encontramos aplicaciones con «<t t-esc="homeState.query"/>»
+                    </div>
+                </div>
+            </t>
+        </xpath>
+    </t>
+
+</templates>

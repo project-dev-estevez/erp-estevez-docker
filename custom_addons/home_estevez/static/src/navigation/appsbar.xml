@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<templates xml:space="preserve">
+
+    <t t-name="home_estevez.AppsBar" t-inherit="muk_web_appsbar.AppsBar" t-inherit-mode="extension">
+        <!-- Nombre completo al pasar el cursor (útil cuando se corta o en modo solo íconos) -->
+        <xpath expr="//a[hasclass('nav-link')]" position="attributes">
+            <attribute name="t-att-title">app.name</attribute>
+        </xpath>
+        <!-- Botón para comprimir/expandir el menú, hasta abajo -->
+        <xpath expr="//div[hasclass('mk_apps_sidebar')]" position="inside">
+            <div class="o_estevez_sidebar_footer">
+                <button type="button"
+                        class="o_estevez_sidebar_toggle"
+                        t-att-title="sidebarState.compact ? 'Expandir menú' : 'Comprimir menú'"
+                        t-att-aria-label="sidebarState.compact ? 'Expandir menú' : 'Comprimir menú'"
+                        t-on-click="toggleSidebar">
+                    <i t-attf-class="fa {{ sidebarState.compact ? 'fa-chevron-right' : 'fa-chevron-left' }}"/>
+                </button>
+            </div>
+        </xpath>
+    </t>
+
+</templates>

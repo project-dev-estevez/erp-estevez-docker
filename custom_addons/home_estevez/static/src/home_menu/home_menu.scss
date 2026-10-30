@@ -1,0 +1,272 @@
+// ------------------------------------------------------------------
+// Pantalla de inicio (menú de aplicaciones de muk_web_theme)
+// Colores tomados del logo de Estevez.Jor
+// ------------------------------------------------------------------
+
+$estevez-blue: #239fd3;
+$estevez-black: #0b0b0b;
+$estevez-silver: #e5e6e8;
+
+// Patrón de triángulos del logo
+$estevez-triangles: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='56' viewBox='0 0 64 56'%3E%3Cpath d='M32 2L62 54H2Z' fill='none' stroke='%23ffffff' stroke-width='1.2'/%3E%3C/svg%3E");
+
+// Usa `translate` (no `transform`) para no anular el efecto de hover de las tarjetas
+@keyframes o_estevez_home_in {
+    from {
+        opacity: 0;
+        translate: 0 12px;
+    }
+    to {
+        opacity: 1;
+        translate: 0 0;
+    }
+}
+
+// !important: muk_web_theme fija padding, dirección y una imagen de fondo en línea
+.mk_app_menu.o_estevez_home.dropdown-menu {
+    --o-home-pad: 1rem;
+
+    @include media-breakpoint-up(md) {
+        --o-home-pad: 8vw;
+    }
+    @include media-breakpoint-up(xl) {
+        --o-home-pad: 14vw;
+    }
+
+    flex-direction: column !important;
+    flex-wrap: nowrap !important;
+    padding: 0 0 2.5rem !important;
+    background: radial-gradient(circle at 90% 0%, rgba($estevez-blue, .08), transparent 40%), #f3f5f7 !important;
+
+    // ---- Encabezado: saludo, fecha y buscador ----
+    .o_estevez_home_hero {
+        position: relative;
+        overflow: hidden;
+        flex-shrink: 0;
+        padding: 2.25rem var(--o-home-pad) 2.5rem;
+        color: $white;
+        background: linear-gradient(135deg, $estevez-black 0%, #1b2833 55%, darken($estevez-blue, 28%) 100%);
+
+        &::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background-image: $estevez-triangles;
+            opacity: .06;
+            pointer-events: none;
+        }
+
+        // Triángulo grande de acento, como el del logo
+        &::after {
+            content: "";
+            position: absolute;
+            right: -60px;
+            bottom: -120px;
+            width: 340px;
+            height: 300px;
+            clip-path: polygon(50% 0, 100% 100%, 0 100%);
+            background: linear-gradient(180deg, rgba($estevez-blue, .35), rgba($estevez-blue, 0));
+            pointer-events: none;
+        }
+
+        > * {
+            position: relative;
+            z-index: 1;
+        }
+    }
+
+    .o_estevez_home_hello {
+        display: flex;
+        align-items: center;
+        gap: 1.25rem;
+        margin-bottom: 1.75rem;
+        animation: o_estevez_home_in .45s ease both;
+
+        h1 {
+            margin: 0;
+            color: $white;
+            font-size: 2rem;
+            font-weight: 700;
+            letter-spacing: -.01em;
+        }
+
+        p {
+            margin: .25rem 0 0;
+            color: rgba($white, .7);
+            font-size: 1rem;
+        }
+    }
+
+    .o_estevez_home_logo {
+        flex-shrink: 0;
+        width: 76px;
+        height: 76px;
+        padding: .5rem;
+        object-fit: contain;
+        background: $white;
+        border-radius: 1.1rem;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, .35);
+    }
+
+    .o_estevez_home_search_box {
+        position: relative;
+        max-width: 560px;
+        animation: o_estevez_home_in .45s .08s ease both;
+
+        > .fa {
+            position: absolute;
+            top: 50%;
+            left: 1.1rem;
+            transform: translateY(-50%);
+            color: $gray-500;
+        }
+
+        .o_estevez_home_search {
+            width: 100%;
+            padding: .8rem 1.25rem .8rem 2.75rem;
+            font-size: 1rem;
+            color: $gray-900;
+            background: $white;
+            border: 2px solid transparent;
+            border-radius: 999px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, .25);
+            outline: none;
+            transition: border-color .2s ease, box-shadow .2s ease;
+
+            &:focus {
+                border-color: $estevez-blue;
+                box-shadow: 0 10px 30px rgba(0, 0, 0, .25), 0 0 0 4px rgba($estevez-blue, .25);
+            }
+        }
+    }
+
+    // ---- Tarjetas de aplicaciones ----
+    .o_estevez_home_apps {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(128px, 1fr));
+        gap: 1rem;
+        padding: 2rem var(--o-home-pad) 0;
+    }
+
+    .o_app {
+        position: relative;
+        width: auto !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        overflow: hidden;
+        background: $white !important;
+        border: 1px solid $estevez-silver;
+        border-radius: 1rem;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, .04);
+        transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+        animation: o_estevez_home_in .4s ease both;
+        animation-delay: calc(var(--o-home-i, 0) * 25ms + 100ms);
+
+        // Barra azul inferior que aparece al seleccionar
+        &::after {
+            content: "";
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            height: 3px;
+            background: $estevez-blue;
+            transform: scaleX(0);
+            transition: transform .2s ease;
+        }
+
+        > .o_estevez_home_card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: .65rem;
+            height: 100%;
+            padding: 1.1rem .75rem 1rem;
+            text-decoration: none;
+        }
+
+        .mk_app_icon {
+            width: 56px;
+            max-width: 56px;
+            padding: 6px;
+            border-radius: .9rem;
+            box-shadow: none;
+            transition: transform .2s ease;
+        }
+
+        .mk_app_name {
+            color: $gray-800;
+            font-size: .85rem;
+            font-weight: 600;
+            line-height: 1.2;
+            text-align: center;
+            transition: color .18s ease;
+        }
+
+        // .focus: la clase que pone Odoo al moverse con las flechas del teclado
+        &:hover,
+        &:focus,
+        &.focus {
+            transform: translateY(-4px);
+            border-color: $estevez-blue;
+            box-shadow: 0 12px 28px rgba($estevez-blue, .2), 0 0 0 3px rgba($estevez-blue, .12);
+
+            &::after {
+                transform: scaleX(1);
+            }
+
+            .mk_app_icon {
+                transform: scale(1.1);
+                box-shadow: none;
+            }
+
+            .mk_app_name {
+                color: darken($estevez-blue, 12%);
+            }
+        }
+    }
+
+    .o_estevez_home_empty {
+        grid-column: 1 / -1;
+        padding: 3rem 1rem;
+        color: $gray-600;
+        font-size: 1rem;
+        text-align: center;
+
+        > .fa {
+            display: block;
+            margin-bottom: .75rem;
+            font-size: 2rem;
+            color: $gray-400;
+        }
+    }
+
+    @include media-breakpoint-down(md) {
+        .o_estevez_home_hello {
+            gap: .9rem;
+
+            h1 {
+                font-size: 1.4rem;
+            }
+        }
+
+        .o_estevez_home_logo {
+            width: 56px;
+            height: 56px;
+        }
+
+        .o_estevez_home_apps {
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: .75rem;
+        }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+            animation: none !important;
+            transition: none !important;
+        }
+    }
+}
