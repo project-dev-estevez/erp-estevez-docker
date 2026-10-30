@@ -9,7 +9,7 @@
     "author": "Estevez.Jor",
     "website": "https://estevezjorinternacional.com",
     "category": "Human Resources",
-    "version": "0.3",
+    "version": "0.4",
     "depends": ['base', 'hr', 'hr_estevez', 'hr_recruitment', 'project', 'survey', 'hr_recruitment_survey', 'utm', 'hr_holidays', 'website_hr_recruitment'],
     "data": [
         # Archivos de seguridad
@@ -55,7 +55,8 @@
         'views/hr_applicant_hired_list_views.xml',
         'views/hr_applicant_sources_dashboard_list.xml',
         'views/hr_applicant_form_inherit.xml',
-        'views/view_attachment_form_custom.xml'
+        'views/view_attachment_form_custom.xml',
+        'views/website_hr_recruitment_templates.xml',
     ],
     'assets': {
         'web.assets_backend': [

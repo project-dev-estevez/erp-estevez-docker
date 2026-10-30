@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- Listado de Empleos: "1 vacante disponible" / "N vacantes disponibles"
+         (la traducción original del singular mostraba "1 puestos abiertos") -->
+    <template id="jobs_index_open_positions" inherit_id="website_hr_recruitment.index" name="Vacantes disponibles en español">
+        <xpath expr="//h5[@t-if='job.no_of_recruitment &gt;= 1']" position="replace">
+            <h5 t-if="job.no_of_recruitment &gt;= 1" class="text-reset">
+                <span t-field="job.no_of_recruitment"/>
+                <t t-if="job.no_of_recruitment == 1">vacante disponible</t>
+                <t t-else="">vacantes disponibles</t>
+            </h5>
+        </xpath>
+    </template>
+</odoo>
