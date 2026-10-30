@@ -1,0 +1,5 @@
+<odoo>
+    <!-- Color de botones de los correos = azul Estevez.Jor. Sin noupdate: se vuelve a
+         aplicar en cada actualización (solo si la compañía sigue con el morado de Odoo). -->
+    <function model="res.company" name="_apply_estevez_email_colors"/>
+</odoo>
