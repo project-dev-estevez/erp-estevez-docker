@@ -16,6 +16,7 @@
                         <group>
                             <field name="name"/>
                             <field name="director_id" options="{'no_create': True}"/>
+                            <field name="director_job_id" options="{'no_create': True}"/>
                             <field name="parent_id" options="{'no_create': True}"/>
                             <field name="company_id"/>
                         </group>

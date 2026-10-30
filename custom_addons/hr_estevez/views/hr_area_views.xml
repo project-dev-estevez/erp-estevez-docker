@@ -16,6 +16,7 @@
                         <group>
                             <field name="name"/>
                             <field name="coordinator_id"/>
+                            <field name="coordinator_job_id" options="{'no_create': True}"/>
                             <field name="department_id" string="Área" options="{'no_create': True}"/>                            
                             <field name="direction_id"/>
                             <field name="company_id"/>

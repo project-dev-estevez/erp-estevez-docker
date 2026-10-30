@@ -29,3 +29,4 @@ from . import hr_occupation
 from . import hr_executive_dashboard
 from . import hr_employee_termination
 from . import mail_branding
+from . import hr_org_heads
