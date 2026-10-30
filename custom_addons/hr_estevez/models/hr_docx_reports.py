@@ -7,6 +7,7 @@ All DOCX rendering is isolated here.
 import io
 import base64
 import logging
+import zipfile
 from datetime import date, datetime
 from xml.sax.saxutils import escape as xml_escape
 from PIL import Image, ImageDraw, ImageOps
@@ -1094,620 +1095,93 @@ class HrContractDocxReports(models.Model):
 
     # --- Contrato Individual de Trabajo ---
 
+    # Plantilla = contrato del sistema anterior (formato, cláusulas, anexos y firmas idénticos).
+    # Solo se reemplazan los marcadores {{...}} con los datos del empleado y del contrato.
+    CONTRACT_TEMPLATE = 'hr_estevez/data/templates/contrato_individual.docx'
+    CONTRACT_GENDERS = {'male': 'MASCULINO', 'female': 'FEMENINO', 'indistinct': 'INDISTINTO'}
+    CONTRACT_MARITAL = {
+        'single': 'SOLTERO(A)', 'married': 'CASADO(A)', 'cohabitant': 'UNIÓN LIBRE',
+        'widower': 'VIUDO(A)', 'divorced': 'DIVORCIADO(A)',
+    }
+
+    def _docx_from_template(self, template, values, filename):
+        """Copia la plantilla .docx reemplazando los marcadores en word/document.xml."""
+        output = io.BytesIO()
+        with zipfile.ZipFile(file_path(template)) as source, \
+                zipfile.ZipFile(output, 'w', zipfile.ZIP_DEFLATED) as result:
+            for item in source.infolist():
+                data = source.read(item.filename)
+                if item.filename == 'word/document.xml':
+                    xml = data.decode('utf-8')
+                    for marker, value in values.items():
+                        xml = xml.replace(marker, xml_escape(value or 'N/A'))
+                    data = xml.encode('utf-8')
+                result.writestr(item, data)
+        return _DocxBuilder.download(self.env, 'hr.contract', self.id, filename, output.getvalue())
+
+    @staticmethod
+    def _contract_address(emp):
+        """Domicilio como el contrato anterior: CALLE #NÚMERO, COLONIA C.P. 00000 CIUDAD, ESTADO."""
+        text = emp.private_street or ''
+        if emp.private_street2:
+            text += f' #{emp.private_street2}'
+        if emp.private_colonia:
+            text += f', {emp.private_colonia}'
+        if emp.private_zip:
+            text += f' C.P. {emp.private_zip}'
+        if emp.private_city:
+            text += f' {emp.private_city}'
+        if emp.private_state_id:
+            text += f', {emp.private_state_id.name}'
+        return text.strip(', ').upper()
+
     def action_download_contract_docx(self):
         self.ensure_one()
-        b = _DocxBuilder
         emp = self.employee_id
-        emp_name = emp.name.upper() if emp else 'N/A'
-        co = self.company_id.name.upper()
-        job = (emp.job_id.name.upper() if emp.job_id else 'N/A')
-        date_str = b.fmt_date(self.date_start) if self.date_start else 'N/A'
-
-        gender_map = {
-            'male': 'MASCULINO', 'female': 'FEMENINO', 'indistinct': 'INDISTINTO',
+        # El contrato anterior pone el país en español ("MÉXICO"), no el gentilicio
+        spanish = next((code for code, _name in self.env['res.lang'].get_installed()
+                        if code.startswith('es')), self.env.lang)
+        country = emp.country_id.with_context(lang=spanish).name if emp.country_id else ''
+        if emp.country_id.code == 'MX':
+            country = 'México'  # con acento aunque no haya un idioma español instalado
+        values = {
+            '{{EMPRESA}}': emp._carta_patronal_company_name() if emp else (self.company_id.name or '').upper(),
+            '{{EMPLEADO}}': emp.name.upper() if emp else '',
+            '{{PUESTO}}': (self.job_id or emp.job_id).name.upper() if (self.job_id or emp.job_id) else '',
+            '{{FECHA}}': _DocxBuilder.fmt_date(self.date_start) if self.date_start else '',
+            '{{NACIONALIDAD}}': country.upper(),
+            '{{EDAD}}': str(emp.age) if emp.age else '',
+            '{{SEXO}}': self.CONTRACT_GENDERS.get(emp.gender, ''),
+            '{{ESTADO_CIVIL}}': self.CONTRACT_MARITAL.get(emp.marital, ''),
+            '{{CURP}}': (emp.curp or '').upper(),
+            '{{RFC}}': (emp.rfc or '').upper(),
+            '{{DOMICILIO}}': self._contract_address(emp),
         }
-        marital_map = {
-          'single': 'SOLTERO(A)', 'married': 'CASADO(A)', 'cohabitant': 'UNIÓN LIBRE',
-            'widower': 'VIUDO', 'divorced': 'DIVORCIADO',
-        }
-        gender = gender_map.get(emp.gender, 'N/A') if emp else 'N/A'
-        marital = marital_map.get(emp.marital, 'N/A') if emp else 'N/A'
-        age = str(emp.age) if emp and emp.age else 'N/A'
-        nationality = (emp.get_nationality() or 'N/A').upper() if emp else 'N/A'
-        curp = emp.curp or 'N/A'
-        rfc = emp.rfc or 'N/A'
-        address = (b.emp_address(emp) or 'N/A').upper() if emp else 'N/A'
-
-        doc = Document()
-        b.apply_default_typography(doc)
-        contract_style = doc.styles['Normal']
-        contract_style.font.name = 'Arial'
-        contract_style.font.size = Pt(8)
-        contract_style.paragraph_format.space_after = Pt(2)
-        contract_style.paragraph_format.line_spacing = 1.15
-        for sec in doc.sections:
-            sec.top_margin = Inches(0.5)
-            sec.bottom_margin = Inches(0.5)
-            sec.left_margin = Inches(0.8)
-            sec.right_margin = Inches(0.8)
-
-        b.heading(doc, 'CONTRATO INDIVIDUAL DE TRABAJO')
-        b.p(doc, [
-            ('CONTRATO INDIVIDUAL DE TRABAJO QUE CONFORME A LO ESTABLECIDO '
-             'POR LOS ARTÍCULOS 24 Y 25 DE LA LEY FEDERAL DEL TRABAJO, '
-             'CELEBRAN POR UNA PARTE LA EMPRESA ', False),
-            (co, True),
-            (', REPRESENTADA LEGALMENTE POR EL LIC. ', False),
-            ('EDWIN GONZALEZ SORIA', True),
-            (', EN SU CARÁCTER DE APODERADO LEGAL A QUIÉN EN LO SUCESIVO Y '
-             'PARA EFECTOS DE ESTE CONTRATO SE LE DENOMINARÁ ', False),
-            ('"EL PATRON"', True),
-            (', Y POR LA OTRA POR SU PROPIO DERECHO, EL/LA C. ', False),
-            (emp_name, True),
-            (', A QUIÉN EN LO SUCESIVO Y PARA EFECTOS DE ESTE CONTRATO SE LE '
-             'DENOMINARÁ ', False),
-            ('"EL TRABAJADOR"', True),
-            (', AL TENOR DE LAS SIGUIENTES DECLARACIONES Y CLÁUSULAS:', False),
-        ], align=J, space_after=3)
-
-        b.heading(doc, 'DECLARACIONES:', space_before=10)
-        b.p(doc, [('A. ', False), ('DE "EL PATRON":', True)], space_after=1)
-
-        patron_decl = [
-            ('1.', ' QUE ES UNA SOCIEDAD ANÓNIMA DE CAPITAL VARIABLE '
-              'DEBIDAMENTE CONSTITUIDA Y LEGALMENTE EXISTENTE DE ACUERDO CON '
-              'LAS LEYES MEXICANAS, TAL Y COMO SE ACREDITA EN TÉRMINOS DE '
-              'INSTRUMENTO NOTARIAL NÚMERO 46,404, DE FECHA 4 DE OCTUBRE DE '
-              '2011 PASADO ANTE LA FE DEL LIC. JOSE ORLANDO PADILLA BENITEZ, '
-              'NOTARIO PÚBLICO NO. 30 DEL ESTADO DE MÉXICO.'),
-            ('2.', ' SU REPRESENTANTE LEGAL CUENTA CON PLENAS Y SUFICIENTES '
-              'FACULTADES PARA CELEBRAR EL PRESENTE CONTRATO, TAL Y COMO LO '
-              'ACREDITA CON EL INSTRUMENTO NOTARIAL NÚMERO 18,435, DE FECHA '
-              '07 DE DICIEMBRE DE 2020, PASADO ANTE LA FE DEL LICENCIADO JUAN '
-              'CARLOS FRANCISCO DIAZ PONCE DE LEON, NOTARIO PÚBLICO NÚMERO '
-              '209 DE LA CIUDAD DE MÉXICO.'),
-            ('3.', ' QUE TIENE SU DOMICILIO EN: CALLE FILIBERTO GOMEZ NUMERO '
-              '46 COLONIA CENTRO INDUSTRIAL TLALNEPANTLA, C.P. 54030, '
-              'MUNICIPIO DE TLALNEPANTLA, ESTADO DE MEXICO.'),
-            ('4.', ' QUE SU OBJETO SOCIAL CONSISTE EN LA INSTALACION Y '
-              'MANTEMIENTO DE FIBRA ÓPTICA ENTRE OTROS.'),
-            ('5.', ' QUE QUIEN SUSCRIBE POR "EL PATRON", CUENTA CON '
-              'BASTANTES, AMPLIAS Y SUFICIENTES FACULTADES PARA LA '
-              'CELEBRACION DE ESTE CONTRATO, LAS CUALES AL DIA DE HOY NO LE '
-              'HAN SIDO REVOCADAS, RESTRINGIDAS, SUSPENDIDAS O DE ALGUNA OTRA '
-              'MANERA LIMITADAS.'),
-            ('6.', ' QUE CUENTA CON EL PERSONAL NECESARIO PARA EL DESARROLLO '
-              'DE SUS OPERACIONES NORMALES, Y REQUIERE CONTRATAR PERSONAL QUE '
-              'CUENTE CON LA DISPOSICIÓN PARA DESEMPEÑAR LOS TRABAJOS '
-              'RELACIONADOS CON EL OBJETO SOCIAL DE LA EMPRESA.'),
-        ]
-        for num, txt in patron_decl:
-          b.p(doc, [(num, True), (txt, False)], align=J,
-            left_indent=14, first_line_indent=-12, space_after=1)
-
-        b.p(doc, [('B. ', False), ('DE "EL TRABAJADOR":', True)], space_before=6,
-          space_after=1)
-        b.p(doc, [
-            ('1.', True),
-            (f' QUE CUENTA CON LA DISPOSICIÓN NECESARIA PARA DESEMPEÑAR LOS '
-             f'SERVICIOS EN EL PUESTO REQUERIDO, DE: ', False),
-            (job, True),
-        ], align=J, left_indent=14, first_line_indent=-12, space_after=1)
-        b.p(doc, [('2.', True), (' QUE SUS GENERALES SON LOS SIGUIENTES:', False)],
-          align=J, left_indent=14, first_line_indent=-12, space_after=1)
-
-        # Generales table
-        doc.add_paragraph()
-        gen_tbl = doc.add_table(rows=7, cols=2)
-        gen_tbl.autofit = False
-        gen_tbl.columns[0].width = Inches(1.25)
-        gen_tbl.columns[1].width = Inches(5.85)
-        b.remove_borders(gen_tbl)
-        for i, (lbl, val) in enumerate([
-            ('NACIONALIDAD', nationality),
-            ('EDAD', age),
-            ('SEXO', gender),
-            ('ESTADO CIVIL', marital),
-            ('CURP', curp),
-            ('RFC', rfc),
-            ('DOMICILIO', address),
-        ]):
-            left_cell = gen_tbl.rows[i].cells[0]
-            right_cell = gen_tbl.rows[i].cells[1]
-            b.cell_left(left_cell, lbl, bold=True)
-            b.cell_left(right_cell, val)
-
-            left_para = left_cell.paragraphs[0]
-            right_para = right_cell.paragraphs[0]
-            left_para.alignment = WD_ALIGN_PARAGRAPH.LEFT
-            right_para.alignment = WD_ALIGN_PARAGRAPH.LEFT
-            left_para.paragraph_format.space_before = Pt(0)
-            left_para.paragraph_format.space_after = Pt(0)
-            right_para.paragraph_format.space_before = Pt(0)
-            right_para.paragraph_format.space_after = Pt(0)
-
-            # Keep horizontal separators like the sample image.
-            if i < 6:
-                b.add_cell_bottom_border(left_cell)
-                b.add_cell_bottom_border(right_cell)
-            # Keep a clear column separator between labels and values.
-            b.add_cell_right_border(left_cell)
-        doc.add_paragraph()
-
-        b.p(doc, [('3.', True), (' QUE BAJO PROTESTA DE DECIR VERDAD, DECLARA '
-            'QUE TODA LA INFORMACIÓN QUE HA PROPORCIONADO DE MANERA ORAL O '
-          'ESCRITA A "EL PATRÓN" ES CORRECTA Y FIDEDIGNA.', False)], align=J,
-          left_indent=14, first_line_indent=-12, space_after=1)
-        b.p(doc, [('4.', True), (' QUE LE HAN ENTERADO Y EXPLICADO LAS '
-            'CONDICIONES DE TRABAJO Y COMO CONSECUENCIA ES SU EXPRESA VOLUNTAD '
-            'CELEBRAR EL PRESENTE CONTRATO EN LOS TÉRMINOS Y CONDICIONES '
-          'DESCRITOS EN EL CUERPO DEL PRESENTE INSTRUMENTO.', False)], align=J,
-          left_indent=14, first_line_indent=-12, space_after=1)
-
-        b.p(doc, [('EXPUESTAS LAS ANTERIORES DECLARACIONES, AMBAS PARTES SE '
-            'SOMETEN A LAS SIGUIENTES:', False)], align=J)
-        b.p(doc, [('DECLARAN "LAS PARTES":', True)])
-        b.p(doc, [('ÚNICO.', True), (' QUE AMBAS PARTES SE RECONOCEN EL '
-            'CARÁCTER CON EL QUE COMPARECEN Y MANIFIESTAN QUE ES SU DESEO '
-            'CELEBRAR EL PRESENTE CONTRATO EN LOS TÉRMINOS QUE A CONTINUACIÓN '
-            'SE ESTIPULAN.', False)], align=J)
-
-        b.heading(doc, 'CLÁUSULAS:')
-
-        clausulas = [
-            ('PRIMERA.', ' PARA EFECTOS DE COMPRENSIÓN DEL PRESENTE CONTRATO, '
-              'SE DENOMINARÁ EN LO SUCESIVO A LA LEY FEDERAL DEL TRABAJO COMO '
-              '"LA LEY", AL REFERIRSE AL PRESENTE DOCUMENTO COMO "EL CONTRATO", '
-              'AL REGLAMENTO INTERIOR DE TRABAJO "REGLAMENTO" Y DE MANERA '
-              'CONJUNTA A LOS QUE SUSCRIBEN COMO "LAS PARTES".'),
-            ('SEGUNDA.', ' EL PRESENTE CONTRATO REGIRÁ EN TODO TIEMPO Y LUGAR '
-              'LO NO ESTIPULADO EN EL MISMO POR EL "REGLAMENTO" Y POR LO '
-              'ESTABLECIDO EN "LA LEY".'),
-            ('TERCERA.', f' "EL PATRÓN", EN ESTE ACTO CONTRATA A "EL '
-              f'TRABAJADOR" BAJO LA MODALIDAD DE CAPACITACIÓN INICIAL PARA QUE '
-              f'DESEMPEÑE EL PUESTO DE {job} ASÍ COMO EN CUALQUIER OTRA '
-              f'ACTIVIDAD ANEXA, CONEXA O RELACIONADA QUE LE ENCOMIENDE EL '
-              f'PATRÓN, COMPATIBLE CON EL FIN DE SU CATEGORÍA, CAPACITACIÓN Y '
-              f'DE SUS APTITUDES.'),
-            ('CUARTA.', ' "EL TRABAJADOR" RECONOCE Y ESTA CONFORME, DADA LA '
-              'MODALIDAD DE CONTRATACIÓN DE CAPACITACIÓN INICIAL, QUE A PARTIR '
-              'DE LA SUSCRIPCIÓN DEL PRESENTE CONTRATO, LA RELACIÓN LABORAL '
-              'TENDRÁ UNA VIGENCIA POR TIEMPO DETERMINADO DE CERO DIAS '
-              'NATURALES, CONTADOS A PARTIR DE LA FECHA DE SU FIRMA.'),
-            ('QUINTA.', f' "EL TRABAJADOR" SE OBLIGA A PRESTAR A "EL PATRÓN", '
-              f'BAJO SU DIRECCIÓN Y DEPENDENCIA, SUS SERVICIOS PERSONALES '
-              f'COMO: {job}.'),
-            ('SEXTA.', ' "EL TRABAJADOR" DEBE DESEMPEÑAR DICHAS ACTIVIDADES EN '
-              'EL DOMICILIO UBICADO EN CALLE FILIBERTO GÓMEZ NUMERO 46 COLONIA '
-              'CENTRO INDUSTRIAL TLALNEPANTLA, C.P. 54030, MUNICIPIO DE '
-              'TLALNEPANTLA, ESTADO DE MEXICO., Y/O INDISTINTAMENTE EN '
-              'CUALQUIER DOMICILIO O LUGAR QUE SE LE INDIQUE POR "EL PATRÓN".'),
-            ('SÉPTIMA.', ' "EL TRABAJADOR" DESARROLLARA SUS FUNCIONES EN '
-              'CUALQUIER LUGAR QUE LE SEA ASIGNADO POR "EL PATRÓN", DE ACUERDO '
-              'A LAS NECESIDADES DE LA EMPRESA.'),
-            ('OCTAVA.', ' LA DURACIÓN DE LA JORNADA DE TRABAJO SERÁ DE 8 HORAS '
-              'DIARIAS EN UN HORARIO QUE SE COMPRENDERÁ DE LAS 08:00 AM A LAS '
-              '17:00 PM O BIEN DE LAS 9:00 AM A 18:00 HORAS O DE 7:00 AM A '
-              '16:00 HORAS, DE LUNES A VIERNES Y SÁBADOS DE 8:00 AM A 14:00 '
-              'HORAS. DURANTE LA JORNADA CONTINUA SE CONCEDERÁ AL TRABAJADOR '
-              'UN DESCANSO DE UNA HORA DE 14:00 PM A 15:00 PM.'),
-            ('NOVENA.', ' EL SALARIO MENSUAL QUE RECIBIRÁ "EL TRABAJADOR" POR '
-              'SUS SERVICIOS SERÁ DE $0,000.000 (CERO CERO CERO CERO PESOS '
-              '00/100 M.N.), MENOS LOS DESCUENTOS DE LEY. EL PAGO SE HARÁ EN '
-              'FORMA QUINCENAL LOS DÍAS QUINCE Y ÚLTIMO DÍA DE CADA MES.'),
-            ('DECIMA.', ' PREVISIÓN SOCIAL "PPP". ADEMÁS DEL SALARIO, EL '
-              'EMPLEADO PERCIBIRÁ LAS PRESTACIONES DE PREVISIÓN SOCIAL DE '
-              'ACUERDO AL PLAN PRIVADO DE PENSIONES QUE TIENE CONTRATADO LA '
-              'EMPRESA, DEBIDAMENTE REGISTRADO ANTE LA CONSAR.'),
-            ('DECIMA PRIMERA.', ' "EL TRABAJADOR" TENDRÁ DERECHO POR CADA SEIS '
-              'DÍAS DE LABORES A DESCANSAR UNO CON EL PAGO DE SALARIO DIARIO '
-              'CORRESPONDIENTE. DE ACUERDO AL ARTÍCULO 74 DE LA LEY FEDERAL '
-              'DEL TRABAJO, SERÁN DÍAS DE DESCANSO OBLIGATORIO: EL 1 DE ENERO, '
-              '1 DE MAYO, 16 DE SEPTIEMBRE, 25 DE DICIEMBRE, ENTRE OTROS.'),
-            ('DECIMA SEGUNDA.', ' CUANDO "EL TRABAJADOR" POR RAZONES '
-              'ADMINISTRATIVAS TENGA QUE LABORAR EL DÍA DOMINGO, "EL PATRÓN" '
-              'LE PAGARÁ, ADEMÁS DE SU SALARIO, 25% COMO PRIMA DOMINICAL SOBRE '
-              'EL SALARIO ORDINARIO DEVENGADO.'),
-            ('DÉCIMA TERCERA.', ' "EL TRABAJADOR" TENDRÁ DERECHO A DISFRUTAR '
-              'DE UN PERIODO ANUAL DE VACACIONES SEGÚN LO ESTABLECIDO EN EL '
-              'ARTÍCULO 76 DE "LA LEY", ASÍ COMO A LA PRIMA VACACIONAL '
-              'EQUIVALENTE AL 25% DEL IMPORTE PAGADO POR CONCEPTO DE '
-              'VACACIONES.'),
-            ('DÉCIMA CUARTA.', ' "EL TRABAJADOR" TENDRÁ DERECHO A RECIBIR '
-              'ANTES DEL DÍA 20 DE DICIEMBRE DE CADA AÑO EL IMPORTE '
-              'CORRESPONDIENTE A QUINCE DÍAS DE SALARIO COMO PAGO DEL '
-              'AGUINALDO.'),
-            ('DÉCIMA QUINTA.', ' "EL TRABAJADOR" DEBERÁ PRESENTARSE '
-              'PUNTUALMENTE A SUS LABORES EN EL HORARIO DE TRABAJO ESTABLECIDO '
-              'Y FIRMAR LAS LISTAS DE ASISTENCIA O CHECAR SU TARJETA EN EL '
-              'RELOJ CHECADOR DIARIAMENTE.'),
-            ('DECIMA SEXTA.', ' SIN PERJUICIO DE LO ESTIPULADO EN EL PRESENTE '
-              'CONTRATO, CUANDO "EL TRABAJADOR" TENGA MAS DE TRES FALTAS '
-              'INJUSTIFICADAS EN UN PERIODO DE TREINTA DIAS SE PROCEDERA A '
-              'APLICAR EL SUPUESTO CONTEMPLADO EN EL ARTICULO 47, FRACCION X '
-              'DE LA LEY.'),
-            ('DÉCIMA SEPTIMA.', ' "EL PATRON" SE OBLIGA A CAPACITAR O A '
-              'ADIESTRAR A "EL TRABAJADOR" DE ACUERDO A LOS PLANES Y PROGRAMAS '
-              'QUE EXISTEN O SE ESTABLEZCAN. "EL TRABAJADOR" SE OBLIGA A '
-              'OBSERVAR LAS DISPOSICIONES EN MATERIA DE SEGURIDAD, SALUD Y '
-              'MEDIO AMBIENTE DE TRABAJO.'),
-            ('DÉCIMA OCTAVA.', ' "EL TRABAJADOR" ACEPTA SOMETERSE A LOS '
-              'EXÁMENES MÉDICOS QUE PERIÓDICAMENTE ESTABLEZCA "EL PATRÓN" EN '
-              'LOS TÉRMINOS DEL ARTICULO 134 FRACCIÓN X DE "LA LEY".'),
-            ('DÉCIMA NOVENA.', ' "EL PATRON" Y "EL TRABAJADOR" SE OBLIGAN EN '
-              'TODO TIEMPO Y LUGAR A CUMPLIR CON LAS OBLIGACIONES QUE "LA LEY" '
-              'LES IMPONEN EN TÉRMINOS DE LO ESTABLECIDO POR LOS ARTÍCULOS '
-              '132 AL 135.'),
-            ('VIGÉSIMA.', ' "EL TRABAJADOR" SABE Y ENTIENDE QUE TODA LA '
-              'INFORMACIÓN QUE EXISTE Y LLEGUE A EXISTIR DE "EL PATRON" TIENE '
-              'EL CARÁCTER DE "CONFIDENCIAL". "EL TRABAJADOR" SE OBLIGA A NO '
-              'EXTRAER, HACER USO, COMUNICAR, DIVULGAR NI REVELAR POR NINGÚN '
-              'MEDIO TAL INFORMACIÓN.'),
-            ('VIGESIMA PRIMERA.', ' "EL TRABAJADOR" SE OBLIGA DURANTE LA '
-              'VIGENCIA DE ESTE CONTRATO, ASÍ COMO DESPUÉS DE SU TERMINACIÓN '
-              'O RESCISIÓN, A NO DIVULGAR NI UTILIZAR CUALQUIER ASPECTO O '
-              'INFORMACIÓN RELACIONADA CON LOS NEGOCIOS, ACTIVIDADES Y '
-              'OPERACIONES DE "EL PATRON" O DE LOS CLIENTES DE ÉSTE.'),
-            ('VIGESIMA SEGUNDA.', ' EN CASO DE QUE "EL TRABAJADOR" INCUMPLA '
-              'CON LAS OBLIGACIONES A SU CARGO, PREVISTAS EN LAS CLAUSULAS QUE '
-              'ANTECEDEN; PAGARÁ A "EL PATRON" UNA INDEMNIZACIÓN EQUIVALENTE '
-              'AL MONTO DE LOS DAÑOS Y PERJUICIOS QUE POR ESTE CONCEPTO SE '
-              'GENERASEN.'),
-            ('VIGESIMA TERCERA.', ' "EL TRABAJADOR", DURANTE EL DESEMPEÑO DE '
-              'SUS FUNCIONES SE RESPONSABILIZA POR CUALQUIER ACTO U OMISIÓN, '
-              'INTENCIONAL O NEGLIGENTE QUE LLEGASE A CAUSAR DAÑO A LOS BIENES '
-              'O AL PERSONAL DE "EL PATRON".'),
-            ('VIGESIMA CUARTA.', ' "EL TRABAJADOR" MANIFIESTA CONOCER '
-              'PERFECTAMENTE EL ALCANCE Y PROCEDIMIENTOS DEL AVISO DE '
-              'PRIVACIDAD QUE OPERA EN LA EMPRESA ESTEVEZ.JOR SERVICIOS S.A '
-              'DE C.V PARA EFECTOS DE QUE SE VEA SALVAGUARDADA LA INFORMACION '
-              'DE SUS DATOS PERSONALES.'),
-            ('VIGESIMA QUINTA.', ' "LAS PARTES" ESTABLECEN QUE "EL PATRON" '
-              'RESPETA PLENAMENTE LA DIGNIDAD HUMANA, PROPICIA EL TRABAJO '
-              'DIGNO Y DECENTE EN TODAS LAS RELACIONES LABORALES, PROMUEVE LA '
-              'IGUALDAD SUSTANTIVA ENTRE TRABAJADORES Y TRABAJADORAS, CONFORME '
-              'A LA NOM NMX-R-025-SCFI-2015.'),
-            ('VIGESIMA SEXTA.', ' "EL PATRON" MANIFIESTA QUE TRATANDOSE DE '
-              'MUJERES Y MENORES SE ESTARA A LO ESTABLECIDO EN EL TITULO '
-              'QUINTO DE "LA LEY".'),
-            ('VIGESIMA SEPTIMA.', ' "EN CUMPLIMIENTO A LO SEÑALADO POR LOS '
-              'ARTÍCULOS 501 Y 25 DE LA LEY, EN ESTE ACTO MANIFIESTO QUE '
-              'SEÑALO COMO MI LEGITIMO BENEFICIARIO DE TODOS LOS BIENES Y '
-              'PRESTACIONES LEGALES A: '
-              '___________________________________________.'),
-            ('VIGESIMA OCTAVA.', ' EN TEMAS DE SEGURIDAD E HIGIENE, EL '
-              'TRABAJADOR SE OBLIGA A OBSERVAR TODAS LAS MEDIDAS Y NORMAS QUE '
-              'APLICAN EN LA EMPRESA PARA PREVENIR ACCIDENTES, ENFERMEDADES Y '
-              'LAS MEDIDAS DE SEGURIDAD E HIGIENE.'),
-            ('VIGESIMA NOVENA.', ' EL PATRON LE HACE SABER AL TRABAJADOR QUE '
-              'TIENE TOTAL LIBERTAD EN INTEGRAR LAS COMISIONES QUE SE INTEGREN '
-              'EN LA EMPRESA CON MOTIVO DE LA CORRECTA APLICACIÓN Y '
-              'SUPERVISION DE LAS CONDICIONES GENERALES DE TRABAJO.'),
-            ('TRIGESIMA.', ' EL PATRON, RESPETA, SE OBLIGA Y GARANTIZA LA '
-              'LIBERTAD SINDICAL QUE EN TERMINOS DE LEY TIENE EL TRABAJADOR.'),
-            ('TRIGESIMA PRIMERA.', ' EL PATRON MANIFIESTA QUE TRATANDOSE DE '
-              '"REPARTO DE UTILIDADES", SI AL TRABAJADOR LE CORRESPONDE ALGUNA '
-              'SUMA POR ESTE CONCEPTO LA MISMA LE SERA ENTREGADA EN LOS '
-              'TIEMPOS QUE SEÑALA LA LEY.'),
-            ('TRIGESIMA SEGUNDA.', ' EL PATRON MANIFIESTA QUE EL TRABAJADOR '
-              'GOZARA LOS BENEFICIOS DE LA SEGURIDAD SOCIAL A TRAVES DEL IMSS, '
-              'ASI COMO EN EL INFONAVIT, SAR E INFONACOT.'),
-            ('TRIGESIMA TERCERA.', ' EL PATRON MANIFIESTA QUE EN EL CENTRO DE '
-              'TRABAJO SE HA IMPLEMENTADO UN PROTOCOLO PARA PREVENIR LA '
-              'DISCRIMINACIÓN POR RAZONES DE GÉNERO Y ATENCIÓN DE CASOS DE '
-              'VIOLENCIA Y ACOSO U HOSTIGAMIENTO SEXUAL.'),
-            ('TRIGESIMA CUARTA.', ' EL PATRON MANIFIESTA QUE CONFORME A LA '
-              'LEY OTORGARA A EL TRABAJADOR PERMISO DE PATERNIDAD DE CINCO '
-              'DÍAS LABORABLES CON GOCE DE SUELDO.'),
-            ('TRIGESIMA QUINTA.', ' LAS PARTES ESTABLECEN QUE TRATANDOSE DE '
-              'TELETRABAJO EN CASO DE QUE ESTE SE DE, SE ESTARA A LO DISPUESTO '
-              'POR EL TITULO CUARTO, CAPITULO XII BIS DE LA LEY.'),
-            ('TRIGESIMA SEXTA.', ' EL PATRON MANIFIESTA TENER IMPLEMENTADAS '
-              'LAS DISPOSICIONES PREVISTAS POR LA NOM-035-STPS-2018 Y LA '
-              'NOM-036-1-STPS-2018.'),
-            ('TRIGESIMA SEPTIMA.', ' EL PATRON MANIFIESTA A EL TRABAJADOR QUE '
-              'TIENE IMPLEMENTADO EN EL CENTRO DE TRABAJO MEDIDAS Y PROTOCOLOS '
-              'SANITARIOS PARA LA PREVENCIÓN DE ENFERMEDADES.'),
-            ('TRIGESIMA OCTAVA.', ' AL TÉRMINO DE LA CAPACITACIÓN INICIAL, DE '
-              'NO ACREDITAR COMPETENCIAS "EL TRABAJADOR", A JUICIO "DEL '
-              'PATRÓN", SE DARÁ POR TERMINADA LA RELACIÓN DE TRABAJO SIN '
-              'RESPONSABILIDAD PARA ESTE.'),
-            ('TRIGESIMA NOVENA.', ' LAS PARTES CONVIENEN QUE TODO LO NO '
-              'ESTIPULADO EXPRESAMENTE EN ESTE CONTRATO Y QUE SE ENCUENTRE '
-              'CONTEMPLADO EN LA LEY, REGLAMENTO, SUS LEYES SUPLETORIAS, '
-              'JURISPRUDENCIA Y LA COSTUMBRE LO TIENEN COMO PACTADO.'),
-            ('CUADRAGÉSIMA.', ' "LAS PARTES" CONVIENEN QUE EN CASO DE '
-              'CONTROVERSIA SE ESTARÁ A LO ESTABLECIDO EN EL PRESENTE Y EN LO '
-              'QUE FUERE OMISO SE ENTENDERÁ A LO DISPUESTO POR LA LEY FEDERAL '
-              'DEL TRABAJO BAJO LA JURISDICCIÓN DEL TRIBUNAL LABORAL DEL '
-              'ESTADO DE MEXICO, COMO PRIMERA OPCIÓN.'),
-        ]
-        for num, txt in clausulas:
-          b.p(doc, [(num, True), (txt, False)], align=J,
-            left_indent=14, first_line_indent=-12, space_after=1)
-
-        b.p(doc, [
-            (f'LEÍDO QUE FUE POR LAS PARTES EL DOCUMENTO E IMPUESTOS DEL '
-             f'CONTENIDO, LAS PARTES LO RATIFICAN EN TODAS Y CADA UNA DE SUS '
-             f'PARTES Y LO SUSCRIBEN POR DUPLICADO EL {date_str}, QUEDANDO UN '
-             f'EJEMPLAR EN PODER DE CADA PARTE.', False),
-        ], align=J)
-
-        LINE = '_' * 48
-        b.sig_table(doc,
-            left_lines=[
-                ('"EL PATRON"', True), ('', False), ('', False),
-                (LINE, False),
-                ('LIC. EDWIN GONZALEZ SORIA', True),
-                ('APODERADO LEGAL', True), (emp_name, True),
-            ],
-            right_lines=[
-                ('"EL TRABAJADOR"', True), ('', False), ('', False),
-                (LINE, False), (emp_name, True),
-            ],
-        )
-
-        # ---- Manifestación de No Adeudo ----
-        doc.add_page_break()
-        b.heading(doc, 'MANIFESTACIÓN DE NO ADEUDO', underline=True)
-
-        b.p(doc, [
-            ('QUIEN SUSCRIBE, C ', False), (emp_name, False),
-            (' POR MEDIO DEL PRESENTE, MANIFIESTO BAJO PROTESTA DE DECIR '
-             'VERDAD QUE A LA PRESENTE FECHA ', False),
-            ('NO TENGO ADEUDOS PENDIENTES', True),
-            (' CON EL INFONAVIT, INFONACOT, O DESCUENTOS POR PAGO DE PENSIÓN '
-             'ALIMENTICIA, MOTIVO POR EL QUE RELEVO A LA EMPRESA ', False),
-            (co, True),
-            (' DE LA OBLIGACIÓN DE REALIZAR DESCUENTO ALGUNO DE MI SALARIO '
-             'POR TALES CONCEPTOS.', False),
-        ], align=J)
-
-        b.p(doc, [
-            ('PARA EL CASO DE QUE CUENTE CON ADEUDOS PENDIENTES CON EL '
-             'INFONAVIT, INFONACOT, O DESCUENTOS POR PAGO DE PENSIÓN '
-             'ALIMENTICIA, AUTORIZO A LA EMPRESA ', False),
-            (co, True),
-            (' PARA EFECTUAR LOS DESCUENTOS CORRESPONDIENTES EN TÉRMINOS DE '
-             'LO DISPUESTO POR LA FRACCIÓN III, V Y VII DEL ARTÍCULO 110 DE '
-             'LA LEY FEDERAL DEL TRABAJO.', False),
-        ], align=J)
-
-        b.p(doc, [
-            ('LO ANTERIOR LO MANIFIESTO BAJO PROTESTA DE DECIR VERDAD, '
-             'SABEDOR DE LAS SANCIONES QUE, EN CASO DE INFORMACIÓN FALSA Y '
-             'ENGAÑOSA, ESTABLECEN PARA EL DELITO DE FRAUDE LOS ARTÍCULOS 386, '
-             '387, 388 Y 388 BIS DEL CÓDIGO PENAL FEDERAL.', False),
-        ], align=J)
-
-        b.p(doc, [
-            (f'QUEDA AUTORIZADO EL EMPLEADOR Y/O PATRÓN ', False),
-            (co, True),
-            (' PARA UTILIZAR LA PRESENTE DECLARACIÓN PARA TODOS LOS FINES '
-             'LEGALES Y ADMINISTRATIVOS A QUE HAYA LUGAR.', False),
-        ], align=J)
-
-        b.p(doc, [(f'ESTADO DE MEXICO A {date_str}', True)], align=C,
-            space_before=20)
-
-        b.sig_table(doc,
-            left_lines=[('', False)],
-            right_lines=[(LINE, False), (f'C. {emp_name}', True)],
-            space_pt=60,
-        )
-
-        # ---- Plan de Previsión Social ----
-        doc.add_page_break()
-        b.p(doc, [('C. ', True), ('REPRESENTANTE LEGAL DE LA EMPRESA', True)])
-        b.p(doc, [('C. ', True), (co, True)])
-
-        b.p(doc, [
-            ('El suscripto de la presente es trabajador de la empresa '
-             'ESTEVEZ.JOR SERVICIOS, S.A. DE C.V., toda vez que tiene '
-             'celebrado contrato individual del trabajo por tiempo CERO DIAS '
-             'con esa empresa, mismo contrato que a la fecha se encuentra '
-             'vigente.', False),
-        ], align=J)
-
-        b.p(doc, [
-            ('Manifiesto que se me ha dado a conocer el Plan de Previsión '
-             'Social de la empresa ESTEVEZ.JOR SERVICIOS, S.A. DE C.V., y '
-             'estoy enterado de las condiciones del mismo; de manera voluntaria '
-             'solicito participar de los beneficios previstos en el Plan a '
-             'partir de esta fecha.', False),
-        ], align=J)
-
-        b.p(doc, [('Sin más por el momento quedo de usted', False)], align=C)
-        b.p(doc, [('ATENTAMENTE', True)], align=C, space_before=20)
-        b.p(doc, [(emp_name, True)], align=C, space_before=30)
-
-        doc.add_page_break()
-        b.p(doc, [(date_str, True)], align=R)
-        b.p(doc, [('C. ', True), (emp_name, True)], space_before=20)
-
-        b.p(doc, [
-            ('Por medio del presente escrito y de conformidad a la solicitud '
-             'presentada por usted para participar de los beneficios previstos '
-             'en el Plan de Previsión Social de la empresa ESTEVEZ.JOR '
-             'SERVICIOS, S.A. DE C.V. y, toda vez que usted cumple con los '
-             'requisitos de elegibilidad establecidos en el referido Plan, '
-             'comunico a usted que ha sido aceptado para gozar de los '
-             'beneficios de dicho Plan con el carácter de participante.', False),
-        ], align=J)
-
-        b.p(doc, [('ATENTAMENTE', True)], align=C, space_before=30)
-        b.p(doc, [('PATRON, REPRESENTANTE LEGAL', True)], align=C)
-
-        return b.download(self.env, 'hr.contract', self.id,
-                          f'Contrato - {self.employee_id.name}.docx',
-                          b.to_bytes(doc))
+        return self._docx_from_template(self.CONTRACT_TEMPLATE, values,
+                                        f'Contrato - {emp.name}.docx')
 
     # --- Addendum ---
 
+    # Plantilla = addendum del sistema anterior (Arial 9 pt, listas numeradas, textos legales
+    # y firmas). Solo se reemplazan los marcadores con los datos del empleado y la empresa,
+    # así el formato queda idéntico al documento anterior.
+    ADDENDUM_TEMPLATE = 'hr_estevez/data/templates/addendum_contrato.docx'
+
+    def _addendum_values(self):
+        employee = self.employee_id
+        today = fields.Date.context_today(self)
+        company_name = (employee._carta_patronal_company_name() if employee
+                        else (self.company_id.name or 'N/A').upper())
+        return {
+            '{{EMPRESA}}': company_name,
+            '{{EMPLEADO}}': employee.name.upper() if employee else 'N/A',
+            '{{RFC_EMPRESA}}': ((employee.company_id or self.company_id).vat or 'N/A').replace(' ', '').upper(),
+            '{{DIA}}': str(today.day),
+            '{{MES}}': _DocxBuilder.MESES_ES[today.month],
+            '{{ANIO}}': str(today.year),
+        }
+
     def action_download_addendum_docx(self):
         self.ensure_one()
-        b = _DocxBuilder
-        emp_name = self.employee_id.name.upper() if self.employee_id else 'N/A'
-        today = date.today()
-        mes = _DocxBuilder.MESES_ES[today.month].lower().capitalize()
-
-        doc = Document()
-        b.apply_default_typography(doc)
-        # Business request: Addendum must use Arial 10.
-        addendum_style = doc.styles['Normal']
-        addendum_style.font.name = 'Arial'
-        addendum_style.font.size = Pt(10)
-        for sec in doc.sections:
-            sec.top_margin = Inches(1)
-            sec.bottom_margin = Inches(1)
-            sec.left_margin = Inches(1.2)
-            sec.right_margin = Inches(1.2)
-
-        b.heading(doc, 'ADDENDUM AL CONTRATO INDIVIDUAL DE TRABAJO')
-        doc.add_paragraph()
-
-        b.p(doc, [
-            ('ADDENDUM AL CONTRATO INDIVIDUAL DE TRABAJO EL QUE CELEBRAN POR '
-             'UNA PARTE LA SOCIEDAD DENOMINADA "ESTEVEZ.JOR SERVICIOS S.A. DE '
-             'C.V..", EN ADELANTE EL "PATRÓN", REPRESENTADA EN ESTE ACTO POR '
-             'EL C. EDWIN GONZALEZ SORIA Y POR OTRA PARTE EL C. ', False),
-            (emp_name, True),
-            (' A QUIEN EN LO SUCESIVO SE LE DENOMINARA EL "TRABAJADOR" '
-             'PUDIENDO REFERIR A AMBOS COMO LAS "PARTES" AL TENOR DE LAS '
-             'SIGUIENTES DECLARACIONES Y CLAUSULAS:', False),
-        ], align=J)
-        doc.add_paragraph()
-
-        b.heading(doc, 'DECLARACIONES')
-        b.p(doc, [('A.', True),
-                  (' EL "PATRÓN" POR CONDUCTO DE SU REPRESENTANTE LEGAL SEÑALA '
-                   'QUE:', False)])
-
-        patron = [
-            ('1.', ' QUE ES UNA SOCIEDAD ANÓNIMA DE CAPITAL VARIABLE DEBIDAMENTE '
-              'CONSTITUIDA Y LEGALMENTE EXISTENTE DE ACUERDO CON LAS LEYES '
-              'MEXICANAS, TAL Y COMO SE ACREDITA EN TÉRMINOS DE INSTRUMENTO '
-              'NOTARIAL NÚMERO 46,404, DE FECHA 4 DE OCTUBRE DE 2011.'),
-            ('2.', ' SU REPRESENTANTE LEGAL CUENTA CON PLENAS Y SUFICIENTES '
-              'FACULTADES PARA CELEBRAR EL PRESENTE CONTRATO, TAL Y COMO LO '
-              'ACREDITA CON EL INSTRUMENTO NOTARIAL NÚMERO 18,435, DE FECHA '
-              '07 DE DICIEMBRE DE 2020.'),
-            ('3.', ' SU REGISTRO FEDERAL DE CONTRIBUYENTES ES ESE111012E79, Y '
-              'MANIFIESTA QUE SE ENCUENTRA AL CORRIENTE DEL CUMPLIMIENTO DE '
-              'SUS OBLIGACIONES FISCALES.'),
-            ('4.', ' QUE ES UNA SOCIEDAD ANÓNIMA DE CAPITAL VARIABLE DEBIDAMENTE '
-              'CONSTITUIDA Y LEGALMENTE EXISTENTE DE ACUERDO CON LAS LEYES '
-              'MEXICANAS (instrumento notarial número 46,404).'),
-            ('5.', ' QUE SU REPRESENTADA CELEBRÓ CON LA PERSONA MORAL '
-              '"MOVIMIENTO TECNOLOGICO, S. DE R.L. DE C.V." EN LO SUCESIVO EL '
-              '"ADMINISTRADOR" UN CONTRATO DE PRESTACIÓN DE SERVICIOS RESPECTO '
-              'DE UN PLAN INTEGRAL DE PREVISIÓN SOCIAL Y COMPENSACIONES '
-              'REGISTRADO EN LA CONSAR.'),
-        ]
-        for num, txt in patron:
-            b.p(doc, [(num, True), (txt, False)], align=J)
-
-        b.p(doc, [('B.', True),
-                  (' EL "TRABAJADOR" POR SU PROPIO DERECHO SEÑALA QUE:', False)],
-            space_before=6)
-
-        trabajador = [
-            ('1.', ' TODAS Y CADA UNA DE LAS MANIFESTACIONES HECHAS EN EL '
-              'CONTRATO INDIVIDUAL DE TRABAJO CELEBRADO CON EL "PATRÓN" SIGUEN '
-              'SIENDO CIERTAS.'),
-            ('2.', ' ESTÁ DE ACUERDO EN CELEBRAR EL PRESENTE INSTRUMENTO A '
-              'EFECTO DE ANEXARLO AL CONTRATO INDIVIDUAL DE TRABAJO QUE TIENEN '
-              'CELEBRADO CON EL "PATRÓN", A EFECTO DE QUE FORME PARTE INTEGRAL '
-              'DE ÉSTE.'),
-            ('3.', ' ASIMISMO, MANIFIESTA EL "TRABAJADOR" QUE, DE SER EL CASO, '
-              'ESTÁ DE ACUERDO EN QUE SE DEN LOS AVISOS QUE SE REQUIERAN A LAS '
-              'AUTORIDADES CORRESPONDIENTES PARA LOS EFECTOS LABORALES Y '
-              'FISCALES CORRESPONDIENTES.'),
-        ]
-        for num, txt in trabajador:
-            b.p(doc, [(num, True), (txt, False)], align=J)
-
-        b.heading(doc, 'C L Á U S U L A S')
-
-        clausulas = [
-            ('PRIMERA.', ' - Que el "Trabajador" manifiesta que es su libre y '
-              'entera voluntad que se reconfiguren sus percepciones que recibe '
-              'por parte del "Patrón" para adherirse al Plan Integral de '
-              'Previsión Social y Compensaciones, y que es de su pleno '
-              'conocimiento que con dicho "Plan" se reconfiguren los conceptos '
-              'que integran su percepción total a efecto de que con ello se '
-              'aumente su percepción actual al obtener un 3% adicional como '
-              'ahorro complementario para el retiro.'),
-            ('SEGUNDA.', ' - En este acto el "Patrón" se da por enterado y '
-              'debidamente notificado de la voluntad del "Trabajador" de '
-              'adherirse al Plan Integral de Previsión Social y Compensaciones.'),
-            ('TERCERA.', ' - Las "Partes", se obligan a guardar y mantener en '
-              'secreto y con carácter de confidencial y no divulgar a terceras '
-              'personas ningún tipo de "información confidencial" generada con '
-              'motivo del presente instrumento.'),
-            ('CUARTA.', ' - La duración del presente instrumento surte los '
-              'mismos efectos del Contrato Individual de Trabajo que el '
-              '"Trabajador" tiene celebrado con el "Patrón".'),
-            ('QUINTA.', ' .- Finalmente, las "Partes" manifiestan y están de '
-              'acuerdo en que el "Trabajador" conoce los términos y condiciones '
-              'establecidos en los estatutos del "Plan Integral de Previsión '
-              'Social y Compensaciones" y que firma y acepta conformidad la '
-              'solicitud anexa al presente como Anexo "1".'),
-            ('SEXTA.', f' - Que una vez requisitada la solicitud de mérito el '
-              f'trabajador queda adherido al citado "Plan Integral de Previsión '
-              f'Social y Compensaciones", y el presente instrumento es un '
-              f'"Addendum" al contrato individual de trabajo. Leído que fue en '
-              f'su totalidad el presente Addendum por las "Partes", lo firman '
-              f'al margen y al calce en el Estado de México, el día {today.day} '
-              f'del mes de {mes} del año {today.year} por no contener cláusula '
-              f'alguna que atente contra el derecho, la moral o las buenas '
-              f'costumbres.'),
-        ]
-        for num, txt in clausulas:
-            b.p(doc, [(num, True), (txt, False)], align=J)
-
-        doc.add_paragraph()
-
-        signature_table = doc.add_table(rows=2, cols=2)
-        b.remove_borders(signature_table)
-
-        top_left = signature_table.rows[0].cells[0].paragraphs[0]
-        top_left.alignment = C
-        top_left.add_run('EL "PATRÓN"')
-
-        top_right = signature_table.rows[0].cells[1].paragraphs[0]
-        top_right.alignment = C
-        top_right.add_run('EL "TRABAJADOR"')
-
-        # Keep signature line short enough to avoid wrapping into a second line.
-        line_text = '_' * 38
-
-        bottom_left = signature_table.rows[1].cells[0].paragraphs[0]
-        bottom_left.alignment = C
-        bottom_left.paragraph_format.space_before = Pt(58)
-        bottom_left.paragraph_format.space_after = Pt(4)
-        bottom_left.add_run(line_text)
-
-        bottom_left_name = signature_table.rows[1].cells[0].add_paragraph()
-        bottom_left_name.alignment = C
-        left_name_run = bottom_left_name.add_run('LIC. EDWIN GONZALEZ SORIA')
-        left_name_run.bold = True
-
-        bottom_left_role = signature_table.rows[1].cells[0].add_paragraph()
-        bottom_left_role.alignment = C
-        bottom_left_role.add_run('APODERADO LEGAL')
-
-        bottom_right = signature_table.rows[1].cells[1].paragraphs[0]
-        bottom_right.alignment = C
-        bottom_right.paragraph_format.space_before = Pt(58)
-        bottom_right.paragraph_format.space_after = Pt(4)
-        bottom_right.add_run(line_text)
-
-        bottom_right_name = signature_table.rows[1].cells[1].add_paragraph()
-        bottom_right_name.alignment = C
-        right_name_run = bottom_right_name.add_run(emp_name)
-        right_name_run.bold = True
-
-        return b.download(self.env, 'hr.contract', self.id,
-                          f'Addendum - {self.employee_id.name}.docx',
-                          b.to_bytes(doc))
+        return self._docx_from_template(self.ADDENDUM_TEMPLATE, self._addendum_values(),
+                                        f'Addendum - {self.employee_id.name}.docx')
