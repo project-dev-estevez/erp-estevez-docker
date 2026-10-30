@@ -322,214 +322,455 @@ class HrEmployeeDocxReports(models.Model):
 
     # --- Convenio de Salida ---
 
-    def action_download_convenio_salida_docx(self):
-        self.ensure_one()
-        b = _DocxBuilder
-        emp = self.name.upper()
-        co = self.company_id.name.upper()
-        today = b.fmt_today()
-        entry = b.entry_date_str(self)
-        job = (self.job_id.name or 'N/A').upper()
+    # Datos fijos del convenio tal como los imprimía el sistema anterior.
+    _CONVENIO_APODERADO = 'EDWIN GONZALEZ SORIA'
+    _CONVENIO_TESTIGOS = ('LUIS ENRIQUE CENTELLA TELLEZ', 'VANESA CAMPOS OSORNO')
+    _CONVENIO_DOMICILIO_EMPRESA = (
+        'FILIBERTO GOMEZ N°46, CENTRO INDUSTRIAL TLALNEPANTLA, '
+        'TLALNEPANTLA DE BAZ, ESTADO DE MÉXICO. C.P. 54030.'
+    )
+    _CONVENIO_HORARIO = 'LUNES A VIERNES 8:00 A 18:00 Y SÁBADOS 8:00 A 12:00'
+    _CONVENIO_CANTIDAD = '$0,000.000 (CERO CERO CERO CERO PESOS 00/100 M.N.)'
 
-        doc = Document()
-        b.apply_default_typography(doc)
-        # Convenio uses a different typography by business request.
-        convenio_style = doc.styles['Normal']
-        convenio_style.font.name = 'Calibri'
-        convenio_style.font.size = Pt(10)
+    @staticmethod
+    def _convenio_setup_document(doc):
+        """Replica estilos y página del convenio anterior: Calibri 10 pt en
+        docDefaults, sin espaciado entre párrafos, carta y márgenes de 1"."""
+        from docx.oxml import parse_xml
+        from docx.oxml.ns import nsdecls
+        from docx.shared import Twips
+        styles = doc.styles.element
+        old = styles.find(qn('w:docDefaults'))
+        new = parse_xml(
+            f'<w:docDefaults {nsdecls("w")}><w:rPrDefault><w:rPr>'
+            '<w:rFonts w:ascii="Calibri" w:hAnsi="Calibri" w:eastAsia="Arial" w:cs="Calibri"/>'
+            '<w:color w:val="000000"/><w:sz w:val="20"/><w:szCs w:val="20"/>'
+            '<w:lang w:val="es-MX"/>'
+            '</w:rPr></w:rPrDefault><w:pPrDefault><w:pPr/></w:pPrDefault>'
+            '</w:docDefaults>'
+        )
+        if old is not None:
+            old.addprevious(new)
+            styles.remove(old)
+        else:
+            styles.insert(0, new)
+        # Estilo Normal "limpio" (sin tamaño, fuente ni espaciado propios).
+        normal = doc.styles['Normal'].element
+        for tag in ('w:pPr', 'w:rPr'):
+            el = normal.find(qn(tag))
+            if el is not None:
+                normal.remove(el)
+
         for sec in doc.sections:
-            sec.top_margin = Inches(1)
-            sec.bottom_margin = Inches(1)
-            sec.left_margin = Inches(1.2)
-            sec.right_margin = Inches(1.2)
+            sec.page_width = Twips(12240)
+            sec.page_height = Twips(15840)
+            sec.top_margin = Twips(1440)
+            sec.right_margin = Twips(1440)
+            sec.bottom_margin = Twips(1440)
+            sec.left_margin = Twips(1440)
+            sec.header_distance = Twips(720)
+            sec.footer_distance = Twips(720)
+            sec.gutter = Twips(0)
 
-        b.p(doc, [
-            ('CONVENIO QUE CELEBRAN POR UNA PARTE LA EMPRESA ', True),
-            (co, True),
-            (', REPRESENTADA POR EL LIC. EDWIN GONZALEZ SORIA EN SU CARÁCTER '
-             'DE APODERADO LEGAL Y UNICO RESPONSABLE DE LA RELACIÓN LABORAL, '
-             'EN LO SUCESIVO "LA EMPRESA" Y POR OTRA EL C. ', True),
-            (emp, True),
-            (', POR SU PROPIO DERECHO, EN SU CARÁCTER DE TRABAJADOR, EN LO '
-             'SUCESIVO "EL TRABAJADOR", CONFORME A LOS SIGUIENTES, '
-             'ANTECEDENTES, DECLARACIONES Y CLAUSULAS.', True),
-        ], align=J)
+    @staticmethod
+    def _convenio_par(doc, runs, align=J):
+        """Párrafo sin espaciado propio; runs = [(texto, negrita, subrayado)]."""
+        para = doc.add_paragraph()
+        para.alignment = align
+        for run_def in runs:
+            text, bold = run_def[0], run_def[1]
+            underline = run_def[2] if len(run_def) > 2 else False
+            r = para.add_run(text)
+            if bold:
+                r.bold = True
+            if underline:
+                r.underline = True
+        return para
 
-        b.heading(doc, 'A N T E C E D E N T E S', underline=True)
-        b.p(doc, [
-            ('UNICO.', True),
-            (f' - CON FECHA {entry} ', False),
-            (co, True),
-            (', Y EL C. ', False), (emp, True),
-            (', CELEBRARON UN CONTRATO INDIVIDUAL DE TRABAJO CON EL OBJETO DE '
-             'ESTABLECER Y REGULAR LA RELACIÓN LABORAL Y LAS CONDICIONES EN '
-             'QUE SE IBA A PRESTAR ESTA.', False),
-        ], align=J)
-
-        b.heading(doc, 'D E C L A R A C I O N E S', underline=True)
-
-        declaraciones = [
-            ('I.', f'LA EMPRESA {co}, Y EL C. {emp}, MANIFIESTAN, QUE EN LA '
-              'CELEBRACIÓN DEL PRESENTE CONVENIO, RECONOCEN MUTUAMENTE QUE NO '
-              'HA EXISTIDO DOLO, MALA FE, ERROR, NI CUALQUIER OTRO VICIO DEL '
-              'CONSENTIMIENTO QUE PUDIERA AFECTAR LA VALIDEZ DE ESTE '
-              'INSTRUMENTO DE INEXISTENCIA O NULIDAD.'),
-            ('II.', f'EL C. {emp}, EN SU CARACTER DE TRABAJADOR RECONOCE QUE '
-              'EN EL CONTENIDO DEL PRESENTE CONVENIO, NO EXISTE NINGUNA '
-              'RENUNCIA A SUS DE DERECHOS LABORALES NI MENOSCABO A ESTOS Y EL '
-              'CONVENIO LO CELEBRA POR ASI CONVENIR A SUS INTERESES, POR SU '
-              'PROPIO DERECHO, DE MANERA VOLUNTARIA, LIBRE Y ESPONTANEA SIN '
-              'NINGUN TIPO DE PRESION, POR LO QUE NO EXISTE NINGUN VICIO DEL '
-              'CONSENTIMIENTO QUE PUDIERA AFECTAR LA VALIDEZ DE ESTE CONVENIO '
-              'DE INEXISTENCIA O NULIDAD.'),
-            ('III.', f'LA EMPRESA {co}, Y EL C {emp}, MANIFIESTAN QUE EN SU '
-              'CALIDAD DE TESTIGOS ESTAN PRESENTES EN EL DESARROLLO Y FIRMA '
-              'DEL PRESENTE CONVENIO LA C. JESSICA CARINA CALLEJAS VAZQUEZ, '
-              'LA C. CLAUDIA PEREZ LOPEZ.'),
-            ('IV.', f'LA EMPRESA {co}, Y EL C {emp}, MANIFIESTAN QUE EL '
-              'PRESENTE CONVENIO LO PACTAN DE ESTA FORMA POR RESULTAR MAS '
-              'PRACTICO, YA QUE EN LA EJECUCION DEL MISMO SE REALIZA EN ESTE '
-              'ACTO Y DE MANERA INMEDIATA, AHORRANDO EL TIEMPO QUE SE HUBIERA '
-              'REQUERIDO PARA GENERAR ESTE TRAMITE ANTE EL CENTRO DE '
-              'CONCILIACION LABORAL.'),
-            ('V.', f'LA EMPRESA {co}, Y EL C {emp}, SE RECONOCEN '
-              'RECÍPROCAMENTE SU PERSONALIDAD Y CAPACIDAD LEGAL PARA CELEBRAR '
-              'EL PRESENTE CONVENIO POR LO TANTO SE OBLIGAN EN LOS TÉRMINOS '
-              'DE LAS SIGUIENTES:'),
-        ]
-        for num, text in declaraciones:
-            b.p(doc, [(num, True), (f' {text}', False)], align=J)
-
-        b.heading(doc, 'C L Á U S U L A S', underline=True)
-
-        clausulas = [
-            ('PRIMERA.', f' DECLARAN, LA EMPRESA {co}, Y EL C {emp}, QUE EN '
-              f'TERMINOS DE LA FRACCION I DEL ARTICULO 53 DE LA LEY FEDERAL '
-              f'DEL TRABAJO, POR ASI CONVENIR A LOS INTERESES DEL C. {emp}, '
-              f'POR MUTUO CONSENTIMIENTO, MANIFIESTAN Y RATIFICAN SU VOLUNTAD '
-              f'DE DAR POR TERMINADA LA RELACION LABORAL QUE LOS UNIA '
-              f'MEDIANTE EL CONTRATO INDIVIDUAL DE TRABAJO MENCIONADO EN EL '
-              f'CAPITULO DE ANTECEDENTES DEL PRESENTE CONVENIO.'),
-            ('SEGUNDA.', f' DECLARAN, EL C. {emp}, QUE POR ASI CONVENIR A '
-              f'SUS INTERESES Y POR MUTUO CONSENTIMIENTO, ES SU LIBRE '
-              f'VOLUNTAD DAR POR TERMINADA LA RELACIÓN LABORAL QUE LO HA '
-              f'UNIDO CON LA EMPRESA {co}, HASTA EL DÍA {today} TERMINACIÓN '
-              f'LABORAL QUE HACE CON FUNDAMENTO EN LO DISPUESTO POR LA '
-              f'FRACCIÓN I DEL ARTÍCULO 53 DE LA LEY FEDERAL DEL TRABAJO.'),
-            ('TERCERA.', f' DECLARAN, EL C. {emp}, QUE DURANTE EL TIEMPO QUE '
-              f'LABORÓ PARA LA EMPRESA {co}, SIEMPRE RECIBIÓ DE ÉSTA DE '
-              f'MANERA PUNTUAL, EL PAGO DE LOS SALARIOS ORDINARIOS Y '
-              f'EXTRAORDINARIOS; SIEMPRE SE LE PAGARON LOS SÉPTIMOS DÍAS, '
-              f'DÍAS FESTIVOS, Y HORAS EXTRAS EN LAS ESCASAS OCASIONES QUE '
-              f'LOS LABORO, LOS SALARIOS DEVENGADOS, ASÍ COMO LAS VACACIONES, '
-              f'PRIMA VACACIONAL Y AGUINALDO GENERADOS EN EL TIEMPO LABORADO, '
-              f'COMO CONSECUENCIA NO SE LE ADEUDA NINGUNA SUMA POR DICHOS '
-              f'CONCEPTOS NI POR NINGÚN OTRO.'),
-            ('CUARTA.', f' DECLARAN: EL C. {emp}, QUE INICIO A PRESTAR SUS '
-              f'SERVICIOS PERSONALES Y SUBORDINADOS, ÚNICAMENTE Y '
-              f'EXCLUSIVAMENTE PARA LA EMPRESA {co}, A QUIEN RECONOCE COMO SU '
-              f'ÚNICO PATRON, EN LOS TÉRMINOS Y CONDICIONES QUE A '
-              f'CONTINUACIÓN SE MENCIONAN:'),
-        ]
-        for num, text in clausulas:
-            b.p(doc, [(num, True), (text, False)], align=J)
-
-        # Tabla fecha ingreso / categoría
-        doc.add_paragraph()
-        tbl = doc.add_table(rows=2, cols=2)
-        b.cell_left(tbl.rows[0].cells[0], 'FECHA DE INGRESO', bold=True)
-        b.cell_left(tbl.rows[0].cells[1], entry)
-        b.cell_left(tbl.rows[1].cells[0], 'CATEGORÍA', bold=True)
-        b.cell_left(tbl.rows[1].cells[1], job)
-        doc.add_paragraph()
-
-        clausulas2 = [
-            ('QUINTA.', f' DECLARAN, LA EMPRESA {co}, POR CONDUCTO DEL LIC. '
-              f'EDWIN GONZALEZ SORIA, QUIEN COMPARECE EN SU CARÁCTER DE '
-              f'APODERADO LEGAL, QUE ESTÁ DE ACUERDO CON LO MANIFESTADO POR '
-              f'EL C. {emp}, EN LAS CLÁUSULAS, SEGUNDA, TERCERA Y CUARTA Y '
-              f'CONSECUENTE CON ELLO EXPRESA SU VOLUNTAD PARA DAR POR '
-              f'TERMINADA POR MUTUO CONSENTIMIENTO LA RELACIÓN LABORAL CON '
-              f'EL C. {emp}.'),
-            ('SEXTA.', f' DECLARAN, LA EMPRESA {co}, Y EL C. {emp}, COMO '
-              f'CONSECUENCIA DE LA TERMINACIÓN DEL CONTRATO INDIVIDUAL DE '
-              f'TRABAJO, LA EMPRESA {co} POR CONDUCTO DEL LIC. EDWIN GONZALEZ '
-              f'SORIA, ENTREGA AL C. {emp}, MEDIANTE TRANSFERENCIA QUE EN '
-              f'COPIA SE ANEXA AL PRESENTE, LA CANTIDAD DE $0,000.000 '
-              f'(CERO CERO CERO CERO PESOS 00/100 M.N.) COMO FINIQUITO DE '
-              f'TODAS Y CADA UNA DE LAS PRESTACIONES A QUE TUVO DERECHO EL '
-              f'C. {emp}, DURANTE LA RELACIÓN LABORAL QUE SE DA POR TERMINADA '
-              f'EL DÍA {today}.'),
-            ('SÉPTIMA.', f' DECLARAN: EL C. {emp}, QUE ESTA CONFORME CON LA '
-              f'CANTIDAD Y CONCEPTOS CITADOS POR LA EMPRESA ESTEVEZ.JOR '
-              f'SERVICIOS, S.A. DE C.V., EN LA CLÁUSULA ANTERIOR YA QUE EN '
-              f'SU OPORTUNIDAD SIEMPRE RECIBIÓ DE MANERA ININTERRUMPIDA EL '
-              f'PAGO DE LOS SÉPTIMOS DÍAS, DÍAS FESTIVOS, Y HORAS EXTRAS, '
-              f'LOS SALARIOS DEVENGADOS, ASÍ COMO LAS VACACIONES, PRIMA '
-              f'VACACIONAL Y AGUINALDO GENERADOS EN EL TIEMPO LABORADO.'),
-            ('OCTAVA.', f' DECLARA: EL C. {emp}, QUE EL PRESENTE DOCUMENTO NO '
-              f'REPRESENTA NINGUNA RENUNCIA A SUS DERECHOS O MENOSCABO A '
-              f'ESTOS, POR QUE LOS DERECHOS QUE GENERO LE ESTAN SIENDO '
-              f'PAGADOS CONFORME A LA LEY FEDERAL DEL TRABAJO, MOTIVO POR EL '
-              f'CUAL NO SE RESERVA NINGUNA ACCIÓN O DERECHO QUE EJERCITAR EN '
-              f'CONTRA DE LA EMPRESA {co}, A QUIEN RECONOCE COMO SU UNICO '
-              f'PATRON, POR NINGÚN CONCEPTO DE TIPO LABORAL, CIVIL, PENAL, '
-              f'ADMINISTRATIVO O CUALQUIER OTRO.'),
-            ('NOVENA.', f' DECLARAN, LA EMPRESA {co} Y EL C. {emp}, PARA '
-              f'EFECTOS DE CUMPLIR CON LOS REQUISITOS DE VALIDEZ QUE REFIERE '
-              f'EL SEGUNDO PARRAFO DEL ARTICULO 33 DE LA LEY FEDERAL DEL '
-              f'TRABAJO, QUE LA RELACION CIRCUNSTANCIADA DE LOS HECHOS QUE '
-              f'MOTIVAN EL PRESENTE CONVENIO ASI COMO LOS DERECHOS '
-              f'COMPRENDIDOS EN ÉL, SE ENCUENTRAN EXPRESADOS EN EL CAPITULO '
-              f'DE ANTECEDENTES, DECLARACIONES Y EN TODAS Y CADA UNA DE LAS '
-              f'CLAUSULAS QUE SE MENCIONAN EN EL CUERPO DEL PRESENTE CONVENIO.'),
-            ('DÉCIMA.', f' SEÑALAN LAS PARTES COMO DOMICILIOS PARA EFECTO DE '
-              f'OIR Y RECIBIR NOTIFICACIONES LA EMPRESA {co} EL UBICADO EN '
-              f'FILIBERTO GOMEZ N°46, CENTRO INDUSTRIAL TLALNEPANTLA, '
-              f'TLALNEPANTLA DE BAZ, ESTADO DE MÉXICO. C.P. 54030. Y EL C. '
-              f'{emp} EL UBICADO EN REVOLUCIÓN #296, LA ROMANA TLALNEPANTLA '
-              f'DE BAZ, MÉXICO C.P. 54030.'),
-            ('DÉCIMA PRIMERA.', f' DECLARAN, LA EMPRESA {co} Y EL C. {emp}, '
-              f'QUE EL PRESENTE CONVENIO POR NO CONTENER CLÁUSULAS CONTRARIAS '
-              f'A LA MORAL O AL DERECHO Y POR ESTAR DENUNCIADO CONFORME A LO '
-              f'PREVISTO POR LOS ARTÍCULOS 33, Y 53, FRACCIÓN I, DE LA LEY '
-              f'FEDERAL DEL TRABAJO VIGENTE, SE OBLIGAN A ESTAR Y PASAR POR '
-              f'EL EN TODO TIEMPO Y LUGAR COMO SI SE TRATARA DE COSA JUZGADA.'),
-        ]
-        for num, text in clausulas2:
-            b.p(doc, [(num, True), (text, False)], align=J)
-
-        b.p(doc, [
-            (f'LEÍDO QUE FUE EN SU TOTALIDAD EL CONTENIDO DEL PRESENTE '
-             f'DOCUMENTO POR LA EMPRESA {co} EN SU CALIDAD DE PATRON, EL C. '
-             f'{emp} EN SU CALIDAD DE TRABAJADOR, Y LAS C. JESSICA CARINA '
-             f'CALLEJAS VAZQUEZ Y CLAUDIA PEREZ LOPEZ EN SU CALIDAD DE '
-             f'TESTIGOS, LO FIRMAN Y RATIFICAN EN EL MUNICIPIO DE '
-             f'TLALNEPANTLA DE BAZ, ESTADO DE MEXICO A {today}.', False),
-        ], align=J)
-
-        b.sig_table(doc,
-            left_lines=[
-                (co, True), ('RESPONSABLE DE LA RELACIÓN DE TRABAJO', False),
-                ('', False),
-                ('LIC. EDWIN GONZALEZ SORIA', True), ('APODERADO LEGAL.', True),
-                ('', False),
-                ('TESTIGO', False), ('', False),
-                ('JESSICA CARINA CALLEJAS VAZQUEZ', False),
-            ],
-            right_lines=[
-                ('EL TRABAJADOR', True), ('.', False),
-                ('', False),
-                (emp, True), ('.', False),
-                ('', False),
-                ('TESTIGO', False), ('', False),
-                ('CLAUDIA PEREZ LOPEZ', False),
-            ],
+    @staticmethod
+    def _convenio_cell_par(text, bold=False, align=None, after=10):
+        from xml.sax.saxutils import escape as xml_escape
+        jc = f'<w:jc w:val="{align}"/>' if align else ''
+        rpr = '<w:rPr><w:b/><w:bCs/></w:rPr>' if bold else ''
+        return (
+            f'<w:p><w:pPr>{jc}<w:spacing w:before="10" w:after="{after}"/></w:pPr>'
+            f'<w:r>{rpr}<w:t xml:space="preserve">{xml_escape(text or "")}</w:t></w:r></w:p>'
         )
 
-        return b.download(self.env, 'hr.employee', self.id,
-                          f'Convenio de Salida - {self.name}.docx',
-                          b.to_bytes(doc))
+    @classmethod
+    def _convenio_condiciones_table(cls, doc, rows):
+        """Tabla FECHA DE INGRESO / CATEGORÍA / HORARIO: sangría de 720,
+        etiqueta con borde derecho e inferior, valor con borde izquierdo e
+        inferior (igual que el documento anterior)."""
+        from docx.oxml.ns import nsdecls
+        border = '<w:{side} w:val="single" w:sz="5" w:space="0" w:color="000000"/>'
+        trs = ''
+        for i, (label, value) in enumerate(rows):
+            valign = '<w:vAlign w:val="center"/>' if i == 0 else ''
+            trs += (
+                '<w:tr>'
+                '<w:tc><w:tcPr><w:tcW w:w="720" w:type="dxa"/><w:noWrap/></w:tcPr>'
+                f'{cls._convenio_cell_par("")}</w:tc>'
+                '<w:tc><w:tcPr><w:tcW w:w="0" w:type="auto"/><w:noWrap/>'
+                f'<w:tcBorders>{border.format(side="bottom")}{border.format(side="right")}</w:tcBorders>'
+                f'{valign}</w:tcPr>{cls._convenio_cell_par(label, bold=True)}</w:tc>'
+                '<w:tc><w:tcPr><w:tcW w:w="5000" w:type="dxa"/><w:noWrap/>'
+                f'<w:tcBorders>{border.format(side="left")}{border.format(side="bottom")}</w:tcBorders>'
+                f'{valign}</w:tcPr>{cls._convenio_cell_par(value)}</w:tc>'
+                '</w:tr>'
+            )
+        cls._convenio_append_table(doc, (
+            f'<w:tbl {nsdecls("w")}><w:tblPr><w:tblW w:w="0" w:type="auto"/>'
+            '<w:tblLayout w:type="autofit"/><w:tblCellMar>'
+            '<w:top w:w="80" w:type="dxa"/><w:left w:w="80" w:type="dxa"/>'
+            '<w:bottom w:w="80" w:type="dxa"/><w:right w:w="80" w:type="dxa"/>'
+            '</w:tblCellMar></w:tblPr><w:tblGrid><w:gridCol w:w="720"/>'
+            '<w:gridCol w:w="3000"/><w:gridCol w:w="5000"/></w:tblGrid>'
+            f'{trs}</w:tbl>'
+        ))
+
+    @classmethod
+    def _convenio_firmas_table(cls, doc, empresa, empleado):
+        """Bloque de firmas: tabla 2x4 sin bordes, como el documento anterior."""
+        from docx.oxml.ns import nsdecls
+        p = cls._convenio_cell_par
+
+        def tc(content, valign=False):
+            va = '<w:vAlign w:val="center"/>' if valign else ''
+            return (f'<w:tc><w:tcPr><w:tcW w:w="5000" w:type="dxa"/><w:noWrap/>'
+                    f'{va}</w:tcPr>{content}</w:tc>')
+
+        t1, t2 = cls._CONVENIO_TESTIGOS
+        rows = [
+            tc(p(empresa, True, 'center')) + tc(p('EL TRABAJADOR', True, 'center')),
+            tc(p('RESPONSABLE DE LA RELACION DE TRABAJO', False, 'center')
+               + '<w:p/>'
+               + p(f'LIC. {cls._CONVENIO_APODERADO}', True, 'center')
+               + p('APODERADO LEGAL.', True, 'center', after=300))
+            + tc(p(f'C. {empleado}', False, 'center'), valign=True),
+            tc(p('TESTIGO', False, 'center', after=600))
+            + tc(p('TESTIGO', False, 'center', after=600)),
+            tc(p(t1, False, 'center')) + tc(p(t2, False, 'center')),
+        ]
+        cls._convenio_append_table(doc, (
+            f'<w:tbl {nsdecls("w")}><w:tblPr><w:tblW w:w="10000" w:type="dxa"/>'
+            '</w:tblPr><w:tblGrid><w:gridCol w:w="5000"/><w:gridCol w:w="5000"/>'
+            '</w:tblGrid>' + ''.join(f'<w:tr>{r}</w:tr>' for r in rows) + '</w:tbl>'
+        ))
+
+    @staticmethod
+    def _convenio_append_table(doc, tbl_xml):
+        from docx.oxml import parse_xml
+        body = doc.element.body
+        tbl = parse_xml(tbl_xml)
+        sect = body.find(qn('w:sectPr'))
+        if sect is not None:
+            sect.addprevious(tbl)
+        else:
+            body.append(tbl)
+
+    def _convenio_empresa(self):
+        """Razón social como la usaba el sistema anterior (campo patrón)."""
+        company = self.company_id
+        if company.patron:
+            label = dict(company._fields['patron'].selection).get(company.patron)
+            if label:
+                return label
+        return (company.name or '').upper()
+
+    def _convenio_fecha(self, d, sep=' DE '):
+        if not d:
+            return 'N/A'
+        return f"{d.day:02d}{sep}{_DocxBuilder.MESES_ES[d.month]}{sep}{d.year}"
+
+    def _convenio_fecha_ingreso(self):
+        d = self.employment_start_date
+        if not d:
+            contracts = self.contract_ids.filtered('date_of_entry')
+            if contracts:
+                d = contracts.sorted('date_of_entry')[0].date_of_entry
+        return self._convenio_fecha(d, sep='-')
+
+    def _convenio_fecha_terminacion(self, today):
+        """Fecha de la última baja registrada; si el último movimiento no es
+        una baja, la fecha de hoy (zona horaria del usuario)."""
+        from odoo import fields
+        last = self.env['hr.employee.history'].search(
+            [('employee_id', '=', self.id)], order='date desc, id desc', limit=1)
+        if last and last.status == 'baja' and last.date:
+            return fields.Datetime.context_timestamp(self, last.date).date()
+        return today
+
+    def _convenio_domicilio_empleado(self):
+        """CALLE NÚMERO, COLONIA CIUDAD, ESTADO C.P. 00000 (formato anterior)."""
+        calle = ' '.join(filter(None, [
+            (self.private_street or '').strip(),
+            (self.private_street2 or '').strip(),
+        ]))
+        zona = ' '.join(filter(None, [
+            (self.private_colonia or '').strip(),
+            (self.private_city or '').strip(),
+        ]))
+        estado = ' '.join(filter(None, [
+            (self.private_state_id.name or '').strip() if self.private_state_id else '',
+            f'C.P. {self.private_zip.strip()}' if self.private_zip else '',
+        ]))
+        return ', '.join(filter(None, [calle, zona, estado])).upper() or 'N/A'
+
+    def action_download_convenio_salida_docx(self):
+        from odoo import fields
+        self.ensure_one()
+        emp = (self.name or '').upper()
+        co = self._convenio_empresa()
+        apoderado = self._CONVENIO_APODERADO
+        t1, t2 = self._CONVENIO_TESTIGOS
+        dom_co = self._CONVENIO_DOMICILIO_EMPRESA
+        today_d = fields.Date.context_today(self)
+        today = self._convenio_fecha(today_d)
+        fin = self._convenio_fecha(self._convenio_fecha_terminacion(today_d))
+        entry = self._convenio_fecha_ingreso()
+        job = (self.job_id.name or self.job_title or 'N/A').upper()
+        dom_emp = self._convenio_domicilio_empleado()
+
+        doc = Document()
+        self._convenio_setup_document(doc)
+        par = lambda runs, align=J: self._convenio_par(doc, runs, align)  # noqa: E731
+
+        par([
+            ('CONVENIO QUE CELEBRAN POR UNA PARTE LA EMPRESA ', True),
+            (co, True),
+            (f', REPRESENTADA POR EL LIC. {apoderado} EN SU CARÁCTER DE '
+             'APODERADO LEGAL Y UNICO RESPONSABLE DE LA RELACION LABORAL, EN LO '
+             'SUCESIVO “LA EMPRESA” Y POR OTRA EL C. ', True),
+            (emp, True),
+            (', POR SU PROPIO DERECHO, EN SU CARÁCTER DE TRABAJADOR, EN LO '
+             'SUCESIVO “EL TRABAJADOR”, CONFORME A LOS SIGUIENTES, '
+             'ANTECEDENTES, DECLARACIONES Y CLAUSULAS.', True),
+        ])
+
+        par([('A N T E C E D E N T E S', True, True)], C)
+        par([
+            ('UNICO. - ', True),
+            (f'CON FECHA {entry}, LA EMPRESA {co}, Y EL C. {emp}, CELEBRARON UN '
+             'CONTRATO INDIVIDUAL DE TRABAJO CON EL OBJETO DE ESTABLECER Y '
+             'REGULAR LA RELACION LABORAL Y LAS CONDICIONES EN QUE SE IBA A '
+             'PRESTAR ESTA.', False),
+        ])
+
+        par([('D E C L A R A C I O N E S', True, True)], C)
+        declaraciones = [
+            ('I.- ', f'LA EMPRESA {co}, Y EL C. {emp}, MANIFIESTAN, QUE EN LA '
+             'CELEBRACIÓN DEL PRESENTE CONVENIO, RECONOCEN MUTUAMENTE QUE NO HA '
+             'EXISTIDO DOLO, MALA FE, ERROR, NI CUALQUIER OTRO VICIO DEL '
+             'CONSENTIMIENTO QUE PUDIERA AFECTAR LA VALIDEZ DE ESTE INSTRUMENTO '
+             'DE INEXISTENCIA O NULIDAD.'),
+            ('II.- ', f'EL C. {emp}, EN SU CARACTER DE TRABAJADOR RECONOCE QUE '
+             'EN EL CONTENIDO DEL PRESENTE CONVENIO, NO EXISTE NINGUNA RENUNCIA '
+             'A SUS DE DERECHOS LABORALES NI MENOSCABO A ESTOS Y EL CONVENIO LO '
+             'CELEBRA POR ASI CONVENIR A SUS INTERESES, POR SU PROPIO DERECHO, '
+             'DE MANERA VOLUNTARIA, LIBRE Y ESPONTANEA SIN NINGUN TIPO DE '
+             'PRESION, POR LO QUE NO EXISTE NINGUN VICIO DEL CONSENTIMIENTO QUE '
+             'PUDIERA AFECTAR LA VALIDEZ DE ESTE CONVENIO DE INEXISTENCIA O '
+             'NULIDAD.'),
+            ('III.- ', f'LA EMPRESA {co}, Y EL C. {emp}, MANIFIESTAN QUE EN SU '
+             'CALIDAD DE TESTIGOS ESTAN PRESENTES EN EL DESARROLLO Y FIRMA DEL '
+             f'PRESENTE CONVENIO LA C. {t1}, LA C. {t2}.'),
+            ('IV.- ', f'LA EMPRESA {co}, Y EL C. {emp}, MANIFIESTAN QUE EL '
+             'PRESENTE CONVENIO LO PACTAN DE ESTA FORMA POR RESULTAR MAS '
+             'PRACTICO, YA QUE EN LA EJECUCION DEL MISMO SE REALIZA EN ESTE '
+             'ACTO Y DE MANERA INMEDIATA, AHORRANDO EL TIEMPO QUE SE HUBIERA '
+             'REQUERIDO PARA GENERAR ESTE TRAMITE ANTE EL CENTRO DE '
+             'CONCILIACION LABORAL.'),
+            ('V.- ', f'LA EMPRESA {co}, Y EL C. {emp}, SE RECONOCEN '
+             'RECÍPROCAMENTE SU PERSONALIDAD Y CAPACIDAD LEGAL PARA CELEBRAR EL '
+             'PRESENTE CONVENIO POR LO TANTO SE OBLIGAN EN LOS TÉRMINOS DE LAS '
+             'SIGUIENTES: '),
+        ]
+        for num, text in declaraciones:
+            par([(num, True), (text, False)])
+
+        par([('C L Á U S U L A S', True, True)], C)
+        par([
+            ('PRIMERA.- ', True),
+            (f'DECLARAN, LA EMPRESA {co}, Y EL C. {emp}, QUE EN TERMINOS DE LA '
+             'FRACCION I DEL ARTICULO 53 DE LA LEY FEDERAL DEL TRABAJO, POR ASI '
+             f'CONVENIR A LOS INTERESES DEL C. {emp}, POR MUTUO CONSENTIMIENTO, '
+             'MANIFIESTAN Y RATIFICAN SU VOLUNTAD DE DAR POR TERMINADA LA '
+             'RELACION LABORAL QUE LOS UNIA MEDIANTE EL CONTRATO INDIVIDUAL DE '
+             'TRABAJO MENCIONADO EN EL CAPITULO DE ANTECEDENTES DEL PRESENTE '
+             'CONVENIO.', False),
+        ])
+        par([
+            ('SEGUNDA.- ', True),
+            (f'DECLARA: EL C. {emp}, QUE POR ASI CONVENIR A SUS INTERESES Y POR '
+             'MUTUO CONSENTIMIENTO, ES SU LIBRE VOLUNTAD DAR POR TERMINADA LA '
+             f'RELACIÓN LABORAL QUE LO HA UNIDO CON LA EMPRESA {co}, HASTA EL '
+             'DÍA ', False),
+            (fin, True),
+            (', TERMINACIÓN LABORAL QUE HACE CON FUNDAMENTO EN LO DISPUESTO POR '
+             'LA FRACCIÓN I DEL ARTÍCULO 53 DE LA LEY FEDERAL DEL TRABAJO.', False),
+        ])
+        par([
+            ('TERCERA.- ', True),
+            (f'DECLARA: EL C. {emp}, QUE DURANTE EL TIEMPO QUE LABORÓ PARA LA '
+             f'EMPRESA {co}, SIEMPRE RECIBIÓ DE ÉSTA DE MANERA PUNTUAL, EL PAGO '
+             'DE LOS SALARIOS ORDINARIOS Y EXTRAORDINARIOS; SIEMPRE SE LE '
+             'PAGARON LOS SÉPTIMOS DÍAS, DÍAS FESTIVOS, Y HORAS EXTRAS EN LAS '
+             'ESCASAS OCASIONES QUE LOS LABORO, LOS SALARIOS DEVENGADOS, ASÍ '
+             'COMO LAS VACACIONES, PRIMA VACACIONAL Y AGUINALDO GENERADOS EN EL '
+             'TIEMPO LABORADO, COMO CONSECUENCIA NO SE LE ADEUDA NINGUNA SUMA '
+             'POR DICHOS CONCEPTOS NI POR NINGÚN OTRO, Y SE LE HAN PAGADO TODAS '
+             'Y CADA UNA DE LAS PRESTACIONES LEGALES Y EXTRALEGALES QUE PUDIERAN '
+             'CORRESPONDERLE CONFORME A LA LEY Y A SU CONTRATO DE TRABAJO; QUE '
+             'IGUALMENTE NO PADECE ENFERMEDAD PROFESIONAL CON MOTIVO Y/O '
+             'DERIVADO Y/O A CONSECUENCIA DE SUS LABORES, NI HA SUFRIDO '
+             'ACCIDENTE ALGUNO DE TRABAJO DENTRO DEL DESEMPEÑO DE LAS MISMAS, '
+             'POR LO QUE POR ESTOS CONCEPTOS NO TIENE NINGUNA ACCIÓN O DERECHO '
+             'QUE RESERVARSE PARA EJERCITARLO CON POSTERIORIDAD.', False),
+        ])
+        par([
+            ('CUARTA.- ', True),
+            (f'DECLARA: EL C. {emp} QUE INICIO A PRESTAR SUS SERVICIOS '
+             'PERSONALES Y SUBORDINADOS, ÚNICAMENTE Y EXCLUSIVAMENTE PARA LA '
+             f'EMPRESA {co}, A QUIEN RECONOCE COMO SU ÚNICO PATRON, EN LOS '
+             'TÉRMINOS Y CONDICIONES QUE A CONTINUACIÓN SE MENCIONAN:', False),
+        ])
+
+        doc.add_paragraph()
+        self._convenio_condiciones_table(doc, [
+            ('FECHA DE INGRESO', entry),
+            ('CATEGORÍA', job),
+            ('HORARIO DE LABORES', self._CONVENIO_HORARIO),
+        ])
+        doc.add_paragraph()
+
+        par([
+            ('QUINTA.- ', True),
+            (f'DECLARA LA EMPRESA {co}, POR CONDUCTO DEL LIC. {apoderado}, QUIEN '
+             'COMPARECE EN SU CARÁCTER DE APODERADO LEGAL, QUE ESTÁ DE ACUERDO '
+             f'CON LO MANIFESTADO POR EL C. {emp}, EN LAS CLÁUSULAS, SEGUNDA, '
+             'TERCERA Y CUARTA Y CONSECUENTE CON ELLO EXPRESA SU VOLUNTAD PARA '
+             'DAR POR TERMINADA POR MUTUO CONSENTIMIENTO LA RELACIÓN LABORAL '
+             f'CON EL C. {emp}, EN TÉRMINOS DE LA FRACCIÓN I DEL ARTÍCULO 53 DE '
+             'LA LEY FEDERAL DEL TRABAJO.', False),
+        ])
+        par([
+            ('SEXTA.- ', True),
+            (f'DECLARAN, LA EMPRESA {co} Y EL C. {emp}, COMO CONSECUENCIA DE LA '
+             'TERMINACIÓN DEL CONTRATO INDIVIDUAL DE TRABAJO MENCIONADO EN EL '
+             f'CAPITULO DE ANTECEDENTES DEL PRESENTE CONVENIO, LA EMPRESA {co}, '
+             f'POR CONDUCTO DEL LIC. {apoderado}, QUIEN COMPARECE EN SU CARÁCTER '
+             'DE APODERADO LEGAL, ENTREGA AL ', False),
+            (f'C. {emp}', True),
+            (', MEDIANTE TRANSFERENCIA QUE EN COPIA SE ANEXA AL PRESENTE Y QUE '
+             'FORMA PARTE INTEGRANTE DE ESTE CONVENIO, LA CANTIDAD DE ', False),
+            (f'{self._CONVENIO_CANTIDAD} ', True),
+            ('COMO FINIQUITO DE TODAS Y CADA UNA DE LAS PRESTACIONES A QUE TUVO '
+             f'DERECHO EL C. {emp}, DURANTE LA RELACIÓN LABORAL QUE SE DA POR '
+             'TERMINADA EL DÍA ', False),
+            (fin, True),
+            ('.', False),
+        ])
+        par([
+            ('EN EL ENTENDIDO DE QUE CON ESA CANTIDAD SE LE CUBREN TOTALMENTE '
+             'LAS PRESTACIONES QUE LE CORRESPONDIERON HASTA LA JORNADA NORMAL DE '
+             f'LABORES QUE LE CORRESPONDIÓ HASTA EL {fin}, DE ACUERDO CON SU '
+             'CONTRATO INDIVIDUAL DE TRABAJO Y LA LEY FEDERAL DEL TRABAJO.', False),
+        ])
+        par([
+            ('SÉPTIMA.- ', True),
+            (f'DECLARA: EL C. {emp}, QUE ESTA CONFORME CON LA CANTIDAD Y '
+             f'CONCEPTOS CITADOS POR LA EMPRESA {co}, EN LA CLÁUSULA ANTERIOR YA '
+             'QUE EN SU OPORTUNIDAD SIEMPRE RECIBIÓ DE MANERA ININTERRUMPIDA EL '
+             'PAGO DE LOS SÉPTIMOS DÍAS, DÍAS FESTIVOS, Y HORAS EXTRAS EN LAS '
+             'ESCASAS OCASIONES QUE LAS LABORO, LOS SALARIOS DEVENGADOS, ASÍ '
+             'COMO LAS VACACIONES, PRIMA VACACIONAL Y AGUINALDO GENERADOS EN EL '
+             'TIEMPO LABORADO, COMO CONSECUENCIA NO SE LE ADEUDA NINGUNA SUMA '
+             'POR DICHOS CONCEPTOS NI POR NINGÚN OTRO, Y SE LE HAN PAGADO TODAS '
+             'Y CADA UNA DE LAS PRESTACIONES LEGALES QUE PUDIERAN '
+             'CORRESPONDERLE CONFORME A LA LEY FEDERAL DEL TRABAJO Y A LAS '
+             'PACTADAS EN SU CONTRATO INDIVIDUAL DE TRABAJO.', False),
+        ])
+        par([
+            ('OCTAVA.- ', True),
+            (f'DECLARA: EL C. {emp}, QUE EL PRESENTE DOCUMENTO NO REPRESENTA '
+             'NINGUNA RENUNCIA A SUS DERECHOS O MENOSCABO A ESTOS, POR QUE LOS '
+             'DERECHOS QUE GENERO HASTA EL DIA ', False),
+            (fin, True),
+            (' LE ESTAN SIENDO PAGADOS CONFORME A LA LEY FEDERAL DEL TRABAJO Y A '
+             'LAS CONDICIONES PACTADAS EN SU CONTRATO INDIVIDUAL DE TRABAJO, '
+             'MOTIVO POR EL CUAL NO SE RESERVA NINGUNA ACCIÓN O DERECHO QUE '
+             f'EJERCITAR EN CONTRA DE LA EMPRESA {co}, A QUIEN RECONOCE COMO SU '
+             'UNICO PATRON, O DE QUIEN LEGALMENTE REPRESENTE SUS INTERESES, O DE '
+             'LOS SOCIOS Y ACCIONISTAS DE LA MISMA, O QUIEN MAS LLEGARA A '
+             'RESULTAR SER PATRÓN, PROPIETARIO O RESPONSABLE DE LA FUENTE DE '
+             'TRABAJO QUE SE UBICA EN ', False),
+            (dom_co, True),
+            (', POR NINGÚN CONCEPTO DE TIPO LABORAL, CIVIL, PENAL, '
+             'ADMINISTRATIVO O CUALQUIER OTRO, MANIFESTANDO QUE DURANTE EL '
+             f'TIEMPO QUE LABORÓ PARA LA EMPRESA {co}, A QUIEN RECONOCE COMO SU '
+             'ÚNICO PATRÓN LABORAL, NO SUFRIÓ ENFERMEDAD, ACCIDENTE O RIESGO DE '
+             'TRABAJO DERIVADO DEL MISMO Y RECIBIÓ EL BUEN TRATO QUE LE '
+             'CORRESPONDIÓ COMO TRABAJADOR DE ESTA ÚLTIMA.', False),
+        ])
+        par([
+            ('NOVENA.- ', True),
+            (f'DECLARAN, LA EMPRESA {co} Y EL C. {emp}, PARA EFECTOS DE CUMPLIR '
+             'CON LOS REQUISITOS DE VALIDEZ QUE REFIERE EL SEGUNDO PARRAFO DEL '
+             'ARTICULO 33 DE LA LEY FEDERAL DEL TRABAJO, QUE LA RELACION '
+             'CIRCUNSTANCIADA DE LOS HECHOS QUE MOTIVAN EL PRESENTE CONVENIO '
+             'ASI COMO LOS DERECHOS COMPRENDIDOS EN ÉL, SE ENCUENTRAN '
+             'EXPRESADOS EN EL CAPITULO DE ANTECEDENTES, DECLARACIONES Y EN '
+             'TODAS Y CADA UNA DE LAS CLAUSULAS QUE SE MENCIONAN EN EL CUERPO '
+             'DEL PRESENTE CONVENIO; Y POR NO CONTENER RENUNCIA DE DERECHOS O '
+             'MENOSCABO A ESTOS, POR ESTAR PACTADO DE MANERA VOLUNTARIA, LIBRE '
+             'Y ESPONTANEA SIN NINGUN TIPO DE PRESION, POR QUE NO EXISTE NINGUN '
+             'VICIO DEL CONSENTIMIENTO QUE PUDIERA AFECTAR LA VALIDEZ DE ESTE '
+             f'CONVENIO DE INEXISTENCIA O NULIDAD, POR QUE EL C. {emp} LO '
+             'CELEBRA POR SU PROPIO DERECHO Y POR ASI CONVENIR A SUS INTERESES; '
+             f'EN ESTE ACTO LA EMPRESA {co} Y EL C. {emp} LO RATIFICAN EN TODAS '
+             'Y CADA UNA DE SUS PARTES.', False),
+        ])
+        par([
+            ('DÉCIMA.- ', True),
+            ('SEÑALAN LAS PARTES COMO DOMICILIOS PARA EFECTO DE OIR Y RECIBIR '
+             'NOTIFICACIONES Y DOCUMENTOS DERIVADOS DE LA INTERPRETACIÓN Y '
+             f'CUMPLIMIENTO DE ESTE CONVENIO LA EMPRESA {co}, EL UBICADO EN ', False),
+            (dom_co, True),
+            (f' Y EL C. {emp} EL UBICADO EN {dom_emp}', False),
+        ])
+        par([
+            ('DÉCIMA PRIMERA.- ', True),
+            (f'DECLARAN, LA EMPRESA {co} Y EL C. {emp}, QUE EL PRESENTE CONVENIO '
+             'POR NO CONTENER CLÁUSULAS CONTRARIAS A LA MORAL O AL DERECHO Y POR '
+             'ESTAR DENUNCIADO CONFORME A LO PREVISTO POR LOS ARTÍCULOS 33, Y '
+             '53, FRACCIÓN I, DE LA LEY FEDERAL DEL TRABAJO VIGENTE, SE OBLIGAN '
+             'A ESTAR Y PASAR POR EL EN TODO TIEMPO Y LUGAR COMO SI SE TRATARA '
+             'DE COSA JUZGADA ASI TAMBIEN A RATIFICARLO EN EL MOMENTO QUE UNA '
+             'PARTE REQUIERA A LA OTRA, ANTE EL CENTRO DE CONCILIACION LABORAL '
+             'Y/O TRIBUNAL LABORAL Y/O CUALQUIER AUTORIDAD DONDE SE DEBA '
+             'RATIFICAR YA SEA POR QUE ASI LO REQUIERA O POR QUE SEA NECESARIO, '
+             'INCURRIENDO EN UNA RESPONSABILIDAD CIVIL Y/O PENAL EN CASO DE QUE '
+             'ALGUNA DE LAS PARTES NO CUMPLA CON ESTA ULTIMA DISPOSICION, '
+             'SITUACION QUE TAMBIEN RATIFICAN CON LOS ALCANCES JURIDICOS QUE DE '
+             'ELLA SE DERIVEN', False),
+        ])
+        par([
+            ('LEÍDO QUE FUE EN SU TOTALIDAD EL CONTENIDO DEL PRESENTE DOCUMENTO '
+             f'POR LA EMPRESA {co}, EN SU CALIDAD DE PATRON Y RESPONSABLE DE LA '
+             f'RELACION DE TRABAJO, EL C. {emp}, EN SU CALIDAD DE TRABAJADOR, Y '
+             f'LAS C. {t1} Y {t2} EN SU CALIDAD DE TESTIGOS, LO FIRMAN Y '
+             'RATIFICAN POR CONTENER EXACTAMENTE LOS TÉRMINOS EN QUE DESEAN '
+             'OBLIGARSE, EN EL MUNICIPIO DE TLALNEPANTLA DE BAZ, ESTADO DE '
+             f'MEXICO A {today}.', False),
+        ])
+
+        doc.add_paragraph()
+        self._convenio_firmas_table(doc, co, emp)
+
+        return _DocxBuilder.download(self.env, 'hr.employee', self.id,
+                                     f'Convenio de Salida - {self.name}.docx',
+                                     _DocxBuilder.to_bytes(doc))
 
     # --- Oficio de Remisión ---
 
