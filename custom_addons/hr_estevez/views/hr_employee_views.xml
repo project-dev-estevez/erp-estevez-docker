@@ -9,7 +9,10 @@
             <field name="arch" type="xml">
                 <filter name="inactive" position="attributes">
                     <attribute name="string">Bajas</attribute>
-                </filter></field>
+                </filter>
+                <xpath expr="//searchpanel/field[@name='department_id']" position="attributes">
+                    <attribute name="string">Área</attribute>
+                </xpath></field>
         </record>
         <record id="view_employee_form_inherit" model="ir.ui.view">
             <field name="name">hr.employee.form.inherit</field>
@@ -489,19 +492,22 @@
             <field name="inherit_id" ref="hr.view_employee_tree"/>
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='name']" position="replace">
-                    <field name="display_name" width="230"/>
+                    <field name="display_name" string="Nombre completo" width="230"/>
                 </xpath>
                 <field name="work_phone" position="attributes">
                     <attribute name="width">210</attribute></field>
                 <field name="work_email" position="attributes">
+                    <attribute name="string">Correo laboral</attribute>
                     <attribute name="width">230</attribute></field>
-                <field name="first_contract_date" position="attributes">
-                    <attribute name="width">210</attribute></field>
-                <field name="activity_user_id" position="attributes">
-                    <attribute name="width">160</attribute></field>
+                <!-- Fecha de ingreso capturada en la ficha, en lugar de la del primer contrato -->
+                <field name="first_contract_date" position="replace">
+                    <field name="employment_start_date" string="Fecha de ingreso" width="160"/>
+                </field>
+                <field name="activity_user_id" position="replace"/>
                 <field name="company_id" position="attributes">
                     <attribute name="width">220</attribute></field>
                 <field name="department_id" position="attributes">
+                    <attribute name="string">Área</attribute>
                     <attribute name="width">220</attribute></field>
                 <field name="job_id" position="attributes">
                     <attribute name="width">210</attribute></field>
