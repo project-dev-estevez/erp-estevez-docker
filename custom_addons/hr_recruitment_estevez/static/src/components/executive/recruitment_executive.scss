@@ -1,0 +1,178 @@
+// Piezas propias del dashboard de Reclutamiento; el resto reutiliza .o_exec de hr_estevez
+$o-recl-accent: #2a78d6;
+$o-recl-accent-soft: #86b6ef;
+$o-recl-track: #eef0f2;
+$o-recl-ink-2: #52514e;
+$o-recl-hairline: #e1e0d9;
+
+.o_recl {
+    .o_recl_unit {
+        font-size: 1rem;
+        font-weight: 600;
+        color: $o-recl-ink-2;
+    }
+
+    .o_recl_vacancy {
+        min-width: 260px;
+    }
+
+    .o_exec_card_head p.o_recl_note {
+        font-size: 0.78rem;
+        color: #898781;
+        margin-top: 0.25rem;
+    }
+
+    .o_recl_vacancy_meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1.25rem;
+        font-size: 0.85rem;
+        color: $o-recl-ink-2;
+        margin-bottom: 0.75rem;
+    }
+
+    // Embudo: barras centradas, conversión entre etapas a la derecha
+    .o_recl_funnel li + li {
+        margin-top: 0.35rem;
+    }
+
+    .o_recl_funnel_row {
+        display: grid;
+        grid-template-columns: minmax(120px, 220px) 1fr 130px;
+        align-items: center;
+        gap: 1rem;
+        width: 100%;
+        background: none;
+        border: 0;
+        border-radius: 0.5rem;
+        padding: 0.3rem 0.5rem;
+        text-align: left;
+        transition: background-color 0.15s ease;
+
+        &:not(:disabled):hover, &:focus-visible {
+            background: #f6f6f4;
+        }
+
+        &:disabled {
+            opacity: 1;
+            cursor: default;
+        }
+    }
+
+    .o_recl_funnel_label {
+        font-size: 0.875rem;
+        color: $o-recl-ink-2;
+        text-align: right;
+    }
+
+    .o_recl_funnel_track {
+        display: flex;
+        justify-content: center;
+    }
+
+    .o_recl_funnel_bar {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 2.5rem;
+        height: 28px;
+        border-radius: 4px;
+        background: $o-recl-accent-soft;
+        transition: width 0.3s ease;
+    }
+
+    .o_recl_funnel_count {
+        font-size: 0.8rem;
+        font-weight: 700;
+        color: #0b0b0b;
+    }
+
+    .o_recl_funnel_hired {
+        .o_recl_funnel_bar { background: $o-recl-accent; }
+        .o_recl_funnel_count { color: #fff; }
+        .o_recl_funnel_label { font-weight: 700; color: #0b0b0b; }
+    }
+
+    .o_recl_funnel_rate {
+        font-size: 0.8rem;
+        color: $o-recl-ink-2;
+
+        small {
+            margin-left: 0.35rem;
+            color: #898781;
+        }
+    }
+
+    // Tabla del equipo
+    .o_recl_scorecard {
+        th {
+            white-space: nowrap;
+        }
+
+        td {
+            vertical-align: middle;
+        }
+    }
+
+    .o_recl_sort {
+        color: $o-recl-ink-2;
+        font-weight: 600;
+        text-decoration: none;
+        font-size: 0.8rem;
+    }
+
+    .o_recl_name {
+        font-weight: 600;
+        text-decoration: none;
+    }
+
+    .o_recl_meter {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        min-width: 140px;
+    }
+
+    .o_recl_meter_track {
+        flex: 1;
+        height: 6px;
+        border-radius: 3px;
+        background: $o-recl-track;
+        overflow: hidden;
+    }
+
+    .o_recl_meter_fill {
+        display: block;
+        height: 100%;
+        background: $o-recl-accent;
+        border-radius: 3px;
+    }
+
+    .o_recl_stalled {
+        text-decoration: none;
+        color: $o-recl-ink-2;
+    }
+
+    .o_recl_stalled_high {
+        text-decoration: none;
+        color: #b26b00;
+        font-weight: 700;
+    }
+
+    @media (max-width: 575.98px) {
+        .o_recl_funnel_row {
+            grid-template-columns: 1fr;
+            gap: 0.25rem;
+        }
+
+        .o_recl_funnel_label, .o_recl_funnel_rate {
+            text-align: center;
+        }
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .o_recl .o_recl_funnel_bar, .o_recl .o_recl_funnel_row {
+        transition: none;
+    }
+}

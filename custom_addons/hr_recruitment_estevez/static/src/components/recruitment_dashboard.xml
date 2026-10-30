@@ -19,79 +19,8 @@
                                   onMounted.bind="onKpisGridMounted"/>
                     </div>
 
-                    <!-- Postulaciones por reclutador y fuentes de reclutamiento -->
-                    <div class="row">
-                        <div class="col-lg-6 m-0 p-0">
-                            <div class="shadow-sm border m-2 p-4 bg-white">
-                                <RecruiterEfficiencyChart startDate="state.startDate"
-                                                          endDate="state.endDate"
-                                                          title="'Eficiencia de Contratación por Reclutador'"
-                                                          height="400"
-                                                          onMounted.bind="onRecruiterEfficiencyMounted"/>
-                            </div>
-                        </div>
-                        <div class="col-lg-6 m-0 p-0">
-                            <div class="shadow-sm border m-2 p-4 bg-white">
-                                <RecruitmentSourcesChart startDate="state.startDate"
-                                                         endDate="state.endDate"
-                                                         title="'Fuentes de Reclutamiento + Efectivas'"
-                                                         height="417"
-                                                         onMounted.bind="onRecruitmentSourcesMounted"/>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Motivos de rechazo -->
-                    <div class="row">
-                        <div class="col-12 m-0 p-0">
-                            <div class="shadow-sm border m-2 p-4 bg-white">
-                                <RejectionReasonsChart startDate="state.startDate"
-                                                       endDate="state.endDate"
-                                                       title="'Declinaciones y Rechazos en el Reclutamiento'"
-                                                       height="350"
-                                                       onMounted.bind="onRejectionReasonsMounted"/>
-                            </div>
-                        </div>                        
-                    </div>
-
-                    <!-- Embudo de Etapas -->
-                    <div class="row">
-                        <div class="col-12 m-0 p-0">
-                            <div class="shadow-sm border m-2 p-4 bg-white">
-                                <RecruitmentFunnelChart startDate="state.startDate"
-                                                        endDate="state.endDate"
-                                                        title="'Embudo de Reclutamiento por Vacante'"
-                                                        height="400"
-                                                        onMounted.bind="onRecruitmentFunnelMounted"/>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Indicadores de requisiciones y torta de tiempo promedio etapas -->
-                    <div class="row">
-                        <div class="col-lg-6 m-0 p-0">
-                            <div class="shadow-sm border m-2 p-4 bg-white">
-                                <!-- ✅ NUEVO COMPONENTE -->
-                                <RequisitionStatsChart startDate="state.startDate"
-                                                       endDate="state.endDate"
-                                                       title="'Indicadores de Requisición de Personal'"
-                                                       height="400"
-                                                       onMounted.bind="onRequisitionStatsMounted"/>
-                            </div>
-                        </div>
-
-                        <div class="col-lg-6 m-0 p-0">
-                            <div class="shadow-sm border m-2 p-4 bg-white">
-                                <ProcessEfficiencyChart
-                                        startDate="state.startDate"
-                                        endDate="state.endDate"
-                                        title="'Eficiencia del Proceso de Contratación'"
-                                        height="610"
-                                        onMounted.bind="onProcessEfficiencyMounted"/>
-                            </div>
-                        </div>
-                    </div>
-
+                    <!-- Desempeño de reclutamiento -->
+                    <RecruitmentExecutive startDate="state.startDate" endDate="state.endDate"/>
                 </div>
             </div>
         </div>

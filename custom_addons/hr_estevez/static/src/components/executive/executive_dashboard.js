@@ -1,8 +1,7 @@
 /** @odoo-module **/
 import { Component, onWillStart, useState } from "@odoo/owl";
 import { useService } from "@web/core/utils/hooks";
-import { escape } from "@web/core/utils/strings";
-import { ExecChart, CHART_INK } from "./exec_chart";
+import { ExecChart, CHART_INK, AXIS, tooltipBox, narrowCategoryLabels } from "./exec_chart";
 
 // Paleta validada con la guía de visualización (categórica y rampa ordinal)
 const COLORS = {
@@ -30,33 +29,6 @@ const SEVERITY_ICON = {
     critical: "fa-exclamation-circle",
     warning: "fa-exclamation-triangle",
     info: "fa-info-circle",
-};
-
-function tooltipBox(title, rows) {
-    const body = rows.map(([color, label, value]) => `
-        <div class="o_exec_tt_row">
-            ${color ? `<span class="o_exec_tt_key" style="background:${color}"></span>` : ""}
-            <strong>${escape(String(value))}</strong><span>${escape(label)}</span>
-        </div>`).join("");
-    return `<div class="o_exec_tt"><div class="o_exec_tt_title">${escape(title)}</div>${body}</div>`;
-}
-
-// En celular los nombres de categoría se acortan para dejar espacio a las barras;
-// el nombre completo queda en el tooltip y en la vista de tabla
-function narrowCategoryLabels(max) {
-    return [{
-        breakpoint: 576,
-        options: {
-            yaxis: { max, labels: { maxWidth: 110, style: { colors: CHART_INK.secondary, fontSize: "12px" } } },
-            dataLabels: { style: { fontSize: "11px" } },
-        },
-    }];
-}
-
-const AXIS = {
-    axisBorder: { show: true, color: CHART_INK.axis },
-    axisTicks: { show: false },
-    labels: { style: { colors: CHART_INK.muted, fontSize: "12px" } },
 };
 
 export class ExecutiveDashboard extends Component {

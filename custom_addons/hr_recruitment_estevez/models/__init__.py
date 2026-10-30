@@ -16,3 +16,4 @@ from . import survey_survey
 from . import hr_candidate_custom
 from . import hr_employee
 from . import hr_candidates_new
+from . import hr_recruitment_executive_dashboard

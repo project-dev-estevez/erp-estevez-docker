@@ -1,0 +1,296 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <t t-name="hr_recruitment_estevez.ExecTableToggle">
+        <button type="button" class="btn btn-sm btn-link o_exec_table_toggle"
+            t-on-click="() => this.toggleTable(key)"
+            t-att-aria-pressed="state.tables[key] ? 'true' : 'false'">
+            <i t-attf-class="fa {{ state.tables[key] ? 'fa-bar-chart' : 'fa-table' }} me-1" aria-hidden="true"/>
+            <t t-esc="state.tables[key] ? 'Gráfica' : 'Tabla'"/>
+        </button>
+    </t>
+
+    <t t-name="hr_recruitment_estevez.RecruitmentExecutive" owl="1">
+        <section class="o_exec o_recl container-fluid p-2" aria-label="Desempeño de reclutamiento">
+
+            <!-- Encabezado y filtros (el periodo es el rango de fechas de arriba) -->
+            <div class="d-flex flex-wrap align-items-end justify-content-between gap-3 mt-3 mb-3">
+                <div>
+                    <h2 class="o_exec_title mb-1">Desempeño de reclutamiento</h2>
+                    <div class="text-muted small">Velocidad, calidad y efectividad del equipo en el periodo seleccionado arriba</div>
+                </div>
+                <div class="d-flex flex-wrap gap-2">
+                    <label t-if="state.options.recruiters.length" class="o_exec_filter">
+                        <span>Reclutador</span>
+                        <select class="form-select form-select-sm" t-on-change="(ev) => this.onFilterChange('recruiterId', ev)">
+                            <option value="">Todo el equipo</option>
+                            <t t-foreach="state.options.recruiters" t-as="r" t-key="r.id">
+                                <option t-att-value="r.id" t-att-selected="r.id === state.filters.recruiterId" t-esc="r.name"/>
+                            </t>
+                        </select>
+                    </label>
+                    <label t-if="state.options.directions.length" class="o_exec_filter">
+                        <span>Dirección</span>
+                        <select class="form-select form-select-sm" t-on-change="(ev) => this.onFilterChange('directionId', ev)">
+                            <option value="">Todas</option>
+                            <t t-foreach="state.options.directions" t-as="d" t-key="d.id">
+                                <option t-att-value="d.id" t-att-selected="d.id === state.filters.directionId" t-esc="d.name"/>
+                            </t>
+                        </select>
+                    </label>
+                </div>
+            </div>
+
+            <t t-set="data" t-value="state.data"/>
+            <div t-if="data" t-attf-class="o_exec_body {{ state.loading ? 'o_exec_refreshing' : '' }}" t-att-aria-busy="state.loading ? 'true' : 'false'">
+
+                <!-- 1. Desempeño del proceso -->
+                <div class="row g-3 mb-3">
+                    <div class="col-12 col-md-6 col-xl-3">
+                        <div class="o_exec_card o_exec_stat" title="Mediana de días entre la postulación y la contratación">
+                            <span class="o_exec_stat_label">Días para contratar</span>
+                            <span class="o_exec_hero"><t t-esc="days(data.kpis.time_to_hire)"/><small t-if="data.kpis.time_to_hire !== null" class="o_recl_unit"> días</small></span>
+                            <span class="o_exec_stat_note">Mediana de <t t-esc="data.kpis.time_to_hire_count"/> contrataciones</span>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-6 col-xl-3">
+                        <div class="o_exec_card o_exec_stat" title="Mediana de días entre la publicación y el cierre de la vacante">
+                            <span class="o_exec_stat_label">Cobertura de vacante</span>
+                            <span class="o_exec_value"><t t-esc="days(data.kpis.time_to_fill)"/> <small t-if="data.kpis.time_to_fill !== null">días</small></span>
+                            <span class="o_exec_stat_note">Publicación → cierre · <t t-esc="data.kpis.time_to_fill_count"/> vacantes cerradas</span>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-6 col-xl-3">
+                        <button type="button" class="o_exec_card o_exec_stat w-100 text-start"
+                            title="Contratados en el periodo ÷ postulaciones recibidas en el periodo"
+                            t-att-disabled="!data.kpis.hired"
+                            t-on-click="() => this.openApplicants(data.kpis.hired_ids, 'Contratados en el periodo')">
+                            <span class="o_exec_stat_label">Conversión</span>
+                            <span class="o_exec_value"><t t-esc="data.kpis.conversion"/>%</span>
+                            <span class="o_exec_stat_note"><t t-esc="data.kpis.hired"/> contratados de <t t-esc="data.kpis.applicants"/> postulaciones</span>
+                        </button>
+                    </div>
+                    <div class="col-12 col-md-6 col-xl-3">
+                        <div class="o_exec_card o_exec_stat" title="De quienes se contrataron hace 3 a 12 meses, cuántos siguen después de 90 días">
+                            <span class="o_exec_stat_label">Retención a 90 días</span>
+                            <span class="o_exec_value"><t t-esc="data.kpis.retention_rate === null ? '—' : data.kpis.retention_rate + '%'"/></span>
+                            <span class="o_exec_stat_note">
+                                <t t-if="data.kpis.retention_measured"><t t-esc="data.kpis.retention_left"/> de <t t-esc="data.kpis.retention_measured"/> contratados salieron antes de 90 días</t>
+                                <t t-else="">Sin contratados de hace 3–12 meses para medir</t>
+                            </span>
+                            <span class="o_exec_stat_note">Mide la calidad de la contratación</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. Embudo por vacante -->
+                <div class="row g-3 mb-3">
+                    <div class="col-12">
+                        <div class="o_exec_card">
+                            <div class="o_exec_card_head">
+                                <div>
+                                    <h3>Embudo de reclutamiento</h3>
+                                    <p>Cuántos candidatos llegaron a cada etapa y qué porcentaje pasa a la siguiente. Toca una etapa para ver a los candidatos.</p>
+                                    <p class="o_recl_note">Sigue solo a las postulaciones de este periodo; las contrataciones de postulaciones anteriores se cuentan en la tarjeta "Contratados".</p>
+                                </div>
+                                <label class="o_exec_filter o_recl_vacancy">
+                                    <span>Vacante</span>
+                                    <select class="form-select form-select-sm" t-on-change="onVacancyChange">
+                                        <option value="">Todas las vacantes</option>
+                                        <t t-foreach="data.vacancies" t-as="v" t-key="v.id">
+                                            <option t-att-value="v.id" t-att-selected="v.id === state.filters.jobId">
+                                                <t t-esc="v.name"/> (<t t-esc="v.applicants"/>)
+                                            </option>
+                                        </t>
+                                    </select>
+                                </label>
+                            </div>
+
+                            <t t-set="funnel" t-value="state.funnel"/>
+                            <div t-if="funnel.vacancy" class="o_recl_vacancy_meta">
+                                <span><strong t-esc="funnel.vacancy.positions"/> posiciones solicitadas</span>
+                                <span t-if="funnel.vacancy.days_open !== null">Abierta hace <strong t-esc="funnel.vacancy.days_open"/> días</span>
+                                <span t-if="!funnel.vacancy.is_open">Sin requisición abierta</span>
+                            </div>
+
+                            <div t-if="!funnel.total" class="o_exec_empty">Sin postulaciones en el periodo.</div>
+                            <ol t-else="" t-attf-class="o_recl_funnel list-unstyled mb-0 {{ state.funnelLoading ? 'o_exec_refreshing' : '' }}">
+                                <li t-foreach="funnel.levels" t-as="level" t-key="level.key">
+                                    <button type="button" t-attf-class="o_recl_funnel_row {{ level.is_hired ? 'o_recl_funnel_hired' : '' }}"
+                                        t-att-disabled="!level.count"
+                                        t-on-click="() => this.openApplicants(level.applicant_ids, level.label)">
+                                        <span class="o_recl_funnel_label" t-esc="level.label"/>
+                                        <span class="o_recl_funnel_track">
+                                            <span class="o_recl_funnel_bar" t-attf-style="width: {{ funnelWidth(level) }}%">
+                                                <span class="o_recl_funnel_count" t-esc="level.count"/>
+                                            </span>
+                                        </span>
+                                        <span class="o_recl_funnel_rate">
+                                            <t t-if="level_index">
+                                                <strong><t t-esc="level.step_rate"/>%</strong> pasa
+                                                <small t-if="level.drop">−<t t-esc="level.drop"/></small>
+                                            </t>
+                                            <t t-else=""><strong>100%</strong> inicio</t>
+                                        </span>
+                                    </button>
+                                </li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. Equipo de reclutamiento -->
+                <div class="row g-3 mb-3">
+                    <div class="col-12">
+                        <div class="o_exec_card">
+                            <div class="o_exec_card_head">
+                                <div>
+                                    <h3>Equipo de reclutamiento</h3>
+                                    <p>Carga, resultados y velocidad de cada reclutador. Ordena por cualquier columna; toca un nombre para ver sus postulaciones.</p>
+                                </div>
+                            </div>
+                            <div t-if="!data.recruiters.length" class="o_exec_empty">Sin actividad de reclutadores en el periodo.</div>
+                            <div t-else="" class="table-responsive">
+                                <table class="table o_exec_table o_recl_scorecard mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th t-foreach="recruiterColumns" t-as="col" t-key="col.key" scope="col">
+                                                <button type="button" class="btn btn-link p-0 o_recl_sort" t-on-click="() => this.sortBy(col.key)"
+                                                    t-att-aria-sort="state.sort.key === col.key ? (state.sort.desc ? 'descending' : 'ascending') : 'none'">
+                                                    <t t-esc="col.label"/> <i t-attf-class="fa {{ sortIcon(col.key) }}" aria-hidden="true"/>
+                                                </button>
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr t-foreach="sortedRecruiters" t-as="r" t-key="r.id">
+                                            <td>
+                                                <button type="button" class="btn btn-link p-0 o_recl_name" t-att-disabled="!r.applicants"
+                                                    t-on-click="() => this.openApplicants(r.applicant_ids, 'Postulaciones · ' + r.name)" t-esc="r.name"/>
+                                            </td>
+                                            <td t-esc="r.open_jobs"/>
+                                            <td t-esc="r.applicants"/>
+                                            <td t-esc="r.hired"/>
+                                            <td>
+                                                <div class="o_recl_meter" t-att-title="r.conversion + '%'">
+                                                    <span class="o_recl_meter_track"><span class="o_recl_meter_fill" t-attf-style="width: {{ r.conversion / maxConversion * 100 }}%"/></span>
+                                                    <span><t t-esc="r.conversion"/>%</span>
+                                                </div>
+                                            </td>
+                                            <td t-esc="days(r.time_to_hire)"/>
+                                            <td>
+                                                <button t-if="r.stalled" type="button" t-attf-class="btn btn-link p-0 {{ r.stalled >= 5 ? 'o_recl_stalled_high' : 'o_recl_stalled' }}"
+                                                    t-on-click="() => this.openApplicants(r.stalled_ids, 'Sin avanzar · ' + r.name)">
+                                                    <i t-if="r.stalled >= 5" class="fa fa-exclamation-triangle me-1" aria-hidden="true"/><t t-esc="r.stalled"/>
+                                                </button>
+                                                <span t-else="" class="text-muted">0</span>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 4. Cuellos de botella  5. Fuentes -->
+                <div class="row g-3 mb-3">
+                    <div class="col-12 col-lg-6">
+                        <div class="o_exec_card h-100">
+                            <div class="o_exec_card_head">
+                                <div>
+                                    <h3>Cuellos de botella</h3>
+                                    <p t-if="data.bottlenecks.length"><strong t-esc="data.bottlenecks[0].name"/> es la etapa más lenta: <t t-esc="data.bottlenecks[0].avg_days"/> días en promedio.</p>
+                                </div>
+                                <t t-if="data.bottlenecks.length" t-call="hr_recruitment_estevez.ExecTableToggle"><t t-set="key" t-value="'bottlenecks'"/></t>
+                            </div>
+                            <div t-if="!data.bottlenecks.length" class="o_exec_empty">Sin movimientos de etapa en el periodo.</div>
+                            <ExecChart t-elif="!state.tables.bottlenecks" options="charts.bottlenecks" height="charts.bottlenecksHeight" ariaLabel="'Días promedio por etapa'"/>
+                            <table t-else="" class="table table-sm o_exec_table">
+                                <thead><tr><th>Etapa</th><th>Días promedio</th><th>Candidatos</th></tr></thead>
+                                <tbody><tr t-foreach="data.bottlenecks" t-as="b" t-key="b.id"><td t-esc="b.name"/><td t-esc="b.avg_days"/><td t-esc="b.count"/></tr></tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="col-12 col-lg-6">
+                        <div class="o_exec_card h-100">
+                            <div class="o_exec_card_head">
+                                <div>
+                                    <h3>Fuentes que funcionan</h3>
+                                    <p>Postulaciones por fuente y cuántas terminan en contratación.</p>
+                                </div>
+                                <t t-if="data.sources.length" t-call="hr_recruitment_estevez.ExecTableToggle"><t t-set="key" t-value="'sources'"/></t>
+                            </div>
+                            <div t-if="!data.sources.length" class="o_exec_empty">Sin postulaciones en el periodo.</div>
+                            <ExecChart t-elif="!state.tables.sources" options="charts.sources" height="charts.sourcesHeight" ariaLabel="'Postulaciones y contrataciones por fuente'"/>
+                            <table t-else="" class="table table-sm o_exec_table">
+                                <thead><tr><th>Fuente</th><th>Postulaciones</th><th>Contratados</th><th>Efectividad</th></tr></thead>
+                                <tbody><tr t-foreach="data.sources" t-as="s" t-key="s.id"><td t-esc="s.name"/><td t-esc="s.applicants"/><td t-esc="s.hired"/><td><t t-esc="s.effectiveness"/>%</td></tr></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 6. Rechazos  7. Alertas -->
+                <div class="row g-3 mb-3">
+                    <div class="col-12 col-lg-6">
+                        <div class="o_exec_card h-100">
+                            <div class="o_exec_card_head">
+                                <div>
+                                    <h3>¿Por qué no se concreta?</h3>
+                                    <p t-if="data.rejections.total"><strong><t t-esc="data.rejections.candidate_share"/>%</strong> de los casos los declinó el candidato; el resto los rechazó la empresa.</p>
+                                </div>
+                                <t t-if="data.rejections.total" t-call="hr_recruitment_estevez.ExecTableToggle"><t t-set="key" t-value="'rejections'"/></t>
+                            </div>
+                            <div t-if="!data.rejections.total" class="o_exec_empty">Sin rechazos en el periodo.</div>
+                            <t t-elif="!state.tables.rejections">
+                                <div class="o_exec_legend">
+                                    <span><span class="o_exec_swatch" t-attf-style="background: {{ colors.decline }}"/>Candidato declinó</span>
+                                    <span><span class="o_exec_swatch" t-attf-style="background: {{ colors.company }}"/>Empresa rechazó</span>
+                                </div>
+                                <ExecChart options="charts.rejections" height="charts.rejectionsHeight" ariaLabel="'Motivos de rechazo y declinación'"/>
+                            </t>
+                            <table t-else="" class="table table-sm o_exec_table">
+                                <thead><tr><th>Motivo</th><th>Quién</th><th>Casos</th><th>%</th></tr></thead>
+                                <tbody>
+                                    <tr t-foreach="data.rejections.reasons" t-as="r" t-key="r.label">
+                                        <td t-esc="r.label"/><td t-esc="r.group === 'candidato' ? 'Candidato' : 'Empresa'"/><td t-esc="r.count"/><td><t t-esc="r.pct"/>%</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="col-12 col-lg-6">
+                        <div class="o_exec_card h-100">
+                            <div class="o_exec_card_head">
+                                <div>
+                                    <h3>Alertas para decidir</h3>
+                                    <p>Lo que requiere una acción hoy.</p>
+                                </div>
+                            </div>
+                            <ul class="list-unstyled mb-0 o_exec_alerts">
+                                <li t-foreach="data.alerts" t-as="alert" t-key="alert.key">
+                                    <button type="button" t-attf-class="o_exec_alert o_exec_alert_{{ alert.severity }} {{ alert.count ? '' : 'o_exec_alert_ok' }}"
+                                        t-att-disabled="!alert.count" t-on-click="() => this.openAlert(alert)">
+                                        <i t-attf-class="fa {{ alert.count ? severityIcon(alert.severity) : 'fa-check-circle' }} o_exec_alert_icon" aria-hidden="true"/>
+                                        <span class="o_exec_alert_text">
+                                            <span><strong t-esc="alert.count"/> <t t-esc="alert.label"/></span>
+                                            <small t-esc="alert.detail"/>
+                                        </span>
+                                        <i t-if="alert.count" class="fa fa-angle-right text-muted" aria-hidden="true"/>
+                                    </button>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <p t-if="data.kpis.retention_unlinked" class="o_exec_footnote">
+                    <i class="fa fa-info-circle me-1" aria-hidden="true"/>
+                    <t t-esc="data.kpis.retention_unlinked"/> contratados de hace 3–12 meses no están vinculados a un empleado y no cuentan en la retención.
+                </p>
+            </div>
+            <div t-else="" class="o_exec_card o_exec_empty">Cargando indicadores…</div>
+        </section>
+    </t>
+</templates>
