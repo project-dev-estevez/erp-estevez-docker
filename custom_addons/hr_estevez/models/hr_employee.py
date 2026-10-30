@@ -18,6 +18,17 @@ EMPLOYEE_PHONE_FIELDS = ('work_phone', 'private_phone', 'emergency_phone', 'emer
 # Formato obligatorio del teléfono fijo: '+52 XXX XXX XXXX'.
 TELEFONO_FIJO_PATTERN = re.compile(r'^\+52 \d{3} \d{3} \d{4}$')
 
+# Nombre del patrón para mostrar en el formulario. Las etiquetas de res.company.patron
+# van en mayúsculas porque deben coincidir con CodeIgniter, así que no se tocan.
+PATRON_DISPLAY_NAMES = {
+    'estevezjor': 'Estevez.Jor Servicios, S.A. de C.V.',
+    'corporativo_comunicacion': 'Corporativo en Comunicación Digital del Futuro, S.A. de C.V.',
+    'planta_ambientalista': 'Planta Ambientalista EESZ S.A. de C.V.',
+    'herrajes': 'Herrajes Estevez, S.A. de C.V.',
+    'rastreo': 'Rastreo Satelital de México J&J S.A. de C.V.',
+    'grupo_back': 'Grupo Back Bone de México S.A. de C.V.',
+}
+
 
 def normalize_mx_phone(raw):
     """Normaliza un número telefónico a formato internacional con espacios.
@@ -228,6 +239,12 @@ class HrEmployee(models.Model):
         ('rastreo', 'Rastreo Satelital de México J&J S.A de C.V.'),
         ('grupo_back', 'Grupo Back Bone de México S.A DE C.V.')
     ], related='company_id.patron', store=True, string='Patrón Fiscal')
+    patron_display = fields.Char(string='Patrón', compute='_compute_patron_display')
+
+    @api.depends('patron')
+    def _compute_patron_display(self):
+        for employee in self:
+            employee.patron_display = PATRON_DISPLAY_NAMES.get(employee.patron, '')
 
     @api.onchange('company_id')
     def _onchange_company_id_sync_fields(self):
@@ -251,14 +268,9 @@ class HrEmployee(models.Model):
         ('vigiliner', 'Vigiliner')
     ], string='Establecimiento')
 
-    registro_patronal = fields.Selection([
-        ('C5350000100', 'C5350000100 - Tlalnepantla de Baz, Edo. Méx'),
-        ('E4673824104', 'E4673824104 - Los Mochis, Sinaloa'),
-        ('H0814082104', 'H0814082104 - Zacatecas'),
-        ('H4814883107', 'H4814883107 - Kuali'),
-        ('C5361185106', 'C5361185106 - Vigiliner / Grupo BackBone'),
-        ('B3613675108', 'B3613675108 - Durango'),
-    ], string='Registro Patronal', required=False)
+    # Catálogo administrable desde Configuración > Registros Patronales
+    registro_patronal_id = fields.Many2one(
+        'hr.registro.patronal', string='Registro Patronal', ondelete='restrict')
 
     bank_id = fields.Many2one('res.bank', string='Banco')
     clabe = fields.Char(
@@ -1047,8 +1059,9 @@ class HrEmployee(models.Model):
         api_token = self.env['ir.config_parameter'].get_param('codeigniter.api_token')
         
         if not api_url or not api_token:
-            _logger.error("Configuración de API para System faltante")
-            return False
+            # Sin configuración (p. ej. ambiente local) se omite la sincronización
+            _logger.warning("Configuración de API para System faltante; se omite la sincronización")
+            return True, ""
 
         if operation == 'create' and not employee.birthday:
             raise ValidationError(
@@ -1132,7 +1145,7 @@ class HrEmployee(models.Model):
         
         patron_nombre = get_selection_label('patron', employee.patron)
         establecimiento_nombre = get_selection_label('establecimiento', employee.establecimiento)
-        registro_patronal_label = get_selection_label('registro_patronal', employee.registro_patronal)
+        registro_patronal_label = employee.registro_patronal_id.display_name or ""
 
         ocupacion_nombre = ""
         ocupacion_id = vals.get('occupation_id') or employee.occupation_id.id
