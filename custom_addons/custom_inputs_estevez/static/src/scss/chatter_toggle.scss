@@ -1,0 +1,87 @@
+// ------------------------------------------------------------------
+// Chatter colapsable (ver static/src/js/chatter_toggle.js)
+// ------------------------------------------------------------------
+
+.o-estevez-chatter-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: map-get($spacers, 2);
+    flex-shrink: 0;
+    color: $gray-700;
+    background-color: $gray-200;
+    border: 1px solid $gray-300;
+    line-height: 1;
+
+    &:hover {
+        color: $gray-900;
+        background-color: $gray-300;
+    }
+}
+
+// Chatter a la derecha (pantallas grandes)
+.o-mail-Form-chatter.o-aside {
+    .o-estevez-chatter-toggle {
+        align-self: flex-start;
+        margin: map-get($spacers, 2);
+        padding: map-get($spacers, 1) map-get($spacers, 2);
+    }
+
+    .o-estevez-chatter-toggle-bottom {
+        display: none;
+    }
+
+    &.o-estevez-chatter-collapsed {
+        flex: 0 0 auto;
+        width: auto;
+        padding-bottom: 0;
+        border-left: 1px solid $border-color;
+
+        // Franja angosta con la etiqueta en vertical
+        .o-estevez-chatter-toggle {
+            flex-direction: column;
+            padding: map-get($spacers, 2) map-get($spacers, 1);
+        }
+
+        .o-estevez-chatter-toggle-label {
+            writing-mode: vertical-rl;
+            font-size: $font-size-sm;
+        }
+    }
+
+    // Abierto: el botón va en su propia fila arriba del chatter para que no lo tape
+    &.o-estevez-chatter-open {
+        flex-direction: column;
+        min-width: $o-mail-Chatter-minWidth;
+
+        .o-estevez-chatter-toggle {
+            margin: map-get($spacers, 2) map-get($spacers, 2) 0;
+            font-size: $font-size-sm;
+        }
+
+        > .o-mail-Chatter {
+            flex: 1 1 auto;
+            min-height: 0;
+        }
+    }
+}
+
+// Chatter abajo del formulario (pantallas pequeñas)
+.o-mail-Form-chatter:not(.o-aside) {
+    flex-direction: column;
+    align-items: stretch;
+
+    .o-estevez-chatter-toggle {
+        align-self: center;
+        margin: map-get($spacers, 3) 0;
+        padding: map-get($spacers, 2) map-get($spacers, 3);
+    }
+
+    .o-estevez-chatter-toggle-side {
+        display: none;
+    }
+
+    &.o-estevez-chatter-collapsed {
+        padding-bottom: map-get($spacers, 3);
+    }
+}

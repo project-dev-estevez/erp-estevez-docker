@@ -1,0 +1,61 @@
+// ------------------------------------------------------------------
+// Estilo homologado de formularios (basado en el formulario de contratos)
+// ------------------------------------------------------------------
+
+.o_form_view {
+    // Etiquetas siempre en negro y negritas, aunque el campo sea de solo lectura
+    .o_form_label,
+    .o_form_label.o_form_label_readonly {
+        opacity: 1;
+        color: $gray-900;
+        font-weight: $font-weight-bold;
+    }
+
+    // Columna de etiquetas con el mismo ancho en todas las secciones
+    @include media-breakpoint-up(sm) {
+        .o_inner_group:not(.oe_subtotal_footer) {
+            grid-template-columns: 170px minmax(0, 1fr);
+        }
+    }
+
+    // Encabezados de sección (string de los <group> y <separator>)
+    .o_horizontal_separator:not(:empty) {
+        color: $o-brand-primary;
+        font-size: .8rem;
+        font-weight: 700;
+        letter-spacing: .06em;
+        text-transform: uppercase;
+        border-bottom: 2px solid $gray-200;
+        box-shadow: none;
+        padding-bottom: .35rem;
+        margin-bottom: .75rem;
+    }
+
+    // Título del registro: grande y sin caja
+    .oe_title h1 {
+        margin-bottom: .35rem;
+
+        // !important: custom_inputs.scss dibuja una caja en todos los inputs
+        .o_field_widget,
+        input {
+            width: 100% !important;
+        }
+
+        input {
+            font-size: 1.75rem !important;
+            font-weight: $font-weight-bold !important;
+            height: auto !important;
+            border: 0 !important;
+            border-bottom: 1px solid transparent !important;
+            border-radius: 0 !important;
+            box-shadow: none !important;
+            padding: 0 0 .15rem !important;
+            background: transparent !important;
+
+            &:hover,
+            &:focus {
+                border-bottom-color: $gray-400 !important;
+            }
+        }
+    }
+}
