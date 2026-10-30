@@ -277,15 +277,16 @@ export class KpisGrid extends Component {
             
             employees.forEach(employee => {
                 if (employee.birthday) {
-                    // Obtener mes del cumpleaños
-                    const birthday = new Date(employee.birthday);
-                    const birthdayMonth = birthday.getMonth();
-                    
+                    // Leer mes y día directo de 'YYYY-MM-DD': new Date() lo toma como UTC
+                    // y en México lo recorre al día anterior (el día 1 caía en el mes previo)
+                    const [, month, day] = employee.birthday.split("-").map(Number);
+                    const birthdayMonth = month - 1;
+
                     // Verificar si el cumpleaños es en el mes actual
                     if (birthdayMonth === currentMonth) {
                         birthdaysThisMonth.push({
                             ...employee,
-                            birthdayDay: birthday.getDate()
+                            birthdayDay: day
                         });
                     }
                 }
@@ -515,10 +516,9 @@ export class KpisGrid extends Component {
 
             // ✅ Verificar que tenemos empleados con cumpleaños en el mes
             if (!this.state.upcomingBirthdays.employees || this.state.upcomingBirthdays.employees.length === 0) {
-                // ✅ Si no hay empleados específicos, crear filtro general
+                // ✅ Nadie cumple este mes: mostrar la vista vacía, no a todos los empleados
                 const domain = [
-                    ["active", "=", true],
-                    ["birthday", "!=", false]
+                    ["id", "in", []]
                 ];
 
                 await this.actionService.doAction({
