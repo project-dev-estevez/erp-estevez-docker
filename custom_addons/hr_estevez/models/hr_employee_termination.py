@@ -6,8 +6,8 @@ _logger = logging.getLogger(__name__)
 
 
 class HrEmployee(models.Model):
-    """Al dar de baja a un empleado (archivarlo), sus contratos en curso o en borrador
-    pasan a Cancelado. Cubre el asistente "Dar de baja" y el archivado directo, porque
+    """Al dar de baja a un empleado (archivarlo), sus contratos en curso, en borrador o
+    vencidos pasan a Cancelado. Cubre el asistente "Dar de baja" y el archivado directo, porque
     ambos terminan escribiendo active=False."""
     _inherit = 'hr.employee'
 
@@ -21,7 +21,7 @@ class HrEmployee(models.Model):
     def _cancel_contracts_on_termination(self):
         contracts = self.env['hr.contract'].sudo().search([
             ('employee_id', 'in', self.ids),
-            ('state', 'in', ('draft', 'open')),
+            ('state', 'in', ('draft', 'open', 'close')),
         ])
         if contracts:
             contracts.write({'state': 'cancel'})
