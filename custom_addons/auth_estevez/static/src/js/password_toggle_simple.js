@@ -1,141 +1,66 @@
-// Password toggle functionality for Odoo login
-(function() {
+// Botón para mostrar/ocultar contraseña en las pantallas de acceso
+// (iniciar sesión, restablecer contraseña, registro y cambio obligatorio de contraseña).
+(function () {
     'use strict';
-    
-    let setupAttempts = 0;
-    const maxAttempts = 10;
-    
-    function setupPasswordToggle() {
-        setupAttempts++;
-        
-        const passwordField = document.querySelector('input[name="password"]');
-        
-        if (!passwordField) {
-            if (setupAttempts < maxAttempts) {
-                setTimeout(setupPasswordToggle, 500);
-            }
+
+    const FORMS = '.oe_login_form, .oe_signup_form, .oe_reset_password_form';
+
+    // Iconos de línea (ojo / ojo tachado) en el color del texto
+    const ICON_SHOW = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.06 12.35a1 1 0 0 1 0-.7C3.42 8.1 7.36 5 12 5s8.58 3.1 9.94 6.65a1 1 0 0 1 0 .7C20.58 15.9 16.64 19 12 19s-8.58-3.1-9.94-6.65"/><circle cx="12" cy="12" r="3"/></svg>';
+    const ICON_HIDE = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c4.64 0 8.58 3.1 9.94 6.65a1 1 0 0 1 0 .7 10.75 10.75 0 0 1-1.44 2.49"/><path d="M14.08 14.16a3 3 0 0 1-4.24-4.24"/><path d="M17.48 17.5A10.75 10.75 0 0 1 12 19c-4.64 0-8.58-3.1-9.94-6.65a1 1 0 0 1 0-.7 10.75 10.75 0 0 1 4.45-5.14"/><path d="m2 2 20 20"/></svg>';
+
+    function setState(button, input, visible) {
+        input.type = visible ? 'text' : 'password';
+        button.innerHTML = visible ? ICON_HIDE : ICON_SHOW;
+        button.setAttribute('aria-pressed', visible ? 'true' : 'false');
+        const label = visible ? 'Ocultar contraseña' : 'Mostrar contraseña';
+        button.setAttribute('aria-label', label);
+        button.title = label;
+    }
+
+    function addToggle(input) {
+        if (input.dataset.passwordToggle) {
             return;
         }
-        
-        const container = passwordField.parentElement;
-        let toggleBtn = container.querySelector('.password-toggle-btn');
-        
-        if (toggleBtn) {
-            toggleBtn.remove();
+        input.dataset.passwordToggle = '1';
+
+        // Envoltura propia para colocar el botón dentro del campo sin tocar la etiqueta
+        const wrapper = document.createElement('span');
+        wrapper.className = 'o_password_wrap';
+        input.parentNode.insertBefore(wrapper, input);
+        wrapper.appendChild(input);
+        input.classList.add('o_password_input');
+
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'o_password_toggle';
+        if (input.id) {
+            button.setAttribute('aria-controls', input.id);
         }
-        
-        // Preparar el contenedor
-        container.style.position = 'relative';
-        passwordField.style.paddingRight = '45px';
-        
-        // Crear el botón
-        toggleBtn = document.createElement('button');
-        toggleBtn.type = 'button';
-        toggleBtn.className = 'password-toggle-btn';
-        toggleBtn.innerHTML = '👁️'; // Usar emoji en lugar de FontAwesome
-        toggleBtn.setAttribute('aria-label', 'Mostrar contraseña');
-        toggleBtn.style.cssText = `
-            position: absolute !important;
-            right: 10px !important;
-            top: 50% !important;
-            transform: translateY(7%) !important;
-            border: none !important;
-            background: rgba(255,255,255,0.8) !important;
-            cursor: pointer !important;
-            padding: 5px !important;
-            color: #6c757d !important;
-            font-size: 16px !important;
-            z-index: 1000 !important;
-            min-width: 30px !important;
-            height: 30px !important;
-            display: flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-            border-radius: 4px !important;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1) !important;
-        `;
-        
-        // Función para manejar el toggle
-        function handleToggle(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            
-            const currentField = document.querySelector('input[name="password"]');
-            if (currentField) {
-                // Guardar la posición actual del cursor
-                const cursorPosition = currentField.selectionStart;
-                const wasPassword = currentField.type === 'password';
-                const newType = wasPassword ? 'text' : 'password';
-                
-                // Cambiar el tipo del input
-                currentField.type = newType;
-                
-                // Restaurar la posición del cursor
-                setTimeout(() => {
-                    currentField.setSelectionRange(cursorPosition, cursorPosition);
-                    currentField.focus();
-                }, 10);
-                
-                // Cambiar el emoji
-                toggleBtn.innerHTML = wasPassword ? '🙈' : '👁️';
-                
-                // Feedback visual
-                const originalColor = toggleBtn.style.color;
-                const originalBackground = toggleBtn.style.background;
-                
-                toggleBtn.style.color = '#007bff';
-                toggleBtn.style.background = 'rgba(0, 123, 255, 0.1)';
-                
-                setTimeout(() => {
-                    toggleBtn.style.color = originalColor;
-                    toggleBtn.style.background = originalBackground;
-                }, 150);
-                
-                toggleBtn.setAttribute('aria-label', wasPassword ? 'Ocultar contraseña' : 'Mostrar contraseña');
+        setState(button, input, false);
+
+        // mousedown sin perder el foco ni la posición del cursor en el campo
+        button.addEventListener('mousedown', (ev) => ev.preventDefault());
+        button.addEventListener('click', () => {
+            const position = input.selectionStart;
+            setState(button, input, input.type === 'password');
+            input.focus();
+            if (position !== null) {
+                input.setSelectionRange(position, position);
             }
-        }
-        
-        // Agregar eventos
-        toggleBtn.addEventListener('click', handleToggle);
-        toggleBtn.addEventListener('mousedown', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
         });
-        
-        // Insertar el botón
-        container.appendChild(toggleBtn);
+        wrapper.appendChild(button);
     }
-    
-    // Inicializar
+
+    function setup() {
+        document.querySelectorAll(FORMS).forEach((form) => {
+            form.querySelectorAll('input[type="password"]').forEach(addToggle);
+        });
+    }
+
     if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', setupPasswordToggle);
+        document.addEventListener('DOMContentLoaded', setup);
     } else {
-        setupPasswordToggle();
-    }
-    
-    window.addEventListener('load', setupPasswordToggle);
-    
-    // Observer para cambios dinámicos
-    const observer = new MutationObserver(function(mutations) {
-        for (const mutation of mutations) {
-            if (mutation.type === 'childList') {
-                for (const node of mutation.addedNodes) {
-                    if (node.nodeType === 1) {
-                        if ((node.matches && node.matches('input[name="password"]')) ||
-                            (node.querySelector && node.querySelector('input[name="password"]'))) {
-                            setTimeout(setupPasswordToggle, 100);
-                            return;
-                        }
-                    }
-                }
-            }
-        }
-    });
-    
-    if (document.body) {
-        observer.observe(document.body, {
-            childList: true,
-            subtree: true
-        });
+        setup();
     }
 })();
