@@ -57,6 +57,7 @@
         'views/hr_department_views.xml',
         'views/hr_area_views.xml',
         'views/hr_registro_patronal_views.xml',
+        'views/hr_occupation_views.xml',
         'views/hr_employee_menu.xml',
         'views/hr_employee_excel_wizard_menu.xml',
         'views/hr_employee_views.xml',
