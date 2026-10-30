@@ -7,6 +7,10 @@ export class KpiChartCard extends Component {
     static props = {
         value: { type: Number },
         label: { type: String },
+        icon: { type: String, optional: true },
+        color: { type: String, optional: true },
+        subtitle: { type: String, optional: true },
+        tooltip: { type: String, optional: true },
         series: { type: Array, optional: true },
         labels: { type: Array, optional: true }, // ✅ NUEVO: Etiquetas para el eje X
         onClick: { type: Function, optional: true },
@@ -32,14 +36,21 @@ export class KpiChartCard extends Component {
         return typeof this.props.onClick === 'function';
     }
 
+    get formattedValue() {
+        return (this.props.value || 0).toLocaleString("es-MX");
+    }
+
+    onCardKeydown(ev) {
+        if ((ev.key === "Enter" || ev.key === " ") && this.hasClick) {
+            ev.preventDefault();
+            this.props.onClick();
+        }
+    }
+
     onCardClick() {
-        console.log("🖱️ Click en card, isPointClicked:", this.isPointClicked);
         // ✅ NUEVO: Solo ejecutar si NO se hizo click en un punto
         if (this.hasClick && !this.isPointClicked) {
-            console.log("✅ Ejecutando click general de card");
             this.props.onClick();
-        } else if (this.isPointClicked) {
-            console.log("❌ Click bloqueado porque se hizo click en punto");
         }
         // ✅ Resetear el flag después de un pequeño delay
         setTimeout(() => {
@@ -51,15 +62,14 @@ export class KpiChartCard extends Component {
         const options = {
             chart: {
                 type: "area",
-                height: 65, // ✅ Altura ajustada para aprovechar mejor el espacio
+                height: 40, // ✅ Cabe en el pie de la tarjeta, como el texto de contexto de las demás
                 sparkline: { enabled: true }, // ✅ VOLVER: Habilitar sparkline para gráfica limpia
                 toolbar: { show: false },
                 events: {
                     dataPointSelection: (event, chartContext, config) => {
                         // ✅ NUEVO: Marcar que se hizo click en un punto
                         this.isPointClicked = true;
-                        console.log("🎯 Click en punto específico:", config.dataPointIndex);
-                        
+
                         // ✅ NUEVO: Manejar click en punto específico
                         if (this.props.onPointClick) {
                             const dayIndex = config.dataPointIndex;
@@ -85,7 +95,7 @@ export class KpiChartCard extends Component {
                 name: "Empleados",
                 data: this.props.series || [0, 0, 0, 0, 0, 0, 0]
             }],
-            colors: ["#008FFB"],
+            colors: [getComputedStyle(this.chartRef.el).getPropertyValue("--o-hr-kpi-accent").trim() || "#008FFB"],
             xaxis: { 
                 labels: { show: false }, 
                 axisTicks: { show: false }, 
@@ -117,7 +127,7 @@ export class KpiChartCard extends Component {
                         box-shadow: 0 2px 8px rgba(0,0,0,0.25);
                         white-space: nowrap;
                     ">
-                        <strong>${dayName}</strong> - ${value} empleados
+                        <strong>${dayName}</strong> - ${value} ${value === 1 ? "alta" : "altas"}
                     </div>`;
                 }
             }

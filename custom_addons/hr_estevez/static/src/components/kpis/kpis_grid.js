@@ -2,8 +2,27 @@
 
 import { Component, onWillStart, onMounted, useState } from "@odoo/owl";
 import { useService } from "@web/core/utils/hooks";
+import { serializeDateTime } from "@web/core/l10n/dates";
 import { KpiCard } from "./kpi_card/kpi_card";
 import { KpiChartCard } from "./kpi_chart_card/kpi_chart_card";
+
+const { DateTime } = luxon;
+
+const MONTH_NAMES = [
+    'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+    'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
+];
+
+// Límites del mes actual en la zona horaria del usuario, serializados en UTC
+// como los guarda Odoo (create_date, hr.employee.history.date)
+function currentMonthRange() {
+    const start = DateTime.local().startOf("month");
+    return {
+        start: serializeDateTime(start),
+        end: serializeDateTime(start.endOf("month")),
+        label: `${MONTH_NAMES[start.month - 1]} ${start.year}`,
+    };
+}
 
 export class KpisGrid extends Component {
 
@@ -22,9 +41,8 @@ export class KpisGrid extends Component {
         // ✅ Estado local para los KPIs
         this.state = useState({
             totalEmployees: { value: 0, series: [], labels: [], dates: [] }, // ✅ Agregamos dates para los clicks
-            activeEmployees: { value: 0 },
-            inactiveEmployees: { value: 0 },
             newThisMonth: { value: 0, startDate: null, endDate: null }, // ✅ Agregamos fechas del mes
+            terminationsThisMonth: { value: 0, employeeIds: [] },
             upcomingBirthdays: { value: 0, employees: [], startDate: null, endDate: null }, // ✅ Agregamos empleados y fechas
             expiringContracts: { value: 0, contracts: [], startDate: null, endDate: null }, // ✅ Agregamos contratos y fechas
             expiredContracts: { value: 0, contracts: [], startDate: null, endDate: null }, // ✅ NUEVO: Contratos vencidos
@@ -56,12 +74,15 @@ export class KpisGrid extends Component {
     }
 
     get kpis() {
+        const month = currentMonthRange().label;
         return [
             {
                 name: "Total Empleados",
                 value: this.state.totalEmployees.value,
-                secondaryValue: 0,
-                showSecondaryValue: false,
+                icon: "fa-users",
+                color: "primary",
+                subtitle: "Altas últimos 7 días",
+                tooltip: "Todos los empleados registrados (activos e inactivos)",
                 showChart: true, // ✅ Solo este KPI tendrá gráfica
                 series: this.state.totalEmployees.series,
                 labels: this.state.totalEmployees.labels, // ✅ NUEVO: Pasar las etiquetas
@@ -69,51 +90,48 @@ export class KpisGrid extends Component {
                 onPointClick: (dayIndex, dayName) => this.viewEmployeesByDay(dayIndex, dayName) // ✅ NUEVO: Click en punto específico
             },
             {
-                name: "Empleados Activos",
-                value: this.state.activeEmployees.value,
-                secondaryValue: 0,
-                showSecondaryValue: false,
-                showChart: false,
-                onClick: () => this.viewActiveEmployees()
-            },
-            {
-                name: "Empleados Inactivos",
-                value: this.state.inactiveEmployees.value,
-                secondaryValue: 0,
-                showSecondaryValue: false,
-                showChart: false,
-                onClick: () => this.viewInactiveEmployees()
-            },
-            {
                 name: "Nuevos este Mes",
                 value: this.state.newThisMonth.value,
-                secondaryValue: 0,
-                showSecondaryValue: false,
-                showChart: false,
+                icon: "fa-user-plus",
+                color: "success",
+                subtitle: month,
+                tooltip: "Empleados dados de alta en el mes actual",
                 onClick: () => this.viewNewThisMonth()
+            },
+            {
+                name: "Bajas este Mes",
+                value: this.state.terminationsThisMonth.value,
+                icon: "fa-user-times",
+                color: "danger",
+                subtitle: month,
+                tooltip: "Empleados dados de baja en el mes actual, según la fecha de baja",
+                onClick: () => this.viewTerminationsThisMonth()
             },
             {
                 name: "Cumpleaños del Mes",
                 value: this.state.upcomingBirthdays.value,
-                secondaryValue: 0,
-                showSecondaryValue: false,
-                showChart: false,
+                icon: "fa-birthday-cake",
+                color: "info",
+                subtitle: MONTH_NAMES[new Date().getMonth()],
+                tooltip: "Empleados activos que cumplen años este mes",
                 onClick: () => this.viewUpcomingBirthdays()
             },
             {
                 name: "Contratos por Vencer",
                 value: this.state.expiringContracts.value,
-                secondaryValue: 0,
-                showSecondaryValue: false,
-                showChart: false,
+                icon: "fa-hourglass-half",
+                color: "warning",
+                subtitle: "Próximos 15 días",
+                tooltip: "Contratos en curso cuya fecha de fin cae en los próximos 15 días",
                 onClick: () => this.viewExpiringContracts()
             },
             {
                 name: "Contratos Vencidos",
                 value: this.state.expiredContracts.value,
-                secondaryValue: 0,
-                showSecondaryValue: false,
-                showChart: false,
+                icon: "fa-calendar-times-o",
+                color: "secondary",
+                subtitle: "Ya cerrados",
+                tooltip: "Contratos cerrados cuya fecha de fin ya pasó",
                 onClick: () => this.viewExpiredContracts()
             }
         ];
@@ -126,9 +144,8 @@ export class KpisGrid extends Component {
         try {
             await Promise.all([
                 this.calculateTotalEmployees(),
-                this.calculateActiveEmployees(),
-                this.calculateInactiveEmployees(),
                 this.calculateNewThisMonth(),
+                this.calculateTerminationsThisMonth(),
                 this.calculateUpcomingBirthdays(),
                 this.calculateExpiringContracts(),
                 this.calculateExpiredContracts(), // ✅ NUEVO: Contratos vencidos
@@ -151,28 +168,27 @@ export class KpisGrid extends Component {
 
             this.state.totalEmployees.value = count;
 
-            // ✅ NUEVO: Calcular series para la gráfica (últimos 7 días)
-            const today = new Date();
+            // ✅ NUEVO: Calcular series para la gráfica (últimos 7 días, en hora local)
             let series = [];
             let labels = [];
-            let dates = []; // ✅ NUEVO: Guardar las fechas para los clicks
-            const diasSemana = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
-            
+            let dates = []; // ✅ NUEVO: Guardar los rangos de cada día para los clicks
+            const diasSemana = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
+
             for (let i = 6; i >= 0; i--) {
-                const date = new Date(today);
-                date.setDate(today.getDate() - i);
-                const dateStr = date.toISOString().slice(0, 10);
-                
-                // Obtener el nombre del día en español
-                const dayName = diasSemana[date.getDay()];
-                labels.push(dayName);
-                dates.push(dateStr); // ✅ NUEVO: Guardar la fecha
-                
+                const day = DateTime.local().minus({ days: i }).startOf("day");
+                const range = {
+                    label: day.toISODate(),
+                    start: serializeDateTime(day),
+                    end: serializeDateTime(day.endOf("day")),
+                };
+                labels.push(diasSemana[day.weekday - 1]);
+                dates.push(range);
+
                 const dayCount = await this.orm.searchCount(
-                    "hr.employee", 
+                    "hr.employee",
                     [
-                        ["create_date", ">=", dateStr + " 00:00:00"], 
-                        ["create_date", "<=", dateStr + " 23:59:59"]
+                        ["create_date", ">=", range.start],
+                        ["create_date", "<=", range.end]
                     ],
                     { context: { active_test: false } }
                 );
@@ -191,47 +207,11 @@ export class KpisGrid extends Component {
         }
     }
 
-    async calculateActiveEmployees() {
-        try {
-            // ✅ TODO: Implementar lógica real
-            const count = await this.orm.searchCount("hr.employee", [["active", "=", true]]);
-            this.state.activeEmployees.value = count;
-        } catch (error) {
-            console.error("❌ KpisGrid HR: Error calculando Empleados Activos:", error);
-            this.state.activeEmployees.value = 0;
-        }
-    }
-
-    async calculateInactiveEmployees() {
-        try {
-            // ✅ TODO: Implementar lógica real
-            const count = await this.orm.searchCount(
-                "hr.employee", 
-                [["active", "=", false]], 
-                { context: { active_test: false } }
-            );
-            this.state.inactiveEmployees.value = count;
-        } catch (error) {
-            console.error("❌ KpisGrid HR: Error calculando Empleados Inactivos:", error);
-            this.state.inactiveEmployees.value = 0;
-        }
-    }
-
     async calculateNewThisMonth() {
         try {
-            // ✅ Obtener el primer y último día del mes actual
-            const today = new Date();
-            const year = today.getFullYear();
-            const month = today.getMonth(); // 0-indexed (Enero = 0)
-            
-            // Primer día del mes
-            const firstDay = new Date(year, month, 1);
-            const firstDayStr = firstDay.toISOString().slice(0, 10) + " 00:00:00";
-            
-            // Último día del mes
-            const lastDay = new Date(year, month + 1, 0); // Día 0 del siguiente mes = último día del mes actual
-            const lastDayStr = lastDay.toISOString().slice(0, 10) + " 23:59:59";
-            
+            // ✅ Primer y último instante del mes actual (hora local, en UTC)
+            const { start: firstDayStr, end: lastDayStr } = currentMonthRange();
+
             // ✅ Contar empleados creados este mes
             const domain = [
                 ["create_date", ">=", firstDayStr],
@@ -253,6 +233,31 @@ export class KpisGrid extends Component {
         } catch (error) {
             console.error("❌ KpisGrid HR: Error calculando Nuevos este Mes:", error);
             this.state.newThisMonth.value = 0;
+        }
+    }
+
+    async calculateTerminationsThisMonth() {
+        try {
+            // ✅ Las bajas quedan en el historial con la fecha capturada en el asistente de baja
+            const { start, end } = currentMonthRange();
+            const groups = await this.orm.readGroup(
+                "hr.employee.history",
+                [
+                    ["status", "=", "baja"],
+                    ["date", ">=", start],
+                    ["date", "<=", end],
+                ],
+                ["employee_id"],
+                ["employee_id"]
+            );
+            // ✅ Un empleado cuenta una sola vez aunque tenga dos bajas en el mes
+            const employeeIds = groups.filter(g => g.employee_id).map(g => g.employee_id[0]);
+            this.state.terminationsThisMonth.value = employeeIds.length;
+            this.state.terminationsThisMonth.employeeIds = employeeIds;
+        } catch (error) {
+            console.error("❌ KpisGrid HR: Error calculando Bajas este Mes:", error);
+            this.state.terminationsThisMonth.value = 0;
+            this.state.terminationsThisMonth.employeeIds = [];
         }
     }
 
@@ -381,13 +386,13 @@ export class KpisGrid extends Component {
             }
 
             const domain = [
-                ["create_date", ">=", selectedDate + " 00:00:00"],
-                ["create_date", "<=", selectedDate + " 23:59:59"]
+                ["create_date", ">=", selectedDate.start],
+                ["create_date", "<=", selectedDate.end]
             ];
 
             await this.actionService.doAction({
                 type: "ir.actions.act_window",
-                name: `👥 Empleados creados el ${dayName} (${selectedDate})`,
+                name: `👥 Empleados creados el ${dayName} (${selectedDate.label})`,
                 res_model: "hr.employee",
                 domain: domain,
                 views: [[false, "kanban"], [false, "list"], [false, "form"]],
@@ -423,42 +428,24 @@ export class KpisGrid extends Component {
         }
     }
 
-    async viewActiveEmployees() {
+    async viewTerminationsThisMonth() {
         try {
+            const { label } = currentMonthRange();
+            const count = this.state.terminationsThisMonth.value;
             await this.actionService.doAction({
                 type: "ir.actions.act_window",
-                name: "✅ Empleados Activos",
+                name: `Bajas - ${label} (${count} ${count === 1 ? "empleado" : "empleados"})`,
                 res_model: "hr.employee",
-                domain: [["active", "=", true]],
-                views: [[false, "kanban"], [false, "list"], [false, "form"]],
-                view_mode: "kanban,list,form",
+                domain: [["id", "in", this.state.terminationsThisMonth.employeeIds]],
+                views: [[false, "list"], [false, "kanban"], [false, "form"]],
+                view_mode: "list,kanban,form",
                 context: {
+                    active_test: false, // ✅ Las bajas están archivadas
                     search_default_group_by_department: 1,
                 },
-                clearBreadcrumbs: true
             });
         } catch (error) {
-            console.error("❌ KpisGrid HR: Error en navegación Empleados Activos:", error);
-        }
-    }
-
-    async viewInactiveEmployees() {
-        try {
-            await this.actionService.doAction({
-                type: "ir.actions.act_window",
-                name: "❌ Empleados Inactivos",
-                res_model: "hr.employee",
-                domain: [["active", "=", false]],
-                views: [[false, "kanban"], [false, "list"], [false, "form"]],
-                view_mode: "kanban,list,form",
-                context: {
-                    active_test: false,
-                    search_default_group_by_department: 1,
-                },
-                clearBreadcrumbs: true
-            });
-        } catch (error) {
-            console.error("❌ KpisGrid HR: Error en navegación Empleados Inactivos:", error);
+            console.error("❌ KpisGrid HR: Error en navegación Bajas este Mes:", error);
         }
     }
 

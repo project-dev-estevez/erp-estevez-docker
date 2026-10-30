@@ -1,0 +1,70 @@
+// Tarjetas KPI del dashboard de Empleados
+.o_hr_kpi_card {
+    --o-hr-kpi-accent: #{$primary};
+    min-height: 150px;
+    border: 1px solid $border-color;
+    border-top: 3px solid var(--o-hr-kpi-accent);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+    &.o_hr_kpi_success { --o-hr-kpi-accent: #{$success}; }
+    &.o_hr_kpi_danger { --o-hr-kpi-accent: #{$danger}; }
+    &.o_hr_kpi_info { --o-hr-kpi-accent: #{$info}; }
+    &.o_hr_kpi_warning { --o-hr-kpi-accent: #{$warning}; }
+    &.o_hr_kpi_secondary { --o-hr-kpi-accent: #{$gray-600}; }
+
+    .o_hr_kpi_icon {
+        width: 2.5rem;
+        height: 2.5rem;
+        font-size: 1.1rem;
+        color: var(--o-hr-kpi-accent);
+        background-color: color-mix(in srgb, var(--o-hr-kpi-accent) 12%, transparent);
+    }
+
+    .o_hr_kpi_value {
+        font-size: 2rem;
+        color: $headings-color;
+    }
+
+    .o_hr_kpi_label {
+        font-size: 0.85rem;
+        color: $gray-700;
+    }
+
+    .o_hr_kpi_sparkline {
+        height: 40px;
+        margin: 0 -0.25rem;
+    }
+
+    .o_hr_kpi_arrow {
+        color: $gray-400;
+        opacity: 0;
+        transform: translateX(-4px);
+        transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+
+    &.o_hr_kpi_clickable {
+        cursor: pointer;
+
+        &:hover, &:focus-visible {
+            transform: translateY(-2px);
+            box-shadow: $box-shadow !important;
+
+            .o_hr_kpi_arrow {
+                opacity: 1;
+                transform: translateX(0);
+                color: var(--o-hr-kpi-accent);
+            }
+        }
+
+        &:focus-visible {
+            outline: 2px solid var(--o-hr-kpi-accent);
+            outline-offset: 2px;
+        }
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .o_hr_kpi_card, .o_hr_kpi_card .o_hr_kpi_arrow {
+        transition: none;
+    }
+}

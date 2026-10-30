@@ -90,6 +90,7 @@
         'web.assets_backend': [
             'hr_estevez/static/src/components/**/*.js',
             'hr_estevez/static/src/components/**/*.xml',
+            'hr_estevez/static/src/components/**/*.scss',
             'hr_estevez/static/src/scss/employee_form.scss',
         ],
     },
