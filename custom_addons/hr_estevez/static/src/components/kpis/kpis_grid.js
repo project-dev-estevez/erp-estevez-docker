@@ -122,7 +122,7 @@ export class KpisGrid extends Component {
                 icon: "fa-hourglass-half",
                 color: "warning",
                 subtitle: "Próximos 15 días",
-                tooltip: "Contratos en curso cuya fecha de fin cae en los próximos 15 días",
+                tooltip: "Contratos en curso de empleados activos cuya fecha de fin cae en los próximos 15 días",
                 onClick: () => this.viewExpiringContracts()
             },
             {
@@ -130,8 +130,8 @@ export class KpisGrid extends Component {
                 value: this.state.expiredContracts.value,
                 icon: "fa-calendar-times-o",
                 color: "secondary",
-                subtitle: "Ya cerrados",
-                tooltip: "Contratos cerrados cuya fecha de fin ya pasó",
+                subtitle: "Sin renovar",
+                tooltip: "Empleados activos cuyo último contrato ya venció y no tienen otro vigente",
                 onClick: () => this.viewExpiredContracts()
             }
         ];
@@ -318,18 +318,15 @@ export class KpisGrid extends Component {
     async calculateExpiringContracts() {
         try {
             // ✅ Obtener fecha actual y fecha límite (próximos 15 días)
-            const today = new Date();
-            const endDate = new Date(today);
-            endDate.setDate(today.getDate() + 15); // Próximos 15 días
+            const todayStr = DateTime.local().toISODate();
+            const endDateStr = DateTime.local().plus({ days: 15 }).toISODate(); // Próximos 15 días
 
-            const todayStr = today.toISOString().slice(0, 10);
-            const endDateStr = endDate.toISOString().slice(0, 10);
-            
             // ✅ Buscar contratos activos que vencen en los próximos 15 días
             const expiringContracts = await this.orm.searchRead(
                 "hr.contract",
                 [
                     ["state", "=", "open"], // Solo contratos activos
+                    ["employee_id.active", "=", true], // Solo empleados activos (no bajas)
                     ["date_end", "!=", false], // Que tengan fecha de fin
                     ["date_end", ">=", todayStr], // Que no hayan vencido aún
                     ["date_end", "<=", endDateStr] // Que venzan en los próximos 15 días
@@ -350,21 +347,43 @@ export class KpisGrid extends Component {
 
     async calculateExpiredContracts() {
         try {
-            // ✅ Obtener fecha actual
-            const today = new Date();
-            const todayStr = today.toISOString().slice(0, 10);
-            
-            // ✅ Buscar TODOS los contratos que vencieron (sin límite de fecha)
-            const expiredContracts = await this.orm.searchRead(
+            const todayStr = DateTime.local().toISODate();
+
+            // ✅ Contratos ya vencidos (expirados o aún "en curso" con fecha pasada) de empleados activos
+            const ended = await this.orm.searchRead(
                 "hr.contract",
                 [
-                    ["state", "=", "close"], // Solo contratos cerrados
-                    ["date_end", "!=", false], // Que tengan fecha de fin
-                    ["date_end", "<", todayStr], // Que hayan vencido (fecha de fin < hoy)
-                    // ✅ No filtrar por rango de fechas - TODOS los vencidos con state=close
+                    ["state", "in", ["open", "close"]],
+                    ["employee_id.active", "=", true], // Las bajas no cuentan
+                    ["date_end", "!=", false],
+                    ["date_end", "<", todayStr],
                 ],
-                ["id", "name", "employee_id", "date_end", "state"]
+                ["id", "name", "employee_id", "date_end", "state"],
+                { order: "date_end desc" }
             );
+
+            // ✅ Quien ya renovó (tiene un contrato vigente) no cuenta
+            const running = await this.orm.searchRead(
+                "hr.contract",
+                [
+                    ["state", "=", "open"],
+                    ["employee_id.active", "=", true],
+                    "|", ["date_end", "=", false], ["date_end", ">=", todayStr],
+                ],
+                ["employee_id"]
+            );
+            const renewed = new Set(running.map((c) => c.employee_id[0]));
+
+            // ✅ Un contrato por empleado: el último que venció
+            const seen = new Set();
+            const expiredContracts = ended.filter((c) => {
+                const employeeId = c.employee_id[0];
+                if (renewed.has(employeeId) || seen.has(employeeId)) {
+                    return false;
+                }
+                seen.add(employeeId);
+                return true;
+            });
 
             this.state.expiredContracts.value = expiredContracts.length;
             this.state.expiredContracts.contracts = expiredContracts; // ✅ Guardar contratos para navegación
@@ -552,16 +571,13 @@ export class KpisGrid extends Component {
             // ✅ Verificar que tenemos contratos por vencer
             if (!this.state.expiringContracts.contracts || this.state.expiringContracts.contracts.length === 0) {
                 // ✅ Si no hay contratos específicos, crear filtro general
-                const today = new Date();
-                const endDate = new Date(today);
-                endDate.setDate(today.getDate() + 15); // Próximos 15 días
-
-                const todayStr = today.toISOString().slice(0, 10);
-                const endDateStr = endDate.toISOString().slice(0, 10);
+                const todayStr = DateTime.local().toISODate();
+                const endDateStr = DateTime.local().plus({ days: 15 }).toISODate();
 
                 // ✅ Crear dominio general para contratos activos con fecha de fin
                 const domain = [
                     ["state", "=", "open"],
+                    ["employee_id.active", "=", true],
                     ["date_end", "!=", false],
                     ["date_end", ">=", todayStr],
                     ["date_end", "<=", endDateStr] // ✅ Límite: próximos 15 días
@@ -615,20 +631,12 @@ export class KpisGrid extends Component {
         try {
             // ✅ Verificar que tenemos contratos vencidos
             if (!this.state.expiredContracts.contracts || this.state.expiredContracts.contracts.length === 0) {
-                // ✅ Si no hay contratos específicos, crear filtro general
-                const today = new Date();
-                const todayStr = today.toISOString().slice(0, 10);
-
-                // ✅ Crear dominio general para contratos vencidos
-                const domain = [
-                    ["state", "=", "close"],
-                    ["date_end", "!=", false],
-                    ["date_end", "<", todayStr]
-                ];
+                // ✅ Nadie pendiente de renovar: mostrar la lista vacía, no todos los contratos cerrados
+                const domain = [["id", "in", []]];
 
                 await this.actionService.doAction({
                     type: "ir.actions.act_window",
-                    name: "❌ Contratos Vencidos (Todos)",
+                    name: "❌ Contratos vencidos sin renovar",
                     res_model: "hr.contract",
                     domain: domain,
                     views: [[false, "list"], [false, "form"]],
@@ -652,7 +660,7 @@ export class KpisGrid extends Component {
 
             await this.actionService.doAction({
                 type: "ir.actions.act_window",
-                name: `❌ Contratos Vencidos (${this.state.expiredContracts.value} contratos)`,
+                name: `❌ Contratos vencidos sin renovar (${this.state.expiredContracts.value})`,
                 res_model: "hr.contract",
                 domain: domain,
                 views: [[false, "list"], [false, "form"]],

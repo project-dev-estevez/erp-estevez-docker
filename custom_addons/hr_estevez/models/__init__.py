@@ -27,3 +27,4 @@ from . import hr_docx_reports
 from . import hr_registro_patronal
 from . import hr_occupation
 from . import hr_executive_dashboard
+from . import hr_employee_termination
