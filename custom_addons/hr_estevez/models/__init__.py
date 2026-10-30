@@ -25,3 +25,4 @@ from . import hr_employee_job_change_wizard
 from . import res_company
 from . import hr_docx_reports
 from . import hr_registro_patronal
+from . import hr_occupation

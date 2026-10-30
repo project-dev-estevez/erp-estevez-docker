@@ -192,7 +192,7 @@ class HrEmployee(models.Model):
     municipality_id = fields.Many2one('hr.municipality', string="Municipio", domain="[('state_id', '=', state_id)]", ondelete='set null')
     municipality_key = fields.Char(compute='_compute_municipality_key', store=True)
 
-    occupation_id = fields.Many2one('hr.occupation', string="Ocupaciones", ondelete='set null')
+    occupation_id = fields.Many2one('hr.occupation', string="Ocupaciones", ondelete='restrict')
     occupation_key = fields.Char(compute='_compute_occupation_key', store=True)    
 
     estudios_id = fields.Many2one('hr.estudios', string="Nivel de estudios", ondelete='set null')
