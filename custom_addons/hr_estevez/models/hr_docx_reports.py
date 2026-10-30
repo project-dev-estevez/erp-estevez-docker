@@ -227,6 +227,22 @@ class _DocxBuilder:
         return stream
 
     @staticmethod
+    def fill_template(template, values):
+        """Copia una plantilla .docx del módulo reemplazando los marcadores {{...}} de word/document.xml."""
+        output = io.BytesIO()
+        with zipfile.ZipFile(file_path(template)) as source, \
+                zipfile.ZipFile(output, 'w', zipfile.ZIP_DEFLATED) as result:
+            for item in source.infolist():
+                data = source.read(item.filename)
+                if item.filename == 'word/document.xml':
+                    xml = data.decode('utf-8')
+                    for marker, value in values.items():
+                        xml = xml.replace(marker, xml_escape(value or 'N/A'))
+                    data = xml.encode('utf-8')
+                result.writestr(item, data)
+        return output.getvalue()
+
+    @staticmethod
     def download(env, model, rec_id, filename, raw_bytes):
         att = env['ir.attachment'].create({
             'name': filename,
@@ -930,165 +946,21 @@ class HrEmployeeDocxReports(models.Model):
 
     # --- Oficio de Remisión ---
 
+    # Plantilla = oficio del sistema anterior (formato, textos y firmas idénticos);
+    # solo se reemplazan razón social, nombre del empleado y fecha.
+    REMISION_TEMPLATE = 'hr_estevez/data/templates/oficio_remision.docx'
+
     def action_download_remision_docx(self):
         self.ensure_one()
-        b = _DocxBuilder
-        emp = self.name.upper()
-        co = self.company_id.name.upper()
-        today = f"{date.today().day} DE {b.MESES_ES[date.today().month]} DE {date.today().year}"
+        values = {
+            '{{EMPRESA}}': self._carta_patronal_company_name(),
+            '{{EMPLEADO}}': self.name.upper(),
+            '{{FECHA}}': _DocxBuilder.fmt_date(fields.Date.context_today(self)),
+        }
+        return _DocxBuilder.download(self.env, 'hr.employee', self.id,
+                                     f'{self.name} - Oficio de Remisión.docx',
+                                     _DocxBuilder.fill_template(self.REMISION_TEMPLATE, values))
 
-        doc = Document()
-        b.apply_default_typography(doc)
-        remision_style = doc.styles['Normal']
-        remision_style.font.name = 'Arial'
-        remision_style.font.size = Pt(10)
-        remision_style.paragraph_format.space_before = Pt(0)
-        remision_style.paragraph_format.space_after = Pt(0)
-        remision_style.paragraph_format.line_spacing = 1.0
-        for sec in doc.sections:
-            sec.top_margin = Inches(0.55)
-            sec.bottom_margin = Inches(0.55)
-            sec.left_margin = Inches(0.9)
-            sec.right_margin = Inches(0.9)
-
-        # Header + addressed block to emulate the visual distribution in the sample.
-        tbl = doc.add_table(rows=2, cols=2)
-        b.remove_borders(tbl)
-        tbl.autofit = False
-        tbl.columns[0].width = Inches(3.05)
-        tbl.columns[1].width = Inches(2.95)
-
-        right = tbl.rows[0].cells[1]
-        for i, (label, val, bold_val) in enumerate([
-            ('Empresa:', co, True),
-            ('Trabajador:', emp, True),
-            ('Actividad De La Empresa:', 'Instalación de Fibra Óptica', False),
-            ('Domicilio:', b.company_address(self.company_id).upper(), False),
-        ]):
-            para = right.paragraphs[0] if i == 0 else right.add_paragraph()
-            para.alignment = J
-            para.paragraph_format.line_spacing = 1.0
-            r1 = para.add_run(f'{label} ')
-            r1.bold = True
-            r2 = para.add_run(val)
-            r2.bold = bold_val
-
-        left = tbl.rows[1].cells[0]
-        for i, (text, bold) in enumerate([
-            ('H. PRIMER TRIBUNAL LABORAL', True),
-            ('DE LA REGION JUDICIAL', True),
-            ('TLALNEPANTLA.', True),
-            ('', False),
-            ('H. CENTRO DE CONCILIACION LABORAL', True),
-            ('CON SEDE EN TLALNEPANTLA ESTADO', True),
-            ('DE MEXICO.', True),
-            ('P R E S E N T E.', True),
-        ]):
-            para = left.paragraphs[0] if i == 0 else left.add_paragraph()
-            para.alignment = J
-            para.paragraph_format.line_spacing = 1.0
-            run = para.add_run(text)
-            run.bold = bold
-
-        doc.add_paragraph()
-        doc.add_paragraph()
-
-        p1 = b.p(doc, [
-            ('LIC. EDWIN GONZALEZ SORIA,', True),
-            (' en mi carácter de Apoderado Legal ', False),
-            (co, True),
-            (', y el C. ', False),
-            (emp, True),
-            (', en mi carácter de trabajador, AMBOS señalando como domicilio '
-             'para oír y recibir notificaciones el ubicado en FILIBERTO GOMEZ '
-             'NÚMERO 46 INTERIOR 101 (JURÍDICO), COLONIA CENTRO INDUSTRIAL '
-             'TLALNEPANTLA, MUNICIPIO DE TLALNEPANTLA DE BAZ, ESTADO DE MÉXICO, '
-             'CÓDIGO POSTAL 54030, ante usted respetuosamente comparecemos a '
-             'exponer:', False),
-        ], align=J)
-        p1.paragraph_format.line_spacing = 1.0
-        p1.paragraph_format.space_after = Pt(18)
-
-        p2 = b.p(doc, [
-            ('Que, por medio del presente ocurso, venimos a presentar el '
-             'convenio que hemos celebrado por medio del cual y de común '
-             'acuerdo damos por terminada la relación y/o vínculo laboral que '
-             'unía en términos de la fracción I del artículo 53 de la ley '
-             'federal del trabajo, a la ', False),
-            ('empresa ', True), (co, True),
-            (', con el C. ', False), (emp, False),
-            (', en su carácter de trabajador.', True),
-        ], align=J)
-        p2.paragraph_format.line_spacing = 1.0
-        p2.paragraph_format.space_after = Pt(18)
-
-        p3 = b.p(doc, [
-            ('Ambas partes nos comprometemos a ratificar el convenio que se '
-             'anexa el día y hora que esta autoridad nos señale fecha para tal '
-             'efecto.', False),
-        ], align=J)
-        p3.paragraph_format.line_spacing = 1.0
-        p3.paragraph_format.space_after = Pt(20)
-
-        p4 = b.p(doc, [
-            ('Por lo anteriormente expuesto, a este H. Tribunal, atentamente '
-             'solicito.', False),
-        ], align=C)
-        p4.paragraph_format.line_spacing = 1.0
-
-        p5 = b.p(doc, [
-            ('Único. -', True),
-            (' Tenernos por presentado en términos del presente escrito.',
-             False),
-        ], align=C)
-        p5.paragraph_format.line_spacing = 1.0
-        p5.paragraph_format.space_after = Pt(12)
-
-        p6 = b.p(doc, [
-            (f'Tlalnepantla de Baz Estado De México, a ', False),
-            (today, True),
-        ], align=C)
-        p6.paragraph_format.line_spacing = 1.0
-
-        spacer = doc.add_paragraph()
-        spacer.paragraph_format.space_before = Pt(34)
-        sig_tbl = doc.add_table(rows=1, cols=2)
-        b.remove_borders(sig_tbl)
-        sig_tbl.autofit = False
-        sig_tbl.columns[0].width = Inches(3.05)
-        sig_tbl.columns[1].width = Inches(2.95)
-
-        left_sig = sig_tbl.rows[0].cells[0]
-        for i, (text, bold) in enumerate([
-            ('LIC. EDWIN GONZALEZ SORIA', True),
-            ('APODERADO LEGAL', True),
-            ('ESTEVEZ.JOR SERVICIOS, S.A. DE C.V.', True),
-        ]):
-            para = left_sig.paragraphs[0] if i == 0 else left_sig.add_paragraph()
-            para.alignment = C
-            para.paragraph_format.line_spacing = 1.0
-            run = para.add_run(text)
-            run.bold = bold
-
-        right_sig = sig_tbl.rows[0].cells[1]
-        for i, (text, bold) in enumerate([
-            (f'EL C {emp}.', True),
-            ('Trabajador', False),
-        ]):
-            para = right_sig.paragraphs[0] if i == 0 else right_sig.add_paragraph()
-            para.alignment = C
-            para.paragraph_format.line_spacing = 1.0
-            run = para.add_run(text)
-            run.bold = bold
-
-        return b.download(self.env, 'hr.employee', self.id,
-                          f'{self.name} - Oficio de Remisión.docx',
-                          b.to_bytes(doc))
-
-
-# ---------------------------------------------------------------------------
-# hr.contract DOCX reports
-# ---------------------------------------------------------------------------
 
 class HrContractDocxReports(models.Model):
     _inherit = 'hr.contract'
@@ -1105,19 +977,8 @@ class HrContractDocxReports(models.Model):
     }
 
     def _docx_from_template(self, template, values, filename):
-        """Copia la plantilla .docx reemplazando los marcadores en word/document.xml."""
-        output = io.BytesIO()
-        with zipfile.ZipFile(file_path(template)) as source, \
-                zipfile.ZipFile(output, 'w', zipfile.ZIP_DEFLATED) as result:
-            for item in source.infolist():
-                data = source.read(item.filename)
-                if item.filename == 'word/document.xml':
-                    xml = data.decode('utf-8')
-                    for marker, value in values.items():
-                        xml = xml.replace(marker, xml_escape(value or 'N/A'))
-                    data = xml.encode('utf-8')
-                result.writestr(item, data)
-        return _DocxBuilder.download(self.env, 'hr.contract', self.id, filename, output.getvalue())
+        return _DocxBuilder.download(self.env, 'hr.contract', self.id, filename,
+                                     _DocxBuilder.fill_template(template, values))
 
     @staticmethod
     def _contract_address(emp):

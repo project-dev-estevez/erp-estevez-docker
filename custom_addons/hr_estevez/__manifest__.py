@@ -20,7 +20,7 @@
     'version': '0.5.0',
 
     # any module necessary for this one to work correctly
-    'depends': ['base', 'hr', 'hr_holidays', 'hr_skills', 'hr_contract', 'custom_training_extension', 'web', 'hr_elearning_integration'],
+    'depends': ['base', 'hr', 'hr_holidays', 'hr_skills', 'hr_contract', 'custom_training_extension', 'web', 'hr_elearning_integration', 'mail', 'auth_signup'],
 
     # always loaded
     'data': [
@@ -81,7 +81,8 @@
         'views/view_attachment_preview_form.xml',
         'views/attachment_preview.xml',
         'views/res_company_views.xml',
-        'data/org_structure_labels.xml',      
+        'data/org_structure_labels.xml',
+        'data/mail_branding.xml',
         #'views/job_history_wizard_views.xml'
     ],
     # only loaded in demonstration mode
@@ -94,6 +95,7 @@
             'hr_estevez/static/src/components/**/*.xml',
             'hr_estevez/static/src/components/**/*.scss',
             'hr_estevez/static/src/scss/employee_form.scss',
+            'hr_estevez/static/src/scss/contract_form.scss',
         ],
     },
 }

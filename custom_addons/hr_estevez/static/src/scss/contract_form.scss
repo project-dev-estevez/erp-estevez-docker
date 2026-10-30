@@ -1,0 +1,118 @@
+// Formulario de contratos (hr.contract)
+.o_form_view.o_estevez_contract_form {
+    // Etiquetas siempre en negro, aunque el campo se llene solo (solo lectura)
+    .o_form_label,
+    .o_form_label.o_form_label_readonly {
+        opacity: 1;
+        color: $gray-900;
+        font-weight: $font-weight-bold;
+    }
+
+    @include media-breakpoint-up(sm) {
+        .o_inner_group {
+            grid-template-columns: 170px minmax(0, 1fr);
+        }
+    }
+
+    .o_estevez_contract_title {
+        margin-bottom: 1rem;
+
+        h1 {
+            margin-bottom: .35rem;
+
+            // !important: los estilos globales de custom_inputs_estevez dibujan una caja en todos los inputs
+            .o_field_widget,
+            input {
+                width: 100% !important;
+            }
+
+            input {
+                font-size: 1.75rem !important;
+                font-weight: $font-weight-bold !important;
+                height: auto !important;
+                border: 0 !important;
+                border-bottom: 1px solid transparent !important;
+                border-radius: 0 !important;
+                box-shadow: none !important;
+                padding: 0 0 .15rem !important;
+                background: transparent !important;
+
+                &:hover,
+                &:focus {
+                    border-bottom-color: $gray-400 !important;
+                }
+            }
+        }
+    }
+
+    .o_estevez_contract_badges {
+        display: flex;
+        flex-wrap: wrap;
+        gap: .5rem;
+
+        .badge {
+            font-size: .8rem;
+            font-weight: 600;
+            padding: .4em .8em;
+        }
+    }
+
+    .o_estevez_contract_alert {
+        display: flex;
+        align-items: flex-start;
+        gap: .75rem;
+        margin-bottom: 1.25rem;
+
+        > .fa {
+            font-size: 1.1rem;
+            margin-top: .15rem;
+        }
+    }
+
+    // Encabezados de sección ("Datos del contrato", "Vigencia", "Puesto y adscripción")
+    .o_horizontal_separator {
+        color: $o-brand-primary;
+        font-size: .8rem;
+        font-weight: 700;
+        letter-spacing: .06em;
+        text-transform: uppercase;
+        border-bottom: 2px solid $gray-200;
+        padding-bottom: .35rem;
+        margin-bottom: .75rem;
+    }
+
+    .o_estevez_contract_position {
+        margin-top: .5rem;
+    }
+
+    .o_estevez_contract_doc {
+        max-width: 26rem;
+        margin: 1.5rem auto;
+        padding: 1.75rem 1.5rem;
+        text-align: center;
+        border: 2px dashed $gray-300;
+        border-radius: .75rem;
+        background: $gray-100;
+
+        > .fa {
+            font-size: 2.25rem;
+            color: $gray-500;
+            margin-bottom: .75rem;
+        }
+
+        h5 {
+            font-weight: 700;
+            margin-bottom: .35rem;
+        }
+
+        &.o_estevez_contract_doc_done {
+            border-style: solid;
+            border-color: rgba($success, .4);
+            background: rgba($success, .06);
+
+            > .fa {
+                color: $success;
+            }
+        }
+    }
+}
