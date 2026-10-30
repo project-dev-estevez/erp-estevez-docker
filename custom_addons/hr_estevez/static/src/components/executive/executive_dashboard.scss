@@ -45,6 +45,7 @@ $o-exec-warning: #fab219;
 
     .o_exec_card_head {
         display: flex;
+        flex-wrap: wrap;
         justify-content: space-between;
         align-items: flex-start;
         gap: 1rem;

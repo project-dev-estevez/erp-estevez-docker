@@ -2,7 +2,8 @@
 
 import { Component, onWillStart, onMounted, useState } from "@odoo/owl";
 import { useService } from "@web/core/utils/hooks";
-import { KpiCard } from "./kpi_card/kpi_card";
+// Misma tarjeta que el dashboard de Empleados, para que ambos se vean iguales
+import { KpiCard } from "@hr_estevez/components/kpis/kpi_card/kpi_card";
 import { PostulationsDetailModal } from "./modals/postulations_detail_modal";
 
 export class KpisGrid extends Component {
@@ -24,7 +25,6 @@ export class KpisGrid extends Component {
         this.state = useState({
             totalApplicants: { value: 0 },
             inProgressApplicants: { value: 0 },
-            preselectedApplicants: { value: 0 },
             rejectedApplicants: { value: 0 },
             hiredApplicants: { value: 0, secondaryValue: 0 },
             openPositions: { value: 0 },
@@ -83,54 +83,61 @@ export class KpisGrid extends Component {
     }
 
     get kpis() {
+        const hired = this.state.hiredApplicants;
         return [
             {
                 name: "Postulaciones",
                 value: this.state.totalApplicants.value,
-                secondaryValue: 0,
-                showSecondaryValue: false,
+                icon: "fa-inbox",
+                color: "primary",
+                subtitle: "Desde primer contacto",
+                tooltip: "Postulaciones del periodo que llegaron al menos a primer contacto",
                 onClick: () => this.viewTotalApplicants()
             },
             {
-                name: "En Progreso",
+                name: "En Proceso",
                 value: this.state.inProgressApplicants.value,
-                secondaryValue: 0,
-                showSecondaryValue: false,
+                icon: "fa-spinner",
+                color: "info",
+                subtitle: "Sin decisión aún",
+                tooltip: "Postulaciones del periodo que siguen activas: ni rechazadas ni contratadas",
                 onClick: () => this.viewInProgressApplicants()
             },
             {
-                name: "Preseleccionados",
-                value: this.state.preselectedApplicants.value,
-                secondaryValue: 0,
-                showSecondaryValue: false,
-                onClick: () => this.viewPreselectedApplicants()
+                name: "Contratados",
+                // Incluye a quienes se postularon antes del periodo y se contrataron en él
+                value: hired.value + hired.secondaryValue,
+                icon: "fa-handshake-o",
+                color: "success",
+                subtitle: hired.secondaryValue ? `${hired.secondaryValue} de postulaciones anteriores` : "En el periodo",
+                tooltip: "Candidatos contratados en el periodo",
+                onClick: () => this.viewHiredApplicants()
             },
             {
                 name: "Rechazados",
                 value: this.state.rejectedApplicants.value,
-                secondaryValue: 0,
-                showSecondaryValue: false,
+                icon: "fa-user-times",
+                color: "danger",
+                subtitle: "Incluye declinaciones",
+                tooltip: "Postulaciones del periodo rechazadas o declinadas después de primer contacto",
                 onClick: () => this.viewRejectedApplicants()
-            },
-            {
-                name: "Contratados",
-                value: this.state.hiredApplicants.value,
-                secondaryValue: this.state.hiredApplicants.secondaryValue,
-                showSecondaryValue: true,  // ✅ Activar mostrar valor secundario
-                onClick: () => this.viewHiredApplicants()
             },
             {
                 name: "Vacantes Abiertas",
                 value: this.state.openPositions.value,
-                secondaryValue: 0,
-                showSecondaryValue: false,
+                icon: "fa-briefcase",
+                color: "warning",
+                subtitle: "Publicadas hoy",
+                tooltip: "Requisiciones aprobadas y publicadas",
                 onClick: () => this.viewOpenPositions()
             },
             {
                 name: "Requisiciones por Aprobar",
                 value: this.state.pendingRequisitions.value,
-                secondaryValue: 0,
-                showSecondaryValue: false,
+                icon: "fa-clipboard",
+                color: "secondary",
+                subtitle: "Esperando aprobación",
+                tooltip: "Requisiciones de personal pendientes de aprobación",
                 onClick: () => this.viewPendingRequisitions()
             }
         ];
@@ -144,7 +151,6 @@ export class KpisGrid extends Component {
             await Promise.all([
                 this.calculateTotalApplicants(),
                 this.calculateInProgressApplicants(),
-                this.calculatePreselectedApplicants(),
                 this.calculateRejectedApplicants(),
                 this.calculateHiredApplicants(),
                 this.calculateOpenPositions(),
@@ -211,17 +217,6 @@ export class KpisGrid extends Component {
             console.error("❌ KpisGrid: Error calculando En Progreso:", error);
             this.state.inProgressApplicants.value = 0;
         }
-    }
-
-    async calculatePreselectedApplicants() {
-        let domain = [
-            ["stage_id.sequence", ">", 4],
-            ["application_status", "!=", "hired"]
-        ];
-        domain = this._addDateRangeToDomain(domain);
-
-        const data = await this.orm.searchCount("hr.applicant", domain);
-        this.state.preselectedApplicants.value = data;
     }
 
     async calculateRejectedApplicants() {
@@ -356,22 +351,6 @@ export class KpisGrid extends Component {
         } catch (error) {
             console.error("❌ KpisGrid: Error en navegación En Progreso:", error);
         }
-    }
-
-    viewPreselectedApplicants() {
-        let domain = [
-            ["stage_id.sequence", ">", 4],
-            ["application_status", "!=", "hired"]
-        ];
-        domain = this._addDateRangeToDomain(domain);
-
-        this.actionService.doAction({
-            type: "ir.actions.act_window",
-            name: "⭐ Candidatos Preseleccionados",
-            res_model: "hr.applicant",
-            domain: domain,
-            views: [[false, "list"], [false, "form"]],
-        });
     }
 
     async viewRejectedApplicants() {
