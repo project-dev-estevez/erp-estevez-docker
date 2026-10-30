@@ -209,13 +209,13 @@
 
     <template id="auth_estevez_signup" inherit_id="auth_signup.signup" name="Sign up login" priority="25">
         <xpath expr="//t[@t-call='web.login_layout']" position="before">
-            <t t-set="login_title_text" t-value="'Sign Up'"/>
+            <t t-set="login_title_text" t-value="'Crear cuenta'"/>
         </xpath>
     </template>
 
     <template id="auth_estevez_reset_password" inherit_id="auth_signup.reset_password" name="Reset password" priority="25">
         <xpath expr="//t[@t-call='web.login_layout']" position="before">
-            <t t-set="login_title_text" t-value="'Reset Password'"/>
+            <t t-set="login_title_text" t-value="'Restablecer contraseña'"/>
         </xpath>
     </template>
 </odoo>
