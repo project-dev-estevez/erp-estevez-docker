@@ -1,0 +1,218 @@
+// ------------------------------------------------------------------
+// Barra superior y menú lateral (muk_web_appsbar) con la marca Estevez.Jor
+// ------------------------------------------------------------------
+
+$estevez-blue: #239fd3;
+$estevez-black: #0b0b0b;
+$estevez-graphite: #1b2833;
+
+// ---- Barra superior ----
+.o_main_navbar {
+    position: relative;
+    background: linear-gradient(90deg, $estevez-black 0%, $estevez-graphite 100%);
+
+    // Línea azul inferior, como acento de marca
+    &::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        height: 2px;
+        background: linear-gradient(90deg, $estevez-blue 0%, rgba($estevez-blue, .15) 70%, transparent 100%);
+        pointer-events: none;
+    }
+
+    .o_menu_brand {
+        font-weight: 700;
+        letter-spacing: .01em;
+    }
+
+    .o_menu_sections {
+        > .dropdown-toggle,
+        > .o_nav_entry,
+        > .dropdown > .dropdown-toggle {
+            position: relative;
+            border-radius: .5rem;
+            margin: 6px 1px;
+            height: calc(var(--o-navbar-height) - 12px);
+            transition: background-color .15s ease;
+
+            &:hover {
+                background-color: rgba($white, .08);
+            }
+
+            // Menú abierto: subrayado azul
+            &.show {
+                background-color: rgba($white, .08);
+                box-shadow: inset 0 -2px 0 $estevez-blue;
+            }
+        }
+    }
+
+    .o_navbar_apps_menu .dropdown-toggle {
+        transition: color .15s ease;
+
+        &:hover {
+            color: $estevez-blue;
+        }
+    }
+}
+
+// ---- Menú lateral ----
+// .o_web_client: gana a los estilos de muk_web_appsbar sin usar !important
+.o_web_client .mk_apps_sidebar_panel {
+    background: linear-gradient(180deg, $estevez-black 0%, #131c24 100%);
+    border-right: 1px solid rgba($white, .06);
+
+    .mk_apps_sidebar .mk_apps_sidebar_menu {
+        padding: .5rem 0;
+
+        > li > a {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: .6rem;
+            margin: 2px .5rem;
+            padding: 7px 10px;
+            border-radius: .6rem;
+            font-weight: 400;
+            color: rgba($white, .72);
+            transition: background-color .15s ease, color .15s ease;
+
+            .mk_apps_sidebar_icon {
+                flex-shrink: 0;
+                margin-right: 0;
+                transition: transform .15s ease;
+            }
+
+            .mk_apps_sidebar_name {
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+        }
+
+        > li:hover > a {
+            background: rgba($white, .07);
+            color: $white;
+
+            .mk_apps_sidebar_icon {
+                transform: scale(1.12);
+            }
+        }
+
+        // App actual: fondo azul tenue y barra azul a la izquierda
+        > li.active > a {
+            background: rgba($estevez-blue, .2);
+            color: $white;
+            font-weight: 600;
+
+            &::before {
+                content: "";
+                position: absolute;
+                left: -.5rem;
+                top: 6px;
+                bottom: 6px;
+                width: 3px;
+                border-radius: 0 3px 3px 0;
+                background: $estevez-blue;
+            }
+        }
+    }
+
+    // Logo en recuadro blanco para que el triángulo negro se vea sobre el fondo oscuro
+    .mk_apps_sidebar_logo img {
+        max-width: 72px;
+        padding: .4rem;
+        background: $white;
+        border-radius: .75rem;
+    }
+
+    // Lista arriba; logo y botón de comprimir hasta abajo
+    .mk_apps_sidebar {
+        justify-content: flex-start;
+
+        .mk_apps_sidebar_menu {
+            flex: 1 0 auto;
+        }
+    }
+
+    // Expandido: botón a la derecha apuntando a la izquierda (comprimir)
+    .o_estevez_sidebar_footer {
+        display: flex;
+        justify-content: flex-end;
+        padding: .5rem .75rem;
+        border-top: 1px solid rgba($white, .08);
+    }
+
+    .o_estevez_sidebar_toggle {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        width: 30px;
+        height: 30px;
+        padding: 0;
+        color: rgba($white, .75);
+        background: rgba($white, .06);
+        border: 1px solid rgba($white, .15);
+        border-radius: 50%;
+        transition: background-color .15s ease, border-color .15s ease, color .15s ease;
+
+        &:hover {
+            color: $white;
+            background: $estevez-blue;
+            border-color: $estevez-blue;
+        }
+
+        > .fa {
+            font-size: 11px;
+        }
+    }
+}
+
+.mk_apps_sidebar_panel {
+    transition: width .2s ease;
+}
+
+// Más ancho para que no se corten los nombres ("Tiempo personal", "Rastreador de…")
+@include media-breakpoint-up(lg) {
+    body.mk_sidebar_type_large {
+        --mk-sidebar-width: 188px;
+    }
+}
+
+// Solo íconos (modo pequeño, o modo grande en tabletas)
+// Ojo: en Odoo 18 el body es el que lleva .o_web_client, por eso aquí no se antepone
+@mixin estevez-sidebar-compact {
+    .mk_apps_sidebar_panel .mk_apps_sidebar .mk_apps_sidebar_menu > li > a {
+        justify-content: center;
+        margin: 2px 4px;
+        padding: 7px 0;
+
+        &::before {
+            left: -4px;
+        }
+    }
+
+    // Comprimido: botón centrado apuntando a la derecha (expandir)
+    .mk_apps_sidebar_panel .o_estevez_sidebar_footer {
+        justify-content: center;
+        padding: .5rem 0;
+    }
+}
+
+body.mk_sidebar_type_small {
+    @include estevez-sidebar-compact;
+}
+
+@include media-breakpoint-only(md) {
+    body.mk_sidebar_type_large {
+        @include estevez-sidebar-compact;
+    }
+
+    // En tabletas el menú siempre va en solo íconos: el botón no aplica
+    .o_estevez_sidebar_footer {
+        display: none;
+    }
+}
