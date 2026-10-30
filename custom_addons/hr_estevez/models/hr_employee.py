@@ -86,6 +86,65 @@ def normalize_mx_phone(raw):
     return f'+{country_code} {grouped}'.strip()
 
 
+# Campos de texto libre de "Información Personal" que no deben quedar TODO EN MAYÚSCULAS.
+# CURP, RFC, NSS, claves y correos quedan fuera a propósito.
+EMPLOYEE_CAPITAL_CASE_FIELDS = (
+    'private_street', 'private_street2', 'private_colonia',
+    'emergency_contact', 'emergency_contact_2', 'spouse_complete_name',
+    'study_school', 'study_field',
+)
+
+# Conectores que van en minúscula salvo al inicio ("Calle de la Luz")
+LOWERCASE_CONNECTORS = {
+    'a', 'al', 'con', 'de', 'del', 'e', 'el', 'en', 'la', 'las', 'lo', 'los',
+    'o', 'para', 'por', 'sin', 'u', 'y',
+}
+
+ROMAN_NUMERAL_PATTERN = re.compile(r'^(?=[IVXLC])(XC|XL|L?X{0,3})(IX|IV|V?I{0,3})$')
+
+
+def normalize_capital_case(raw):
+    """Convierte un texto capturado TODO EN MAYÚSCULAS a formato título.
+
+    Reglas:
+      * Solo actúa si el texto no tiene ninguna minúscula; lo que ya viene con
+        mayúsculas y minúsculas se respeta tal cual (es idempotente).
+      * Conectores (de, del, la, y, ...) en minúscula salvo al inicio, al final o
+        después de una abreviatura ("Col. Del Valle").
+      * Se conservan en mayúscula los tokens con dígitos o diagonal ("5A", "S/N"),
+        las siglas con puntos ("C.P.", "S.A.") y los números romanos
+        ("Juan Pablo II", "Calle XIV"); "AV." o "COL." quedan como "Av.", "Col.".
+      * Las partes separadas por guion se capitalizan por separado ("López-Mateos").
+    Si el valor es falsy (False/None/'') se devuelve sin cambios.
+    """
+    if not raw or not isinstance(raw, str):
+        return raw
+    if any(ch.islower() for ch in raw) or not any(ch.isalpha() for ch in raw):
+        return raw
+
+    def capitalize_word(word):
+        return re.sub(r'[^\W\d_]+', lambda m: m.group(0)[0].upper() + m.group(0)[1:].lower(), word)
+
+    words = raw.split(' ')
+    result = []
+    for index, word in enumerate(words):
+        letters = re.sub(r'[^\w]', '', word)
+        if not word:
+            result.append(word)
+        elif any(ch.isdigit() for ch in word) or '/' in word:
+            result.append(word)
+        elif word.count('.') >= 2 and len(letters) <= 3:
+            result.append(word)
+        elif len(letters) > 1 and ROMAN_NUMERAL_PATTERN.match(letters) and letters.lower() not in LOWERCASE_CONNECTORS:
+            result.append(word)
+        elif (letters.lower() in LOWERCASE_CONNECTORS and 0 < index < len(words) - 1
+                and not words[index - 1].endswith('.')):
+            result.append(word.lower())
+        else:
+            result.append('-'.join(capitalize_word(part) for part in word.split('-')))
+    return ' '.join(result)
+
+
 # Notificación en tiempo real a Vigiliner (rastreo de flotas) cuando cambia un conductor
 VIGILINER_WEBHOOK_URL_PARAM = 'vigiliner.webhook_url'
 VIGILINER_WEBHOOK_SECRET_PARAM = 'vigiliner.webhook_secret'
@@ -505,6 +564,11 @@ class HrEmployee(models.Model):
                 if vals.get(phone_field):
                     vals[phone_field] = normalize_mx_phone(vals[phone_field])
 
+            # Texto capturado TODO EN MAYÚSCULAS se guarda en formato título
+            for text_field in EMPLOYEE_CAPITAL_CASE_FIELDS:
+                if vals.get(text_field):
+                    vals[text_field] = normalize_capital_case(vals[text_field])
+
             # Sincronización de barcode/employee_number
             if 'employee_number' in vals and vals['employee_number'] and not vals.get('barcode'):
                 vals['barcode'] = vals['employee_number']
@@ -553,6 +617,10 @@ class HrEmployee(models.Model):
         for phone_field in EMPLOYEE_PHONE_FIELDS:
             if vals.get(phone_field):
                 vals[phone_field] = normalize_mx_phone(vals[phone_field])
+
+        for text_field in EMPLOYEE_CAPITAL_CASE_FIELDS:
+            if vals.get(text_field):
+                vals[text_field] = normalize_capital_case(vals[text_field])
 
         if self.env.context.get('skip_codeigniter_sync'):
             return super().write(vals)
