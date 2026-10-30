@@ -12,11 +12,13 @@ from PIL import Image, ImageDraw, ImageOps
 
 from docx import Document
 from docx.shared import Inches, Pt
+from docx.enum.table import WD_TABLE_ALIGNMENT
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.oxml.ns import qn
 from docx.oxml import OxmlElement
 
-from odoo import models
+from odoo import fields, models
+from odoo.tools.misc import file_path
 
 _logger = logging.getLogger(__name__)
 
@@ -251,34 +253,185 @@ class HrEmployeeDocxReports(models.Model):
 
     # --- Carta Patronal ---
 
+    # Réplica de la carta del sistema anterior: Times New Roman 10 pt, sin negritas
+    # (salvo el nombre), membrete de Estevez.Jor como encabezado y pie, tabla de datos
+    # de 3 columnas (3000 / 720 / resto twips) sin bordes y bloque de firma centrado.
+    CARTA_PATRONAL_HEADER_IMG = 'hr_estevez/static/src/img/carta_patronal_encabezado.png'
+    CARTA_PATRONAL_FOOTER_IMG = 'hr_estevez/static/src/img/carta_patronal_pie.png'
+
+    def _carta_patronal_address(self):
+        """Domicilio con el formato de la carta anterior: CALLE #NÚMERO, COLONIA CIUDAD, ESTADO C.P. 00000."""
+        text = self.private_street or ''
+        if self.private_street2:
+            text += f' #{self.private_street2}'
+        if self.private_colonia:
+            text += f', {self.private_colonia}'
+        if self.private_city:
+            text += f' {self.private_city}'
+        if self.private_state_id:
+            text += f', {self.private_state_id.name}'
+        if self.private_zip:
+            text += f' C.P. {self.private_zip}'
+        return text.strip(', ').upper() or 'N/A'
+
+    def _carta_patronal_company_address(self):
+        """Domicilio de la empresa con la puntuación de la carta anterior: CALLE, COLONIA, CIUDAD, ESTADO. C.P. 00000."""
+        partner = self.company_id.partner_id
+        parts = [partner.street, partner.street2, partner.city, partner.state_id.name]
+        text = ', '.join(part for part in parts if part)
+        if partner.zip:
+            text += f'. C.P. {partner.zip}.'
+        return text.upper() or 'N/A'
+
+    def _carta_patronal_company_name(self):
+        # Razón social del patrón (mismas mayúsculas y puntuación que CodeIgniter)
+        company = self.company_id
+        patron = dict(company._fields['patron'].selection).get(company.patron) if company.patron else False
+        return (patron or company.name or 'N/A').upper()
+
+    @staticmethod
+    def _carta_patronal_rfc(vat):
+        """RFC de persona moral separado como en la carta anterior: ESE 111012 E79."""
+        vat = (vat or '').replace(' ', '').upper()
+        if len(vat) in (12, 13):
+            return f'{vat[:-9]} {vat[-9:-3]} {vat[-3:]}'
+        return vat or 'N/A'
+
+    def _carta_patronal_registro(self):
+        """Registro patronal del empleado separado como en la carta anterior: C5350000 10 0."""
+        code = (self.registro_patronal_id.code or '').replace(' ', '')
+        if len(code) == 11:
+            return f'{code[:8]} {code[8:10]} {code[10:]}'
+        return code or 'N/A'
+
+    def _carta_patronal_photo(self):
+        """Foto rectangular 3:4 (recorte centrado), igual que la carta anterior."""
+        img = Image.open(io.BytesIO(base64.b64decode(self.image_1920))).convert('RGB')
+        img = ImageOps.fit(img, (600, 800), method=Image.Resampling.LANCZOS)
+        stream = io.BytesIO()
+        img.save(stream, format='JPEG', quality=90)
+        stream.seek(0)
+        return stream
+
+    @staticmethod
+    def _carta_patronal_doc_defaults(doc):
+        """Times New Roman 10 pt e interlineado sencillo en docDefaults, como la carta anterior.
+
+        Se define ahí (y no en el estilo Normal) porque Word y otros visores interpretan
+        distinto un tamaño puesto en el estilo; así ambas cartas se ven igual en cualquier programa.
+        """
+        defaults = doc.styles.element.find(qn('w:docDefaults'))
+        rpr = defaults.find(qn('w:rPrDefault')).find(qn('w:rPr'))
+        fonts = rpr.find(qn('w:rFonts'))
+        for attr in list(fonts.attrib):
+            del fonts.attrib[attr]
+        for attr in ('w:ascii', 'w:hAnsi', 'w:eastAsia', 'w:cs'):
+            fonts.set(qn(attr), 'Times New Roman')
+        for tag in ('w:sz', 'w:szCs'):
+            el = rpr.find(qn(tag))
+            if el is None:
+                el = OxmlElement(tag)
+                rpr.append(el)
+            el.set(qn('w:val'), '20')
+        lang = rpr.find(qn('w:lang'))
+        if lang is not None:
+            for attr in list(lang.attrib):
+                del lang.attrib[attr]
+            lang.set(qn('w:val'), 'es-MX')
+        ppr_default = defaults.find(qn('w:pPrDefault'))
+        if ppr_default is not None:
+            defaults.remove(ppr_default)
+
+    @staticmethod
+    def _carta_patronal_table(doc, widths):
+        table = doc.add_table(rows=0, cols=len(widths))
+        _DocxBuilder.remove_borders(table)
+        tbl_pr = table._tbl.tblPr
+        cell_mar = OxmlElement('w:tblCellMar')
+        for side in ('top', 'left', 'bottom', 'right'):
+            el = OxmlElement(f'w:{side}')
+            el.set(qn('w:w'), '0')
+            el.set(qn('w:type'), 'dxa')
+            cell_mar.append(el)
+        tbl_pr.append(cell_mar)
+        # Ancho automático como la carta anterior
+        table.autofit = True
+        for col, width in zip(table.columns, widths):
+            col.width = width or Inches(1)
+        return table
+
+    @staticmethod
+    def _carta_patronal_free_columns(table, widths):
+        """Quita el ancho de las columnas marcadas con None (columna libre, como la carta anterior).
+
+        Se hace al final porque python-docx necesita el ancho de cada columna para crear filas.
+        """
+        for index, width in enumerate(widths):
+            if width is not None:
+                continue
+            table.columns[index]._gridCol.attrib.pop(qn('w:w'), None)
+            for row in table.rows:
+                tc_pr = row.cells[index]._tc.get_or_add_tcPr()
+                tc_w = tc_pr.find(qn('w:tcW'))
+                if tc_w is not None:
+                    tc_pr.remove(tc_w)
+
+    @staticmethod
+    def _carta_patronal_row(table, values, widths, spacing=Pt(0.5), align=None):
+        row = table.add_row()
+        for cell, value, width in zip(row.cells, values, widths):
+            if width is not None:
+                cell.width = width
+            cell._tc.get_or_add_tcPr().append(OxmlElement('w:noWrap'))
+            para = cell.paragraphs[0]
+            para.paragraph_format.space_before = spacing
+            para.paragraph_format.space_after = spacing
+            if align is not None:
+                para.alignment = align
+            if value:
+                para.add_run(value)
+        return row
+
     def action_download_carta_patronal_docx(self):
         self.ensure_one()
         b = _DocxBuilder
         doc = Document()
-        b.apply_default_typography(doc)
 
-        for sec in doc.sections:
-            sec.top_margin = Inches(0.8)
-            sec.bottom_margin = Inches(0.8)
-            sec.left_margin = Inches(0.9)
-            sec.right_margin = Inches(0.9)
+        self._carta_patronal_doc_defaults(doc)
 
-        b.p(doc, [(f'TLALNEPANTLA DE BAZ A {b.fmt_today()}', True)], align=R)
+        section = doc.sections[0]
+        section.page_width, section.page_height = Inches(8.5), Inches(11)
+        section.top_margin = section.bottom_margin = Pt(50)       # 1000 twips
+        section.left_margin = section.right_margin = Inches(1)    # 1440 twips
+        section.header_distance = section.footer_distance = Inches(0.5)
+
+        # Membrete: logo y línea azul arriba, domicilio de la empresa abajo
+        if self.company_id.patron == 'estevezjor':
+            section.header.paragraphs[0].add_run().add_picture(
+                file_path(self.CARTA_PATRONAL_HEADER_IMG), width=Pt(470))
+            section.footer.paragraphs[0].add_run().add_picture(
+                file_path(self.CARTA_PATRONAL_FOOTER_IMG), width=Pt(470))
+        elif self.company_id.logo:
+            logo = io.BytesIO(base64.b64decode(self.company_id.logo))
+            section.header.paragraphs[0].add_run().add_picture(logo, height=Pt(60))
+
+        doc.add_paragraph()
+        today = fields.Date.context_today(self)
+        b.p(doc, [(f'TLALNEPANTLA DE BAZ A {b.fmt_date(today)}', False)], align=R)
+        doc.add_paragraph()
 
         if self.image_1920:
             try:
-                img_stream = b.circular_image_bytes(self.image_1920)
                 para = doc.add_paragraph()
                 para.alignment = R
-                para.add_run().add_picture(img_stream, width=Inches(1.65))
+                para.add_run().add_picture(self._carta_patronal_photo(), width=Pt(80), height=Pt(106.67))
             except Exception:
-                pass
+                _logger.warning("Carta patronal: no se pudo insertar la foto del empleado %s", self.id)
 
+        b.p(doc, [('A QUIEN CORRESPONDA', False)])
         doc.add_paragraph()
-        b.p(doc, [('A QUIEN CORRESPONDA', True)])
-        b.p(doc, [('PRESENTE:', True)])
+        b.p(doc, [('PRESENTE:', False)])
         doc.add_paragraph()
-
         b.p(doc, [
             ('ME PERMITO INFORMAR A USTED, LOS DATOS QUE TENEMOS REGISTRADOS '
              'EN EL EXPEDIENTE DE EL C. ', False),
@@ -288,33 +441,37 @@ class HrEmployeeDocxReports(models.Model):
         ], align=J)
         doc.add_paragraph()
 
-        t1 = doc.add_table(rows=5, cols=2)
-        b.remove_borders(t1)
-        for i, (label, val) in enumerate([
-            ('FECHA DE INGRESO:', b.entry_date_str(self)),
-            ('RFC:', self.rfc or 'N/A'),
+        # Una sola tabla para empleado y empresa, así ambas columnas quedan alineadas
+        entry_date = self.employment_start_date or (
+            self.contract_ids.filtered('date_of_entry').sorted('date_of_entry')[:1].date_of_entry)
+        widths = [Pt(150), Pt(36), None]   # 3000 / 720 twips / resto libre
+        table = self._carta_patronal_table(doc, widths)
+        rows = [
+            ('FECHA DE INGRESO:', b.fmt_date(entry_date, sep='-') if entry_date else 'N/A'),
+            ('RFC:', (self.rfc or 'N/A').upper()),
             ('IMSS:', self.nss or 'N/A'),
-            ('PUESTO:', self.job_id.name if self.job_id else 'N/A'),
-            ('DOMICILIO PARTICULAR:', b.emp_address(self)),
-        ]):
-            b.cell_left(t1.rows[i].cells[0], label, bold=True)
-            b.cell_left(t1.rows[i].cells[1], val)
+            ('PUESTO:', (self.job_id.name or 'N/A').upper()),
+            ('DOMICILIO PARTICULAR:', self._carta_patronal_address()),
+            None,
+            ('NOMBRE DE LA EMPRESA:', self._carta_patronal_company_name()),
+            ('DOMICILIO DE LA EMPRESA:', self._carta_patronal_company_address()),
+            ('RFC:', self._carta_patronal_rfc(self.company_id.vat)),
+            ('REGISTRO PATRONAL:', self._carta_patronal_registro()),
+        ]
+        for row in rows:
+            label, value = row or ('', '')
+            self._carta_patronal_row(table, [label, '', value], widths)
+        self._carta_patronal_free_columns(table, widths)
 
         doc.add_paragraph()
 
-        t2 = doc.add_table(rows=4, cols=2)
-        b.remove_borders(t2)
-        for i, (label, val) in enumerate([
-            ('NOMBRE DE LA EMPRESA:', self.company_id.name or 'N/A'),
-            ('DOMICILIO DE LA EMPRESA:', b.company_address(self.company_id)),
-            ('RFC:', self.company_id.vat or 'No configurado'),
-            ('REGISTRO PATRONAL:', 'C5350000 10 0'),
-        ]):
-            b.cell_left(t2.rows[i].cells[0], label, bold=True)
-            b.cell_left(t2.rows[i].cells[1], val)
-
-        b.p(doc, [('ATENTAMENTE', False)], align=C, space_before=42)
-        b.p(doc, [('DEPARTAMENTO RECURSOS HUMANOS', False)], align=C)
+        # Firma: tabla centrada de 4000 twips con espacio para firmar
+        sign_width = [Pt(200)]
+        sign = self._carta_patronal_table(doc, sign_width)
+        sign.alignment = WD_TABLE_ALIGNMENT.CENTER
+        self._carta_patronal_row(sign, ['ATENTAMENTE'], sign_width, spacing=Pt(0), align=C)
+        self._carta_patronal_row(sign, [''], sign_width, spacing=Pt(17.5), align=C)
+        self._carta_patronal_row(sign, ['DPO RECURSOS HUMANOS'], sign_width, spacing=Pt(0), align=C)
 
         return b.download(self.env, 'hr.employee', self.id,
                           f'{self.name} - Carta Patronal.docx',
