@@ -7,6 +7,7 @@ All DOCX rendering is isolated here.
 import io
 import base64
 import logging
+import zipfile
 from datetime import date, datetime
 from xml.sax.saxutils import escape as xml_escape
 from PIL import Image, ImageDraw, ImageOps
@@ -1544,170 +1545,39 @@ class HrContractDocxReports(models.Model):
 
     # --- Addendum ---
 
+    # Plantilla = addendum del sistema anterior (Arial 9 pt, listas numeradas, textos legales
+    # y firmas). Solo se reemplazan los marcadores con los datos del empleado y la empresa,
+    # así el formato queda idéntico al documento anterior.
+    ADDENDUM_TEMPLATE = 'hr_estevez/data/templates/addendum_contrato.docx'
+
+    def _addendum_values(self):
+        employee = self.employee_id
+        today = fields.Date.context_today(self)
+        company_name = (employee._carta_patronal_company_name() if employee
+                        else (self.company_id.name or 'N/A').upper())
+        return {
+            '{{EMPRESA}}': company_name,
+            '{{EMPLEADO}}': employee.name.upper() if employee else 'N/A',
+            '{{RFC_EMPRESA}}': ((employee.company_id or self.company_id).vat or 'N/A').replace(' ', '').upper(),
+            '{{DIA}}': str(today.day),
+            '{{MES}}': _DocxBuilder.MESES_ES[today.month],
+            '{{ANIO}}': str(today.year),
+        }
+
     def action_download_addendum_docx(self):
         self.ensure_one()
-        b = _DocxBuilder
-        emp_name = self.employee_id.name.upper() if self.employee_id else 'N/A'
-        today = date.today()
-        mes = _DocxBuilder.MESES_ES[today.month].lower().capitalize()
-
-        doc = Document()
-        b.apply_default_typography(doc)
-        # Business request: Addendum must use Arial 10.
-        addendum_style = doc.styles['Normal']
-        addendum_style.font.name = 'Arial'
-        addendum_style.font.size = Pt(10)
-        for sec in doc.sections:
-            sec.top_margin = Inches(1)
-            sec.bottom_margin = Inches(1)
-            sec.left_margin = Inches(1.2)
-            sec.right_margin = Inches(1.2)
-
-        b.heading(doc, 'ADDENDUM AL CONTRATO INDIVIDUAL DE TRABAJO')
-        doc.add_paragraph()
-
-        b.p(doc, [
-            ('ADDENDUM AL CONTRATO INDIVIDUAL DE TRABAJO EL QUE CELEBRAN POR '
-             'UNA PARTE LA SOCIEDAD DENOMINADA "ESTEVEZ.JOR SERVICIOS S.A. DE '
-             'C.V..", EN ADELANTE EL "PATRÓN", REPRESENTADA EN ESTE ACTO POR '
-             'EL C. EDWIN GONZALEZ SORIA Y POR OTRA PARTE EL C. ', False),
-            (emp_name, True),
-            (' A QUIEN EN LO SUCESIVO SE LE DENOMINARA EL "TRABAJADOR" '
-             'PUDIENDO REFERIR A AMBOS COMO LAS "PARTES" AL TENOR DE LAS '
-             'SIGUIENTES DECLARACIONES Y CLAUSULAS:', False),
-        ], align=J)
-        doc.add_paragraph()
-
-        b.heading(doc, 'DECLARACIONES')
-        b.p(doc, [('A.', True),
-                  (' EL "PATRÓN" POR CONDUCTO DE SU REPRESENTANTE LEGAL SEÑALA '
-                   'QUE:', False)])
-
-        patron = [
-            ('1.', ' QUE ES UNA SOCIEDAD ANÓNIMA DE CAPITAL VARIABLE DEBIDAMENTE '
-              'CONSTITUIDA Y LEGALMENTE EXISTENTE DE ACUERDO CON LAS LEYES '
-              'MEXICANAS, TAL Y COMO SE ACREDITA EN TÉRMINOS DE INSTRUMENTO '
-              'NOTARIAL NÚMERO 46,404, DE FECHA 4 DE OCTUBRE DE 2011.'),
-            ('2.', ' SU REPRESENTANTE LEGAL CUENTA CON PLENAS Y SUFICIENTES '
-              'FACULTADES PARA CELEBRAR EL PRESENTE CONTRATO, TAL Y COMO LO '
-              'ACREDITA CON EL INSTRUMENTO NOTARIAL NÚMERO 18,435, DE FECHA '
-              '07 DE DICIEMBRE DE 2020.'),
-            ('3.', ' SU REGISTRO FEDERAL DE CONTRIBUYENTES ES ESE111012E79, Y '
-              'MANIFIESTA QUE SE ENCUENTRA AL CORRIENTE DEL CUMPLIMIENTO DE '
-              'SUS OBLIGACIONES FISCALES.'),
-            ('4.', ' QUE ES UNA SOCIEDAD ANÓNIMA DE CAPITAL VARIABLE DEBIDAMENTE '
-              'CONSTITUIDA Y LEGALMENTE EXISTENTE DE ACUERDO CON LAS LEYES '
-              'MEXICANAS (instrumento notarial número 46,404).'),
-            ('5.', ' QUE SU REPRESENTADA CELEBRÓ CON LA PERSONA MORAL '
-              '"MOVIMIENTO TECNOLOGICO, S. DE R.L. DE C.V." EN LO SUCESIVO EL '
-              '"ADMINISTRADOR" UN CONTRATO DE PRESTACIÓN DE SERVICIOS RESPECTO '
-              'DE UN PLAN INTEGRAL DE PREVISIÓN SOCIAL Y COMPENSACIONES '
-              'REGISTRADO EN LA CONSAR.'),
-        ]
-        for num, txt in patron:
-            b.p(doc, [(num, True), (txt, False)], align=J)
-
-        b.p(doc, [('B.', True),
-                  (' EL "TRABAJADOR" POR SU PROPIO DERECHO SEÑALA QUE:', False)],
-            space_before=6)
-
-        trabajador = [
-            ('1.', ' TODAS Y CADA UNA DE LAS MANIFESTACIONES HECHAS EN EL '
-              'CONTRATO INDIVIDUAL DE TRABAJO CELEBRADO CON EL "PATRÓN" SIGUEN '
-              'SIENDO CIERTAS.'),
-            ('2.', ' ESTÁ DE ACUERDO EN CELEBRAR EL PRESENTE INSTRUMENTO A '
-              'EFECTO DE ANEXARLO AL CONTRATO INDIVIDUAL DE TRABAJO QUE TIENEN '
-              'CELEBRADO CON EL "PATRÓN", A EFECTO DE QUE FORME PARTE INTEGRAL '
-              'DE ÉSTE.'),
-            ('3.', ' ASIMISMO, MANIFIESTA EL "TRABAJADOR" QUE, DE SER EL CASO, '
-              'ESTÁ DE ACUERDO EN QUE SE DEN LOS AVISOS QUE SE REQUIERAN A LAS '
-              'AUTORIDADES CORRESPONDIENTES PARA LOS EFECTOS LABORALES Y '
-              'FISCALES CORRESPONDIENTES.'),
-        ]
-        for num, txt in trabajador:
-            b.p(doc, [(num, True), (txt, False)], align=J)
-
-        b.heading(doc, 'C L Á U S U L A S')
-
-        clausulas = [
-            ('PRIMERA.', ' - Que el "Trabajador" manifiesta que es su libre y '
-              'entera voluntad que se reconfiguren sus percepciones que recibe '
-              'por parte del "Patrón" para adherirse al Plan Integral de '
-              'Previsión Social y Compensaciones, y que es de su pleno '
-              'conocimiento que con dicho "Plan" se reconfiguren los conceptos '
-              'que integran su percepción total a efecto de que con ello se '
-              'aumente su percepción actual al obtener un 3% adicional como '
-              'ahorro complementario para el retiro.'),
-            ('SEGUNDA.', ' - En este acto el "Patrón" se da por enterado y '
-              'debidamente notificado de la voluntad del "Trabajador" de '
-              'adherirse al Plan Integral de Previsión Social y Compensaciones.'),
-            ('TERCERA.', ' - Las "Partes", se obligan a guardar y mantener en '
-              'secreto y con carácter de confidencial y no divulgar a terceras '
-              'personas ningún tipo de "información confidencial" generada con '
-              'motivo del presente instrumento.'),
-            ('CUARTA.', ' - La duración del presente instrumento surte los '
-              'mismos efectos del Contrato Individual de Trabajo que el '
-              '"Trabajador" tiene celebrado con el "Patrón".'),
-            ('QUINTA.', ' .- Finalmente, las "Partes" manifiestan y están de '
-              'acuerdo en que el "Trabajador" conoce los términos y condiciones '
-              'establecidos en los estatutos del "Plan Integral de Previsión '
-              'Social y Compensaciones" y que firma y acepta conformidad la '
-              'solicitud anexa al presente como Anexo "1".'),
-            ('SEXTA.', f' - Que una vez requisitada la solicitud de mérito el '
-              f'trabajador queda adherido al citado "Plan Integral de Previsión '
-              f'Social y Compensaciones", y el presente instrumento es un '
-              f'"Addendum" al contrato individual de trabajo. Leído que fue en '
-              f'su totalidad el presente Addendum por las "Partes", lo firman '
-              f'al margen y al calce en el Estado de México, el día {today.day} '
-              f'del mes de {mes} del año {today.year} por no contener cláusula '
-              f'alguna que atente contra el derecho, la moral o las buenas '
-              f'costumbres.'),
-        ]
-        for num, txt in clausulas:
-            b.p(doc, [(num, True), (txt, False)], align=J)
-
-        doc.add_paragraph()
-
-        signature_table = doc.add_table(rows=2, cols=2)
-        b.remove_borders(signature_table)
-
-        top_left = signature_table.rows[0].cells[0].paragraphs[0]
-        top_left.alignment = C
-        top_left.add_run('EL "PATRÓN"')
-
-        top_right = signature_table.rows[0].cells[1].paragraphs[0]
-        top_right.alignment = C
-        top_right.add_run('EL "TRABAJADOR"')
-
-        # Keep signature line short enough to avoid wrapping into a second line.
-        line_text = '_' * 38
-
-        bottom_left = signature_table.rows[1].cells[0].paragraphs[0]
-        bottom_left.alignment = C
-        bottom_left.paragraph_format.space_before = Pt(58)
-        bottom_left.paragraph_format.space_after = Pt(4)
-        bottom_left.add_run(line_text)
-
-        bottom_left_name = signature_table.rows[1].cells[0].add_paragraph()
-        bottom_left_name.alignment = C
-        left_name_run = bottom_left_name.add_run('LIC. EDWIN GONZALEZ SORIA')
-        left_name_run.bold = True
-
-        bottom_left_role = signature_table.rows[1].cells[0].add_paragraph()
-        bottom_left_role.alignment = C
-        bottom_left_role.add_run('APODERADO LEGAL')
-
-        bottom_right = signature_table.rows[1].cells[1].paragraphs[0]
-        bottom_right.alignment = C
-        bottom_right.paragraph_format.space_before = Pt(58)
-        bottom_right.paragraph_format.space_after = Pt(4)
-        bottom_right.add_run(line_text)
-
-        bottom_right_name = signature_table.rows[1].cells[1].add_paragraph()
-        bottom_right_name.alignment = C
-        right_name_run = bottom_right_name.add_run(emp_name)
-        right_name_run.bold = True
-
-        return b.download(self.env, 'hr.contract', self.id,
-                          f'Addendum - {self.employee_id.name}.docx',
-                          b.to_bytes(doc))
+        values = self._addendum_values()
+        output = io.BytesIO()
+        with zipfile.ZipFile(file_path(self.ADDENDUM_TEMPLATE)) as template, \
+                zipfile.ZipFile(output, 'w', zipfile.ZIP_DEFLATED) as result:
+            for item in template.infolist():
+                data = template.read(item.filename)
+                if item.filename == 'word/document.xml':
+                    xml = data.decode('utf-8')
+                    for marker, value in values.items():
+                        xml = xml.replace(marker, xml_escape(value))
+                    data = xml.encode('utf-8')
+                result.writestr(item, data)
+        return _DocxBuilder.download(self.env, 'hr.contract', self.id,
+                                     f'Addendum - {self.employee_id.name}.docx',
+                                     output.getvalue())
