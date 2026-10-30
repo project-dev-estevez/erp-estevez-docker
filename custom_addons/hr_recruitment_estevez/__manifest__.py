@@ -9,8 +9,8 @@
     "author": "Estevez.Jor",
     "website": "https://estevezjorinternacional.com",
     "category": "Human Resources",
-    "version": "0.2",
-    "depends": ['base', 'hr', 'hr_estevez', 'hr_recruitment', 'project', 'survey', 'hr_recruitment_survey', 'utm', 'hr_holidays'],
+    "version": "0.3",
+    "depends": ['base', 'hr', 'hr_estevez', 'hr_recruitment', 'project', 'survey', 'hr_recruitment_survey', 'utm', 'hr_holidays', 'website_hr_recruitment'],
     "data": [
         # Archivos de seguridad
         "security/hr_recruitment_security.xml",
@@ -63,7 +63,10 @@
             'hr_recruitment_estevez/static/src/components/**/*.js',
             'hr_recruitment_estevez/static/src/components/**/*.xml',
             'hr_recruitment_estevez/static/src/components/**/*.scss',
-            'hr_recruitment_estevez/static/src/scss/requisition_form.scss',          
+            'hr_recruitment_estevez/static/src/scss/requisition_form.scss',
+        ],
+        'web.assets_frontend': [
+            'hr_recruitment_estevez/static/src/scss/website_job.scss',
         ],
     },
     "installable": True,
