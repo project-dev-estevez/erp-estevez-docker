@@ -12,8 +12,9 @@
     }
 
     // Columna de etiquetas con el mismo ancho en todas las secciones
+    // (excepto .o_label_nowrap, p. ej. permisos técnicos del usuario: la columna debe crecer con la etiqueta)
     @include media-breakpoint-up(sm) {
-        .o_inner_group:not(.oe_subtotal_footer) {
+        .o_inner_group:not(.oe_subtotal_footer):not(.o_label_nowrap) {
             grid-template-columns: 170px minmax(0, 1fr);
         }
     }
