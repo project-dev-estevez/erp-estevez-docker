@@ -1,17 +1,6 @@
-// Pestaña "Información Laboral": columnas de etiquetas y cajas alineadas entre secciones
+// Pestaña "Información Laboral"
+// Columnas y etiquetas vienen de custom_inputs_estevez/static/src/scss/form_style.scss
 .o_form_view .o_estevez_work_info {
-    @include media-breakpoint-up(sm) {
-        .o_inner_group {
-            grid-template-columns: 150px minmax(0, 1fr);
-        }
-    }
-
-    // Etiquetas de campos de solo lectura (Work Address, Patrón) igual que las demás
-    .o_form_label.o_form_label_readonly {
-        opacity: 1;
-        font-weight: $font-weight-bold;
-    }
-
     // El botón de abrir registro de los many2one ya no reserva espacio a la derecha
     .o_field_many2one_selection {
         position: relative;

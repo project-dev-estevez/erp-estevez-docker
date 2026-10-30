@@ -1,19 +1,6 @@
 // Formulario de contratos (hr.contract)
+// Etiquetas, columnas y encabezados de sección vienen de custom_inputs_estevez/static/src/scss/form_style.scss
 .o_form_view.o_estevez_contract_form {
-    // Etiquetas siempre en negro, aunque el campo se llene solo (solo lectura)
-    .o_form_label,
-    .o_form_label.o_form_label_readonly {
-        opacity: 1;
-        color: $gray-900;
-        font-weight: $font-weight-bold;
-    }
-
-    @include media-breakpoint-up(sm) {
-        .o_inner_group {
-            grid-template-columns: 170px minmax(0, 1fr);
-        }
-    }
-
     .o_estevez_contract_title {
         margin-bottom: 1rem;
 
@@ -67,18 +54,6 @@
             font-size: 1.1rem;
             margin-top: .15rem;
         }
-    }
-
-    // Encabezados de sección ("Datos del contrato", "Vigencia", "Puesto y adscripción")
-    .o_horizontal_separator {
-        color: $o-brand-primary;
-        font-size: .8rem;
-        font-weight: 700;
-        letter-spacing: .06em;
-        text-transform: uppercase;
-        border-bottom: 2px solid $gray-200;
-        padding-bottom: .35rem;
-        margin-bottom: .75rem;
     }
 
     .o_estevez_contract_position {

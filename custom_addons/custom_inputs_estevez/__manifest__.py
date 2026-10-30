@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'Custom Inputs Estevez',
-    'version': '1.1.0',
+    'version': '1.2.0',
     'category': 'Web',
     'license': 'LGPL-3',
     'summary': 'Personalización global de estilos, spinner y logos PWA en Odoo',
@@ -24,11 +24,14 @@
     'assets': {
         'web.assets_backend': [
             'custom_inputs_estevez/static/src/scss/custom_inputs.scss',
+            'custom_inputs_estevez/static/src/scss/form_style.scss',
             'custom_inputs_estevez/static/src/css/custom_spinner.css',
             'custom_inputs_estevez/static/src/js/custom_spinner.js',
             'custom_inputs_estevez/static/img/odoo-icon-192x192.png',
             'custom_inputs_estevez/static/img/odoo-icon-512x512.png',
             'custom_inputs_estevez/static/src/js/remove_test_paragraphs.js',
+            'custom_inputs_estevez/static/src/scss/chatter_toggle.scss',
+            'custom_inputs_estevez/static/src/js/chatter_toggle.js',
         ],
         "web.assets_frontend": [
             'custom_inputs_estevez/static/img/favicon.ico',
