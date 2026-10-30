@@ -237,7 +237,9 @@ class HrEmployee(models.Model):
     #company_id = fields.Many2one('res.company', string='Company', compute='_compute_company', store=True, readonly=True)
     #company_id = fields.Many2one('res.company', string='Compañía', default=lambda self: self.env.company)
     direction_id = fields.Many2one('hr.direction', string='Dirección')
-    area_id = fields.Many2one('hr.area', string='Área')
+    # Organigrama: Dirección > Área (hr.department) > Departamento (hr.area) > Puesto
+    department_id = fields.Many2one(string='Área')
+    area_id = fields.Many2one('hr.area', string='Departamento')
 
     # Información de Trabajo
     imss_registration_date = fields.Date(string='Fecha de Alta en IMSS')

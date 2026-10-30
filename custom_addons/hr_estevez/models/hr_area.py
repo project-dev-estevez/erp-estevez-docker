@@ -2,11 +2,12 @@ from odoo import api, models, fields
 
 class HrArea(models.Model):
     _name = 'hr.area'
-    _description = 'Area'
+    # En el organigrama de la empresa este modelo es el "Departamento" (hijo de un Área = hr.department)
+    _description = 'Departamento'
 
     name = fields.Char('Nombre', required=True)
     company_id = fields.Many2one('res.company', string='Empresa', ondelete='set null', readonly=True)
-    department_id = fields.Many2one('hr.department', string='Departamento')
+    department_id = fields.Many2one('hr.department', string='Área')
     employee_ids = fields.One2many('hr.employee', 'area_id', string='Empleados')
     coordinator_id = fields.Many2one('hr.employee', string='Coordinador')
     direction_id = fields.Many2one('hr.direction', string='Dirección')

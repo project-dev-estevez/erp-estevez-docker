@@ -15,7 +15,7 @@
             </xpath>
 
             <xpath expr="//field[@name='employee_id']" position="after">
-                <field name="department_id" string="Departamento"/>
+                <field name="department_id" string="Área"/>
                 <field name="job_id" string="Puesto de trabajo" readonly="1"/>
                 <field name="tag_ids" widget="many2many_tags" string="Etiquetas"/>
             </xpath>

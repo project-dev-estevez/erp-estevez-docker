@@ -13,7 +13,7 @@ class HrEmployee(models.Model):
     last_name = fields.Char(string="Apellido Paterno", required=True)
     mother_last_name = fields.Char(string="Apellido Materno", required=True)    
     direction_id = fields.Many2one('hr.direction', string='Dirección')
-    area_id = fields.Many2one('hr.area', string='Area')
+    area_id = fields.Many2one('hr.area', string='Departamento')
 
     @api.onchange('first_name', 'names', 'last_name', 'mother_last_name')
     def _onchange_recruitment_name_fields(self):

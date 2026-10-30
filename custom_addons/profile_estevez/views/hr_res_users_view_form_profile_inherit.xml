@@ -134,7 +134,7 @@
             </xpath>
             <!-- Agregar área después del departamento -->
             <xpath expr="//page[@name='public']//field[@name='department_id']" position="after">
-                <field name="area_id" string="Área" readonly="True" options="{'no_open': True}"/>
+                <field name="area_id" string="Departamento" readonly="True" options="{'no_open': True}"/>
             </xpath>
             <!-- Hacer readonly todos los campos de la página public -->
             <xpath expr="//page[@name='public']//field[@name='department_id']" position="attributes">

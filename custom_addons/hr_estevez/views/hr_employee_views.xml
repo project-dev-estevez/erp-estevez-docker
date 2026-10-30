@@ -109,13 +109,13 @@
                         placeholder="Tags" groups="hr.group_hr_user"/>
                     </group>
                 </xpath>
-                <!-- Compañia, Dirección, Departamento, Area, Puesto de Trabajo, Jefe Inmediato -->
+                <!-- Compañia, Dirección, Área (hr.department), Departamento (hr.area), Puesto de Trabajo, Jefe Inmediato -->
                 <xpath expr="//group/group[field[@name='department_id']]" position="replace">
                     <group>
                         <field name="company_id" widget="many2one" options="{'no_create': True, 'no_create_edit': True}"/>
                         <field name="direction_id" options="{'no_create': True}"/>
-                        <field name="department_id" domain="[('direction_id', '=', direction_id)]" invisible="not direction_id" options="{'no_create': True}"/>
-                        <field name="area_id" domain="[('department_id', '=', department_id)]" invisible="not department_id" options="{'no_create': True}"/>
+                        <field name="department_id" string="Área" domain="[('direction_id', '=', direction_id)]" invisible="not direction_id" options="{'no_create': True}"/>
+                        <field name="area_id" string="Departamento" domain="[('department_id', '=', department_id)]" invisible="not department_id" options="{'no_create': True}"/>
                         <!--field name="job_id" domain="[('department_id', '=', department_id)]" invisible="not department_id" options="{'no_create': True}"/-->
                         <field name="job_id" domain="['|', ('name', 'ilike', 'Becario'), ('direction_id', '=', direction_id)]" options="{'no_create': True}" context="{'default_direction_id': direction_id}"/>
                         <field name="parent_id" string="Jefe Inmediato" options="{'no_create': True}"/>
