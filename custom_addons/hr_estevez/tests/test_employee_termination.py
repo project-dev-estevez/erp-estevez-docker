@@ -6,7 +6,7 @@ from odoo.tests.common import TransactionCase
 
 
 class TestEmployeeTermination(TransactionCase):
-    """Al dar de baja a un empleado sus contratos en curso o en borrador se cancelan."""
+    """Al dar de baja a un empleado sus contratos en curso, en borrador o vencidos se cancelan."""
 
     @classmethod
     def setUpClass(cls):
@@ -48,8 +48,7 @@ class TestEmployeeTermination(TransactionCase):
         self.assertFalse(employee.active)
         self.assertEqual(running.state, 'cancel')
         self.assertEqual(draft.state, 'cancel')
-        # Un contrato ya vencido se queda como estaba
-        self.assertEqual(expired.state, 'close')
+        self.assertEqual(expired.state, 'cancel')
 
     def test_direct_archive_cancels_contracts(self):
         employee, _expired, running, _draft = self._employee_with_contracts()
