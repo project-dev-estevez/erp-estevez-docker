@@ -1,0 +1,127 @@
+// Formulario de Requisición de Personal (hr.requisition)
+$estevez-blue: #239fd3;
+
+.o_form_view.o_estevez_requisition_form {
+    .o_estevez_req_badges {
+        display: flex;
+        flex-wrap: wrap;
+        gap: .5rem;
+        margin-bottom: 1rem;
+
+        .badge {
+            font-size: .8rem;
+            font-weight: 600;
+            padding: .4em .8em;
+        }
+    }
+
+    .o_estevez_req_alert {
+        display: flex;
+        align-items: flex-start;
+        gap: .75rem;
+        margin-bottom: 1.25rem;
+
+        > .fa {
+            font-size: 1.1rem;
+            margin-top: .15rem;
+        }
+    }
+
+    // ---- Pasos del asistente ----
+    .o_estevez_req_steps {
+        display: flex;
+        align-items: center;
+        gap: .5rem;
+        margin: .5rem 0 1.5rem;
+        padding: .75rem 1rem;
+        background: $gray-100;
+        border-radius: .75rem;
+    }
+
+    .o_estevez_req_step {
+        display: flex;
+        align-items: center;
+        gap: .6rem;
+        flex-shrink: 0;
+        padding: .35rem .75rem .35rem .35rem;
+        color: $gray-700;
+        font-weight: 600;
+        background: transparent;
+        border: 0;
+        border-radius: 999px;
+        transition: background-color .15s ease, color .15s ease;
+
+        &:is(button):hover {
+            color: $gray-900;
+            background: $white;
+        }
+
+        &.o_active {
+            color: $white;
+            background: $estevez-blue;
+
+            .o_estevez_req_step_num {
+                color: $estevez-blue;
+                background: $white;
+            }
+        }
+    }
+
+    .o_estevez_req_step_num {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        color: $gray-700;
+        background: $white;
+        border: 1px solid $gray-300;
+        font-size: .85rem;
+    }
+
+    .o_estevez_req_step_line {
+        flex: 1 1 auto;
+        min-width: 1rem;
+        height: 2px;
+        background: $gray-300;
+    }
+
+    @include media-breakpoint-down(md) {
+        .o_estevez_req_steps {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .o_estevez_req_step_line {
+            display: none;
+        }
+    }
+
+    // ---- Rango de edad ----
+    .o_estevez_req_age {
+        align-items: center;
+
+        .o_field_widget {
+            flex: 0 0 80px;
+            width: 80px;
+        }
+    }
+
+    // ---- Navegación del asistente ----
+    .o_estevez_req_nav {
+        display: flex;
+        align-items: center;
+        gap: .75rem;
+        margin-top: 1.5rem;
+        padding-top: 1.25rem;
+        border-top: 1px solid $border-color;
+
+        .o_estevez_req_nav_info {
+            flex: 1 1 auto;
+            color: $gray-600;
+            font-weight: 600;
+            text-align: center;
+        }
+    }
+}

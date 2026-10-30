@@ -1,17 +1,22 @@
 import logging
+from markupsafe import Markup
 from odoo import models, fields, api
 from odoo.exceptions import ValidationError, UserError
 
 _logger = logging.getLogger(__name__)
+
+WIZARD_STEPS = ['especificaciones', 'datos_puesto', 'equipo']
+
 
 class HrRequisition(models.Model):
     _name = 'hr.requisition'
     _description = 'Requisición de Personal'
     _inherit = ['mail.thread', 'mail.activity.mixin']
     _rec_name = 'name'
+    _order = 'create_date desc, id desc'
 
+    folio = fields.Char(string="Folio", readonly=True, copy=False, index=True)
     name = fields.Char(string="Nombre", compute="_compute_name", store=True)
-    workstation_job_id = fields.Many2one('hr.job', string="Puesto")
 
     wizard_step = fields.Selection(
         selection=[
@@ -23,12 +28,14 @@ class HrRequisition(models.Model):
         default='especificaciones'
     )
 
+    # Flujo: Borrador → Aprobación de Dirección → Aprobación final → Aprobada (o Rechazada)
     state = fields.Selection([
-        ('to_approve', 'Por Aprobar'),
-        ('first_approval', 'En Curso'),
-        ('rejected', 'Rechazado'),
-        ('approved', 'Aprobado'),
-    ], default='to_approve', track_visibility='onchange')
+        ('draft', 'Borrador'),
+        ('to_approve', 'Aprobación Dirección'),
+        ('first_approval', 'Aprobación Final'),
+        ('rejected', 'Rechazada'),
+        ('approved', 'Aprobada'),
+    ], string="Estado", default='draft', tracking=True, copy=False)
 
     requisition_number = fields.Char(string='Formato de Solicitud', readonly=True, default='DA-F0-TH-006')
     # Información del solicitante
@@ -55,7 +62,7 @@ class HrRequisition(models.Model):
         ('other', 'Otro'),
     ], string="Motivo de Vacante")
     other_reason_description = fields.Text(string="Descripción de Otro Motivo")
-    
+
     # Información del puesto
     job_type = fields.Selection([
         ('administrative', 'Administrativo'),
@@ -66,7 +73,7 @@ class HrRequisition(models.Model):
     workstation_area_id = fields.Many2one('hr.area', string="Departamento del Puesto", domain="[('department_id', '=', workstation_department_id)]", help="Especifica el departamento interno donde el puesto realiza sus funciones.")
     workstation_job_id = fields.Many2one('hr.job', string="Puesto Solicitado", domain="[('department_id', '=', workstation_department_id)]", help="Nombre del puesto que se solicita cubrir.")
     project_id = fields.Many2one('project.project', string="Proyecto", help="Especifica el proyecto al que estará asignado el puesto.")
-    number_of_vacancies = fields.Integer(string="Número de Vacantes", help="Número total de puestos disponibles que se desean cubrir.")
+    number_of_vacancies = fields.Integer(string="Número de Vacantes", default=1, help="Número total de puestos disponibles que se desean cubrir.")
     work_schedule = fields.Many2one('resource.calendar', string="Horario de Jornada Laboral", help="Selecciona el tipo de jornada laboral correspondiente.")
     gender = fields.Selection([
         ('male', 'Masculino'),
@@ -74,7 +81,7 @@ class HrRequisition(models.Model):
         ('indistinct', 'Indistinto'),
         ('other', 'Otro')
     ], string="Género", help="Selecciona el género requerido para el puesto.")
-    
+
     age_range_min = fields.Selection(
         selection=[(str(i), str(i)) for i in range(18, 61)],  # 18 a 60
         string="Edad Mínima",
@@ -86,10 +93,7 @@ class HrRequisition(models.Model):
         string="Edad Máxima",
         default='60'
     )
-        
-    #age_range_min = fields.Integer(string="Edad Mínima", default=18)
-    # age_range_max = fields.Integer(string="Edad Máxima", default=60)
-    #years_of_experience = fields.Integer(string="Años de Experiencia", required=True, help="Indica los años mínimos de experiencia que debe tener el candidato.")
+
     year_of_experience = fields.Selection([
         ('seis_meses', '6 meses'),
         ('uno_anio', '1 año'),
@@ -113,6 +117,19 @@ class HrRequisition(models.Model):
     tag_ids = fields.Many2many('hr.requisition.tag', string="Etiquetas")
     observations = fields.Text(string="Observaciones de la Vacante", help="Espacio para incluir comentarios adicionales o detalles relevantes sobre la vacante.")
 
+    # Aprobaciones
+    submit_date = fields.Datetime(string="Enviada a aprobación", readonly=True, copy=False)
+    first_approver_id = fields.Many2one('res.users', string="Aprobó Dirección", readonly=True, copy=False)
+    first_approval_date = fields.Datetime(string="Fecha aprobación Dirección", readonly=True, copy=False)
+    final_approver_id = fields.Many2one('res.users', string="Aprobación final", readonly=True, copy=False)
+    final_approval_date = fields.Datetime(string="Fecha aprobación final", readonly=True, copy=False)
+    rejected_by_id = fields.Many2one('res.users', string="Rechazó", readonly=True, copy=False)
+    rejection_reason = fields.Text(string="Motivo de rechazo", readonly=True, copy=False, tracking=True)
+
+    pending_approver_id = fields.Many2one('res.users', string="Pendiente de aprobar por", compute='_compute_approval_info')
+    is_current_approver = fields.Boolean(compute='_compute_approval_info')
+    is_requestor = fields.Boolean(compute='_compute_approval_info')
+
     is_published = fields.Boolean(
         string='Vacante Publicada',
         default=False,
@@ -124,31 +141,48 @@ class HrRequisition(models.Model):
         string='Fecha de Publicación',
         copy=False
     )
-    
+
     close_date = fields.Datetime(
         string='Fecha de Cierre',
         copy=False
     )
 
-    _sql_constraints = [
-        ('check_years_of_experience', 'CHECK(years_of_experience >= 0)', 'Los años de experiencia no pueden ser un número negativo.')
-    ]
-
-    # Nuevo campo computado
-    publication_status = fields.Char(        
+    publication_status = fields.Char(
+        string='Estado Vacante',
         compute='_compute_publication_status',
         store=False,
         search='_search_publication_status'
-    )        
+    )
+
+    # ------------------------------------------------------------------
+    # Cómputos
+    # ------------------------------------------------------------------
+
+    @api.depends('folio', 'workstation_job_id')
+    def _compute_name(self):
+        for record in self:
+            job_name = record.workstation_job_id.name or 'Sin puesto'
+            record.name = f"{record.folio} · {job_name}" if record.folio else f"Requisición · {job_name}"
+
+    @api.depends('state', 'is_published')
+    def _compute_publication_status(self):
+        for record in self:
+            if record.state == 'rejected':
+                record.publication_status = 'No aplica'
+            elif record.state != 'approved':
+                record.publication_status = 'Por Abrir'
+            else:
+                record.publication_status = 'Abierta' if record.is_published else 'Cerrada'
 
     def _search_publication_status(self, operator, value):
         if operator not in ('=', '!=', 'ilike', 'not ilike', 'in', 'not in'):
             return []
 
         status_mapping = {
-            'Por Abrir': [('state', '!=', 'approved')],  # Coincide con tu _compute
+            'Por Abrir': [('state', 'in', ('draft', 'to_approve', 'first_approval'))],
             'Abierta': [('state', '=', 'approved'), ('is_published', '=', True)],
             'Cerrada': [('state', '=', 'approved'), ('is_published', '=', False)],
+            'No aplica': [('state', '=', 'rejected')],
         }
 
         if value in status_mapping:
@@ -156,285 +190,366 @@ class HrRequisition(models.Model):
 
         return []
 
-    @api.constrains('wizard_step', 'job_type', '')
-
-    @api.depends('workstation_job_id')
-    def _compute_name(self):
+    @api.depends_context('uid')
+    @api.depends('state', 'requestor_id')
+    def _compute_approval_info(self):
+        user = self.env.user
+        is_recruitment_manager = user.has_group('hr_recruitment.group_hr_recruitment_manager')
         for record in self:
-            record.name = f"Requisición - {record.workstation_job_id.name or 'Sin Puesto'}"
-    
-    @api.depends('state', 'is_published')
-    def _compute_publication_status(self):
-        for record in self:
-            if record.state != 'approved':
-                record.publication_status = 'Por Abrir'            
+            approver = record._get_pending_approver()
+            record.pending_approver_id = approver
+            record.is_requestor = record.requestor_id == user
+            if record.state not in ('to_approve', 'first_approval'):
+                record.is_current_approver = False
+            elif approver:
+                record.is_current_approver = approver == user
             else:
-                record.publication_status = 'Abierta' if record.is_published else 'Cerrada'
+                # Sin aprobador configurado: Talento Humano puede aprobar para que no se atore
+                record.is_current_approver = is_recruitment_manager
 
-    # Acciones de estado
-    def action_approve(self):
-        self.state = 'first_approval'
-        
-        if not self.direction_id:
-            _logger.warning("No direction ID found for the requisition")
-            return
+    # ------------------------------------------------------------------
+    # Aprobadores
+    # ------------------------------------------------------------------
 
-        _logger.info("Direction ID found: %s", self.direction_id.id)
-        if not self.direction_id.director_id:
-            _logger.warning("No director ID found for direction ID: %s", self.direction_id.id)
-            return
+    def _get_director_employee(self):
+        # sudo: un colaborador sin permisos de RH no puede leer la ficha privada del Director
+        self.ensure_one()
+        return self.sudo().direction_id.director_id
 
-        _logger.info("Director ID found: %s", self.direction_id.director_id.id)
-        director_user = self.direction_id.director_id.user_id
-        if not director_user:
-            _logger.warning("No director user found for director ID: %s", self.direction_id.director_id.id)
-            return
+    def _get_first_approver(self):
+        """1ª aprobación: Director de la Dirección del solicitante."""
+        self.ensure_one()
+        return self._get_director_employee().user_id.with_env(self.env)
 
-        _logger.info("Director user found: %s", director_user.id)
-        if not director_user.employee_id or not director_user.employee_id.parent_id:
-            _logger.warning("No immediate supervisor found for director user ID: %s", director_user.id)
-            return
+    def _get_final_approver(self):
+        """2ª aprobación: jefe inmediato del Director."""
+        self.ensure_one()
+        return self._get_director_employee().parent_id.user_id.with_env(self.env)
 
-        immediate_supervisor_user = director_user.employee_id.parent_id.user_id
-        if not immediate_supervisor_user:
-            _logger.warning("No user found for immediate supervisor of director user ID: %s", director_user.id)
-            return
-
-        _logger.info("Immediate supervisor user found: %s", immediate_supervisor_user.id)
-        
-        message = "La requisición de personal ha sido aprobada por %s." % self.requestor_id.name
-        subject = "Requisición Aprobada: %s" % self.requisition_number
-        message_id = self.message_post(
-            body=message,
-            subject=subject,
-            partner_ids=[immediate_supervisor_user.partner_id.id],
-            message_type='notification',
-            subtype_xmlid='mail.mt_comment',
-        )
-        _logger.info("Notification sent to immediate supervisor user: %s", immediate_supervisor_user.partner_id.id)
-        _logger.info("Message ID: %s", message_id)
-
-
-    def action_reset_to_draft(self):
-        for record in self:
-            # Solo permite restablecer si está aprobado o rechazado
-            if record.state in ['approved', 'rejected']:
-                # Volver al estado inicial (ajusta según tu flujo)
-                record.state = 'to_approve'
-                
-                # Opcional: Resetear campos relacionados
-                record.is_published = False
-    
-        return True
-    
-    def action_confirm_approve(self):
+    def _get_pending_approver(self):
+        self.ensure_one()
+        if self.state == 'to_approve':
+            return self._get_first_approver()
         if self.state == 'first_approval':
-            self.state = 'approved'
-            
-            if not self.direction_id:
-                _logger.warning("No direction ID found for the requisition")
-                return
+            return self._get_final_approver()
+        return self.env['res.users']
 
-            _logger.info("Direction ID found: %s", self.direction_id.id)
-            if not self.direction_id.director_id:
-                _logger.warning("No director ID found for direction ID: %s", self.direction_id.id)
-                return
+    def _check_current_approver(self):
+        for record in self:
+            if not record.is_current_approver:
+                approver = record.pending_approver_id
+                raise UserError(
+                    f"Esta requisición la debe aprobar {approver.name}." if approver
+                    else "No tienes permiso para aprobar esta requisición."
+                )
 
-            _logger.info("Director ID found: %s", self.direction_id.director_id.id)
-            director_user = self.direction_id.director_id.user_id
-            if not director_user:
-                _logger.warning("No director user found for director ID: %s", self.direction_id.director_id.id)
-                return
-
-            _logger.info("Director user found: %s", director_user.id)
-            message = "La requisición de personal ha sido aprobada por %s." % self.requestor_id.name
-            subject = "Requisición Aprobada: %s" % self.requisition_number
-            partner_ids = [director_user.partner_id.id, self.requestor_id.partner_id.id]
-            message_id = self.message_post(
-                body=message,
-                subject=subject,
-                partner_ids=partner_ids,
-                message_type='notification',
-                subtype_xmlid='mail.mt_comment',
+    def _schedule_approval_activity(self, user):
+        self.ensure_one()
+        if user:
+            self.activity_schedule(
+                'mail.mail_activity_data_todo',
+                user_id=user.id,
+                summary="Aprobar requisición de personal",
+                note=f"Revisa y aprueba o rechaza la requisición {self.name}.",
             )
-            _logger.info("Notification sent to director user: %s and requestor user: %s", director_user.partner_id.id, self.requestor_id.partner_id.id)
-            _logger.info("Message ID: %s", message_id)
 
-    def action_reject(self):
-        self.state = 'rejected'
-        partner_ids = [self.requestor_id.partner_id.id]
-        
-        if self.state == 'first_approval' and self.direction_id and self.direction_id.director_id:
-            director_user = self.direction_id.director_id.user_id
-            if director_user and director_user.partner_id:
-                partner_ids.append(director_user.partner_id.id)
-        
-        if not partner_ids:
-            _logger.warning("No partner IDs found for notification")
-            return
+    def _close_approval_activities(self, feedback):
+        self.activity_feedback(['mail.mail_activity_data_todo'], feedback=feedback)
 
-        message = "Su solicitud de requisición de personal ha sido rechazada."
-        subject = "Requisición Rechazada: %s" % self.requisition_number
-        message_id = self.message_post(
-            body=message,
-            subject=subject,
-            partner_ids=partner_ids,
-            message_type='notification',
+    def _notify(self, body, partners):
+        self.message_post(
+            body=body,
+            partner_ids=partners.ids,
+            message_type='comment',
             subtype_xmlid='mail.mt_comment',
         )
-        if message_id:
-            _logger.info("Notification sent to partner IDs: %s", partner_ids)
-            _logger.info("Message ID: %s", message_id)
-        else:
-            _logger.warning("Failed to send notification to partner IDs: %s", partner_ids)
+
+    # ------------------------------------------------------------------
+    # Validaciones
+    # ------------------------------------------------------------------
 
     @api.constrains('age_range_min', 'age_range_max')
     def _check_age_range(self):
         for record in self:
-            # Convertir a enteros
             min_age = int(record.age_range_min) if record.age_range_min else 0
             max_age = int(record.age_range_max) if record.age_range_max else 0
-        
+
             if min_age < 18:
                 raise ValidationError("La edad mínima no puede ser menor a 18 años")
-            
+
             if max_age <= min_age:
                 raise ValidationError("La edad máxima debe ser mayor que la mínima")
-            
+
             if max_age > 60:
                 raise ValidationError("La edad máxima no puede exceder los 60 años")
 
-    # Si es para un reemplazo se debe de seleccionar el empleado a reemplazar
     @api.constrains('requisition_type', 'employee_id')
     def _check_employee_id_required(self):
         for record in self:
             if record.requisition_type == 'replacement' and not record.employee_id:
                 raise ValidationError("Debe seleccionar el empleado a reemplazar cuando el tipo de requisición es 'Reposición de personal'.")
 
-    # Si la vacante es por otro motivo se debe de especificar cual es
     @api.constrains('vacancy_reason', 'other_reason_description')
     def _check_other_reason_description(self):
         for record in self:
             if record.vacancy_reason == 'other' and not record.other_reason_description:
                 raise ValidationError("Debe especificar la descripción del otro motivo cuando el motivo de la vacante es 'Otro'.")
 
-    @api.model
-    def create(self, vals):
-        _logger.info("Creating a new hr.requisition record with values: %s", vals)
-        record = super(HrRequisition, self).create(vals)
-        _logger.info("New hr.requisition record created with ID: %s", record.id)
-
-        if not record.direction_id:
-            _logger.warning("No direction ID found for the requisition")
-            return record
-
-        _logger.info("Direction ID found: %s", record.direction_id.id)
-        if not record.direction_id.director_id:
-            _logger.warning("No director ID found for direction ID: %s", record.direction_id.id)
-            return record
-
-        _logger.info("Director ID found: %s", record.direction_id.director_id.id)
-        director_user = record.direction_id.director_id.user_id
-        if not director_user:
-            _logger.warning("No director user found for director ID: %s", record.direction_id.director_id.id)
-            return record
-
-        _logger.info("Director user found: %s", director_user.id)
-        message = "Se ha creado una nueva requisición de personal por el usuario %s." % record.requestor_id.name
-        subject = "Nueva Requisición: %s" % record.requisition_number
-        message_id = record.message_post(
-            body=message,
-            subject = subject,
-            partner_ids=[director_user.partner_id.id],
-            message_type='notification',
-            subtype_xmlid='mail.mt_comment',
-        )
-        _logger.info("Notification sent to director user: %s", director_user.partner_id.id)
-        _logger.info("Message ID: %s", message_id)
-
-        return record
-    
-    def action_save(self):
+    def _missing_fields(self, step):
+        """Etiquetas de los campos obligatorios que faltan en un paso."""
         self.ensure_one()
+        required = {
+            'especificaciones': ['requisition_type'],
+            'datos_puesto': [
+                'job_type', 'workstation_direction_id', 'workstation_department_id', 'workstation_job_id',
+            ],
+            'equipo': [],
+        }[step]
+        missing = [self._fields[name].string for name in required if not self[name]]
+        if step == 'datos_puesto' and self.number_of_vacancies < 1:
+            missing.append(self._fields['number_of_vacancies'].string)
+        return missing
 
-        _logger.info("Mostrando vista lista + efecto rainbow_man")
+    def _check_step(self, step):
+        for record in self:
+            missing = record._missing_fields(step)
+            if missing:
+                raise ValidationError("Completa los campos obligatorios:\n• " + "\n• ".join(missing))
+
+    # ------------------------------------------------------------------
+    # Cambios en el formulario
+    # ------------------------------------------------------------------
+
+    @api.onchange('workstation_direction_id')
+    def _onchange_workstation_direction_id(self):
+        if self.workstation_department_id.direction_id != self.workstation_direction_id:
+            self.workstation_department_id = False
+
+    @api.onchange('workstation_department_id')
+    def _onchange_workstation_department_id(self):
+        if self.workstation_area_id.department_id != self.workstation_department_id:
+            self.workstation_area_id = False
+        if self.workstation_job_id.department_id != self.workstation_department_id:
+            self.workstation_job_id = False
+
+    @api.onchange('employee_id')
+    def _onchange_employee_id(self):
+        # En una reposición, el puesto a cubrir es el del empleado que se va
+        employee = self.employee_id
+        if employee and not self.workstation_job_id:
+            self.workstation_direction_id = employee.direction_id
+            self.workstation_department_id = employee.department_id
+            self.workstation_job_id = employee.job_id
+
+    # ------------------------------------------------------------------
+    # Asistente de captura (solo en Borrador)
+    # ------------------------------------------------------------------
+
+    def action_previous(self):
+        for record in self:
+            index = WIZARD_STEPS.index(record.wizard_step or 'especificaciones')
+            record.wizard_step = WIZARD_STEPS[max(index - 1, 0)]
+        return True
+
+    def action_next(self):
+        for record in self:
+            step = record.wizard_step or 'especificaciones'
+            record._check_step(step)
+            index = WIZARD_STEPS.index(step)
+            record.wizard_step = WIZARD_STEPS[min(index + 1, len(WIZARD_STEPS) - 1)]
+        return True
+
+    def action_go_to_step(self):
+        """Clic en el encabezado de un paso: se puede regresar libremente, avanzar solo con lo previo completo."""
+        step = self.env.context.get('wizard_step')
+        if step not in WIZARD_STEPS:
+            return True
+        for record in self:
+            target = WIZARD_STEPS.index(step)
+            for previous in WIZARD_STEPS[:target]:
+                record._check_step(previous)
+            record.wizard_step = step
+        return True
+
+    def set_wizard_step(self, step):
+        self.ensure_one()
+        if step in WIZARD_STEPS:
+            self.wizard_step = step
+        return True
+
+    # ------------------------------------------------------------------
+    # Flujo de aprobación
+    # ------------------------------------------------------------------
+
+    def action_submit(self):
+        """Enviar a aprobación (antes «Guardar y Finalizar»)."""
+        for record in self:
+            if record.state != 'draft':
+                raise UserError("Solo se pueden enviar requisiciones en Borrador.")
+            for step in WIZARD_STEPS:
+                record._check_step(step)
+
+            record.write({
+                'state': 'to_approve',
+                # El folio se asigna al enviar, para que los borradores abandonados no dejen huecos
+                'folio': record.folio or self.env['ir.sequence'].next_by_code('hr.requisition'),
+                'submit_date': fields.Datetime.now(),
+                'rejection_reason': False,
+                'rejected_by_id': False,
+            })
+            first_approver = record._get_first_approver()
+            if first_approver and first_approver == record.requestor_id:
+                # El solicitante es el Director: su envío cuenta como la aprobación de Dirección
+                record.write({
+                    'state': 'first_approval',
+                    'first_approver_id': first_approver.id,
+                    'first_approval_date': fields.Datetime.now(),
+                })
+            approver = record._get_pending_approver()
+            record._schedule_approval_activity(approver)
+            if approver:
+                record._notify(
+                    Markup("Nueva requisición de personal de <b>%s</b>. Requiere tu aprobación.") % record.requestor_id.name,
+                    approver.partner_id,
+                )
 
         return {
-            'effect': { 
+            'effect': {
                 'fadeout': 'slow',
-                'message': '¡Requisición registrada exitosamente!',
+                'message': '¡Requisición enviada a aprobación!',
                 'type': 'rainbow_man',
             },
             'type': 'ir.actions.act_window',
-            'res_model': self._name, 
-            'view_mode': 'list',
+            'res_model': self._name,
+            'res_id': self[:1].id,
+            'views': [(False, 'form')],
             'target': 'current',
-            
         }
-    
-    def action_previous(self):
-        steps = {
-            'datos_puesto': 'especificaciones',
-            'equipo': 'datos_puesto'
-        }
+
+    def action_approve(self):
+        """1ª aprobación (Dirección)."""
+        self._check_current_approver()
         for record in self:
-            record.wizard_step = steps.get(record.wizard_step, 'especificaciones')
-        return False
-    
-    def action_next(self):
-        error_messages = {
-            'especificaciones': "Debe completar todos los campos obligatorios en 'Especificaciones'",
-            'datos_puesto': "Faltan datos importantes en 'Datos del puesto'"
-        }
+            if record.state != 'to_approve':
+                raise UserError("La requisición no está esperando la aprobación de Dirección.")
+            record._close_approval_activities(f"Aprobada por {self.env.user.name}")
+            record.write({
+                'state': 'first_approval',
+                'first_approver_id': self.env.user.id,
+                'first_approval_date': fields.Datetime.now(),
+            })
+            final_approver = record._get_final_approver()
+            record._schedule_approval_activity(final_approver)
+            record._notify(
+                Markup("<b>%s</b> aprobó la requisición. Pasa a aprobación final.") % self.env.user.name,
+                final_approver.partner_id | record.requestor_id.partner_id,
+            )
+        return True
 
-        steps = {
-            'especificaciones': 'datos_puesto',
-            'datos_puesto': 'equipo'
-        }
-
+    def action_confirm_approve(self):
+        """Aprobación final."""
+        self._check_current_approver()
         for record in self:
-            if record.wizard_step == 'especificaciones' and not record.requisition_type:
-                raise ValidationError(error_messages['especificaciones'])
-            elif record.wizard_step == 'datos_puesto' and not record.job_type:
-                raise ValidationError(error_messages['datos_puesto'])
-
-            record.wizard_step = steps.get(record.wizard_step, 'equipo')
-
+            if record.state != 'first_approval':
+                raise UserError("La requisición no está esperando la aprobación final.")
+            record._close_approval_activities(f"Aprobada por {self.env.user.name}")
+            record.write({
+                'state': 'approved',
+                'final_approver_id': self.env.user.id,
+                'final_approval_date': fields.Datetime.now(),
+            })
+            record._notify(
+                Markup("✅ Requisición <b>aprobada</b> por %s. Talento Humano ya puede aperturar la vacante.") % self.env.user.name,
+                record.requestor_id.partner_id | record._get_director_employee().user_id.partner_id,
+            )
         return True
-    
-    def set_wizard_step(self, step):
-        self.ensure_one()
-        valid_steps = ['especificaciones', 'datos_puesto', 'equipo']
-        if step in valid_steps:
-            self.wizard_step = step
+
+    def action_reject(self):
+        """Abre la ventana para capturar el motivo del rechazo."""
+        self._check_current_approver()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'Rechazar requisición',
+            'res_model': 'hr.requisition.reject.wizard',
+            'view_mode': 'form',
+            'target': 'new',
+            'context': {'default_requisition_id': self.id},
+        }
+
+    def _do_reject(self, reason):
+        self._check_current_approver()
+        for record in self:
+            if record.state not in ('to_approve', 'first_approval'):
+                raise UserError("Solo se pueden rechazar requisiciones en aprobación.")
+            record._close_approval_activities(f"Rechazada por {self.env.user.name}")
+            record.write({
+                'state': 'rejected',
+                'rejected_by_id': self.env.user.id,
+                'rejection_reason': reason,
+            })
+            partners = record.requestor_id.partner_id
+            if record.first_approver_id:
+                partners |= record.first_approver_id.partner_id
+            record._notify(
+                Markup("❌ Requisición <b>rechazada</b> por %s.<br/>Motivo: %s") % (self.env.user.name, reason),
+                partners,
+            )
         return True
-    
+
+    def action_reset_to_draft(self):
+        """Regresar a Borrador para corregir y volver a enviar."""
+        is_recruitment_manager = self.env.user.has_group('hr_recruitment.group_hr_recruitment_manager')
+        for record in self:
+            if record.state not in ('approved', 'rejected'):
+                raise UserError("Solo se pueden regresar a Borrador requisiciones aprobadas o rechazadas.")
+            if record.state == 'approved' and not is_recruitment_manager:
+                raise UserError("Solo Talento Humano puede regresar a Borrador una requisición aprobada.")
+            if record.state == 'rejected' and not (record.requestor_id == self.env.user or is_recruitment_manager):
+                raise UserError("Solo el solicitante o Talento Humano pueden corregir una requisición rechazada.")
+            if record.is_published:
+                record.action_close_vacancy(from_job=False)
+            record.write({
+                'state': 'draft',
+                'wizard_step': 'especificaciones',
+                'first_approver_id': False,
+                'first_approval_date': False,
+                'final_approver_id': False,
+                'final_approval_date': False,
+            })
+        return True
+
+    # ------------------------------------------------------------------
+    # Publicación de la vacante
+    # ------------------------------------------------------------------
+
     def action_publish_vacancy(self, from_job=False):
         self.ensure_one()
-        
+
         if self.state != 'approved':
             if not from_job:  # Solo mostrar error si no viene del puesto
                 raise UserError("Solo puedes publicar vacantes aprobadas")
             return
-        
+
         if self.is_published:
             if not from_job:  # Solo mostrar error si no viene del puesto
                 raise UserError("La vacante ya está publicada")
             return
-        
+
         # Actualizar la requisición
         self.write({
             'is_published': True,
             'publish_date': fields.Datetime.now(),
             'close_date': False
         })
-        
+
         # Actualizar el puesto SOLO si no viene del puesto
         if not from_job and self.workstation_job_id:
-            self.workstation_job_id.with_context(skip_requisition_update=True).write({
+            # sudo: publicar el puesto en el sitio web exige permisos de editor del sitio;
+            # los botones de la requisición ya están limitados a Reclutamiento
+            self.workstation_job_id.sudo().with_context(skip_requisition_update=True).write({
                 'is_published': True
             })
-        
+
         # Mostrar notificación solo si es acción manual
         if not from_job:
             return {
@@ -457,24 +572,26 @@ class HrRequisition(models.Model):
 
     def action_close_vacancy(self, from_job=False):
         self.ensure_one()
-        
+
         if not self.is_published:
             if not from_job:  # Solo mostrar error si no viene del puesto
                 raise UserError("La vacante no está publicada")
             return
-        
+
         # Actualizar la requisición
         self.write({
             'is_published': False,
             'close_date': fields.Datetime.now()
         })
-        
+
         # Actualizar el puesto SOLO si no viene del puesto
         if not from_job and self.workstation_job_id:
-            self.workstation_job_id.with_context(skip_requisition_update=True).write({
+            # sudo: publicar el puesto en el sitio web exige permisos de editor del sitio;
+            # los botones de la requisición ya están limitados a Reclutamiento
+            self.workstation_job_id.sudo().with_context(skip_requisition_update=True).write({
                 'is_published': False
             })
-        
+
         # Mostrar notificación solo si es acción manual
         if not from_job:
             return {
@@ -494,3 +611,16 @@ class HrRequisition(models.Model):
                     }
                 }
             }
+
+
+class HrRequisitionRejectWizard(models.TransientModel):
+    _name = 'hr.requisition.reject.wizard'
+    _description = 'Rechazar requisición de personal'
+
+    requisition_id = fields.Many2one('hr.requisition', required=True)
+    reason = fields.Text(string="Motivo del rechazo", required=True)
+
+    def action_confirm(self):
+        self.ensure_one()
+        self.requisition_id._do_reject(self.reason)
+        return {'type': 'ir.actions.act_window_close'}
