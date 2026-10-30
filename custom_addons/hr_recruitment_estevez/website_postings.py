@@ -1,11 +1,13 @@
 # -*- coding: utf-8 -*-
 """Contenido de las vacantes publicadas en el sitio web (sección Empleos).
 
-Cada vacante se identifica por el nombre del puesto (hr.job) y su página se arma con
+Cada vacante se identifica por los posibles nombres del puesto (hr.job, sin importar mayúsculas
+ni acentos) y su página se arma con
 `render_posting`. El HTML resultante queda en `website_description`, así que después
 se puede seguir editando desde el editor del sitio web.
 """
 import logging
+import unicodedata
 from html import escape
 
 _logger = logging.getLogger(__name__)
@@ -22,7 +24,7 @@ COMMON_BENEFITS = [
 
 POSTINGS = [
     {
-        'job': "Coordinador de Almacén",
+        'job': ["Coordinador de Almacén General", "Coordinador de Almacén"],
         'title': "Coordinador de Almacenes e Inventarios",
         'hook': "¿Tienes experiencia liderando equipos de almacén, manteniendo inventarios confiables y coordinando "
                 "el abastecimiento de varios proyectos a la vez? Buscamos a una persona organizada y resolutiva que se "
@@ -63,7 +65,7 @@ POSTINGS = [
         ],
     },
     {
-        'job': "Coordinador de EHS",
+        'job': ["Coordinador de EHS"],
         'title': "Coordinador de Gestión EHS",
         'hook': "¿Tienes experiencia coordinando áreas de Seguridad, Salud Ocupacional y Medio Ambiente, liderando equipos "
                 "multidisciplinarios y asegurando el cumplimiento documental? Buscamos un líder con visión estratégica para "
@@ -106,7 +108,7 @@ POSTINGS = [
         ],
     },
     {
-        'job': "Supervisor de EHS",
+        'job': ["Supervisor de EHS"],
         'title': "Supervisor de Seguridad e Higiene en Tramos Carreteros (Foráneo)",
         'hook': "¿Tienes experiencia supervisando seguridad en obras dentro de tramos carreteros y sabes hacer cumplir las "
                 "medidas de seguridad con las cuadrillas? Buscamos a un profesional con conocimiento normativo, criterio para "
@@ -151,7 +153,7 @@ POSTINGS = [
         ],
     },
     {
-        'job': "Auxiliar de Gestión de Personal",
+        'job': ["Auxiliar de Gestión de Talento", "Auxiliar de Gestión de Personal"],
         'title': "Auxiliar de Gestión de Talento",
         'hook': "¿Eres una persona organizada, con gran atención al detalle y buscas crecer en Capital Humano? Buscamos un "
                 "Auxiliar de Gestión de Talento con visión administrativa para fortalecer el control documental y la gestión "
@@ -188,9 +190,9 @@ POSTINGS = [
         ],
     },
     {
-        'job': "Analista de Compras",
-        'title': "Analista de Compras",
-        'hook': "¿Tienes experiencia en compras, facilidad para negociar y atención al detalle? Buscamos un Analista de Compras "
+        'job': ["Auxiliar de Compras", "Analista de Compras"],
+        'title': "Auxiliar de Compras",
+        'hook': "¿Tienes experiencia en compras, facilidad para negociar y atención al detalle? Buscamos un Auxiliar de Compras "
                 "que contribuya al abastecimiento oportuno de nuestros proyectos y áreas administrativas.",
         'salary': "$13,000 a $18,000 MXN mensuales libres",
         'location': "Tlalnepantla de Baz, Estado de México",
@@ -235,7 +237,7 @@ POSTINGS = [
         ],
     },
     {
-        'job': "Chofer",
+        'job': ["Chofer"],
         'title': "Chofer Ejecutivo de Dirección General",
         'hook': "¿Tienes experiencia como Chofer Ejecutivo y te distingues por tu puntualidad, discreción y actitud de servicio? "
                 "Buscamos a una persona responsable y confiable para apoyar directamente a Dirección General con traslados "
@@ -349,23 +351,42 @@ def render_posting(posting, apply_url):
 """
 
 
-def apply_postings(env):
-    """Activa y publica las vacantes de POSTINGS con su página. Devuelve los puestos que no encontró."""
+def _normalize(text):
+    text = unicodedata.normalize('NFD', text or '')
+    return ''.join(c for c in text if unicodedata.category(c) != 'Mn').casefold().strip()
+
+
+def apply_postings(env, skip_published=False):
+    """Activa y publica las vacantes de POSTINGS con su página. Devuelve las que no pudo publicar.
+
+    skip_published: no toca las vacantes que ya tienen su página publicada (para no pisar ediciones).
+    """
     Job = env['hr.job'].with_context(active_test=False)
     slug = env['ir.http']._slug
     langs = [lang for lang, _name in env['res.lang'].get_installed()]
+
+    # Nombre normalizado (en cada idioma instalado) → puestos
+    by_name = {}
+    all_jobs = Job.search([])
+    for lang in langs:
+        for job in all_jobs.with_context(lang=lang):
+            by_name.setdefault(_normalize(job.name), Job)
+            by_name[_normalize(job.name)] |= job.with_env(Job.env)
+
     missing = []
     for posting in POSTINGS:
-        # El nombre es traducible: se busca en cada idioma instalado
         jobs = Job
-        for lang in langs:
-            jobs = Job.with_context(lang=lang).search([('name', '=ilike', posting['job'])])
+        for name in posting['job']:
+            jobs = by_name.get(_normalize(name), Job)
             if jobs:
                 break
         if len(jobs) != 1:
-            missing.append(posting['job'] if not jobs else f"{posting['job']} ({len(jobs)} coincidencias)")
+            label = posting['job'][0]
+            missing.append(label if not jobs else f"{label} ({len(jobs)} coincidencias)")
             continue
         job = jobs
+        if skip_published and job.is_published and 'o_estevez_job' in (job.website_description or ''):
+            continue
         job.write({'active': True, 'no_of_recruitment': job.no_of_recruitment or 1})
         # Campos traducibles: se escriben en cada idioma para que no quede la plantilla anterior traducida
         content = {
