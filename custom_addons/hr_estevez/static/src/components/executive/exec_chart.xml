@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="hr_estevez.ExecChart" owl="1">
+        <div t-ref="chart" role="img" t-att-aria-label="props.ariaLabel"/>
+    </t>
+</templates>

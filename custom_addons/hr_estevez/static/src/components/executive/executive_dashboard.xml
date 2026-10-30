@@ -1,0 +1,261 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <!-- Botón "Tabla / Gráfica" de cada tarjeta (vista accesible de los mismos datos) -->
+    <t t-name="hr_estevez.ExecTableToggle">
+        <button type="button" class="btn btn-sm btn-link o_exec_table_toggle"
+            t-on-click="() => this.toggleTable(key)"
+            t-att-aria-pressed="state.tables[key] ? 'true' : 'false'">
+            <i t-attf-class="fa {{ state.tables[key] ? 'fa-bar-chart' : 'fa-table' }} me-1" aria-hidden="true"/>
+            <t t-esc="state.tables[key] ? 'Gráfica' : 'Tabla'"/>
+        </button>
+    </t>
+
+    <t t-name="hr_estevez.ExecutiveDashboard" owl="1">
+        <section class="o_exec container-fluid p-2" aria-label="Análisis de la plantilla">
+
+            <!-- Encabezado y filtros: una sola fila que afecta todo lo de abajo -->
+            <div class="d-flex flex-wrap align-items-end justify-content-between gap-3 mt-3 mb-3">
+                <div>
+                    <h2 class="o_exec_title mb-1">Análisis de la plantilla</h2>
+                    <div class="text-muted small">Indicadores para decidir sobre retención, contratación y riesgos laborales</div>
+                </div>
+                <div class="d-flex flex-wrap gap-2 o_exec_filters">
+                    <label class="o_exec_filter">
+                        <span>Periodo</span>
+                        <select class="form-select form-select-sm" t-on-change="(ev) => this.onFilterChange('months', ev)">
+                            <t t-foreach="state.options.periods" t-as="p" t-key="p">
+                                <option t-att-value="p" t-att-selected="p === state.filters.months">Últimos <t t-esc="p"/> meses</option>
+                            </t>
+                        </select>
+                    </label>
+                    <label t-if="state.options.companies.length > 1" class="o_exec_filter">
+                        <span>Empresa</span>
+                        <select class="form-select form-select-sm" t-on-change="(ev) => this.onFilterChange('companyId', ev)">
+                            <option value="">Todas</option>
+                            <t t-foreach="state.options.companies" t-as="c" t-key="c.id">
+                                <option t-att-value="c.id" t-att-selected="c.id === state.filters.companyId" t-esc="c.name"/>
+                            </t>
+                        </select>
+                    </label>
+                    <label t-if="state.options.directions.length" class="o_exec_filter">
+                        <span>Dirección</span>
+                        <select class="form-select form-select-sm" t-on-change="(ev) => this.onFilterChange('directionId', ev)">
+                            <option value="">Todas</option>
+                            <t t-foreach="state.options.directions" t-as="d" t-key="d.id">
+                                <option t-att-value="d.id" t-att-selected="d.id === state.filters.directionId" t-esc="d.name"/>
+                            </t>
+                        </select>
+                    </label>
+                </div>
+            </div>
+
+            <t t-set="data" t-value="state.data"/>
+            <div t-if="data" t-attf-class="o_exec_body {{ state.loading ? 'o_exec_refreshing' : '' }}" t-att-aria-busy="state.loading ? 'true' : 'false'">
+
+                <!-- 1. Salud de la plantilla -->
+                <div class="row g-3 mb-3">
+                    <div class="col-12 col-md-6 col-xl-3">
+                        <button type="button" class="o_exec_card o_exec_stat w-100 text-start"
+                            t-on-click="() => this.openEmployees(data.kpis.active_ids, 'Plantilla activa')">
+                            <span class="o_exec_stat_label">Plantilla activa</span>
+                            <span class="o_exec_hero" t-esc="data.kpis.headcount.toLocaleString('es-MX')"/>
+                            <span class="o_exec_stat_note">
+                                <i t-attf-class="fa {{ headcountTrend.icon }} me-1" aria-hidden="true"/>
+                                <t t-esc="headcountTrend.label"/>
+                            </span>
+                        </button>
+                    </div>
+                    <div class="col-12 col-md-6 col-xl-3">
+                        <div class="o_exec_card o_exec_stat" title="Bajas del periodo ÷ plantilla promedio del periodo">
+                            <span class="o_exec_stat_label">Rotación · <t t-esc="periodLabel"/></span>
+                            <span class="o_exec_value"><t t-esc="data.kpis.turnover_rate"/>%</span>
+                            <span t-attf-class="o_exec_stat_note {{ turnoverTrend.cls }}">
+                                <i t-attf-class="fa {{ turnoverTrend.icon }} me-1" aria-hidden="true"/>
+                                <t t-esc="turnoverTrend.label"/>
+                            </span>
+                            <span class="o_exec_stat_note">
+                                <t t-esc="data.kpis.exits"/> bajas · plantilla promedio <t t-esc="data.kpis.average_headcount"/>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-6 col-xl-3">
+                        <button type="button" class="o_exec_card o_exec_stat w-100 text-start"
+                            title="Bajas con menos de 90 días de antigüedad ÷ total de bajas del periodo"
+                            t-att-disabled="!data.kpis.early_exits"
+                            t-on-click="() => this.openEmployees(data.kpis.early_exit_ids, 'Rotación temprana (menos de 90 días)')">
+                            <span class="o_exec_stat_label">Rotación temprana</span>
+                            <span class="o_exec_value"><t t-esc="data.kpis.early_turnover_rate"/>%</span>
+                            <span class="o_exec_stat_note">
+                                <t t-esc="data.kpis.early_exits"/> de <t t-esc="data.kpis.exits"/> bajas se fueron antes de 90 días
+                            </span>
+                            <span class="o_exec_stat_note">Mide la calidad de contratación e inducción</span>
+                        </button>
+                    </div>
+                    <div class="col-12 col-md-6 col-xl-3">
+                        <div class="o_exec_card o_exec_stat">
+                            <span class="o_exec_stat_label">Antigüedad promedio</span>
+                            <span class="o_exec_value"><t t-esc="data.kpis.avg_tenure_years"/> <small>años</small></span>
+                            <span class="o_exec_stat_note">De la plantilla activa</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. Movimiento de plantilla -->
+                <div class="row g-3 mb-3">
+                    <div class="col-12">
+                        <div class="o_exec_card h-100">
+                            <div class="o_exec_card_head">
+                                <div>
+                                    <h3>Movimiento de plantilla</h3>
+                                    <p>Altas contra bajas por mes y su efecto en la plantilla. Toca una barra para ver a las personas.</p>
+                                </div>
+                                <t t-call="hr_estevez.ExecTableToggle"><t t-set="key" t-value="'movement'"/></t>
+                            </div>
+                            <t t-if="!state.tables.movement">
+                                <div class="o_exec_sub">Plantilla al cierre de cada mes</div>
+                                <ExecChart options="charts.headcount" height="130" ariaLabel="'Plantilla al cierre de cada mes'"/>
+                                <div class="o_exec_legend mt-2">
+                                    <span><span class="o_exec_swatch" t-attf-style="background: {{ colors.hires }}"/>Altas</span>
+                                    <span><span class="o_exec_swatch" t-attf-style="background: {{ colors.exits }}"/>Bajas</span>
+                                </div>
+                                <ExecChart options="charts.movement" height="250" ariaLabel="'Altas y bajas por mes'"/>
+                            </t>
+                            <div t-else="" class="table-responsive">
+                                <table class="table table-sm o_exec_table">
+                                    <thead><tr><th>Mes</th><th>Altas</th><th>Bajas</th><th>Rotación</th><th>Plantilla</th></tr></thead>
+                                    <tbody>
+                                        <tr t-foreach="data.monthly" t-as="m" t-key="m.date_from">
+                                            <td t-esc="m.label"/><td t-esc="m.hires"/><td t-esc="m.exits"/>
+                                            <td><t t-esc="m.rate"/>%</td><td t-esc="m.headcount"/>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- 3. ¿Por qué se van?  4. ¿Dónde se van? -->
+                <div class="row g-3 mb-3">
+                    <div class="col-12 col-lg-6">
+                        <div class="o_exec_card h-100">
+                            <div class="o_exec_card_head">
+                                <div>
+                                    <h3>¿Por qué se van?</h3>
+                                    <p t-if="data.reasons.length">
+                                        <strong><t t-esc="voluntaryShare"/>%</strong> de las bajas fueron voluntarias (renuncia o abandono).
+                                    </p>
+                                </div>
+                                <t t-if="data.reasons.length" t-call="hr_estevez.ExecTableToggle"><t t-set="key" t-value="'reasons'"/></t>
+                            </div>
+                            <div t-if="!data.reasons.length" class="o_exec_empty">
+                                <i class="fa fa-smile-o" aria-hidden="true"/> Sin bajas en el periodo.
+                            </div>
+                            <t t-elif="!state.tables.reasons">
+                                <div class="o_exec_legend">
+                                    <span t-foreach="reasonGroups" t-as="g" t-key="g.key">
+                                        <span class="o_exec_swatch" t-attf-style="background: {{ g.color }}"/><t t-esc="g.label"/>
+                                    </span>
+                                </div>
+                                <ExecChart options="charts.reasons" height="charts.reasonsHeight" ariaLabel="'Bajas por motivo'"/>
+                            </t>
+                            <table t-else="" class="table table-sm o_exec_table">
+                                <thead><tr><th>Motivo</th><th>Tipo</th><th>Bajas</th><th>%</th></tr></thead>
+                                <tbody>
+                                    <tr t-foreach="data.reasons" t-as="r" t-key="r.key">
+                                        <td t-esc="r.label"/><td t-esc="r.group_label"/><td t-esc="r.count"/><td><t t-esc="r.pct"/>%</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="col-12 col-lg-6">
+                        <div class="o_exec_card h-100">
+                            <div class="o_exec_card_head">
+                                <div>
+                                    <h3>¿Dónde se van?</h3>
+                                    <p>Departamentos con más bajas en el periodo y su tasa de rotación.</p>
+                                </div>
+                                <t t-if="data.departments.length" t-call="hr_estevez.ExecTableToggle"><t t-set="key" t-value="'departments'"/></t>
+                            </div>
+                            <div t-if="!data.departments.length" class="o_exec_empty">
+                                <i class="fa fa-smile-o" aria-hidden="true"/> Sin bajas en el periodo.
+                            </div>
+                            <ExecChart t-elif="!state.tables.departments" options="charts.departments" height="charts.departmentsHeight" ariaLabel="'Bajas por departamento'"/>
+                            <table t-else="" class="table table-sm o_exec_table">
+                                <thead><tr><th>Departamento</th><th>Bajas</th><th>Rotación</th><th>Plantilla prom.</th></tr></thead>
+                                <tbody>
+                                    <tr t-foreach="data.departments" t-as="d" t-key="d.id">
+                                        <td t-esc="d.name"/><td t-esc="d.exits"/><td><t t-esc="d.rate"/>%</td><td t-esc="d.average_headcount"/>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 5. Antigüedad -->
+                <div class="row g-3 mb-3">
+                    <div class="col-12 col-lg-6">
+                        <div class="o_exec_card h-100">
+                            <div class="o_exec_card_head">
+                                <div>
+                                    <h3>Antigüedad de la plantilla</h3>
+                                    <p>Cuánta experiencia acumulada tiene hoy el equipo.</p>
+                                </div>
+                                <t t-call="hr_estevez.ExecTableToggle"><t t-set="key" t-value="'tenure'"/></t>
+                            </div>
+                            <ExecChart t-if="!state.tables.tenure" options="charts.tenure" height="230" ariaLabel="'Empleados por antigüedad'"/>
+                            <table t-else="" class="table table-sm o_exec_table">
+                                <thead><tr><th>Antigüedad</th><th>Empleados</th></tr></thead>
+                                <tbody>
+                                    <tr t-foreach="data.tenure" t-as="t" t-key="t.label">
+                                        <td><span class="o_exec_swatch" t-attf-style="background: {{ tenureColor(t_index) }}"/><t t-esc="t.label"/></td>
+                                        <td t-esc="t.count"/>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <!-- 6. Alertas para decidir -->
+                    <div class="col-12 col-lg-6">
+                        <div class="o_exec_card h-100">
+                            <div class="o_exec_card_head">
+                                <div>
+                                    <h3>Alertas para decidir</h3>
+                                    <p>Lo que requiere una acción hoy.</p>
+                                </div>
+                            </div>
+                            <ul class="list-unstyled mb-0 o_exec_alerts">
+                                <li t-foreach="data.alerts" t-as="alert" t-key="alert.key">
+                                    <button type="button" t-attf-class="o_exec_alert o_exec_alert_{{ alert.severity }} {{ alert.count ? '' : 'o_exec_alert_ok' }}"
+                                        t-att-disabled="!alert.count" t-on-click="() => this.openAlert(alert)">
+                                        <i t-attf-class="fa {{ alert.count ? severityIcon(alert.severity) : 'fa-check-circle' }} o_exec_alert_icon" aria-hidden="true"/>
+                                        <span class="o_exec_alert_text">
+                                            <span><strong t-esc="alert.count"/> <t t-esc="alert.label"/></span>
+                                            <small t-esc="alert.detail"/>
+                                        </span>
+                                        <i t-if="alert.count" class="fa fa-angle-right text-muted" aria-hidden="true"/>
+                                    </button>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <p t-if="data.data_quality.missing_start_date or data.data_quality.missing_exit_date" class="o_exec_footnote">
+                    <i class="fa fa-info-circle me-1" aria-hidden="true"/>
+                    <t t-if="data.data_quality.missing_start_date">
+                        <t t-esc="data.data_quality.missing_start_date"/> empleados activos no tienen fecha de ingreso; se usó la fecha del primer contrato o de alta en el sistema.
+                    </t>
+                    <t t-if="data.data_quality.missing_exit_date">
+                        <t t-esc="data.data_quality.missing_exit_date"/> bajas antiguas no tienen fecha registrada y no cuentan en la rotación.
+                    </t>
+                </p>
+            </div>
+            <div t-else="" class="o_exec_card o_exec_empty">Cargando indicadores…</div>
+        </section>
+    </t>
+</templates>

@@ -1,0 +1,291 @@
+// Dashboard de Dirección: ink y chrome de la guía de visualización
+$o-exec-ink: #0b0b0b;
+$o-exec-ink-2: #52514e;
+$o-exec-muted: #898781;
+$o-exec-hairline: #e1e0d9;
+$o-exec-good: #006300;
+$o-exec-critical: #d03b3b;
+$o-exec-warning: #fab219;
+
+.o_exec {
+    color: $o-exec-ink;
+
+    .o_exec_title {
+        font-size: 1.35rem;
+        font-weight: 700;
+    }
+
+    .o_exec_filter {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        min-width: 180px;
+        font-size: 0.75rem;
+        color: $o-exec-ink-2;
+        font-weight: 600;
+    }
+
+    // Al refrescar se conserva la gráfica anterior atenuada: sin saltos ni parpadeos
+    .o_exec_body {
+        transition: opacity 0.2s ease;
+
+        &.o_exec_refreshing {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+    }
+
+    .o_exec_card {
+        background: #fff;
+        border: 1px solid $o-exec-hairline;
+        border-radius: 0.75rem;
+        box-shadow: 0 1px 2px rgba(11, 11, 11, 0.04);
+        padding: 1.25rem;
+    }
+
+    .o_exec_card_head {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 1rem;
+        margin-bottom: 0.75rem;
+
+        h3 {
+            font-size: 1rem;
+            font-weight: 700;
+            margin: 0 0 0.25rem;
+        }
+
+        p {
+            font-size: 0.85rem;
+            color: $o-exec-ink-2;
+            margin: 0;
+        }
+    }
+
+    .o_exec_table_toggle {
+        color: $o-exec-ink-2;
+        white-space: nowrap;
+        text-decoration: none;
+
+        &:hover, &:focus-visible {
+            color: $o-exec-ink;
+        }
+    }
+
+    .o_exec_sub {
+        font-size: 0.75rem;
+        color: $o-exec-muted;
+        margin-bottom: -0.5rem;
+    }
+
+    // Cifras clave
+    .o_exec_stat {
+        display: flex;
+        flex-direction: column;
+        gap: 0.35rem;
+        height: 100%;
+        min-height: 150px;
+
+        &:is(button) {
+            transition: box-shadow 0.2s ease, transform 0.2s ease;
+
+            &:not(:disabled):hover, &:focus-visible {
+                box-shadow: 0 6px 16px rgba(11, 11, 11, 0.08);
+                transform: translateY(-1px);
+            }
+
+            &:disabled {
+                opacity: 1;
+                cursor: default;
+            }
+        }
+    }
+
+    .o_exec_stat_label {
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: $o-exec-ink-2;
+    }
+
+    .o_exec_hero {
+        font-size: 3.25rem;
+        font-weight: 700;
+        line-height: 1;
+        letter-spacing: -0.02em;
+    }
+
+    .o_exec_value {
+        font-size: 2.25rem;
+        font-weight: 700;
+        line-height: 1.1;
+
+        small {
+            font-size: 1rem;
+            font-weight: 600;
+            color: $o-exec-ink-2;
+        }
+    }
+
+    .o_exec_stat_note {
+        font-size: 0.8rem;
+        color: $o-exec-ink-2;
+    }
+
+    .o_exec_delta_bad {
+        color: $o-exec-critical;
+        font-weight: 600;
+    }
+
+    .o_exec_delta_good {
+        color: $o-exec-good;
+        font-weight: 600;
+    }
+
+    .o_exec_legend {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        font-size: 0.8rem;
+        color: $o-exec-ink-2;
+
+        > span {
+            display: inline-flex;
+            align-items: center;
+        }
+    }
+
+    .o_exec_swatch {
+        display: inline-block;
+        width: 10px;
+        height: 10px;
+        border-radius: 2px;
+        margin-right: 0.4rem;
+    }
+
+    .o_exec_empty {
+        color: $o-exec-muted;
+        padding: 2.5rem 0;
+        text-align: center;
+    }
+
+    .o_exec_table {
+        font-size: 0.85rem;
+        font-variant-numeric: tabular-nums;
+
+        th {
+            color: $o-exec-ink-2;
+            font-weight: 600;
+            border-bottom-color: $o-exec-hairline;
+        }
+
+        td {
+            border-color: $o-exec-hairline;
+        }
+    }
+
+    // Alertas: icono + texto, el color nunca va solo
+    .o_exec_alerts li + li {
+        margin-top: 0.5rem;
+    }
+
+    .o_exec_alert {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        width: 100%;
+        text-align: left;
+        background: #fafaf8;
+        border: 1px solid $o-exec-hairline;
+        border-left: 4px solid $o-exec-muted;
+        border-radius: 0.5rem;
+        padding: 0.65rem 0.85rem;
+        transition: background-color 0.15s ease;
+
+        &:not(:disabled):hover, &:focus-visible {
+            background: #f1f0ec;
+        }
+
+        &:disabled {
+            opacity: 1;
+            cursor: default;
+        }
+    }
+
+    .o_exec_alert_text {
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+        font-size: 0.9rem;
+
+        small {
+            color: $o-exec-ink-2;
+        }
+    }
+
+    .o_exec_alert_icon {
+        font-size: 1.15rem;
+        color: $o-exec-muted;
+    }
+
+    .o_exec_alert_critical {
+        border-left-color: $o-exec-critical;
+
+        .o_exec_alert_icon { color: $o-exec-critical; }
+    }
+
+    .o_exec_alert_warning {
+        border-left-color: $o-exec-warning;
+
+        .o_exec_alert_icon { color: darken($o-exec-warning, 18%); }
+    }
+
+    .o_exec_alert_ok {
+        border-left-color: #0ca30c;
+
+        .o_exec_alert_icon { color: #0ca30c; }
+
+        .o_exec_alert_text { color: $o-exec-ink-2; }
+    }
+
+    .o_exec_footnote {
+        font-size: 0.8rem;
+        color: $o-exec-muted;
+    }
+}
+
+// Tooltip de las gráficas: el valor manda, la etiqueta acompaña
+.o_exec_tt {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.8rem;
+    color: $o-exec-ink;
+    min-width: 160px;
+
+    .o_exec_tt_title {
+        font-weight: 700;
+        margin-bottom: 0.25rem;
+    }
+
+    .o_exec_tt_row {
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+
+        span:last-child {
+            color: $o-exec-ink-2;
+        }
+    }
+
+    .o_exec_tt_key {
+        width: 12px;
+        height: 3px;
+        border-radius: 2px;
+        flex: none;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .o_exec .o_exec_body, .o_exec .o_exec_stat, .o_exec .o_exec_alert {
+        transition: none;
+    }
+}
