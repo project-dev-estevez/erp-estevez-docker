@@ -2,15 +2,19 @@
 <templates xml:space="preserve">
     <t t-name="hr_estevez.KpisGrid" owl="1">
         <div class="container-fluid p-2">
-            <div class="row g-2">
-                <!-- ✅ Mostrar KPIs dinámicamente -->
+            <!-- 6 KPIs del mismo tamaño: 2 por fila en móvil, 3 en tablet, 6 en escritorio -->
+            <div class="row row-cols-2 row-cols-md-3 row-cols-xl-6 g-3">
                 <t t-foreach="kpis" t-as="kpi" t-key="kpi_index">
-                    <div class="col-12 col-sm-6 col-md-4 col-lg col-xl">
+                    <div class="col">
                         <!-- KPI con gráfica (solo Total Empleados) -->
-                        <KpiChartCard 
+                        <KpiChartCard
                             t-if="kpi.showChart"
-                            value="kpi.value" 
-                            label="kpi.name" 
+                            value="kpi.value"
+                            label="kpi.name"
+                            icon="kpi.icon"
+                            color="kpi.color"
+                            subtitle="kpi.subtitle"
+                            tooltip="kpi.tooltip"
                             series="kpi.series"
                             labels="kpi.labels"
                             onClick="kpi.onClick"
@@ -18,12 +22,14 @@
                             isLoading="state.isLoading"
                         />
                         <!-- KPI normal (todos los demás) -->
-                        <KpiCard 
+                        <KpiCard
                             t-else=""
                             name="kpi.name"
                             value="kpi.value"
-                            secondaryValue="kpi.secondaryValue"
-                            showSecondaryValue="kpi.showSecondaryValue"
+                            icon="kpi.icon"
+                            color="kpi.color"
+                            subtitle="kpi.subtitle"
+                            tooltip="kpi.tooltip"
                             onClick="kpi.onClick"
                             isLoading="state.isLoading"
                         />
