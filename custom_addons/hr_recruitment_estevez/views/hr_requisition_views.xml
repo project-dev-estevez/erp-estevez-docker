@@ -9,8 +9,8 @@
                 <field name="create_date" string="Fecha de Solicitud" width="180"/>
                 <field name="workstation_job_id" width="180"/>
                 <field name="tag_ids" widget="many2many_tags" string="Etiquetas" optional="show" width="180"/>
-                <field name="workstation_area_id" string="Área" optional="show" width="180"/>
-                <field name="workstation_department_id" string="Departamento" optional="show" width="180"/>
+                <field name="workstation_area_id" string="Departamento" optional="show" width="180"/>
+                <field name="workstation_department_id" string="Área" optional="show" width="180"/>
                 <field name="number_of_vacancies" string="N° Vacantes" optional="show" width="180"/>
                 <field name="requestor_id" optional="show" width="180"/>
                 <field name="company_id" optional="hide" width="180"/>

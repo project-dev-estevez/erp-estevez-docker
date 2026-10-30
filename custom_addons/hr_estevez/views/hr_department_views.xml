@@ -16,9 +16,9 @@
                 </xpath>
                 <xpath expr="//sheet" position="inside">
                     <notebook>
-                        <page string="Áreas">
+                        <page string="Departamentos">
                             <field name="area_ids">
-                                <list string="Áreas">
+                                <list string="Departamentos">
                                     <field name="name" string="Nombre"/>
                                 </list>
                             </field>

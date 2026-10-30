@@ -20,9 +20,9 @@
                             <field name="company_id"/>
                         </group>
                         <notebook>
-                            <page string="Departamentos">
+                            <page string="Áreas">
                                 <field name="department_ids">
-                                    <list string="Departamentos">
+                                    <list string="Áreas">
                                         <field name="name"/>
                                     </list>
                                 </field>

@@ -1,0 +1,5 @@
+<odoo>
+    <!-- Nombres del organigrama (Áreas = hr.department, Departamentos = hr.area) en todos los
+         idiomas instalados. Sin noupdate: se vuelve a aplicar en cada actualización del módulo. -->
+    <function model="hr.department" name="_apply_org_structure_labels"/>
+</odoo>

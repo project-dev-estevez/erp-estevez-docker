@@ -2,7 +2,7 @@
     <data>
 
         <record id="action_hr_area" model="ir.actions.act_window">
-            <field name="name">Áreas</field>
+            <field name="name">Departamentos</field>
             <field name="res_model">hr.area</field>
             <field name="view_mode">kanban,list,form</field>
         </record>
@@ -11,12 +11,12 @@
             <field name="name">hr.area.form</field>
             <field name="model">hr.area</field>
             <field name="arch" type="xml">
-                <form string="Área">
+                <form string="Departamento">
                     <sheet>
                         <group>
                             <field name="name"/>
                             <field name="coordinator_id"/>
-                            <field name="department_id" options="{'no_create': True}"/>                            
+                            <field name="department_id" string="Área" options="{'no_create': True}"/>                            
                             <field name="direction_id"/>
                             <field name="company_id"/>
                         </group>
@@ -32,9 +32,9 @@
             <field name="name">hr.area.list</field>
             <field name="model">hr.area</field>
             <field name="arch" type="xml">    
-                <list string="Areas">
+                <list string="Departamentos">
                     <field name="name"/>
-                    <field name="department_id"/>
+                    <field name="department_id" string="Área"/>
                     <field name="company_id" readonly="1"/>
                     <field name="direction_id"/>
                 </list>

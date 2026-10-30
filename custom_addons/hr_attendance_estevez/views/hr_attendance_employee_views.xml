@@ -7,7 +7,7 @@
         <field name="arch" type="xml">
             <list create="false" edit="false" delete="false" export_xlsx="false">
                 <field name="employee_id" string="Empleado" widget="many2one_avatar_employee"/>
-                <field name="department_id" string="Departamento" optional="show"/>
+                <field name="department_id" string="Área" optional="show"/>
                 <field name="job_id" string="Puesto" optional="show"/>
                 <field name="check_in_date" string="Entrada"/>
                 <field name="check_out_display" string="Salida"/>

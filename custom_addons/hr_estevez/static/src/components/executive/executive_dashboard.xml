@@ -176,16 +176,16 @@
                             <div class="o_exec_card_head">
                                 <div>
                                     <h3>¿Dónde se van?</h3>
-                                    <p>Departamentos con más bajas en el periodo y su tasa de rotación.</p>
+                                    <p>Áreas con más bajas en el periodo y su tasa de rotación.</p>
                                 </div>
                                 <t t-if="data.departments.length" t-call="hr_estevez.ExecTableToggle"><t t-set="key" t-value="'departments'"/></t>
                             </div>
                             <div t-if="!data.departments.length" class="o_exec_empty">
                                 <i class="fa fa-smile-o" aria-hidden="true"/> Sin bajas en el periodo.
                             </div>
-                            <ExecChart t-elif="!state.tables.departments" options="charts.departments" height="charts.departmentsHeight" ariaLabel="'Bajas por departamento'"/>
+                            <ExecChart t-elif="!state.tables.departments" options="charts.departments" height="charts.departmentsHeight" ariaLabel="'Bajas por área'"/>
                             <table t-else="" class="table table-sm o_exec_table">
-                                <thead><tr><th>Departamento</th><th>Bajas</th><th>Rotación</th><th>Plantilla prom.</th></tr></thead>
+                                <thead><tr><th>Área</th><th>Bajas</th><th>Rotación</th><th>Plantilla prom.</th></tr></thead>
                                 <tbody>
                                     <tr t-foreach="data.departments" t-as="d" t-key="d.id">
                                         <td t-esc="d.name"/><td t-esc="d.exits"/><td><t t-esc="d.rate"/>%</td><td t-esc="d.average_headcount"/>

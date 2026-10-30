@@ -80,7 +80,8 @@
         'views/hr_employee_job_history_views.xml',
         'views/view_attachment_preview_form.xml',
         'views/attachment_preview.xml',
-        'views/res_company_views.xml',      
+        'views/res_company_views.xml',
+        'data/org_structure_labels.xml',      
         #'views/job_history_wizard_views.xml'
     ],
     # only loaded in demonstration mode

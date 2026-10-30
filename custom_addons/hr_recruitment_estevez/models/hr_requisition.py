@@ -35,7 +35,7 @@ class HrRequisition(models.Model):
     requestor_id = fields.Many2one('res.users', string="Solicitante", default=lambda self: self.env.user, readonly=True)
     company_id = fields.Many2one('res.company', string="Empresa", related='requestor_id.company_id', readonly=True, store=False)
     direction_id = fields.Many2one('hr.direction', string="Dirección", related='requestor_id.employee_id.direction_id', readonly=True, store=False)
-    department_id = fields.Many2one('hr.department', string="Departamento", related='requestor_id.employee_id.department_id', readonly=True, store=False)
+    department_id = fields.Many2one('hr.department', string="Área", related='requestor_id.employee_id.department_id', readonly=True, store=False)
     job_id = fields.Many2one('hr.job', string="Puesto Solicitante", related='requestor_id.employee_id.job_id', readonly=True, store=False)
 
     # Especificaciones de la requisición
@@ -62,8 +62,8 @@ class HrRequisition(models.Model):
         ('operational', 'Operativo'),
     ], string="Tipo de Puesto", help="Selecciona el tipo de funciones que desempeñará el puesto. Administrativo: (Oficina, planificación o soporte interno). Operativo: (Tareas técnicas o de campo).")
     workstation_direction_id = fields.Many2one('hr.direction', string="Dirección del Puesto", help="Selecciona la dirección a la que pertenece el puesto dentro de la empresa.")
-    workstation_department_id = fields.Many2one('hr.department', string="Departamento del Puesto", domain="[('direction_id', '=', workstation_direction_id)]", help="Indica el departamento específico al que está adscrito el puesto.")
-    workstation_area_id = fields.Many2one('hr.area', string="Área del Puesto", domain="[('department_id', '=', workstation_department_id)]", help="Especifica el área interna donde el puesto realiza sus funciones.")
+    workstation_department_id = fields.Many2one('hr.department', string="Área del Puesto", domain="[('direction_id', '=', workstation_direction_id)]", help="Indica el área específica a la que está adscrito el puesto.")
+    workstation_area_id = fields.Many2one('hr.area', string="Departamento del Puesto", domain="[('department_id', '=', workstation_department_id)]", help="Especifica el departamento interno donde el puesto realiza sus funciones.")
     workstation_job_id = fields.Many2one('hr.job', string="Puesto Solicitado", domain="[('department_id', '=', workstation_department_id)]", help="Nombre del puesto que se solicita cubrir.")
     project_id = fields.Many2one('project.project', string="Proyecto", help="Especifica el proyecto al que estará asignado el puesto.")
     number_of_vacancies = fields.Integer(string="Número de Vacantes", help="Número total de puestos disponibles que se desean cubrir.")

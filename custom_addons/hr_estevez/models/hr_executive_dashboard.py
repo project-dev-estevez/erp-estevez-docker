@@ -211,7 +211,7 @@ class HrExecutiveDashboard(models.AbstractModel):
                 continue
             rows.append({
                 'id': department.id,
-                'name': department.name or _('Sin departamento'),
+                'name': department.name or _('Sin área'),
                 'exits': len(exit_ids),
                 'average_headcount': round(average, 1),
                 'rate': round(len(exit_ids) / average * 100, 1),
