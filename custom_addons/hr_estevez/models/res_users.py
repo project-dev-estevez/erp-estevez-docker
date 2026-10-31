@@ -1,6 +1,7 @@
 import logging
 from odoo import api, fields, models
 from odoo.exceptions import AccessDenied
+from odoo.osv import expression
 
 _logger = logging.getLogger(__name__)
 
@@ -121,8 +122,34 @@ class ResUsers(models.Model):
                 self._assign_employee_role(user)
                 # Forzar que solo tenga los grupos del rol asignado
                 user.set_groups_from_roles(force=True)
-        
+
+        users._link_employees_by_email()
         return users
+
+    def _link_employees_by_email(self):
+        """Enlaza cada usuario interno nuevo que no tenga empleado con el empleado activo sin usuario
+        que tenga su mismo correo (laboral, o personal si no hay laboral). Si el correo coincide con
+        más de un empleado no se enlaza, para no elegir uno al azar."""
+        # El usuario relacionado no se envía a System, así que este enlace no se sincroniza
+        Employee = self.env['hr.employee'].sudo().with_context(skip_codeigniter_sync=True)
+        for user in self.filtered(lambda u: not u.share and not u.employee_ids):
+            emails = {e.strip().lower() for e in (user.email, user.login) if e and '@' in e}
+            if not emails:
+                continue
+            # =ilike trata _ y % como comodines, por eso se vuelve a comparar exacto abajo
+            candidates = Employee.search(expression.AND([
+                [('user_id', '=', False), ('company_id', 'in', user.company_ids.ids)],
+                expression.OR([[('work_email', '=ilike', e)] for e in emails]
+                              + [[('private_email', '=ilike', e)] for e in emails]),
+            ]))
+            by_work = candidates.filtered(lambda e: (e.work_email or '').strip().lower() in emails)
+            matches = by_work or candidates.filtered(lambda e: (e.private_email or '').strip().lower() in emails)
+            if len(matches) == 1:
+                matches.user_id = user
+                _logger.info("Usuario %s enlazado al empleado %s por correo", user.login, matches.id)
+            elif matches:
+                _logger.warning("Usuario %s no enlazado: su correo coincide con los empleados %s",
+                                user.login, matches.ids)
     
     def _assign_employee_role(self, user):
         """

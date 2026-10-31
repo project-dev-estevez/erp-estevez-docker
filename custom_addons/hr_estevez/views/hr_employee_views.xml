@@ -83,8 +83,8 @@
                 <xpath expr="//group[@name='managers']" position="replace">
                     <!-- Eliminar el grupo managers -->
                 </xpath>
-                <!-- Insertar el grupo managers en la página hr_settings -->
-                <xpath expr="//notebook/page[@name='hr_settings']" position="inside">
+                <!-- Insertar el grupo managers en la página hr_settings, a la derecha de Estado (dos columnas) -->
+                <xpath expr="//page[@name='hr_settings']//group[@name='active_group']" position="after">
                     <group name="managers" string="Aprobadores" class="hide-group-if-empty" invisible="1"/>
                 </xpath>
                 <xpath expr="//div[hasclass('oe_title')]//h1/field[@name='name']" position="replace">
