@@ -104,3 +104,38 @@ class TestOrgHeads(TransactionCase):
         })
         self._terminate(employee)
         self.assertTrue(user.active)
+
+    def test_termination_reassigns_approvers_to_boss(self):
+        boss_user = self.env['res.users'].create({'name': 'Jefe Aprobador', 'login': 'jefe.aprobador.prueba'})
+        approver_user = self.env['res.users'].create({'name': 'Aprobadora Baja', 'login': 'aprobadora.baja.prueba'})
+        boss = self._employee(self.job_other, user_id=boss_user.id)
+        approver = self._employee(self.job_other, user_id=approver_user.id)
+        employee = self._employee(self.job_other, parent_id=boss.id)
+        employee.write({'leave_manager_id': approver_user.id, 'attendance_manager_id': approver_user.id})
+        self._terminate(approver)
+        self.assertEqual(employee.leave_manager_id, boss_user)
+        self.assertEqual(employee.attendance_manager_id, boss_user)
+
+    def test_termination_clears_approvers_when_boss_leaves(self):
+        boss_user = self.env['res.users'].create({'name': 'Jefe Baja', 'login': 'jefe.baja.prueba'})
+        boss = self._employee(self.job_other, user_id=boss_user.id)
+        employee = self._employee(self.job_other, parent_id=boss.id)
+        employee.write({'leave_manager_id': boss_user.id, 'attendance_manager_id': boss_user.id})
+        self._terminate(boss)
+        self.assertFalse(employee.leave_manager_id)
+        self.assertFalse(employee.attendance_manager_id)
+
+    def test_new_user_links_active_employee_with_same_email(self):
+        employee = self._employee(self.job_other, work_email='Enlace.Prueba@Estevezjor.mx')
+        user = self.env['res.users'].create({'name': 'Enlace', 'login': 'enlace.prueba@estevezjor.mx'})
+        self.assertEqual(employee.user_id, user)
+
+    def test_new_user_does_not_link_terminated_or_ambiguous_employees(self):
+        terminated = self._employee(self.job_other, work_email='baja.enlace@estevezjor.mx')
+        self._terminate(terminated)
+        self.env['res.users'].create({'name': 'Baja', 'login': 'baja.enlace@estevezjor.mx'})
+        self.assertFalse(terminated.user_id)
+        first = self._employee(self.job_other, work_email='doble.enlace@estevezjor.mx')
+        second = self._employee(self.job_other, work_email='doble.enlace@estevezjor.mx')
+        self.env['res.users'].create({'name': 'Doble', 'login': 'doble.enlace@estevezjor.mx'})
+        self.assertFalse(first.user_id | second.user_id)
