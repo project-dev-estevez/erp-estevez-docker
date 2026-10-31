@@ -160,12 +160,18 @@ class HrContract(models.Model):
                 vals['department_id'] = employee.department_id.id if employee.department_id else False
                 vals['job_id'] = employee.job_id.id if employee.job_id else False
 
+            if vals.get('contract_duration') == 'indefinite':
+                vals['date_end'] = False
+
             # Determinar el estado inicial usando función separada
             vals['state'] = self._get_initial_state(vals)
 
         return super(HrContract, self).create(vals_list)
 
     def write(self, vals):
+        # Un contrato indefinido no lleva fecha fin (también al importar o vía API)
+        if vals.get('contract_duration') == 'indefinite':
+            vals['date_end'] = False
         res = super().write(vals)
         # Al cambiar el tipo de contrato se actualiza el nombre automático (p. ej. a "Contrato Final")
         if 'contract_type_id' in vals and 'name' not in vals:

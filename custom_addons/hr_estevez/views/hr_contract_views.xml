@@ -105,7 +105,11 @@
                 <group string="Vigencia" name="top_info_right">
                     <field name="date_start" string="Fecha Inicio de Contrato"/>
                     <field name="contract_duration" string="Duración del Contrato" placeholder="Selecciona la duración"/>
-                    <field name="date_end" string="Fecha Fin de Contrato" placeholder="Sin fecha de fin"/>
+                    <!-- Un contrato indefinido no lleva fecha fin. Solo se muestra (de lectura) si Odoo
+                         le puso una al vencerlo -->
+                    <field name="date_end" string="Fecha Fin de Contrato" placeholder="Sin fecha de fin"
+                           invisible="contract_duration == 'indefinite' and not date_end"
+                           readonly="contract_duration == 'indefinite'"/>
                     <field name="days_to_expiry" invisible="not date_end or state == 'cancel'"
                            decoration-danger="days_to_expiry &lt; 0" decoration-warning="days_to_expiry &gt;= 0 and days_to_expiry &lt;= 15"
                            decoration-success="days_to_expiry &gt; 15"/>
