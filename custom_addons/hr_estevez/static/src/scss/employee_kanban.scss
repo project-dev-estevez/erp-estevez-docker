@@ -1,0 +1,27 @@
+// Kanban de empleados: la tarjeta reacciona al pasar el mouse para que se note que se puede abrir.
+// Se usa un anillo con box-shadow (no border) para no mover el contenido ni el acomodo de la cuadrícula.
+.o_hr_employee_kanban .o_kanban_renderer .o_kanban_record {
+    transition: transform .15s ease, box-shadow .15s ease;
+
+    [name="name"] {
+        transition: color .15s ease;
+    }
+
+    &:hover {
+        z-index: 1;
+        transform: translateY(-2px);
+        box-shadow: 0 0 0 1px $primary, 0 .5rem 1rem rgba($black, .12);
+
+        main [name="name"] {
+            color: $primary;
+        }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        transition: none;
+
+        &:hover {
+            transform: none;
+        }
+    }
+}
