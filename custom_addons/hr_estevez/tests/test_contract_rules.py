@@ -80,3 +80,11 @@ class TestContractRules(TransactionCase):
         self._contract()
         with self.assertRaises(UserError):
             Form(self.env['hr.contract'].with_context(default_employee_id=self.employee.id))
+
+    def test_indefinite_contract_has_no_end_date(self):
+        contract = self._contract(contract_duration='indefinite', date_end=self.today + timedelta(days=90))
+        self.assertFalse(contract.date_end)
+        contract.action_cancel_contract()
+        other = self._contract(contract_duration='1_year', date_end=self.today + timedelta(days=365))
+        other.write({'contract_duration': 'indefinite'})
+        self.assertFalse(other.date_end)
