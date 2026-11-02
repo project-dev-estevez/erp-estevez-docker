@@ -2,8 +2,10 @@
 
 import { reactive, useState } from "@odoo/owl";
 import { user } from "@web/core/user";
+import { useBus } from "@web/core/utils/hooks";
 import { patch } from "@web/core/utils/patch";
 import { NavBar } from "@web/webclient/navbar/navbar";
+import { WebClient } from "@web/webclient/webclient";
 import { AppsMenu } from "@muk_web_theme/webclient/appsmenu/appsmenu";
 
 const { DateTime } = luxon;
@@ -57,9 +59,24 @@ patch(NavBar.prototype, {
 });
 
 /**
+ * 🔹 Parche WebClient: al entrar sin una ruta concreta (p. ej. tras iniciar sesión)
+ * se carga la app por defecto de fondo y se muestra la pantalla de inicio encima
+ */
+patch(WebClient.prototype, {
+    async _loadDefaultApp() {
+        await super._loadDefaultApp();
+        this.env.bus.trigger("HOME_ESTEVEZ:OPEN");
+    },
+});
+
+/**
  * 🔹 Parche AppsMenu: buscador limpio y con el cursor listo al abrir
  */
 patch(AppsMenu.prototype, {
+    setup() {
+        super.setup();
+        useBus(this.env.bus, "HOME_ESTEVEZ:OPEN", () => this.state.open());
+    },
     onOpened() {
         super.onOpened();
         homeState.query = "";
