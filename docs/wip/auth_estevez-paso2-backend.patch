@@ -1,0 +1,404 @@
+diff --git a/custom_addons/auth_estevez/__manifest__.py b/custom_addons/auth_estevez/__manifest__.py
+index 898243b..511b84c 100644
+--- a/custom_addons/auth_estevez/__manifest__.py
++++ b/custom_addons/auth_estevez/__manifest__.py
+@@ -1,7 +1,7 @@
+ {
+     "name": "Authentication Estevez.Jor",
+     # The first 2 numbers are Odoo major version, the last 3 are x.y.z version of the module.
+-    "version": "18.0.1.0.0",
++    "version": "18.0.2.0.0",
+     "depends": ["web", "auth_signup"],
+     "author": "Estevez.Jor",
+     # Categories are freeform, for existing categories visit https://github.com/odoo/odoo/blob/17.0/odoo/addons/base/data/ir_module_category_data.xml
+diff --git a/custom_addons/auth_estevez/controllers/binary.py b/custom_addons/auth_estevez/controllers/binary.py
+index 56cff24..7d562cc 100644
+--- a/custom_addons/auth_estevez/controllers/binary.py
++++ b/custom_addons/auth_estevez/controllers/binary.py
+@@ -1,78 +1,21 @@
+-
+-import base64
+-import io
+-
+-try:
+-    from werkzeug.utils import send_file
+-except ImportError:
+-    from odoo.tools._vendor.send_file import send_file
+-
+ from odoo import http
+-from odoo.http import request, Response
+-from odoo.tools import file_path
+-from odoo.addons.web.controllers.binary import Binary
+-from odoo.tools.mimetypes import guess_mimetype
++from odoo.http import request
++
++PLACEHOLDER_IMAGE = 'auth_estevez/static/img/1x1.png'
+ 
+-class ThemeBinary(Binary):
+-    @http.route(
+-        [
+-            '/web/binary/login_page_background_image',
+-            '/web/login_page_background_image',
+-            '/login_page_background_image.png',
+-        ], type='http', auth="none", cors="*"
+-    )
+-    def login_page_background_image(self, **kw):
+-        image_str, image_last_update = request.env['ir.config_parameter'].sudo().get_param_with_last_update('auth_estevez.login_page_background_image')
+-        if image_str:
+-            imgname = 'logo'
+-            imgext = '.png'
+ 
+-            image_base64 = base64.b64decode(image_str)
+-            image_data = io.BytesIO(image_base64)
+-            mimetype = guess_mimetype(image_base64, default='image/png')
+-            imgext = '.' + mimetype.split('/')[1]
+-            if imgext == '.svg+xml':
+-                imgext = '.svg'
+-            response = send_file(
+-                image_data,
+-                request.httprequest.environ,
+-                download_name=imgname + imgext,
+-                mimetype=mimetype,
+-                last_modified=image_last_update,
+-                response_class=Response,
+-            )
+-        else:
+-            response = http.Stream.from_path(file_path('auth_estevez/static/img/1x1.png')).get_response()
+-        return response
++class AuthEstevezBinary(http.Controller):
+ 
+-    @http.route(
+-        [
+-            '/web/binary/login_logo',
+-            '/web/login_logo',
+-            '/login_logo.png',
+-        ], type='http', auth="none", cors="*"
+-    )
+-    def login_page_logo(self, **kw):
+-        image_str, image_last_update = request.env['ir.config_parameter'].sudo().get_param_with_last_update('auth_estevez.login_page_logo')
+-        if image_str:
+-            imgname = 'logo'
+-            imgext = '.png'
++    def _login_page_image(self, field_name):
++        company = request.env['res.company'].sudo()._get_login_page_company(request.session.uid)
++        return request.env['ir.binary']._get_image_stream_from(
++            company, field_name, placeholder=PLACEHOLDER_IMAGE,
++        ).get_response()
+ 
+-            image_base64 = base64.b64decode(image_str)
+-            image_data = io.BytesIO(image_base64)
+-            mimetype = guess_mimetype(image_base64, default='image/png')
+-            imgext = '.' + mimetype.split('/')[1]
+-            if imgext == '.svg+xml':
+-                imgext = '.svg'
+-            response = send_file(
+-                image_data,
+-                request.httprequest.environ,
+-                download_name=imgname + imgext,
+-                mimetype=mimetype,
+-                last_modified=image_last_update,
+-                response_class=Response,
+-            )
+-        else:
+-            response = http.Stream.from_path(file_path('auth_estevez/static/img/1x1.png')).get_response()
++    @http.route('/login_page_background_image.png', type='http', auth='public')
++    def login_page_background_image(self):
++        return self._login_page_image('login_page_background_image')
+ 
+-        return response
++    @http.route('/login_logo.png', type='http', auth='public')
++    def login_page_logo(self):
++        return self._login_page_image('login_page_logo')
+diff --git a/custom_addons/auth_estevez/controllers/home.py b/custom_addons/auth_estevez/controllers/home.py
+index 682551d..bac1333 100644
+--- a/custom_addons/auth_estevez/controllers/home.py
++++ b/custom_addons/auth_estevez/controllers/home.py
+@@ -1,41 +1,26 @@
+ from odoo import http
+ from odoo.http import request
+-from odoo.addons.web.controllers.home import SIGN_UP_REQUEST_PARAMS
+ from odoo.addons.auth_signup.controllers.main import AuthSignupHome
+ 
+-class ThemeHome(AuthSignupHome):
+-    def _get_login_page_settings(self):
+-        SIGN_UP_REQUEST_PARAMS.add('login_page_design')
+-        SIGN_UP_REQUEST_PARAMS.add('login_page_custom_background')
+-        SIGN_UP_REQUEST_PARAMS.add('login_page_show_motto')
+-        SIGN_UP_REQUEST_PARAMS.add('login_page_motto_text')
+-        SIGN_UP_REQUEST_PARAMS.add('login_page_motto_author')
+-        SIGN_UP_REQUEST_PARAMS.add('login_page_motto_text_color')
+-        params = request.env['ir.config_parameter'].sudo()
+-        request.params['login_page_design'] = params.get_param('auth_estevez.login_page_design')
+-        request.params['login_page_custom_background'] = params.get_param('auth_estevez.login_page_custom_background')
+ 
+-        request.params['login_page_show_motto'] = params.get_param('auth_estevez.login_page_show_motto')
+-        request.params['login_page_motto_text_color'] = params.get_param('auth_estevez.login_page_motto_text_color')
+-        request.params['login_page_motto_text'] = params.get_param('auth_estevez.login_page_motto_text')
+-        request.params['login_page_motto_author'] = params.get_param('auth_estevez.login_page_motto_author')
+-        if not request.params['login_page_motto_text_color'] or request.params['login_page_motto_text_color'] == '':
+-            request.params['login_page_motto_text_color'] = "#000000"
++class AuthEstevezHome(AuthSignupHome):
++
++    def _with_login_page_values(self, response):
++        """Agrega la configuración de la página a las respuestas QWeb
++        (las redirecciones se devuelven tal cual)."""
++        if getattr(response, 'is_qweb', False):
++            company = request.env['res.company'].sudo()._get_login_page_company(request.session.uid)
++            response.qcontext.update(company._get_login_page_values())
++        return response
+ 
+     @http.route()
+-    def web_login(self, redirect=None, **kw):
+-        self._get_login_page_settings()
+-        res = super().web_login(redirect, **kw)
+-        return res
++    def web_login(self, *args, **kw):
++        return self._with_login_page_values(super().web_login(*args, **kw))
+ 
+     @http.route()
+     def web_auth_reset_password(self, *args, **kw):
+-        self._get_login_page_settings()
+-        res = super().web_auth_reset_password(*args, **kw)
+-        return res
++        return self._with_login_page_values(super().web_auth_reset_password(*args, **kw))
+ 
+     @http.route()
+     def web_auth_signup(self, *args, **kw):
+-        self._get_login_page_settings()
+-        res = super().web_auth_signup(*args, **kw)
+-        return res
++        return self._with_login_page_values(super().web_auth_signup(*args, **kw))
+diff --git a/custom_addons/auth_estevez/migrations/18.0.2.0.0/post-migrate.py b/custom_addons/auth_estevez/migrations/18.0.2.0.0/post-migrate.py
+new file mode 100644
+index 0000000..c3929a0
+--- /dev/null
++++ b/custom_addons/auth_estevez/migrations/18.0.2.0.0/post-migrate.py
+@@ -0,0 +1,45 @@
++"""Mueve la configuración de la página de acceso de ir.config_parameter
++(auth_estevez.*) a los campos de res.company (docs/spec.md, D6 y AUTH-18)."""
++import logging
++
++from odoo import SUPERUSER_ID, api
++
++from odoo.addons.auth_estevez.models.res_company import LOGIN_PAGE_DESIGNS
++
++_logger = logging.getLogger(__name__)
++
++PARAM_PREFIX = 'auth_estevez.'
++BOOLEAN_FIELDS = {'login_page_custom_background', 'login_page_show_motto'}
++FIELDS = (
++    'login_page_design',
++    'login_page_custom_background',
++    'login_page_background_image',
++    'login_page_logo',
++    'login_page_show_motto',
++    'login_page_motto_text',
++    'login_page_motto_author',
++    'login_page_motto_text_color',
++)
++
++
++def _convert(field_name, raw_value):
++    if field_name in BOOLEAN_FIELDS:
++        return raw_value in ('True', 'true', '1')
++    return raw_value
++
++
++def migrate(cr, version):
++    env = api.Environment(cr, SUPERUSER_ID, {})
++    legacy_params = env['ir.config_parameter'].search([('key', '=like', f'{PARAM_PREFIX}%')])
++    if not legacy_params:
++        return
++
++    stored = {param.key.removeprefix(PARAM_PREFIX): param.value for param in legacy_params}
++    values = {name: _convert(name, stored[name]) for name in FIELDS if name in stored}
++    if values.get('login_page_design') not in dict(LOGIN_PAGE_DESIGNS):
++        values.pop('login_page_design', None)
++
++    company = env['res.company']._get_login_page_company()
++    company.write(values)
++    legacy_params.unlink()
++    _logger.info("auth_estevez: %s parámetros migrados a %s", len(values), company.display_name)
+diff --git a/custom_addons/auth_estevez/models/__init__.py b/custom_addons/auth_estevez/models/__init__.py
+index b155b52..0b150f7 100644
+--- a/custom_addons/auth_estevez/models/__init__.py
++++ b/custom_addons/auth_estevez/models/__init__.py
+@@ -1,2 +1,2 @@
+-from . import ir_config_parameter
+-from . import res_config_settings
+\ No newline at end of file
++from . import res_company
++from . import res_config_settings
+diff --git a/custom_addons/auth_estevez/models/ir_config_parameter.py b/custom_addons/auth_estevez/models/ir_config_parameter.py
+deleted file mode 100644
+index 42844d7..0000000
+--- a/custom_addons/auth_estevez/models/ir_config_parameter.py
++++ /dev/null
+@@ -1,17 +0,0 @@
+-from odoo import models, api
+-from odoo.tools import ormcache
+-
+-class IrConfigParameter(models.Model):
+-    _inherit = 'ir.config_parameter'
+-
+-    @api.model
+-    @ormcache('key')
+-    def get_param_with_last_update(self, key):
+-        """Obtiene parámetro del sistema con su fecha de última actualización."""
+-        self.check_access_rights('read')
+-        param = self.sudo().search([('key', '=', key)], limit=1)
+-
+-        if not param:
+-            return False, False
+-        
+-        return param.value, param.write_date
+diff --git a/custom_addons/auth_estevez/models/res_company.py b/custom_addons/auth_estevez/models/res_company.py
+new file mode 100644
+index 0000000..665cf5a
+--- /dev/null
++++ b/custom_addons/auth_estevez/models/res_company.py
+@@ -0,0 +1,62 @@
++import re
++
++from odoo import api, fields, models
++
++LOGIN_PAGE_DESIGNS = [
++    ("fullscreen_right", "Fullscreen Right"),
++    ("fullscreen_left", "Fullscreen Left"),
++    ("boxed_left", "Boxed Left"),
++    ("boxed_right", "Boxed Right"),
++    ("boxed_center", "Boxed Center"),
++]
++DEFAULT_LOGIN_PAGE_DESIGN = "fullscreen_left"
++DEFAULT_MOTTO_TEXT_COLOR = "#000000"
++HEX_COLOR = re.compile(r"^#(?:[0-9a-fA-F]{3}){1,2}$")
++
++
++class ResCompany(models.Model):
++    _inherit = 'res.company'
++
++    login_page_design = fields.Selection(
++        string="Login Page Design",
++        selection=LOGIN_PAGE_DESIGNS,
++        default=DEFAULT_LOGIN_PAGE_DESIGN,
++        help="Elige el estilo de diseño para la página de inicio de sesión",
++    )
++    login_page_custom_background = fields.Boolean(string="Login Page Custom Background")
++    login_page_background_image = fields.Image(string="Login Page Background Image")
++    login_page_logo = fields.Image(string="Login Page Logo")
++    login_page_show_motto = fields.Boolean(string="Show Motto")
++    login_page_motto_text = fields.Char(string="Motto Text")
++    login_page_motto_author = fields.Char(string="Motto Author")
++    login_page_motto_text_color = fields.Char(
++        string="Motto Text Color",
++        default=DEFAULT_MOTTO_TEXT_COLOR,
++    )
++
++    @api.model
++    def _get_login_page_company(self, uid=None):
++        """Compañía cuya configuración se muestra en las pantallas de acceso:
++        la del usuario con sesión o, sin sesión, la compañía principal."""
++        if uid:
++            return self.env['res.users'].sudo().browse(uid).company_id
++        return (
++            self.env.ref('base.main_company', raise_if_not_found=False)
++            or self.sudo().search([], limit=1)
++        )
++
++    def _get_login_page_values(self):
++        """Valores que reciben las plantillas de acceso, con valores por defecto
++        resueltos y entradas saneadas."""
++        self.ensure_one()
++        valid_designs = dict(LOGIN_PAGE_DESIGNS)
++        design = self.login_page_design
++        color = self.login_page_motto_text_color
++        return {
++            'login_page_design': design if design in valid_designs else DEFAULT_LOGIN_PAGE_DESIGN,
++            'login_page_custom_background': self.login_page_custom_background,
++            'login_page_show_motto': self.login_page_show_motto,
++            'login_page_motto_text': self.login_page_motto_text,
++            'login_page_motto_author': self.login_page_motto_author,
++            'login_page_motto_text_color': color if color and HEX_COLOR.match(color) else DEFAULT_MOTTO_TEXT_COLOR,
++        }
+diff --git a/custom_addons/auth_estevez/models/res_config_settings.py b/custom_addons/auth_estevez/models/res_config_settings.py
+index 4f01760..077cb2f 100644
+--- a/custom_addons/auth_estevez/models/res_config_settings.py
++++ b/custom_addons/auth_estevez/models/res_config_settings.py
+@@ -1,65 +1,17 @@
+-from odoo import _, fields, models, api
++from odoo import fields, models
++
+ 
+ class ResConfigSettings(models.TransientModel):
+     _inherit = 'res.config.settings'
+ 
+-    login_page_design = fields.Selection(
+-        string="Login Page Design",
+-        selection=[
+-            ("fullscreen_right", "Fullscreen Right"),
+-            ("fullscreen_left", "Fullscreen Left"),
+-            ("boxed_left", "Boxed Left"),
+-            ("boxed_right", "Boxed Right"),
+-            ("boxed_center", "Boxed Center")
+-        ],
+-        config_parameter="auth_estevez.login_page_design",
+-        default="fullscreen_left",
+-        help="Elige el estilo de diseño para la página de inicio de sesión"
+-    )
+-
++    login_page_design = fields.Selection(related='company_id.login_page_design', readonly=False)
+     login_page_custom_background = fields.Boolean(
+-        string="Login Page Custom Background",
+-        config_parameter="auth_estevez.login_page_custom_background"
+-    )
+-
+-    login_page_background_image = fields.Binary(
+-        string="Login Page Background Image"
+-    )
+-
+-    login_page_logo = fields.Binary(
+-        string="Login Page Logo"
+-    )
+-
+-    login_page_show_motto = fields.Boolean(
+-        string="Show Motto",
+-        config_parameter="auth_estevez.login_page_show_motto",
+-        default=False
+-    )
+-
+-    login_page_motto_text = fields.Char(
+-        string="Motto Text",
+-        config_parameter="auth_estevez.login_page_motto_text"
+-    )
+-
+-    login_page_motto_author = fields.Char(
+-        string="Motto Author",
+-        config_parameter="auth_estevez.login_page_motto_author"
+-    )
+-
++        related='company_id.login_page_custom_background', readonly=False)
++    login_page_background_image = fields.Image(
++        related='company_id.login_page_background_image', readonly=False)
++    login_page_logo = fields.Image(related='company_id.login_page_logo', readonly=False)
++    login_page_show_motto = fields.Boolean(related='company_id.login_page_show_motto', readonly=False)
++    login_page_motto_text = fields.Char(related='company_id.login_page_motto_text', readonly=False)
++    login_page_motto_author = fields.Char(related='company_id.login_page_motto_author', readonly=False)
+     login_page_motto_text_color = fields.Char(
+-        string="Motto Text Color",
+-        config_parameter="auth_estevez.login_page_motto_text_color"
+-    )
+-
+-    def get_values(self):
+-        vals = super(ResConfigSettings, self).get_values()
+-        params = self.env['ir.config_parameter'].sudo()
+-        vals.update(login_page_background_image=params.get_param('auth_estevez.login_page_background_image'))
+-        vals.update(login_page_logo=params.get_param('auth_estevez.login_page_logo'))
+-        return vals
+-
+-    def set_values(self):
+-        super(ResConfigSettings, self).set_values()
+-        params = self.env['ir.config_parameter'].sudo()
+-        params.set_param('auth_estevez.login_page_background_image', self.login_page_background_image)
+-        params.set_param('auth_estevez.login_page_logo', self.login_page_logo)
+\ No newline at end of file
++        related='company_id.login_page_motto_text_color', readonly=False)

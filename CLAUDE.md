@@ -38,6 +38,14 @@ To update a specific module manually:
 docker-compose exec odoo odoo -c /etc/odoo/odoo.conf -u <module_name>
 ```
 
+## Production Deployment (differs from local)
+
+- Production is a **GCP Compute Engine VM** running Odoo from a Python venv under **systemd** (`odoo18` service, user `odoo18`), not Docker.
+- **Every push to `main` deploys to production** (`.github/workflows/deploy-erp.yml`): SSH → `git pull` in `/opt/odoo18/odoo-erp-docker` → `rsync` (no `--delete`) of `custom_addons/` into `/opt/odoo18/odoo-erp/custom-addons/` → `systemctl restart odoo18`.
+- The workflow does **not** back up the database and does **not** run `-u`, so new fields, data files, QWeb/XML views and migration scripts are not applied by the deploy itself (unless the systemd unit's `ExecStart` passes `-u` — unverified). Only Python-only and static-asset changes are safe to push to `main` today.
+- **Top priority: infrastructure modernization** — spec in [docs/infra/spec.md](docs/infra/spec.md) (GCE + Docker Compose + Cloud SQL, immutable images, backup + `-u` + health check on every deploy). Start every infra session at its section "0. Retomar aquí". No other change that touches the schema or XML ships until its phase 4 is done.
+- Work that is ready but blocked by the deploy is parked as patches in `docs/wip/` (outside `custom_addons/`, so `rsync` does not ship it); apply with `git apply`.
+
 ## Running Tests
 
 Odoo tests run inside the container against a test database:
@@ -51,6 +59,45 @@ docker-compose exec odoo odoo -c /etc/odoo/odoo.conf --test-enable --stop-after-
 ```
 
 Tests inherit from `odoo.tests.common.TransactionCase`. See `custom_addons/hr_estevez/tests/test_hr_direction.py` for the pattern used.
+
+**Prefer an isolated test database** over `odoo-prod` (the `db_name` in `config/odoo.conf`). Create it once with `-i`, then use `-u`. Use a separate `--http-port` so `HttpCase` does not clash with the running server:
+
+```bash
+# MSYS_NO_PATHCONV=1 is required from Git Bash on Windows; otherwise /etc/odoo/... becomes a Windows path
+MSYS_NO_PATHCONV=1 docker compose exec -T odoo odoo -c /etc/odoo/odoo.conf \
+  -d test_<module> -i <module> --test-enable --test-tags /<module> \
+  --stop-after-init --http-port 8079 --log-level=test
+```
+
+Then grep the log for `ERROR|FAIL:|tests when loading`. `HttpCase` classes must be tagged `post_install, -at_install` and run after the `TransactionCase` ones.
+
+## Development Workflow (SDD + TDD)
+
+New work and refactors follow spec-driven + test-driven development:
+
+1. **Spec first** — each module being refactored keeps `docs/spec.md` with: purpose/scope, architecture decisions (`D1…`), acceptance criteria with IDs (`<MOD>-NN`, Given/When/Then), and a traceability table (criterion → test → ✅/🔴/⏳) with the date of the last run.
+2. **Red** — write tests that cite the criterion ID in the docstring; run them and record which fail.
+3. **Green / refactor** — implement, keep tests green, update the traceability table and the module README.
+4. Bugs found by tests go in the spec's "Hallazgos" section.
+
+Test conventions: test against public interfaces (Settings `create(...).execute()`, HTTP routes) so tests survive refactors; shared helpers live in `tests/common.py`; tag classes with the module name.
+
+### Refactor status
+
+| Module | Spec | Status |
+|---|---|---|
+| Infrastructure | [docs/infra/spec.md](docs/infra/spec.md) | Spec written; nothing built. Next: phase 0 (manual prod backup + gather the data in section 7). |
+| auth_estevez | [docs/spec.md](custom_addons/auth_estevez/docs/spec.md) | Step 1 (spec + tests) on `main`: 4/15 green — red tests are the pending spec. Step 2 (backend on `res.company` + migration `18.0.2.0.0`) validated at 13/15 but **parked** in `docs/wip/auth_estevez-paso2-backend.patch`, blocked by infra INFRA-07/08. Steps 3 (QWeb) and 4 (assets) follow. |
+
+### Odoo 18 pitfalls seen in this repo
+
+- A `default=` on a `res.config.settings` field with `config_parameter=` only applies inside the Settings form; code that reads the parameter directly gets `None` on a fresh database.
+- Do not mutate `odoo.addons.web.controllers.home.SIGN_UP_REQUEST_PARAMS` or write config into `request.params`; extend the response with `response.qcontext.update(...)` after `super()`.
+- `check_access_rights` is deprecated in 18 — use `check_access`.
+- Store settings that need defaults, validation or images as `res.company` fields exposed in Settings via `related=..., readonly=False` — not as base64 in `ir.config_parameter`. Serve images with `request.env['ir.binary']._get_image_stream_from(record, field, placeholder=...)`.
+- Restarting the `odoo` container runs `-u` on `odoo-prod` for the modules in the entrypoint, so **migration scripts run on restart**. Back up first.
+- Migration scripts (`migrations/<version>/post-migrate.py`) are testable: load them with `importlib.util.spec_from_file_location` and call `migrate(cr, version)` (see `auth_estevez/tests/test_migration.py`).
+- Anything in `web.assets_frontend` applies to the portal, eLearning and website too; scope CSS under a module root class. `web.assets_frontend` already includes `web._assets_bootstrap_frontend`.
 
 ## Repository Structure
 
@@ -67,7 +114,7 @@ docker-compose.yml
 
 The modules listed in the docker-compose entrypoint (`-u` flag) are auto-updated on container start:
 - **hr_estevez** — Core HR: employees, contracts, memorandums, loans, leaves, vacations, org structure (directions/areas)
-- **auth_estevez** — Custom login page UI and password toggle
+- **auth_estevez** — Custom login page UI and password toggle (under SDD/TDD refactor — see `docs/spec.md`)
 - **menu_estevez** — Menu visibility customizations
 - **hr_attendance_controls_adv** — Third-party advanced attendance controls (base for hr_attendance_estevez)
 - **hr_recruitment_estevez** — Recruitment extensions: requisitions, driving tests, applicant documents

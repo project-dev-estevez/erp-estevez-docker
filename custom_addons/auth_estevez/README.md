@@ -24,9 +24,10 @@ El módulo ofrece **5 diseños diferentes** completamente personalizables:
 - **Diseño responsive**: Adaptación automática a diferentes tamaños de pantalla
 
 ### 🔐 Funcionalidad de Contraseñas
-- **Toggle de visibilidad de contraseña**: Botón para mostrar/ocultar contraseña tanto en frontend como backend
+- **Mostrar/ocultar contraseña**: botón dentro del campo en las pantallas de acceso
+  (iniciar sesión, restablecer contraseña y registro)
 - Estilos CSS personalizados para los campos de contraseña
-- JavaScript para manejar la interacción del toggle
+- JavaScript para manejar la interacción del botón
 
 ## Instalación
 
@@ -69,14 +70,17 @@ auth_estevez/
 ├── __init__.py
 ├── __manifest__.py
 ├── README.md
+├── docs/
+│   └── spec.md          # Especificación: criterios AUTH-NN, decisiones y trazabilidad
+├── tests/               # Pruebas que validan docs/spec.md
 ├── controllers/
 │   ├── __init__.py
-│   ├── home.py          # Controlador de rutas de autenticación
-│   └── binary.py
+│   ├── home.py          # Inyecta la configuración en login, registro y restablecer contraseña
+│   └── binary.py        # Sirve logo y fondo (/login_logo.png, /login_page_background_image.png)
 ├── models/
 │   ├── __init__.py
 │   ├── res_config_settings.py    # Modelo de configuración
-│   └── ir_config_parameter.py
+│   └── ir_config_parameter.py    # get_param_with_last_update() para servir imágenes
 ├── views/
 │   ├── login_templates.xml        # Templates QWeb para login
 │   └── res_config_settings_views.xml  # Vistas de configuración
@@ -113,9 +117,8 @@ El módulo extiende `AuthSignupHome` para inyectar los parámetros de configurac
 - `/web/signup` - Registro de usuarios
 
 ### Assets
-El módulo incluye assets tanto para frontend como backend:
-- **Frontend**: Bootstrap, fuentes Poppins, SCSS de login, CSS y JS de toggle
-- **Backend**: CSS y JS de toggle de contraseña
+Todo va en `web.assets_frontend`: fuentes Poppins, SCSS de login, CSS y JS del botón
+de contraseña. No hay assets de backend.
 
 ### Parámetros de Sistema
 Todos los ajustes se almacenan en `ir.config_parameter` con el prefijo `auth_estevez.`:
@@ -127,6 +130,37 @@ Todos los ajustes se almacenan en `ir.config_parameter` con el prefijo `auth_est
 - `auth_estevez.login_page_motto_text`
 - `auth_estevez.login_page_motto_author`
 - `auth_estevez.login_page_motto_text_color`
+
+> 🚧 **Refactor en pausa.** El paso 2 (configuración en `res.company`, migración
+> 18.0.2.0.0) está implementado y validado, pero guardado como parche en
+> `docs/wip/auth_estevez-paso2-backend.patch` (raíz del repo) hasta que el deploy
+> ejecute respaldo + `-u`. Ver [docs/spec.md](docs/spec.md), sección 6.
+
+## Desarrollo (SDD + TDD)
+
+El comportamiento esperado está en **[docs/spec.md](docs/spec.md)**. Flujo para cualquier cambio:
+
+1. Escribir o ajustar el criterio `AUTH-NN` en la especificación.
+2. Escribir la prueba que lo valida (con el ID en el docstring) y verla fallar.
+3. Implementar lo mínimo para que pase y refactorizar con las pruebas en verde.
+4. Actualizar la tabla de trazabilidad de la especificación.
+
+### Ejecutar las pruebas
+
+Se usa una base de pruebas aparte para no tocar `odoo-prod`. La primera vez se crea con `-i`;
+después basta con `-u`:
+
+```bash
+# Desde Git Bash, MSYS_NO_PATHCONV=1 evita que /etc/odoo/... se convierta en ruta de Windows
+MSYS_NO_PATHCONV=1 docker compose exec -T odoo odoo -c /etc/odoo/odoo.conf \
+  -d test_auth_estevez -u auth_estevez --test-enable --test-tags /auth_estevez \
+  --stop-after-init --http-port 8079 --log-level=test
+```
+
+- `tests/test_login_page_values.py` — `TransactionCase`: valores de la página y Ajustes.
+- `tests/test_login_routes.py` — `HttpCase` (`post_install`): pantallas de acceso e imágenes.
+- `tests/test_migration.py` — `TransactionCase`: migración 18.0.2.0.0 y compañía de acceso
+  (en rojo hasta reaplicar el parche del paso 2).
 
 ## Capturas de Pantalla
 
