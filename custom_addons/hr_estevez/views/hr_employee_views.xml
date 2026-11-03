@@ -536,10 +536,14 @@
                     <!-- Eliminar el botón de contacto -->
                 </xpath></field>
         </record>
+        <!-- Necesita 'disabilities' (view_employee_form_inherit) y 'courses' (hr_elearning_integration).
+             Esas dos vistas son hermanas y Odoo las ordena por prioridad e id, y el id cambia según la base.
+             Si esta vista heredara de una de ellas, se aplicaría antes que la otra en algunas bases.
+             Por eso hereda de la vista raíz con prioridad 99: se aplica después de ambas. -->
         <record id="view_employee_form_move_courses" model="ir.ui.view">
             <field name="name">hr.employee.form.move.courses</field>
             <field name="model">hr.employee</field>
-            <field name="inherit_id" ref="hr_elearning_integration.view_employee_form_inherit_courses"/>
+            <field name="inherit_id" ref="hr.view_employee_form"/>
             <field name="priority">99</field>
             <field name="arch" type="xml">
                 
